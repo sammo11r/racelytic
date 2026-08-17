@@ -20,7 +20,7 @@ async function loadCircuit() {
     const firstYear = years.length ? Math.min(...years) : null;
     const lastYear = years.length ? Math.max(...years) : null;
 
-    document.title = 'Racelytics';
+    document.title = 'Racelytic';
     document.getElementById('circuit-head').innerHTML = `
       <section class="detail-hero profile-hero circuit-hero">
         <div class="profile-hero-copy">
@@ -59,11 +59,11 @@ async function loadCircuit() {
         <article class="circuit-race-card">
           <div class="circuit-race-year">${esc(r.year)}</div>
           <div class="circuit-race-copy">
-            <a href="/race.html?id=${encodeURIComponent(r.id)}"><strong>${esc(r.officialName)}</strong></a>
+            <a href="/race?id=${encodeURIComponent(r.id)}"><strong>${esc(r.officialName)}</strong></a>
             <span>Round ${esc(r.round)} · ${esc(fmtDate(r.date))}${r.laps ? ` · ${fmtNumber(r.laps)} laps` : ''}</span>
-            ${r.winnerName ? `<small>Won by <a href="/driver.html?id=${encodeURIComponent(r.winnerDriverId)}">${esc(r.winnerName)}</a>${r.winnerConstructorName ? ` for <a href="/constructor.html?id=${encodeURIComponent(r.winnerConstructorId)}">${esc(r.winnerConstructorName)}</a>` : ''}</small>` : ''}
+            ${r.winnerName ? `<small>Won by <a href="/driver?id=${encodeURIComponent(r.winnerDriverId)}">${esc(r.winnerName)}</a>${r.winnerConstructorName ? ` for <a href="/constructor?id=${encodeURIComponent(r.winnerConstructorId)}">${esc(r.winnerConstructorName)}</a>` : ''}</small>` : ''}
           </div>
-          <a class="text-link" href="/season.html?year=${encodeURIComponent(r.year)}">Season <span aria-hidden="true">→</span></a>
+          <a class="text-link" href="/season?year=${encodeURIComponent(r.year)}">Season <span aria-hidden="true">→</span></a>
         </article>`).join('')
       : '<div class="empty-state">No races found for this circuit.</div>';
       renderPagination('circuit-races', data.races.length, racePage, 20, page => { racePage = page; renderCircuitRaces(); document.getElementById('circuit-races').scrollIntoView({ behavior: 'smooth', block: 'start' }); });

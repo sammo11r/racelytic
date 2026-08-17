@@ -98,3 +98,30 @@ test('same-origin writes accept HTTPS forwarded by the local reverse proxy', asy
         await new Promise((resolve, reject) => server.close(error => error ? reject(error) : resolve()));
     }
 });
+
+test('public pages use extensionless URLs and preserve legacy query strings', async () => {
+    const server = app.listen(0, '127.0.0.1');
+    await new Promise((resolve, reject) => {
+        server.once('listening', resolve);
+        server.once('error', reject);
+    });
+
+    const request = (port, path) => new Promise((resolve, reject) => {
+        http.get({ hostname: '127.0.0.1', port, path }, response => {
+            response.resume();
+            response.once('end', () => resolve(response));
+        }).once('error', reject);
+    });
+
+    try {
+        const { port } = server.address();
+        const clean = await request(port, '/driver?id=max-verstappen');
+        const legacy = await request(port, '/driver.html?id=max-verstappen');
+
+        assert.equal(clean.statusCode, 200);
+        assert.equal(legacy.statusCode, 308);
+        assert.equal(legacy.headers.location, '/driver?id=max-verstappen');
+    } finally {
+        await new Promise((resolve, reject) => server.close(error => error ? reject(error) : resolve()));
+    }
+});

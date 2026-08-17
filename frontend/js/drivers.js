@@ -47,7 +47,7 @@ function renderDrivers(list) {
   const paged = pageItems(list, driverPage, DRIVER_PAGE_SIZE);
   driverPage = paged.page;
   document.getElementById('drivers').innerHTML = paged.items.map(d => `
-    <a class="entity-card driver-browser-card" href="/driver.html?id=${encodeURIComponent(d.id)}">
+    <a class="entity-card driver-browser-card" href="/driver?id=${encodeURIComponent(d.id)}">
       <div class="driver-card-name"><h3>${esc(d.name)}</h3>${COUNTRY_CODES[d.nationalityCountryId] ? `<img class="driver-card-flag" src="/assets/flags/${COUNTRY_CODES[d.nationalityCountryId].toLowerCase()}.svg" alt="${esc(countryName(d.nationalityCountryId))} flag" loading="lazy">` : ''}</div>
       <p>${esc(d.abbreviation || '')}${d.nationalityCountryId ? ` · ${esc(countryName(d.nationalityCountryId))}` : ''}</p>
       <span class="number">${fmtNumber(d.totalRaceWins)} wins · ${fmtNumber(d.totalPodiums)} podiums</span>

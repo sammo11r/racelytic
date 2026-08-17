@@ -1,6 +1,6 @@
-# Racelytics
+# Racelytic
 
-Racelytics is a Formula 1 data and analytics website using:
+Racelytic is a Formula 1 data and analytics website using:
 
 - F1DB CSV data
 - MySQL/MariaDB
@@ -25,7 +25,7 @@ npm install
 ```
 
 4. Make sure MySQL is running and the F1DB data has been imported.
-5. Start Racelytics:
+5. Start Racelytic:
 
 ```bash
 npm start
@@ -54,16 +54,16 @@ The API is intentionally read-only: the website does not modify the F1DB data.
 ## Pages
 
 - `/` — landing page
-- `/seasons.html` — season browser
-- `/season.html?year=2025` — season details
-- `/drivers.html` — driver browser
-- `/driver.html?id=max-verstappen` — driver details
-- `/circuits.html` — circuit browser
-- `/circuit.html?id=silverstone` — circuit details
-- `/constructors.html` — constructor browser
-- `/constructor.html?id=red-bull` — constructor details
+- `/seasons` — season browser
+- `/season?year=2025` — season details
+- `/drivers` — driver browser
+- `/driver?id=max-verstappen` — driver details
+- `/circuits` — circuit browser
+- `/circuit?id=silverstone` — circuit details
+- `/constructors` — constructor browser
+- `/constructor?id=red-bull` — constructor details
 
-- `/race.html?id=2025-01` — race classification
+- `/race?id=2025-01` — race classification
 
 ## Quality checks
 

@@ -11,7 +11,7 @@ function renderConstructors(list) {
   const paged = pageItems(list, constructorPage, CONSTRUCTOR_PAGE_SIZE);
   constructorPage = paged.page;
   document.getElementById('constructors').innerHTML = paged.items.map(t => `
-    <a class="entity-card" href="/constructor.html?id=${encodeURIComponent(t.id)}">
+    <a class="entity-card" href="/constructor?id=${encodeURIComponent(t.id)}">
       <h3>${esc(t.name)}</h3>
       <p>${esc(t.fullName || '')}${t.countryName ? ` · ${esc(t.countryName)}` : ''}</p>
       <span class="number">${fmtNumber(t.totalRaceWins)} wins · ${fmtNumber(t.totalChampionshipWins)} titles</span>

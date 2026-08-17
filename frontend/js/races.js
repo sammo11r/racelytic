@@ -15,7 +15,7 @@ function renderRaceArchive() {
   const paged = pageItems(filtered, racePage, RACE_PAGE_SIZE);
   racePage = paged.page;
   document.getElementById('races').innerHTML = filtered.length ? paged.items.map(race => `
-    <a class="race-archive-card" href="/race.html?id=${encodeURIComponent(race.id)}">
+    <a class="race-archive-card" href="/race?id=${encodeURIComponent(race.id)}">
       <div class="race-archive-date"><strong>${esc(race.year)}</strong><span>Round ${esc(race.round)}</span></div>
       <div class="race-archive-copy"><h2>${esc(race.officialName)}</h2><p>${esc(race.circuitName || '')}${race.countryName ? ` · ${esc(race.countryName)}` : ''}</p></div>
       <div class="race-archive-meta"><span>${esc(fmtDate(race.date))}</span>${race.sprintRaceDate ? '<small>Sprint weekend</small>' : ''}</div>

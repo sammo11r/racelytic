@@ -187,7 +187,7 @@ function renderSimulation() {
       <thead><tr><th>Pos.</th><th>${label}</th><th>Simulated points</th><th>Original</th><th>Change</th></tr></thead>
       <tbody>${standings.map(entry => `<tr${entry.simulatedPosition === 1 ? ' class="simulated-leader"' : ''}>
         <td class="simulation-position">${entry.simulatedPosition}</td>
-        <td><a href="/${link}.html?id=${encodeURIComponent(entry.id)}"><strong>${esc(entry.name)}</strong>${entry.abbreviation ? `<small>${esc(entry.abbreviation)}</small>` : ''}</a></td>
+        <td><a href="/${link}?id=${encodeURIComponent(entry.id)}"><strong>${esc(entry.name)}</strong>${entry.abbreviation ? `<small>${esc(entry.abbreviation)}</small>` : ''}</a></td>
         <td class="simulated-points">${fmtNumber(entry.points)}${entry.droppedPoints ? `<small>${fmtNumber(entry.droppedPoints)} dropped</small>` : ''}</td>
         <td><span class="original-result">P${entry.originalPosition}</span><small>${fmtNumber(entry.originalPoints)} pts</small></td>
         <td>${movement(entry.change)}</td>

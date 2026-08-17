@@ -11,7 +11,7 @@ function renderCircuits(list) {
   const paged = pageItems(list, circuitPage, CIRCUIT_PAGE_SIZE);
   circuitPage = paged.page;
   document.getElementById('circuits').innerHTML = paged.items.map(c => `
-    <a class="entity-card" href="/circuit.html?id=${encodeURIComponent(c.id)}">
+    <a class="entity-card" href="/circuit?id=${encodeURIComponent(c.id)}">
       ${c.layoutId ? `<img class="circuit-card-map" src="/assets/circuits/${encodeURIComponent(c.layoutId)}.svg" alt="" loading="lazy">` : ''}
       <div class="circuit-card-copy">
         <h3>${esc(c.name)}</h3>

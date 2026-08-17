@@ -53,7 +53,7 @@ async function loadCustomChampionships() {
   communityChampionships = championships.filter(championship => !championship.owned && championship.visibility === 'public');
   const container = document.getElementById('saved-championships');
   container.innerHTML = ownedChampionships.length ? ownedChampionships.map(championship => `
-    <article class="saved-record-card"><a href="/championship-builder.html?id=${encodeURIComponent(championship.id)}">
+    <article class="saved-record-card"><a href="/championship-builder?id=${encodeURIComponent(championship.id)}">
       <span>${esc(championship.visibility)} CHAMPIONSHIP</span><strong>${esc(championship.name)}</strong>
       <small>${fmtNumber(championship.configuration.raceIds.length)} races · ${fmtNumber(championship.configuration.driverIds.length)} drivers · ${esc(championship.configuration.pointsSystem.name)}</small>
     </a><button type="button" data-delete-championship="${esc(championship.id)}">Delete</button></article>`).join('')
@@ -71,7 +71,7 @@ function savedRecordUrl(configuration) {
   Object.entries(configuration || {}).forEach(([key, value]) => {
     if (value !== null && value !== undefined && value !== '' && value !== false) query.set(key, String(value));
   });
-  return `/records.html?${query}`;
+  return `/records?${query}`;
 }
 
 async function loadSavedRecords() {
@@ -175,7 +175,7 @@ function communityItems() {
     ...communitySystems.map(system => ({
       type: 'points', label: 'Points system', name: system.name, owner: system.ownerName,
       detail: `${system.racePoints.join('–')} · ${system.qualifyingPoints.length ? 'qualifying points' : 'race and sprint scoring'}`,
-      url: '/points-systems.html'
+      url: '/points-systems'
     })),
     ...communityRecords.map(record => ({
       type: 'records', label: 'Record', name: record.name, owner: record.ownerName,
@@ -184,7 +184,7 @@ function communityItems() {
     ...communityChampionships.map(championship => ({
       type: 'championships', label: 'Championship', name: championship.name, owner: championship.ownerName,
       detail: `${championship.configuration.raceIds.length} races · ${championship.configuration.driverIds.length} drivers · ${championship.configuration.pointsSystem.name}`,
-      url: `/championship-builder.html?id=${encodeURIComponent(championship.id)}`
+      url: `/championship-builder?id=${encodeURIComponent(championship.id)}`
     }))
   ];
 }

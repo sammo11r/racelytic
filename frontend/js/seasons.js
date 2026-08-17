@@ -88,7 +88,7 @@ function renderSeasons(seasons) {
         return `
             <a
                 class="season-card"
-                href="/season.html?year=${encodeURIComponent(season.year)}"
+                href="/season?year=${encodeURIComponent(season.year)}"
             >
 
                 <div class="season-card-heading">
@@ -144,7 +144,7 @@ document.getElementById('season-jump')?.addEventListener('submit', event => {
     const season = allSeasons.find(item => String(item.year) === year);
 
     if (season) {
-        window.location.href = `/season.html?year=${encodeURIComponent(season.year)}`;
+        window.location.href = `/season?year=${encodeURIComponent(season.year)}`;
         return;
     }
 

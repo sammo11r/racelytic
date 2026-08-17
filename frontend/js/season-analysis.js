@@ -129,7 +129,7 @@ function renderHeatmap() {
   const drivers = seasonData.driverChampionship.slice(0, 15);
   const rounds = seasonData.calendar;
   const container = document.getElementById('results-heatmap');
-  container.innerHTML = `<div class="results-heatmap" style="--rounds:${rounds.length}"><div class="heatmap-corner">Driver</div>${rounds.map(race => `<div class="heatmap-round" data-chart-tooltip="<strong>Round ${race.round}</strong><span>${esc(race.officialName)}</span><b>${esc(fmtDate(race.date))}</b>">R${race.round}</div>`).join('')}${drivers.map(driver => `<a class="heatmap-driver" href="/driver.html?id=${encodeURIComponent(driver.driverId)}">${esc(driver.name)}</a>${rounds.map(race => {
+  container.innerHTML = `<div class="results-heatmap" style="--rounds:${rounds.length}"><div class="heatmap-corner">Driver</div>${rounds.map(race => `<div class="heatmap-round" data-chart-tooltip="<strong>Round ${race.round}</strong><span>${esc(race.officialName)}</span><b>${esc(fmtDate(race.date))}</b>">R${race.round}</div>`).join('')}${drivers.map(driver => `<a class="heatmap-driver" href="/driver?id=${encodeURIComponent(driver.driverId)}">${esc(driver.name)}</a>${rounds.map(race => {
     const result = driver.raceResults?.[String(race.round)];
     const display = result?.positionText || result?.position || '';
     const sprint = Number(result?.sprintPoints || 0);
@@ -149,7 +149,7 @@ function renderAverages() {
     const qualifying = results.filter(result => result.qualifyingPosition !== null && result.qualifyingPosition !== undefined).map(result => Number(result.qualifyingPosition)).filter(Number.isFinite);
     return { ...driver, averageFinish: average(finishes), averageQualifying: average(qualifying), starts: finishes.length };
   }).sort((a,b) => (a.averageFinish ?? 99) - (b.averageFinish ?? 99));
-  document.getElementById('average-position-table').innerHTML = `<table class="average-position-table"><thead><tr><th>Driver</th><th>Avg. finish</th><th>Avg. qualifying</th><th>Classified results</th><th>Final standing</th></tr></thead><tbody>${rows.map(driver => `<tr><td><a href="/driver.html?id=${encodeURIComponent(driver.driverId)}">${esc(driver.name)}</a></td><td>${driver.averageFinish?.toFixed(2) ?? '—'}</td><td>${driver.averageQualifying?.toFixed(2) ?? '—'}</td><td>${driver.starts}</td><td>P${driver.position}</td></tr>`).join('')}</tbody></table>`;
+  document.getElementById('average-position-table').innerHTML = `<table class="average-position-table"><thead><tr><th>Driver</th><th>Avg. finish</th><th>Avg. qualifying</th><th>Classified results</th><th>Final standing</th></tr></thead><tbody>${rows.map(driver => `<tr><td><a href="/driver?id=${encodeURIComponent(driver.driverId)}">${esc(driver.name)}</a></td><td>${driver.averageFinish?.toFixed(2) ?? '—'}</td><td>${driver.averageQualifying?.toFixed(2) ?? '—'}</td><td>${driver.starts}</td><td>P${driver.position}</td></tr>`).join('')}</tbody></table>`;
 }
 
 async function renderSeasonAnalysis() {

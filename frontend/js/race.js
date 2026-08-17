@@ -43,8 +43,8 @@ function renderSessionTable() {
       <thead><tr><th>Pos.</th><th>Driver</th><th>Constructor</th>${isRace ? '<th>Grid</th><th>Laps</th><th>Time / status</th><th>Points</th>' : isQualifying ? '<th>Q1</th><th>Q2</th><th>Q3</th><th>Time</th><th>Laps</th>' : '<th>Time</th><th>Gap</th><th>Laps</th>'}</tr></thead>
       <tbody>${rows.map(result => `<tr>
         <td><span class="finish-position${Number(result.positionNumber) <= 3 ? ' podium' : ''}">${resultCell(result.positionText || result.positionNumber)}</span></td>
-        <td><a href="/driver.html?id=${encodeURIComponent(result.driverId)}"><strong>${esc(result.driverName)}</strong></a>${result.driverNumber ? `<small>#${esc(result.driverNumber)}</small>` : ''}</td>
-        <td><a href="/constructor.html?id=${encodeURIComponent(result.constructorId)}">${esc(result.constructorName || '—')}</a></td>
+        <td><a href="/driver?id=${encodeURIComponent(result.driverId)}"><strong>${esc(result.driverName)}</strong></a>${result.driverNumber ? `<small>#${esc(result.driverNumber)}</small>` : ''}</td>
+        <td><a href="/constructor?id=${encodeURIComponent(result.constructorId)}">${esc(result.constructorName || '—')}</a></td>
         ${isRace ? `<td>${resultCell(result.gridPositionNumber)}</td><td>${resultCell(result.laps)}</td><td>${resultCell(result.time || result.gap || result.reasonRetired)}</td><td class="result-points-total">${fmtNumber(result.points)}</td>`
           : isQualifying ? `<td>${resultCell(result.q1)}</td><td>${resultCell(result.q2)}</td><td>${resultCell(result.q3)}</td><td>${resultCell(result.time)}</td><td>${resultCell(result.laps)}</td>`
           : `<td>${resultCell(result.time)}</td><td>${resultCell(result.gap || result.interval)}</td><td>${resultCell(result.laps)}</td>`}
@@ -75,7 +75,7 @@ async function loadRace() {
     const data = await getJSON(`/api/races/${encodeURIComponent(id)}`);
     raceData = data;
     const race = data.race;
-    document.title = 'Racelytics';
+    document.title = 'Racelytic';
     document.getElementById('race-head').innerHTML = `
       <div class="detail-hero">
         <div class="eyebrow">ROUND ${esc(race.round)} · ${esc(race.year)}</div>

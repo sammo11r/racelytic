@@ -12,7 +12,7 @@ async function loadConstructor() {
     const firstSeason = data.standings.length ? data.standings[data.standings.length - 1].year : null;
     const lastSeason = data.standings.length ? data.standings[0].year : null;
 
-    document.title = 'Racelytics';
+    document.title = 'Racelytic';
     document.getElementById('constructor-head').innerHTML = `
       <section class="detail-hero profile-hero">
         <div class="profile-hero-copy">
@@ -44,7 +44,7 @@ async function loadConstructor() {
       ? `<div class="career-timeline constructor-career-timeline" role="list" aria-label="Constructor career by season">${constructorTimeline.map((s, index) => {
           const drivers = String(s.drivers || '').split('||').filter(Boolean);
           const chassis = String(s.chassis || '').split('||').filter(Boolean);
-          return `<a role="listitem" class="career-timeline-item${s.championshipWon ? ' champion' : ''}" href="/season.html?year=${encodeURIComponent(s.year)}">
+          return `<a role="listitem" class="career-timeline-item${s.championshipWon ? ' champion' : ''}" href="/season?year=${encodeURIComponent(s.year)}">
             <div class="timeline-marker"><i></i></div><span class="timeline-year">${esc(s.year)}</span>
             <strong>${s.championshipWon ? 'World champion' : `Championship P${esc(s.positionNumber || '—')}`}</strong>
             <small>${fmtNumber(s.points)} points</small>
@@ -62,7 +62,7 @@ async function loadConstructor() {
       driverPage = paged.page;
       document.getElementById('constructor-drivers').innerHTML = data.drivers.length
       ? paged.items.map(driver => `
-        <a class="constructor-driver-card" href="/driver.html?id=${encodeURIComponent(driver.driverId)}">
+        <a class="constructor-driver-card" href="/driver?id=${encodeURIComponent(driver.driverId)}">
           <div class="constructor-driver-years">${driver.firstYear === driver.lastYear ? esc(driver.firstYear) : `${esc(driver.firstYear)}–${esc(driver.lastYear)}`}</div>
           <strong>${esc(driver.driverName)}</strong>
           <span>${fmtNumber(driver.starts)} starts · ${fmtNumber(driver.points)} points</span>
@@ -104,9 +104,9 @@ async function loadConstructor() {
       document.getElementById('constructor-results').innerHTML = data.results.length
       ? `<table><thead><tr><th>Season</th><th>Race</th><th>Driver</th><th>Grid</th><th>Finish</th><th>Points</th></tr></thead>
         <tbody>${paged.items.map(r => `<tr>
-          <td><a href="/season.html?year=${encodeURIComponent(r.year)}">${esc(r.year)}</a></td>
-          <td><a href="/race.html?id=${encodeURIComponent(r.raceId)}">${esc(r.officialName)}</a><small>${esc(fmtDate(r.date))}</small></td>
-          <td><a href="/driver.html?id=${encodeURIComponent(r.driverId)}">${esc(r.driverName)}</a></td>
+          <td><a href="/season?year=${encodeURIComponent(r.year)}">${esc(r.year)}</a></td>
+          <td><a href="/race?id=${encodeURIComponent(r.raceId)}">${esc(r.officialName)}</a><small>${esc(fmtDate(r.date))}</small></td>
+          <td><a href="/driver?id=${encodeURIComponent(r.driverId)}">${esc(r.driverName)}</a></td>
           <td>${esc(r.gridPositionNumber ?? '—')}</td>
           <td><span class="finish-position${Number(r.positionNumber) <= 3 ? ' podium' : ''}">${esc(r.positionText || r.positionNumber || '—')}</span></td>
           <td class="result-points-total">${fmtNumber(r.points)}</td>

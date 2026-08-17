@@ -1,5 +1,5 @@
 {
-  "name": "racelytics",
+  "name": "racelytic",
   "version": "1.0.0",
   "private": true,
   "description": "Formula 1 analytics website powered by F1DB, Node.js and MySQL.",

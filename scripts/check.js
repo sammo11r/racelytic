@@ -16,17 +16,16 @@ for (const file of files) {
     if (result.status !== 0) process.exit(result.status || 1);
 }
 
-const missing = [];
+const legacyLinks = [];
 for (const file of files.filter(file => file.includes(`${path.sep}frontend${path.sep}js${path.sep}`))) {
     const source = fs.readFileSync(file, 'utf8');
-    for (const match of source.matchAll(/\/(?:[a-z-]+\/)*[a-z-]+\.html/g)) {
-        const target = path.join(root, 'frontend', match[0]);
-        if (!fs.existsSync(target)) missing.push(`${path.relative(root, file)} -> ${match[0]}`);
+    for (const match of source.matchAll(/(?<![a-z0-9/-])\/[a-z-]+\.html/gi)) {
+        legacyLinks.push(`${path.relative(root, file)} -> ${match[0]}`);
     }
 }
 
-if (missing.length) {
-    console.error(`Broken local links:\n${missing.join('\n')}`);
+if (legacyLinks.length) {
+    console.error(`Public links must not include .html:\n${legacyLinks.join('\n')}`);
     process.exit(1);
 }
 

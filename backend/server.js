@@ -4,6 +4,7 @@ const path = require('path');
 
 const app = express();
 const PORT = Number(process.env.PORT || 3000);
+const frontendDirectory = path.join(__dirname, '../frontend');
 
 // Nginx terminates HTTPS locally and forwards the original protocol. Trust only
 // loopback proxies so origin checks see https without accepting spoofed headers
@@ -11,10 +12,24 @@ const PORT = Number(process.env.PORT || 3000);
 app.set('trust proxy', 'loopback');
 
 app.use(express.json());
-app.use(express.static(path.join(__dirname, '../frontend')));
+
+const publicPages = require('node:fs').readdirSync(frontendDirectory)
+    .filter(file => file.endsWith('.html') && file !== 'index.html');
+
+for (const file of publicPages) {
+    const route = `/${file.slice(0, -'.html'.length)}`;
+    app.get(route, (req, res) => res.sendFile(path.join(frontendDirectory, file)));
+    app.get(`/${file}`, (req, res) => {
+        const queryIndex = req.originalUrl.indexOf('?');
+        const query = queryIndex === -1 ? '' : req.originalUrl.slice(queryIndex);
+        res.redirect(308, `${route}${query}`);
+    });
+}
+
+app.use(express.static(frontendDirectory));
 
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend/index.html'));
+    res.sendFile(path.join(frontendDirectory, 'index.html'));
 });
 
 for (const route of ['core', 'seasons', 'drivers', 'circuits', 'constructors', 'chassis', 'races', 'records', 'games', 'account', 'points-systems', 'custom-championships']) {
@@ -36,7 +51,7 @@ app.use((req, res, next) => {
 
 if (require.main === module) {
     app.listen(PORT, () => {
-        console.log(`Racelytics running at http://localhost:${PORT}`);
+        console.log(`Racelytic running at http://localhost:${PORT}`);
     });
 }
 

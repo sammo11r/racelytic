@@ -13,7 +13,7 @@ function renderChassis() {
   document.getElementById('chassis').innerHTML = paged.items.length ? paged.items.map(chassis => `
     <article class="constructor-chassis-card chassis-browser-card">
       <div class="chassis-card-heading"><div><span>${chassis.firstYear ? (chassis.firstYear === chassis.lastYear ? esc(chassis.firstYear) : `${esc(chassis.firstYear)}–${esc(chassis.lastYear)}`) : 'YEAR UNKNOWN'}</span><h3>${esc(chassis.fullName || chassis.name)}</h3></div></div>
-      <div class="chassis-constructor">${chassis.constructorId ? `<a href="/constructor.html?id=${encodeURIComponent(chassis.constructorId)}">${esc(chassis.constructorName)}</a>` : 'Unknown constructor'}</div>
+      <div class="chassis-constructor">${chassis.constructorId ? `<a href="/constructor?id=${encodeURIComponent(chassis.constructorId)}">${esc(chassis.constructorName)}</a>` : 'Unknown constructor'}</div>
       <div class="chassis-engine-block"><span>ENGINE MANUFACTURER${chassis.engineManufacturers.length === 1 ? '' : 'S'}</span><p class="engine-manufacturer-list">${esc(chassis.engineManufacturers.join(', ') || 'Unknown')}</p><span>ENGINE${chassis.engines.length === 1 ? '' : 'S'}</span>${chassis.engines.length ? `<ul>${chassis.engines.map(engine => `<li>${esc(engine)}</li>`).join('')}</ul>` : '<p>Exact engine information unavailable</p>'}</div>
     </article>`).join('') : '<div class="empty-state">No chassis match these filters.</div>';
   renderPagination('chassis', visible.length, chassisPage, CHASSIS_PAGE_SIZE, page => { chassisPage = page; renderChassis(); document.getElementById('chassis').scrollIntoView({ behavior:'smooth', block:'start' }); });

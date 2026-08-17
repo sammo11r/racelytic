@@ -209,7 +209,7 @@
 
 
             console.log(
-                'Racelytics season data:',
+                'Racelytic season data:',
                 data
             );
 
@@ -504,7 +504,7 @@
                     <td class="name-column">
 
                         <a
-                            href="/driver.html?id=${encodeURIComponent(
+                            href="/driver?id=${encodeURIComponent(
                                 driver.driverId
                             )}"
                         >
@@ -671,7 +671,7 @@
                     <td class="name-column">
 
                         <a
-                            href="/constructor.html?id=${encodeURIComponent(
+                            href="/constructor?id=${encodeURIComponent(
                                 constructor.constructorId
                             )}"
                         >
@@ -759,7 +759,7 @@
                 <a
                     class="calendar-race"
                     data-round="${escapeHtml(race.round)}"
-                    href="/race.html?id=${encodeURIComponent(
+                    href="/race?id=${encodeURIComponent(
                         race.id
                     )}"
                 >
