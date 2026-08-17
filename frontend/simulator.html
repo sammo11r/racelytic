@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Season Simulator — Racelytics</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/polish.css">
+</head>
+<body>
+  <div id="header"></div>
+  <main class="container page simulator-page">
+    <section class="simulator-hero">
+      <div>
+        <div class="eyebrow">SIMULATOR</div>
+        <h1>Rewrite a championship.</h1>
+        <p>Apply a different scoring system and championship rule to any Formula 1 season.</p>
+      </div>
+      <div class="simulator-hero-mark" aria-hidden="true">Σ</div>
+    </section>
+
+    <section class="simulator-controls" aria-label="Simulation settings">
+      <label>
+        <span>Season</span>
+        <select id="simulation-season"><option value="">Loading seasons…</option></select>
+      </label>
+      <label class="ruleset-control">
+        <span>Points system</span>
+        <select id="simulation-points">
+          <option value="modern">Modern · all results count</option>
+          <option value="modern-fastest">2019–2024 · fastest-lap bonus</option>
+          <option value="2003">2003–2009 · all results count</option>
+          <option value="1991">1991–2002 · all results count</option>
+          <option value="classic-11">Classic · best 11 results</option>
+          <option value="classic-8">Classic · best 8 results</option>
+          <option value="classic-6">Classic · best 6 results</option>
+        </select>
+      </label>
+      <button class="button primary" id="run-simulation" type="button">Run simulation</button>
+    </section>
+
+    <section id="simulation-explanation" class="simulation-explanation" aria-live="polite"></section>
+
+    <section class="simulator-results">
+      <div class="section-heading">
+        <div><div class="eyebrow">RECALCULATED</div><h2 id="simulation-championship-title">Driver championship</h2></div>
+        <div class="simulation-heading-actions">
+          <div class="standings-mode" role="group" aria-label="Championship standings">
+            <button class="standings-mode-button active" type="button" data-simulation-mode="drivers" aria-pressed="true">Drivers</button>
+            <button class="standings-mode-button" type="button" data-simulation-mode="constructors" aria-pressed="false">Constructors</button>
+          </div>
+          <div id="simulation-status" class="section-note"></div>
+        </div>
+      </div>
+      <div id="simulation-summary" class="simulation-summary"></div>
+      <div id="simulation-results" class="table-wrap simulation-table-wrap">
+        <div class="empty-state">Choose your settings and run the simulation.</div>
+      </div>
+    </section>
+  </main>
+  <footer class="footer"><div class="container">Racelytics</div></footer>
+  <script src="/js/utils.js"></script>
+  <script src="/js/header.js"></script>
+  <script src="/js/simulator.js"></script>
+</body>
+</html>

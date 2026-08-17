@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Drivers — Racelytics</title><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/polish.css"></head>
+<body>
+<div id="header"></div>
+<main class="container page">
+  <div class="page-head"><div><div class="eyebrow">THE GRID</div><h1>Drivers</h1><p>Browse the drivers in the F1DB dataset.</p></div><input class="search" id="search" type="search" placeholder="Search drivers..."></div>
+  <div class="browser-toolbar">
+    <div class="browser-count" id="driver-count" aria-live="polite"></div>
+    <label class="sort-control" for="driver-sort">
+      <span>Order by</span>
+      <select id="driver-sort">
+        <option value="name-asc">Name A–Z</option>
+        <option value="name-desc">Name Z–A</option>
+        <option value="wins-desc">Most wins</option>
+      </select>
+    </label>
+  </div>
+  <div id="drivers" class="entity-grid"></div>
+</main>
+<footer class="footer"><div class="container">Racelytics</div></footer>
+<script src="/js/utils.js"></script>
+<script src="/js/header.js"></script>
+<script src="/js/drivers.js"></script>
+</body></html>

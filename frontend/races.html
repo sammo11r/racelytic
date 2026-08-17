@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Races — Racelytics</title>
+  <link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/polish.css">
+</head>
+<body>
+  <div id="header"></div>
+  <main class="container page races-page">
+    <div class="page-head"><div><div class="eyebrow">GRAND PRIX ARCHIVE</div><h1>Races</h1><p>Every Formula 1 race, from the first championship round to today.</p></div></div>
+    <section class="race-filters" aria-label="Race filters">
+      <label><span>Search</span><input id="race-search" type="search" placeholder="Race, circuit or country"></label>
+      <label><span>Season</span><select id="race-year"><option value="">All seasons</option></select></label>
+      <label><span>Circuit</span><select id="race-circuit"><option value="">All circuits</option></select></label>
+      <button id="clear-race-filters" class="button" type="button">Clear filters</button>
+    </section>
+    <div class="race-browser-heading"><strong id="race-count">Loading races…</strong><span id="race-filter-note"></span></div>
+    <div id="races" class="race-archive"></div>
+  </main>
+  <footer class="footer"><div class="container">Racelytics</div></footer>
+  <script src="/js/utils.js"></script><script src="/js/header.js"></script><script src="/js/races.js"></script>
+</body>
+</html>

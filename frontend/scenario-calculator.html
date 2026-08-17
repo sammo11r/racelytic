@@ -1,0 +1,10 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Championship scenario calculator — Racelytics</title><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/polish.css"></head>
+<body><div id="header"></div><main class="container page scenario-page">
+  <a class="back-link" href="/simulator.html">← Simulator</a>
+  <section class="simulator-hero scenario-hero"><div><div class="eyebrow">CHAMPIONSHIP SCENARIOS</div><h1>Shape the title run-in.</h1><p>Freeze a championship after any round, rewrite the remaining results, and see who can still win.</p></div><div class="simulator-hero-mark" aria-hidden="true">?</div></section>
+  <section class="scenario-controls"><label><span>Season</span><select id="scenario-season"><option>Loading seasons…</option></select></label><label><span>Standings after</span><select id="scenario-cutoff"></select></label><label><span>Points system</span><select id="scenario-points"><option value="modern">Modern · 25–18–15–12–10–8–6–4–2–1</option><option value="2003">2003–2009 · 10–8–6–5–4–3–2–1</option><option value="1991">1991–2002 · 10–6–4–3–2–1</option><option value="classic">Classic · 9–6–4–3–2–1</option></select></label><button id="reset-scenario" type="button">Reset predictions</button></section>
+  <section class="scenario-workspace">
+    <div class="scenario-editor"><div class="section-heading"><div><div class="eyebrow">PREDICTIONS</div><h2>Edit the run-in</h2></div><label class="scenario-race-choice"><span>Race</span><select id="scenario-race"></select></label></div><div id="scenario-grid"><div class="empty-state">Choose a season to begin.</div></div></div>
+    <aside class="scenario-outlook"><div class="section-heading"><div><div class="eyebrow">TITLE OUTLOOK</div><h2>Projected standings</h2></div></div><div id="scenario-summary"></div><div id="scenario-standings"></div></aside>
+  </section>
+</main><footer class="footer"><div class="container">Racelytics</div></footer><script src="/js/utils.js"></script><script src="/js/header.js"></script><script src="/js/scenario-calculator.js"></script></body></html>

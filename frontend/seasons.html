@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1"
+    >
+
+    <title>Seasons — Racelytics</title>
+
+    <link
+        rel="stylesheet"
+        href="/css/style.css"
+    >
+    <link rel="stylesheet" href="/css/polish.css">
+
+</head>
+
+
+<body>
+
+    <div id="header"></div>
+
+
+    <main class="container page">
+
+        <div class="page-head">
+
+            <div>
+
+                <div class="eyebrow">
+                    CHAMPIONSHIP HISTORY
+                </div>
+
+                <h1>
+                    Seasons
+                </h1>
+
+                <p>
+                    Every championship season in the F1DB dataset.
+                </p>
+
+            </div>
+
+            <form id="season-jump" class="season-jump" role="search">
+                <label for="season-search">Find a season</label>
+                <div class="season-jump-controls">
+                    <input
+                        id="season-search"
+                        type="search"
+                        inputmode="numeric"
+                        list="season-years"
+                        placeholder="Enter a year"
+                        autocomplete="off"
+                    >
+                    <button type="submit">Open</button>
+                </div>
+                <datalist id="season-years"></datalist>
+                <small id="season-search-message" aria-live="polite"></small>
+            </form>
+
+        </div>
+
+
+        <div
+            id="seasons"
+            class="season-grid"
+        >
+        </div>
+
+    </main>
+
+
+    <footer class="footer">
+
+        <div class="container">
+            Racelytics
+        </div>
+
+    </footer>
+
+
+    <script src="/js/header.js"></script>
+    <script src="/js/utils.js"></script>
+    <script src="/js/seasons.js"></script>
+
+</body>
+
+</html>

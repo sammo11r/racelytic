@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Account — Racelytics</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/polish.css">
+</head>
+<body>
+  <div id="header"></div>
+  <main class="container page account-page">
+    <section class="account-intro">
+      <div class="eyebrow">RACELYTICS ACCOUNT</div>
+      <h1>Your Racelytics workspace.</h1>
+      <p>Create custom championship rules and keep a personal record book of the statistics you care about.</p>
+    </section>
+
+    <section id="account-auth" class="account-auth">
+      <div class="account-tabs" role="tablist" aria-label="Account action">
+        <button type="button" class="active" data-account-tab="login" role="tab" aria-selected="true">Sign in</button>
+        <button type="button" data-account-tab="register" role="tab" aria-selected="false">Create account</button>
+      </div>
+
+      <form id="login-form" class="account-form">
+        <label><span>Email</span><input name="email" type="email" autocomplete="email" required></label>
+        <label><span>Password</span><input name="password" type="password" autocomplete="current-password" required></label>
+        <button class="button primary" type="submit">Sign in</button>
+      </form>
+
+      <form id="register-form" class="account-form" hidden>
+        <label><span>Display name</span><input name="displayName" autocomplete="name" minlength="2" maxlength="80" required></label>
+        <label><span>Email</span><input name="email" type="email" autocomplete="email" required></label>
+        <label><span>Password</span><input name="password" type="password" autocomplete="new-password" minlength="10" required><small>At least 10 characters</small></label>
+        <button class="button primary" type="submit">Create account</button>
+      </form>
+      <div id="account-message" class="account-message" aria-live="polite"></div>
+    </section>
+
+    <section id="account-profile" class="account-profile" hidden>
+      <div class="account-avatar" id="account-avatar"></div>
+      <div><span>Signed in as</span><h2 id="account-name"></h2><p id="account-email"></p></div>
+      <button class="button secondary" id="logout-button" type="button">Sign out</button>
+    </section>
+
+    <section id="community-library" class="community-library" hidden>
+      <div class="section-heading">
+        <div><div class="eyebrow">COMMUNITY</div><h2>Discover shared creations</h2><p>Find public rulesets, record definitions and custom championships made by other Racelytics users.</p></div>
+      </div>
+      <div class="community-toolbar">
+        <label class="community-search"><span>Search community</span><input id="community-search" type="search" placeholder="Search by name or creator"></label>
+        <div class="community-type-filter" role="group" aria-label="Community creation type">
+          <button type="button" class="active" data-community-type="all">All</button>
+          <button type="button" data-community-type="points">Points systems</button>
+          <button type="button" data-community-type="records">Records</button>
+          <button type="button" data-community-type="championships">Championships</button>
+        </div>
+      </div>
+      <div id="community-results-summary" class="community-results-summary" aria-live="polite"></div>
+      <div id="community-results" class="community-results"></div>
+    </section>
+
+    <section id="points-system-manager" class="points-system-manager" hidden>
+      <div class="section-heading">
+        <div><div class="eyebrow">SIMULATOR</div><h2>Your points systems</h2></div>
+        <button class="button primary" id="new-system-button" type="button">New points system</button>
+      </div>
+      <div id="saved-systems" class="saved-systems"></div>
+
+      <form id="points-system-form" class="points-system-form" hidden>
+        <input type="hidden" name="id">
+        <div class="points-form-heading"><div><span id="points-form-kicker">NEW RULESET</span><h3 id="points-form-title">Create points system</h3></div><button type="button" class="text-link" id="cancel-system-button">Cancel</button></div>
+        <div class="points-form-grid">
+          <label class="wide"><span>Name</span><input name="name" maxlength="100" required placeholder="My points system"></label>
+          <label class="wide"><span>Race points by position</span><input name="racePoints" required placeholder="25, 18, 15, 12, 10, 8, 6, 4, 2, 1"><small>Comma-separated, starting with first place.</small></label>
+          <label class="wide"><span>Sprint points by position</span><input name="sprintPoints" placeholder="8, 7, 6, 5, 4, 3, 2, 1"><small>Leave empty to award no sprint points.</small></label>
+          <label class="wide"><span>Qualifying points by position</span><input name="qualifyingPoints" placeholder="3, 2, 1"><small>Leave empty to award no qualifying points.</small></label>
+          <label><span>Pole bonus</span><input name="poleBonus" type="number" min="0" max="1000" step="0.5" value="0"></label>
+          <label><span>Fastest-lap bonus</span><input name="fastestLapBonus" type="number" min="0" max="1000" step="0.5" value="0"></label>
+          <label><span>Fastest-lap eligibility</span><input name="fastestLapMaxPosition" type="number" min="1" max="30" placeholder="Any position"><small>Maximum finishing position, e.g. 10.</small></label>
+          <label><span>Count best rounds</span><input name="countBestRounds" type="number" min="1" max="100" placeholder="All rounds"></label>
+          <label><span>Best of first races</span><input name="bestFirstRounds" type="number" min="1" max="100" placeholder="Best X"></label>
+          <label><span>First-race window</span><input name="firstRoundsWindow" type="number" min="1" max="100" placeholder="First Y races"></label>
+          <label><span>Best of last races</span><input name="bestLastRounds" type="number" min="1" max="100" placeholder="Best X"></label>
+          <label><span>Last-race window</span><input name="lastRoundsWindow" type="number" min="1" max="100" placeholder="Last Y races"></label>
+          <label><span>Visibility</span><select name="visibility"><option value="private">Private</option><option value="public">Public</option></select></label>
+          <label class="points-checkbox wide"><input name="sprintCountsTowardRound" type="checkbox" checked><span>Include sprint points in a round before applying the best-round limit</span></label>
+        </div>
+        <div class="points-form-actions"><button class="button primary" type="submit">Save points system</button><button class="button secondary" id="delete-system-button" type="button" hidden>Delete</button></div>
+        <div id="points-system-message" class="account-message" aria-live="polite"></div>
+      </form>
+    </section>
+
+    <section id="personal-record-book" class="points-system-manager personal-record-book" hidden>
+      <div class="section-heading"><div><div class="eyebrow">ANALYSIS</div><h2>Your record book</h2></div><a class="button primary" href="/records.html">Explore records</a></div>
+      <div id="saved-records" class="saved-records"></div>
+    </section>
+
+    <section id="custom-championship-manager" class="points-system-manager" hidden>
+      <div class="section-heading"><div><div class="eyebrow">SIMULATOR</div><h2>Your championships</h2></div><a class="button primary" href="/championship-builder.html">New championship</a></div>
+      <div id="saved-championships" class="saved-records"></div>
+    </section>
+  </main>
+  <footer class="footer"><div class="container">Racelytics</div></footer>
+  <script src="/js/utils.js"></script>
+  <script src="/js/header.js"></script>
+  <script src="/js/account.js"></script>
+</body>
+</html>

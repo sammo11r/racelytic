@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Name every Formula 1 Grand Prix winner.">
+  <title>Race Winners Quiz — Racelytics</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/polish.css">
+</head>
+<body>
+  <div id="header"></div>
+  <main class="container page champions-quiz-page race-winners-quiz-page">
+    <a class="back-link" href="/quizzes.html">← Quizzes</a>
+    <section class="quiz-game-head">
+      <div><div class="eyebrow">DRIVER QUIZ</div><h1>Race winners</h1><p>Enter any Formula 1 Grand Prix winner. Their place in the all-time winners table will be revealed.</p></div>
+      <div class="quiz-score"><span>Drivers found</span><strong id="quiz-score">0 / —</strong><small id="quiz-progress-label">Loading race winners…</small></div>
+    </section>
+
+    <form id="winner-guess-form" class="quiz-guess-form" autocomplete="off">
+      <label for="winner-guess">Driver name</label>
+      <div><input id="winner-guess" name="guess" placeholder="e.g. Lewis Hamilton" maxlength="100" disabled required><button type="submit" disabled>Submit guess</button></div>
+      <p id="quiz-feedback" aria-live="polite">Loading quiz…</p>
+    </form>
+
+    <section class="quiz-table-section">
+      <div class="quiz-table-heading"><div><div class="eyebrow">ALL-TIME WINNERS</div><h2>Complete the table</h2></div><div id="guessed-drivers" class="guessed-drivers"></div></div>
+      <div id="race-winners-quiz-board" class="champions-quiz-board"><div class="loading-state">Loading drivers…</div></div>
+    </section>
+  </main>
+  <footer class="footer"><div class="container">Racelytics</div></footer>
+  <script src="/js/utils.js"></script>
+  <script src="/js/header.js"></script>
+  <script src="/js/race-winners-quiz.js"></script>
+</body>
+</html>

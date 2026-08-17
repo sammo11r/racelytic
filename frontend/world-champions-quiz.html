@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Name every Formula 1 World Drivers' Champion.">
+  <title>World Champions Quiz — Racelytics</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/polish.css">
+</head>
+<body>
+  <div id="header"></div>
+  <main class="container page champions-quiz-page">
+    <a class="back-link" href="/quizzes.html">← Quizzes</a>
+    <section class="quiz-game-head">
+      <div><div class="eyebrow">DRIVER QUIZ</div><h1>World champions</h1><p>Enter the name of any World Drivers’ Champion. Every season won by that driver will be revealed.</p></div>
+      <div class="quiz-score"><span>Seasons found</span><strong id="quiz-score">0 / —</strong><small id="quiz-progress-label">Loading championship history…</small></div>
+    </section>
+
+    <form id="champion-guess-form" class="quiz-guess-form" autocomplete="off">
+      <label for="champion-guess">Driver name</label>
+      <div><input id="champion-guess" name="guess" placeholder="e.g. Ayrton Senna" maxlength="100" disabled required><button type="submit" disabled>Submit guess</button></div>
+      <p id="quiz-feedback" aria-live="polite">Loading quiz…</p>
+    </form>
+
+    <section class="quiz-table-section">
+      <div class="quiz-table-heading"><div><div class="eyebrow">CHAMPIONSHIP HISTORY</div><h2>Complete the table</h2></div><div id="guessed-drivers" class="guessed-drivers"></div></div>
+      <div id="champions-quiz-board" class="champions-quiz-board">
+        <div class="loading-state">Loading seasons…</div>
+      </div>
+    </section>
+  </main>
+  <footer class="footer"><div class="container">Racelytics</div></footer>
+  <script src="/js/utils.js"></script>
+  <script src="/js/header.js"></script>
+  <script src="/js/world-champions-quiz.js"></script>
+</body>
+</html>

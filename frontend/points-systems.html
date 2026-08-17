@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Points systems — Racelytics</title>
+  <link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/polish.css">
+</head>
+<body>
+  <div id="header"></div>
+  <main class="container page points-library-page">
+    <section class="points-library-hero">
+      <div><div class="eyebrow">CHAMPIONSHIP RULES</div><h1>Points systems.</h1><p>Create reusable scoring rules and apply them to any season in the simulator.</p></div>
+      <a class="button secondary" href="/simulator.html">Simulate a season</a>
+    </section>
+
+    <section id="points-login-prompt" class="points-login-prompt" hidden>
+      <div><strong>Sign in to create your own system</strong><span>Your saved rules remain tied to your Racelytics account.</span></div>
+      <a class="button primary" href="/account.html">Sign in or create account</a>
+    </section>
+
+    <section id="points-system-manager" class="points-system-manager points-library-manager">
+      <div class="section-heading">
+        <div><div class="eyebrow">YOUR LIBRARY</div><h2>Your points systems</h2></div>
+        <button class="button primary" id="new-system-button" type="button" hidden>New points system</button>
+      </div>
+      <div id="saved-systems" class="saved-systems"></div>
+
+      <form id="points-system-form" class="points-system-form" hidden>
+        <input type="hidden" name="id">
+        <div class="points-form-heading"><div><span id="points-form-kicker">NEW RULESET</span><h3 id="points-form-title">Create points system</h3></div><button type="button" class="text-link" id="cancel-system-button">Cancel</button></div>
+        <div class="points-form-grid">
+          <label class="wide"><span>Name</span><input name="name" maxlength="100" required placeholder="My points system"></label>
+          <label class="wide"><span>Race points by position</span><input name="racePoints" required placeholder="25, 18, 15, 12, 10, 8, 6, 4, 2, 1"><small>Comma-separated, starting with first place.</small></label>
+          <label class="wide"><span>Sprint points by position</span><input name="sprintPoints" placeholder="8, 7, 6, 5, 4, 3, 2, 1"><small>Leave empty to award no sprint points.</small></label>
+          <label class="wide"><span>Qualifying points by position</span><input name="qualifyingPoints" placeholder="3, 2, 1"><small>Leave empty to award no qualifying points.</small></label>
+          <label><span>Pole bonus</span><input name="poleBonus" type="number" min="0" max="1000" step="0.5" value="0"></label>
+          <label><span>Fastest-lap bonus</span><input name="fastestLapBonus" type="number" min="0" max="1000" step="0.5" value="0"></label>
+          <label><span>Fastest-lap eligibility</span><input name="fastestLapMaxPosition" type="number" min="1" max="30" placeholder="Any position"><small>Maximum finishing position, e.g. 10.</small></label>
+          <label><span>Count best rounds</span><input name="countBestRounds" type="number" min="1" max="100" placeholder="All rounds"></label>
+          <label><span>Best of first races</span><input name="bestFirstRounds" type="number" min="1" max="100" placeholder="Best X"></label>
+          <label><span>First-race window</span><input name="firstRoundsWindow" type="number" min="1" max="100" placeholder="First Y races"></label>
+          <label><span>Best of last races</span><input name="bestLastRounds" type="number" min="1" max="100" placeholder="Best X"></label>
+          <label><span>Last-race window</span><input name="lastRoundsWindow" type="number" min="1" max="100" placeholder="Last Y races"></label>
+          <label><span>Visibility</span><select name="visibility"><option value="private">Private</option><option value="public">Public</option></select></label>
+          <label class="points-checkbox wide"><input name="sprintCountsTowardRound" type="checkbox" checked><span>Include sprint points in a round before applying the best-round limit</span></label>
+        </div>
+        <div class="points-form-actions"><button class="button primary" type="submit">Save points system</button><button class="button secondary" id="delete-system-button" type="button" hidden>Delete</button></div>
+        <div id="points-system-message" class="account-message" aria-live="polite"></div>
+      </form>
+    </section>
+
+    <section class="points-community">
+      <div class="section-heading"><div><div class="eyebrow">PUBLIC SYSTEMS</div><h2>Community rulesets</h2></div></div>
+      <div id="public-systems" class="saved-systems"></div>
+    </section>
+  </main>
+  <footer class="footer"><div class="container">Racelytics</div></footer>
+  <script src="/js/utils.js"></script><script src="/js/header.js"></script><script src="/js/points-systems.js"></script>
+</body>
+</html>

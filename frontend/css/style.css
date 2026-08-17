@@ -1,0 +1,2972 @@
+/* =========================================================
+   RACELYTICS
+   Global Stylesheet
+   Light / Sharp / Editorial
+   ========================================================= */
+
+
+/* =========================================================
+   DESIGN TOKENS
+   ========================================================= */
+
+:root {
+    --background: #f5f5f3;
+    --surface: #ffffff;
+    --surface-alt: #eeeeec;
+
+    --border: #deded9;
+    --border-strong: #c9c9c3;
+
+    --text: #111214;
+    --text-secondary: #4f5257;
+    --text-muted: #777a80;
+    --text-light: #a1a3a7;
+
+    --accent: #e10600;
+    --accent-dark: #b80500;
+    --accent-light: #fcebea;
+
+    --success: #16834b;
+    --warning: #a86d00;
+
+    --max-width: 1200px;
+
+    --header-height: 72px;
+
+    --radius-sm: 4px;
+    --radius-md: 6px;
+    --radius-lg: 8px;
+
+    --shadow-small: 0 2px 8px rgba(0, 0, 0, 0.04);
+    --shadow-medium: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+
+/* =========================================================
+   RESET
+   ========================================================= */
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+
+    background: var(--background);
+    color: var(--text);
+
+    font-family:
+        Inter,
+        ui-sans-serif,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+
+    font-size: 15px;
+    line-height: 1.55;
+
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+}
+
+img {
+    display: block;
+    max-width: 100%;
+}
+
+button,
+input,
+select,
+textarea {
+    font: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+h1,
+h2,
+h3,
+h4,
+p {
+    margin-top: 0;
+}
+
+
+/* =========================================================
+   GLOBAL CONTAINER
+   ========================================================= */
+
+.container {
+    width: min(
+        var(--max-width),
+        calc(100% - 48px)
+    );
+
+    margin: 0 auto;
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.site-header {
+    position: sticky;
+    top: 0;
+
+    z-index: 1000;
+
+    height: var(--header-height);
+
+    background: rgba(255, 255, 255, 0.94);
+
+    border-bottom: 1px solid var(--border);
+
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+}
+
+.nav {
+    min-height: var(--header-height);
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 32px;
+}
+
+
+/* =========================================================
+   BRAND
+   ========================================================= */
+
+.brand {
+    display: inline-flex;
+    align-items: center;
+
+    color: var(--text);
+
+    font-size: 23px;
+    font-weight: 850;
+
+    letter-spacing: -0.055em;
+
+    white-space: nowrap;
+}
+
+.brand span {
+    color: var(--accent);
+}
+
+
+/* =========================================================
+   MAIN NAVIGATION
+   ========================================================= */
+
+.main-nav {
+    display: flex;
+    align-items: center;
+
+    gap: 2px;
+}
+
+.nav-link {
+    position: relative;
+
+    display: inline-flex;
+    align-items: center;
+
+    gap: 6px;
+
+    padding: 9px 12px;
+
+    border: 0;
+    border-radius: var(--radius-sm);
+
+    background: transparent;
+
+    color: var(--text-secondary);
+
+    font-size: 13px;
+    font-weight: 650;
+
+    line-height: 1;
+
+    text-decoration: none;
+
+    transition:
+        color 0.15s ease,
+        background 0.15s ease;
+}
+
+.nav-link:hover {
+    background: var(--surface-alt);
+    color: var(--text);
+}
+
+.nav-link.active {
+    color: var(--text);
+}
+
+
+/* =========================================================
+   NAVIGATION DROPDOWN
+   ========================================================= */
+
+.nav-dropdown {
+    position: relative;
+}
+
+.chevron {
+    display: inline-block;
+
+    margin-top: -2px;
+
+    color: var(--text-muted);
+
+    font-size: 13px;
+
+    transition:
+        transform 0.18s ease;
+}
+
+.nav-dropdown:hover .chevron {
+    transform: rotate(180deg);
+}
+
+.dropdown-menu {
+    position: absolute;
+
+    top: calc(100% + 10px);
+    right: 0;
+
+    width: 270px;
+
+    padding: 7px;
+
+    background: var(--surface);
+
+    border: 1px solid var(--border);
+
+    border-radius: var(--radius-md);
+
+    box-shadow: var(--shadow-medium);
+
+    opacity: 0;
+    visibility: hidden;
+
+    transform: translateY(-5px);
+
+    transition:
+        opacity 0.15s ease,
+        transform 0.15s ease,
+        visibility 0.15s ease;
+}
+
+.nav-dropdown:hover .dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+
+    transform: translateY(0);
+}
+
+.dropdown-title {
+    padding: 9px 11px 7px;
+
+    color: var(--accent);
+
+    font-size: 10px;
+    font-weight: 800;
+
+    letter-spacing: 0.15em;
+}
+
+.dropdown-menu a {
+    display: flex;
+    flex-direction: column;
+
+    padding: 10px 11px;
+
+    border-radius: var(--radius-sm);
+
+    color: var(--text);
+
+    transition:
+        background 0.12s ease;
+}
+
+.dropdown-menu a:hover {
+    background: var(--surface-alt);
+}
+
+.dropdown-menu a span {
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.dropdown-menu a small {
+    margin-top: 2px;
+
+    color: var(--text-muted);
+
+    font-size: 11px;
+    line-height: 1.4;
+}
+
+
+/* =========================================================
+   HERO
+   ========================================================= */
+
+.hero {
+    padding: 120px 0 105px;
+}
+
+.eyebrow {
+    margin-bottom: 14px;
+
+    color: var(--accent);
+
+    font-size: 11px;
+    font-weight: 800;
+
+    letter-spacing: 0.17em;
+
+    text-transform: uppercase;
+}
+
+.hero h1 {
+    max-width: 980px;
+
+    margin: 0 0 28px;
+
+    font-size: clamp(
+        54px,
+        8vw,
+        104px
+    );
+
+    font-weight: 800;
+
+    line-height: 0.91;
+
+    letter-spacing: -0.075em;
+}
+
+.hero h1 span {
+    color: var(--text-muted);
+}
+
+.hero-copy {
+    max-width: 650px;
+
+    margin-bottom: 0;
+
+    color: var(--text-secondary);
+
+    font-size: 18px;
+    line-height: 1.65;
+}
+
+.hero-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+
+    gap: 10px;
+
+    margin-top: 34px;
+}
+
+
+/* =========================================================
+   BUTTONS
+   ========================================================= */
+
+.button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 42px;
+
+    padding: 0 17px;
+
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+
+    background: var(--surface);
+
+    color: var(--text);
+
+    font-size: 13px;
+    font-weight: 700;
+
+    transition:
+        background 0.15s ease,
+        border-color 0.15s ease,
+        color 0.15s ease,
+        transform 0.15s ease;
+}
+
+.button:hover {
+    border-color: #a9aaa5;
+
+    background: var(--surface-alt);
+
+    transform: translateY(-1px);
+}
+
+.button.primary {
+    border-color: var(--accent);
+
+    background: var(--accent);
+
+    color: #ffffff;
+}
+
+.button.primary:hover {
+    border-color: var(--accent-dark);
+
+    background: var(--accent-dark);
+}
+
+.button.secondary {
+    background: var(--surface);
+}
+
+
+/* =========================================================
+   STATISTICS
+   ========================================================= */
+
+.stats-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, 1fr);
+
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+}
+
+.metric {
+    min-height: 130px;
+
+    padding: 25px 24px;
+
+    border-right: 1px solid var(--border);
+
+    background: var(--surface);
+}
+
+.metric:last-child {
+    border-right: 0;
+}
+
+.metric span {
+    display: block;
+
+    margin-bottom: 8px;
+
+    color: var(--text-muted);
+
+    font-size: 11px;
+    font-weight: 700;
+
+    letter-spacing: 0.08em;
+
+    text-transform: uppercase;
+}
+
+.metric strong {
+    display: block;
+
+    color: var(--text);
+
+    font-size: 34px;
+    font-weight: 800;
+
+    line-height: 1;
+
+    letter-spacing: -0.05em;
+}
+
+
+/* =========================================================
+   FEATURE GRID
+   ========================================================= */
+
+.feature-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, 1fr);
+
+    gap: 1px;
+
+    margin-top: 48px;
+
+    padding-bottom: 100px;
+
+    background: var(--border);
+
+    border: 1px solid var(--border);
+}
+
+.feature {
+    position: relative;
+
+    min-height: 280px;
+
+    padding: 25px;
+
+    background: var(--surface);
+
+    transition:
+        background 0.15s ease;
+}
+
+.feature:hover {
+    background: #fafaf9;
+}
+
+.feature-kicker {
+    color: var(--text-light);
+
+    font-size: 11px;
+    font-weight: 700;
+
+    letter-spacing: 0.08em;
+}
+
+.feature h2 {
+    margin-top: 105px;
+    margin-bottom: 8px;
+
+    font-size: 23px;
+    font-weight: 750;
+
+    letter-spacing: -0.035em;
+}
+
+.feature p {
+    max-width: 210px;
+
+    margin-bottom: 0;
+
+    color: var(--text-muted);
+
+    font-size: 13px;
+}
+
+.arrow {
+    position: absolute;
+
+    right: 25px;
+    bottom: 24px;
+
+    color: var(--accent);
+
+    font-size: 22px;
+
+    transition:
+        transform 0.15s ease;
+}
+
+.feature:hover .arrow {
+    transform: translateX(4px);
+}
+
+
+/* =========================================================
+   PAGE
+   ========================================================= */
+
+.page {
+    padding: 64px 0 100px;
+}
+
+
+/* =========================================================
+   PAGE HEADER
+   ========================================================= */
+
+.page-head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+
+    gap: 32px;
+
+    padding-bottom: 28px;
+
+    margin-bottom: 32px;
+
+    border-bottom: 1px solid var(--border);
+}
+
+.page-head h1 {
+    margin: 5px 0 8px;
+
+    color: var(--text);
+
+    font-size: 62px;
+    font-weight: 800;
+
+    line-height: 0.95;
+
+    letter-spacing: -0.065em;
+}
+
+.page-head p {
+    margin: 0;
+
+    color: var(--text-muted);
+
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   SEARCH
+   ========================================================= */
+
+.search {
+    width: min(300px, 100%);
+
+    height: 42px;
+
+    padding: 0 13px;
+
+    background: var(--surface);
+
+    color: var(--text);
+
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+
+    outline: none;
+
+    font-size: 13px;
+
+    transition:
+        border-color 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+.search::placeholder {
+    color: var(--text-light);
+}
+
+.search:focus {
+    border-color: #8d8f8b;
+
+    box-shadow:
+        0 0 0 3px rgba(0, 0, 0, 0.04);
+}
+
+
+/* =========================================================
+   SEASON GRID
+   ========================================================= */
+
+.season-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, 1fr);
+
+    gap: 10px;
+}
+
+
+/* Season card */
+
+.season-card {
+    position: relative;
+
+    display: block;
+
+    padding: 23px;
+
+    background: var(--surface);
+
+    border: 1px solid var(--border);
+
+    transition:
+        border-color 0.15s ease,
+        background 0.15s ease,
+        transform 0.15s ease;
+}
+
+.season-card:hover {
+    border-color: var(--border-strong);
+
+    background: #fafaf9;
+
+    transform: translateY(-2px);
+}
+
+
+/* Season year */
+
+.season-year {
+    margin-bottom: 28px;
+
+    color: var(--text);
+
+    font-size: 38px;
+    font-weight: 800;
+
+    line-height: 1;
+
+    letter-spacing: -0.055em;
+}
+
+
+/* Season statistics */
+
+.season-details {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 0;
+
+    padding-top: 16px;
+
+    border-top: 1px solid var(--border);
+}
+
+
+/* Individual season statistic */
+
+.season-stat {
+    padding-right: 12px;
+
+    border-right: 1px solid var(--border);
+}
+
+.season-stat:not(:first-child) {
+    padding-left: 12px;
+}
+
+.season-stat:last-child {
+    padding-right: 0;
+
+    border-right: 0;
+}
+
+
+/* Statistic label */
+
+.season-stat span {
+    display: block;
+
+    margin-bottom: 4px;
+
+    color: var(--text-muted);
+
+    font-size: 9px;
+    font-weight: 800;
+
+    letter-spacing: 0.1em;
+
+    text-transform: uppercase;
+}
+
+
+/* Statistic value */
+
+.season-stat strong {
+    display: block;
+
+    color: var(--text);
+
+    font-size: 20px;
+    font-weight: 800;
+
+    line-height: 1;
+
+    letter-spacing: -0.035em;
+
+    font-variant-numeric: tabular-nums;
+}
+
+
+/* =========================================================
+   ENTITY GRID
+   ========================================================= */
+
+.entity-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 10px;
+}
+
+.entity-card {
+    padding: 21px;
+
+    background: var(--surface);
+
+    border: 1px solid var(--border);
+
+    transition:
+        border-color 0.15s ease,
+        background 0.15s ease,
+        transform 0.15s ease;
+}
+
+.entity-card:hover {
+    border-color: var(--border-strong);
+
+    background: #fafaf9;
+
+    transform: translateY(-2px);
+}
+
+.entity-card h3 {
+    margin: 0 0 5px;
+
+    color: var(--text);
+
+    font-size: 18px;
+    font-weight: 750;
+
+    letter-spacing: -0.025em;
+}
+
+.entity-card p {
+    margin: 0;
+
+    color: var(--text-muted);
+
+    font-size: 12px;
+}
+
+.entity-card .number {
+    display: block;
+
+    margin-top: 17px;
+
+    color: var(--accent);
+
+    font-size: 12px;
+    font-weight: 750;
+}
+
+
+/* =========================================================
+   DETAIL HERO
+   ========================================================= */
+
+.detail-hero {
+    padding: 10px 0 36px;
+
+    border-bottom: 1px solid var(--border);
+}
+
+.detail-hero h1 {
+    margin: 5px 0 8px;
+
+    color: var(--text);
+
+    font-size: clamp(
+        44px,
+        7vw,
+        80px
+    );
+
+    font-weight: 800;
+
+    line-height: 0.92;
+
+    letter-spacing: -0.07em;
+}
+
+.detail-sub {
+    color: var(--text-muted);
+
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   TWO COLUMN
+   ========================================================= */
+
+.two-col {
+    display: grid;
+
+    grid-template-columns:
+        1fr 1fr;
+
+    gap: 40px;
+
+    margin-top: 42px;
+}
+
+
+/* =========================================================
+   SECTIONS
+   ========================================================= */
+
+.section {
+    margin-top: 56px;
+}
+
+.section-title {
+    display: flex;
+    align-items: center;
+
+    padding-bottom: 11px;
+
+    margin-bottom: 12px;
+
+    border-bottom: 1px solid var(--border);
+
+    color: var(--text-muted);
+
+    font-size: 10px;
+    font-weight: 800;
+
+    letter-spacing: 0.15em;
+
+    text-transform: uppercase;
+}
+
+
+/* =========================================================
+   STANDINGS
+   ========================================================= */
+
+.standings {
+    overflow: hidden;
+
+    background: var(--surface);
+
+    border: 1px solid var(--border);
+}
+
+.standing {
+    display: grid;
+
+    grid-template-columns:
+        42px 1fr auto;
+
+    align-items: center;
+
+    gap: 12px;
+
+    min-height: 54px;
+
+    padding: 0 16px;
+
+    border-bottom: 1px solid var(--border);
+
+    transition:
+        background 0.12s ease;
+}
+
+.standing:last-child {
+    border-bottom: 0;
+}
+
+.standing:hover {
+    background: var(--surface-alt);
+}
+
+.pos {
+    color: var(--text-light);
+
+    font-variant-numeric: tabular-nums;
+
+    font-size: 12px;
+}
+
+.points {
+    font-size: 13px;
+    font-weight: 800;
+
+    font-variant-numeric: tabular-nums;
+}
+
+.winner {
+    color: var(--accent);
+}
+
+
+/* =========================================================
+   RACE LIST
+   ========================================================= */
+
+.race-list {
+    display: grid;
+
+    gap: 7px;
+}
+
+.race {
+    display: grid;
+
+    grid-template-columns:
+        65px 1fr auto;
+
+    align-items: center;
+
+    gap: 16px;
+
+    min-height: 70px;
+
+    padding: 12px 15px;
+
+    background: var(--surface);
+
+    border: 1px solid var(--border);
+
+    transition:
+        background 0.12s ease,
+        border-color 0.12s ease;
+}
+
+.race:hover {
+    background: var(--surface-alt);
+
+    border-color: var(--border-strong);
+}
+
+.race-round {
+    color: var(--accent);
+
+    font-size: 12px;
+    font-weight: 800;
+
+    text-transform: uppercase;
+}
+
+.race-meta {
+    margin-top: 2px;
+
+    color: var(--text-muted);
+
+    font-size: 11px;
+}
+
+
+/* =========================================================
+   TABLES
+   ========================================================= */
+
+.table-wrap {
+    overflow-x: auto;
+
+    background: var(--surface);
+
+    border: 1px solid var(--border);
+}
+
+table {
+    width: 100%;
+
+    min-width: 720px;
+
+    border-collapse: collapse;
+}
+
+th,
+td {
+    padding: 12px 15px;
+
+    border-bottom: 1px solid var(--border);
+
+    text-align: left;
+
+    font-size: 12px;
+}
+
+th {
+    background: var(--surface-alt);
+
+    color: var(--text-muted);
+
+    font-size: 10px;
+    font-weight: 800;
+
+    letter-spacing: 0.08em;
+
+    text-transform: uppercase;
+}
+
+td {
+    color: var(--text-secondary);
+}
+
+tbody tr {
+    transition:
+        background 0.12s ease;
+}
+
+tbody tr:hover {
+    background: var(--surface-alt);
+}
+
+tr:last-child td {
+    border-bottom: 0;
+}
+
+
+/* =========================================================
+   UTILITY
+   ========================================================= */
+
+.muted {
+    color: var(--text-muted);
+}
+
+.error {
+    padding: 20px 0;
+
+    color: var(--accent);
+
+    font-size: 13px;
+}
+
+.compact {
+    margin-bottom: 0;
+}
+
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+.footer {
+    padding: 28px 0 55px;
+
+    border-top: 1px solid var(--border);
+
+    color: var(--text-muted);
+
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 1000px) {
+
+    .feature-grid,
+    .season-grid {
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+
+    .entity-grid {
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+
+    .stats-grid {
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+
+    .metric:nth-child(2) {
+        border-right: 0;
+    }
+
+    .metric:nth-child(-n + 2) {
+        border-bottom: 1px solid var(--border);
+    }
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+    :root {
+        --header-height: 64px;
+    }
+
+    .container {
+        width: calc(100% - 28px);
+    }
+
+    .nav {
+        gap: 10px;
+    }
+
+    .brand {
+        font-size: 20px;
+    }
+
+    .main-nav {
+        gap: 0;
+    }
+
+    .nav-link {
+        padding: 8px;
+
+        font-size: 12px;
+    }
+
+    .dropdown-menu {
+        right: 0;
+
+        width: 235px;
+    }
+
+    .hero {
+        padding: 78px 0 70px;
+    }
+
+    .hero h1 {
+        font-size: 52px;
+    }
+
+    .hero-copy {
+        font-size: 16px;
+    }
+
+    .page {
+        padding: 45px 0 75px;
+    }
+
+    .page-head {
+        align-items: stretch;
+
+        flex-direction: column;
+
+        gap: 20px;
+    }
+
+    .page-head h1 {
+        font-size: 48px;
+    }
+
+    .search {
+        width: 100%;
+    }
+
+    .feature-grid,
+    .season-grid,
+    .entity-grid,
+    .stats-grid,
+    .two-col {
+        grid-template-columns: 1fr;
+    }
+
+    .stats-grid {
+        border-bottom: 0;
+    }
+
+    .metric {
+        min-height: 105px;
+
+        border-right: 0;
+
+        border-bottom: 1px solid var(--border);
+    }
+
+    .metric:last-child {
+        border-bottom: 1px solid var(--border);
+    }
+
+    .feature-grid {
+        gap: 1px;
+
+        margin-top: 35px;
+    }
+
+    .feature {
+        min-height: 220px;
+    }
+
+    .feature h2 {
+        margin-top: 70px;
+    }
+
+    /* Season card statistics */
+
+    .season-year {
+        margin-bottom: 24px;
+    }
+
+    .season-details {
+        grid-template-columns:
+            repeat(3, 1fr);
+    }
+
+    .season-stat strong {
+        font-size: 18px;
+    }
+
+    .season-stat span {
+        font-size: 8px;
+    }
+
+    .race {
+        grid-template-columns:
+            55px 1fr;
+
+        padding: 14px;
+    }
+
+    .race > :last-child {
+        grid-column: 2;
+    }
+
+    .detail-hero h1 {
+        font-size: 50px;
+    }
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+   ========================================================= */
+
+@media (max-width: 450px) {
+
+    .main-nav > .nav-link {
+        display: none;
+    }
+
+    .nav-dropdown .nav-link {
+        display: flex;
+    }
+
+    .dropdown-menu {
+        width: 220px;
+    }
+
+    .hero h1 {
+        font-size: 44px;
+    }
+
+    .hero-actions {
+        align-items: stretch;
+
+        flex-direction: column;
+    }
+
+    .hero-actions .button {
+        width: 100%;
+    }
+
+    .page-head h1 {
+        font-size: 43px;
+    }
+
+    .detail-hero h1 {
+        font-size: 44px;
+    }
+
+    /* Stack season statistics on very small screens */
+
+    .season-details {
+        grid-template-columns:
+            repeat(3, 1fr);
+    }
+
+    .season-stat {
+        padding-right: 8px;
+    }
+
+    .season-stat:not(:first-child) {
+        padding-left: 8px;
+    }
+
+    .season-stat strong {
+        font-size: 17px;
+    }
+}
+
+/* =========================================================
+   RACELYTICS
+   Global Stylesheet
+   Light / Sharp / Editorial
+   ========================================================= */
+
+:root {
+    --background: #f5f5f3;
+    --surface: #ffffff;
+    --surface-alt: #eeeeec;
+
+    --border: #deded9;
+    --border-strong: #c9c9c3;
+
+    --text: #111214;
+    --text-secondary: #4f5257;
+    --text-muted: #777a80;
+    --text-light: #a1a3a7;
+
+    --accent: #e10600;
+    --accent-dark: #b80500;
+    --accent-light: #fcebea;
+
+    --success: #16834b;
+    --warning: #a86d00;
+
+    --max-width: 1200px;
+
+    --header-height: 72px;
+
+    --radius-sm: 4px;
+    --radius-md: 6px;
+    --radius-lg: 8px;
+
+    --shadow-small: 0 2px 8px rgba(0, 0, 0, 0.04);
+    --shadow-medium: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+
+/* =========================================================
+   RESET
+   ========================================================= */
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+
+    background: var(--background);
+    color: var(--text);
+
+    font-family:
+        Inter,
+        ui-sans-serif,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+
+    font-size: 15px;
+    line-height: 1.55;
+
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+}
+
+img {
+    display: block;
+    max-width: 100%;
+}
+
+button,
+input,
+select,
+textarea {
+    font: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+h1,
+h2,
+h3,
+h4,
+p {
+    margin-top: 0;
+}
+
+
+/* =========================================================
+   CONTAINER
+   ========================================================= */
+
+.container {
+    width: min(
+        var(--max-width),
+        calc(100% - 48px)
+    );
+
+    margin: 0 auto;
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.site-header {
+    position: sticky;
+    top: 0;
+
+    z-index: 1000;
+
+    height: var(--header-height);
+
+    background: rgba(255, 255, 255, 0.94);
+
+    border-bottom: 1px solid var(--border);
+
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+}
+
+.nav {
+    min-height: var(--header-height);
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 32px;
+}
+
+
+/* =========================================================
+   BRAND
+   ========================================================= */
+
+.brand {
+    display: inline-flex;
+    align-items: center;
+
+    color: var(--text);
+
+    font-size: 23px;
+    font-weight: 850;
+
+    letter-spacing: -0.055em;
+
+    white-space: nowrap;
+}
+
+.brand span {
+    color: var(--accent);
+}
+
+
+/* =========================================================
+   NAVIGATION
+   ========================================================= */
+
+.main-nav {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.nav-link {
+    display: inline-flex;
+    align-items: center;
+
+    gap: 6px;
+
+    padding: 9px 12px;
+
+    border: 0;
+    border-radius: var(--radius-sm);
+
+    background: transparent;
+
+    color: var(--text-secondary);
+
+    font-size: 13px;
+    font-weight: 650;
+
+    line-height: 1;
+
+    transition:
+        color 0.15s ease,
+        background 0.15s ease;
+}
+
+.nav-link:hover {
+    background: var(--surface-alt);
+    color: var(--text);
+}
+
+.nav-link.active {
+    color: var(--text);
+}
+
+.nav-dropdown {
+    position: relative;
+}
+
+.chevron {
+    display: inline-block;
+
+    color: var(--text-muted);
+
+    font-size: 13px;
+
+    transition:
+        transform 0.18s ease;
+}
+
+.nav-dropdown:hover .chevron {
+    transform: rotate(180deg);
+}
+
+.dropdown-menu {
+    position: absolute;
+
+    top: calc(100% + 10px);
+    right: 0;
+
+    width: 270px;
+
+    padding: 7px;
+
+    background: var(--surface);
+
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+
+    box-shadow: var(--shadow-medium);
+
+    opacity: 0;
+    visibility: hidden;
+
+    transform: translateY(-5px);
+
+    transition:
+        opacity 0.15s ease,
+        transform 0.15s ease,
+        visibility 0.15s ease;
+}
+
+.nav-dropdown:hover .dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.dropdown-title {
+    padding: 9px 11px 7px;
+
+    color: var(--accent);
+
+    font-size: 10px;
+    font-weight: 800;
+
+    letter-spacing: 0.15em;
+}
+
+.dropdown-menu a {
+    display: flex;
+    flex-direction: column;
+
+    padding: 10px 11px;
+
+    border-radius: var(--radius-sm);
+
+    color: var(--text);
+}
+
+.dropdown-menu a:hover {
+    background: var(--surface-alt);
+}
+
+.dropdown-menu a span {
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.dropdown-menu a small {
+    margin-top: 2px;
+
+    color: var(--text-muted);
+
+    font-size: 11px;
+}
+
+
+/* =========================================================
+   HERO
+   ========================================================= */
+
+.hero {
+    padding: 120px 0 105px;
+}
+
+.eyebrow {
+    margin-bottom: 14px;
+
+    color: var(--accent);
+
+    font-size: 11px;
+    font-weight: 800;
+
+    letter-spacing: 0.17em;
+
+    text-transform: uppercase;
+}
+
+.hero h1 {
+    max-width: 980px;
+
+    margin: 0 0 28px;
+
+    font-size: clamp(54px, 8vw, 104px);
+
+    font-weight: 800;
+
+    line-height: 0.91;
+
+    letter-spacing: -0.075em;
+}
+
+.hero h1 span {
+    color: var(--text-muted);
+}
+
+.hero-copy {
+    max-width: 650px;
+
+    margin-bottom: 0;
+
+    color: var(--text-secondary);
+
+    font-size: 18px;
+    line-height: 1.65;
+}
+
+.hero-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+
+    gap: 10px;
+
+    margin-top: 34px;
+}
+
+
+/* =========================================================
+   BUTTONS
+   ========================================================= */
+
+.button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 42px;
+
+    padding: 0 17px;
+
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+
+    background: var(--surface);
+
+    color: var(--text);
+
+    font-size: 13px;
+    font-weight: 700;
+
+    transition:
+        background 0.15s ease,
+        border-color 0.15s ease,
+        transform 0.15s ease;
+}
+
+.button:hover {
+    border-color: #a9aaa5;
+    background: var(--surface-alt);
+    transform: translateY(-1px);
+}
+
+.button.primary {
+    border-color: var(--accent);
+    background: var(--accent);
+    color: #fff;
+}
+
+.button.primary:hover {
+    border-color: var(--accent-dark);
+    background: var(--accent-dark);
+}
+
+
+/* =========================================================
+   PAGE
+   ========================================================= */
+
+.page {
+    padding: 64px 0 100px;
+}
+
+
+/* =========================================================
+   PAGE HEADER
+   ========================================================= */
+
+.page-head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+
+    gap: 32px;
+
+    padding-bottom: 28px;
+    margin-bottom: 32px;
+
+    border-bottom: 1px solid var(--border);
+}
+
+.page-head h1 {
+    margin: 5px 0 8px;
+
+    font-size: 62px;
+    font-weight: 800;
+
+    line-height: 0.95;
+
+    letter-spacing: -0.065em;
+}
+
+.page-head p {
+    margin: 0;
+
+    color: var(--text-muted);
+
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   DETAIL HERO
+   ========================================================= */
+
+.detail-hero {
+    padding: 10px 0 36px;
+
+    border-bottom: 1px solid var(--border);
+}
+
+.detail-hero h1 {
+    margin: 5px 0 8px;
+
+    font-size: clamp(44px, 7vw, 80px);
+
+    font-weight: 800;
+
+    line-height: 0.92;
+
+    letter-spacing: -0.07em;
+}
+
+.detail-sub {
+    color: var(--text-muted);
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   SEASON OVERVIEW
+   ========================================================= */
+
+.season-overview {
+    display: grid;
+
+    grid-template-columns:
+        repeat(5, 1fr);
+
+    margin-top: 24px;
+
+    background: var(--surface);
+
+    border: 1px solid var(--border);
+}
+
+.season-overview-stat {
+    min-height: 125px;
+
+    padding: 22px;
+
+    border-right: 1px solid var(--border);
+}
+
+.season-overview-stat:last-child {
+    border-right: 0;
+}
+
+.season-overview-stat span {
+    display: block;
+
+    margin-bottom: 10px;
+
+    color: var(--text-muted);
+
+    font-size: 10px;
+    font-weight: 800;
+
+    letter-spacing: 0.12em;
+
+    text-transform: uppercase;
+}
+
+.season-overview-stat strong {
+    display: block;
+
+    color: var(--text);
+
+    font-size: 24px;
+    font-weight: 800;
+
+    line-height: 1.1;
+
+    letter-spacing: -0.035em;
+}
+
+.season-overview-stat small {
+    display: block;
+
+    margin-top: 6px;
+
+    color: var(--text-muted);
+
+    font-size: 11px;
+}
+
+.season-winner {
+    background: #fffafa;
+}
+
+.season-winner strong {
+    color: var(--accent);
+}
+
+
+/* =========================================================
+   SEASON SECTIONS
+   ========================================================= */
+
+.season-section {
+    margin-top: 64px;
+}
+
+.section-heading {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    margin-bottom: 18px;
+}
+
+.section-heading .eyebrow {
+    margin-bottom: 5px;
+}
+
+.section-heading h2 {
+    margin: 0;
+
+    font-size: 32px;
+    font-weight: 800;
+
+    line-height: 1;
+
+    letter-spacing: -0.045em;
+}
+
+.section-note {
+    color: var(--text-muted);
+
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   CHAMPIONSHIP TABLE
+   ========================================================= */
+
+.championship-table-wrap {
+
+    width: 100%;
+
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    background: var(--surface);
+
+    border: 1px solid var(--border);
+
+    display: block;
+}
+
+.championship-table {
+    width: max-content;
+
+    min-width: 100%;
+
+    border-collapse: collapse;
+
+    table-layout: auto;
+}
+
+.championship-table th,
+.championship-table td {
+    height: 43px;
+
+    padding: 7px 9px;
+
+    border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+
+    text-align: center;
+
+    font-size: 12px;
+}
+
+.championship-table th {
+    height: 48px;
+
+    background: #f0f0ee;
+
+    color: var(--text-secondary);
+
+    font-size: 10px;
+    font-weight: 800;
+
+    letter-spacing: 0.04em;
+}
+
+.championship-table th:last-child,
+.championship-table td:last-child {
+    border-right: 0;
+}
+
+.championship-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+
+/* Fixed columns */
+
+.championship-table .position-column {
+    width: 48px;
+
+    color: var(--text-muted);
+
+    font-weight: 700;
+}
+
+.championship-table .name-column {
+    width: 190px;
+
+    text-align: left;
+
+    font-weight: 700;
+}
+
+.championship-table .points-column {
+    width: 72px;
+
+    background: #f7f7f5;
+
+    font-weight: 800;
+}
+
+
+/* Race columns */
+
+.championship-table .race-column {
+    width: 48px;
+
+    padding: 5px 3px;
+
+    font-size: 10px;
+}
+
+.championship-table .race-column span {
+    display: block;
+
+    font-weight: 800;
+}
+
+
+/* Driver names */
+
+.championship-table .driver-name {
+    color: #1554a5;
+
+    font-weight: 700;
+}
+
+.championship-table .name-column a:hover {
+    text-decoration: underline;
+}
+
+
+/* Race points */
+
+.championship-table .race-point {
+    color: var(--text-muted);
+
+    font-variant-numeric: tabular-nums;
+}
+
+.championship-table .race-point.has-points {
+    color: var(--text);
+    font-weight: 650;
+}
+
+.championship-table .total-points {
+    color: var(--text);
+
+    font-variant-numeric: tabular-nums;
+}
+
+
+/* Championship leader */
+
+.championship-table tr.championship-leader td {
+    background: #fffdf0;
+}
+
+.championship-table tr.championship-leader td.points-column {
+    color: var(--accent);
+}
+
+
+/* Hover */
+
+.championship-table tbody tr:hover td {
+    background: #fafaf8;
+}
+
+.championship-table tbody tr:hover td.points-column {
+    background: #f3f3f0;
+}
+
+
+/* =========================================================
+   CALENDAR
+   ========================================================= */
+
+.calendar-list {
+    display: grid;
+
+    gap: 1px;
+
+    background: var(--border);
+
+    border: 1px solid var(--border);
+}
+
+.calendar-race {
+    display: grid;
+
+    grid-template-columns:
+        55px 115px 1fr 80px;
+
+    align-items: center;
+
+    min-height: 72px;
+
+    background: var(--surface);
+
+    transition:
+        background 0.12s ease;
+}
+
+.calendar-race:hover {
+    background: #fafaf8;
+}
+
+.calendar-round {
+    padding-left: 18px;
+
+    color: var(--accent);
+
+    font-size: 13px;
+    font-weight: 800;
+
+    font-variant-numeric: tabular-nums;
+}
+
+.calendar-date {
+    color: var(--text-muted);
+
+    font-size: 12px;
+}
+
+.calendar-name {
+    display: flex;
+    flex-direction: column;
+
+    padding: 10px 15px;
+}
+
+.calendar-name strong {
+    color: var(--text);
+
+    font-size: 14px;
+    font-weight: 750;
+}
+
+.calendar-name span {
+    margin-top: 2px;
+
+    color: var(--text-muted);
+
+    font-size: 11px;
+}
+
+.calendar-laps {
+    display: flex;
+    align-items: baseline;
+    justify-content: flex-end;
+
+    gap: 4px;
+
+    padding-right: 18px;
+
+    color: var(--text);
+
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.calendar-laps small {
+    color: var(--text-muted);
+
+    font-size: 10px;
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   SEASON GRID
+   ========================================================= */
+
+.season-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, 1fr);
+
+    gap: 10px;
+}
+
+.season-card {
+    position: relative;
+
+    display: block;
+
+    padding: 23px;
+
+    background: var(--surface);
+
+    border: 1px solid var(--border);
+
+    transition:
+        border-color 0.15s ease,
+        background 0.15s ease,
+        transform 0.15s ease;
+}
+
+.season-card:hover {
+    border-color: var(--border-strong);
+
+    background: #fafaf9;
+
+    transform: translateY(-2px);
+}
+
+.season-year {
+    margin-bottom: 28px;
+
+    color: var(--text);
+
+    font-size: 38px;
+    font-weight: 800;
+
+    line-height: 1;
+
+    letter-spacing: -0.055em;
+}
+
+.season-details {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    padding-top: 16px;
+
+    border-top: 1px solid var(--border);
+}
+
+.season-stat {
+    padding-right: 12px;
+
+    border-right: 1px solid var(--border);
+}
+
+.season-stat:not(:first-child) {
+    padding-left: 12px;
+}
+
+.season-stat:last-child {
+    padding-right: 0;
+    border-right: 0;
+}
+
+.season-stat span {
+    display: block;
+
+    margin-bottom: 4px;
+
+    color: var(--text-muted);
+
+    font-size: 9px;
+    font-weight: 800;
+
+    letter-spacing: 0.1em;
+
+    text-transform: uppercase;
+}
+
+.season-stat strong {
+    display: block;
+
+    color: var(--text);
+
+    font-size: 20px;
+    font-weight: 800;
+
+    line-height: 1;
+
+    font-variant-numeric: tabular-nums;
+}
+
+
+/* =========================================================
+   STATS GRID
+   ========================================================= */
+
+.stats-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, 1fr);
+
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+}
+
+.metric {
+    min-height: 130px;
+
+    padding: 25px 24px;
+
+    border-right: 1px solid var(--border);
+
+    background: var(--surface);
+}
+
+.metric:last-child {
+    border-right: 0;
+}
+
+.metric span {
+    display: block;
+
+    margin-bottom: 8px;
+
+    color: var(--text-muted);
+
+    font-size: 11px;
+    font-weight: 700;
+
+    letter-spacing: 0.08em;
+
+    text-transform: uppercase;
+}
+
+.metric strong {
+    display: block;
+
+    font-size: 34px;
+    font-weight: 800;
+
+    line-height: 1;
+
+    letter-spacing: -0.05em;
+}
+
+
+/* =========================================================
+   FEATURE GRID
+   ========================================================= */
+
+.feature-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, 1fr);
+
+    gap: 1px;
+
+    margin-top: 48px;
+
+    padding-bottom: 100px;
+
+    background: var(--border);
+
+    border: 1px solid var(--border);
+}
+
+.feature {
+    position: relative;
+
+    min-height: 280px;
+
+    padding: 25px;
+
+    background: var(--surface);
+}
+
+.feature:hover {
+    background: #fafaf9;
+}
+
+.feature-kicker {
+    color: var(--text-light);
+
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.feature h2 {
+    margin-top: 105px;
+    margin-bottom: 8px;
+
+    font-size: 23px;
+    font-weight: 750;
+}
+
+.feature p {
+    max-width: 210px;
+
+    color: var(--text-muted);
+
+    font-size: 13px;
+}
+
+.arrow {
+    position: absolute;
+
+    right: 25px;
+    bottom: 24px;
+
+    color: var(--accent);
+
+    font-size: 22px;
+}
+
+
+/* =========================================================
+   ENTITY GRID
+   ========================================================= */
+
+.entity-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 10px;
+}
+
+.entity-card {
+    padding: 21px;
+
+    background: var(--surface);
+
+    border: 1px solid var(--border);
+}
+
+.entity-card h3 {
+    margin: 0 0 5px;
+
+    font-size: 18px;
+}
+
+.entity-card p {
+    margin: 0;
+
+    color: var(--text-muted);
+
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   SEARCH
+   ========================================================= */
+
+.search {
+    width: min(300px, 100%);
+
+    height: 42px;
+
+    padding: 0 13px;
+
+    background: var(--surface);
+
+    color: var(--text);
+
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+
+    outline: none;
+}
+
+
+/* =========================================================
+   TWO COLUMN
+   ========================================================= */
+
+.two-col {
+    display: grid;
+
+    grid-template-columns:
+        1fr 1fr;
+
+    gap: 40px;
+
+    margin-top: 42px;
+}
+
+
+/* =========================================================
+   SECTIONS
+   ========================================================= */
+
+.section {
+    margin-top: 56px;
+}
+
+.section-title {
+    padding-bottom: 11px;
+
+    margin-bottom: 12px;
+
+    border-bottom: 1px solid var(--border);
+
+    color: var(--text-muted);
+
+    font-size: 10px;
+    font-weight: 800;
+
+    letter-spacing: 0.15em;
+
+    text-transform: uppercase;
+}
+
+
+/* =========================================================
+   STANDINGS
+   ========================================================= */
+
+.standings {
+    overflow: hidden;
+
+    background: var(--surface);
+
+    border: 1px solid var(--border);
+}
+
+.standing {
+    display: grid;
+
+    grid-template-columns:
+        42px 1fr auto;
+
+    align-items: center;
+
+    gap: 12px;
+
+    min-height: 54px;
+
+    padding: 0 16px;
+
+    border-bottom: 1px solid var(--border);
+}
+
+.standing:last-child {
+    border-bottom: 0;
+}
+
+.pos {
+    color: var(--text-light);
+
+    font-size: 12px;
+}
+
+.points {
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.winner {
+    color: var(--accent);
+}
+
+
+/* =========================================================
+   RACE LIST
+   ========================================================= */
+
+.race-list {
+    display: grid;
+    gap: 7px;
+}
+
+.race {
+    display: grid;
+
+    grid-template-columns:
+        65px 1fr auto;
+
+    align-items: center;
+
+    gap: 16px;
+
+    min-height: 70px;
+
+    padding: 12px 15px;
+
+    background: var(--surface);
+
+    border: 1px solid var(--border);
+}
+
+.race-round {
+    color: var(--accent);
+
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.race-meta {
+    color: var(--text-muted);
+
+    font-size: 11px;
+}
+
+
+/* =========================================================
+   TABLES
+   ========================================================= */
+
+.table-wrap {
+    overflow-x: auto;
+
+    background: var(--surface);
+
+    border: 1px solid var(--border);
+}
+
+table {
+    width: 100%;
+
+    border-collapse: collapse;
+}
+
+th,
+td {
+    padding: 12px 15px;
+
+    border-bottom: 1px solid var(--border);
+
+    text-align: left;
+
+    font-size: 12px;
+}
+
+th {
+    background: var(--surface-alt);
+
+    color: var(--text-muted);
+
+    font-size: 10px;
+    font-weight: 800;
+
+    text-transform: uppercase;
+}
+
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+.footer {
+    padding: 28px 0 55px;
+
+    border-top: 1px solid var(--border);
+
+    color: var(--text-muted);
+
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   UTILITY
+   ========================================================= */
+
+.muted {
+    color: var(--text-muted);
+}
+
+.error {
+    padding: 20px 0;
+
+    color: var(--accent);
+
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 1000px) {
+
+    .feature-grid,
+    .season-grid {
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+
+    .entity-grid {
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+
+    .stats-grid {
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+
+    .season-overview {
+        grid-template-columns:
+            repeat(3, 1fr);
+    }
+
+    .season-overview-stat:nth-child(3) {
+        border-right: 0;
+    }
+
+    .season-overview-stat:nth-child(-n + 3) {
+        border-bottom: 1px solid var(--border);
+    }
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+    :root {
+        --header-height: 64px;
+    }
+
+    .container {
+        width: calc(100% - 28px);
+    }
+
+    .nav {
+        gap: 10px;
+    }
+
+    .brand {
+        font-size: 20px;
+    }
+
+    .nav-link {
+        padding: 8px;
+        font-size: 12px;
+    }
+
+    .hero {
+        padding: 78px 0 70px;
+    }
+
+    .hero h1 {
+        font-size: 52px;
+    }
+
+    .page {
+        padding: 45px 0 75px;
+    }
+
+    .page-head {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .page-head h1 {
+        font-size: 48px;
+    }
+
+    .feature-grid,
+    .season-grid,
+    .entity-grid,
+    .stats-grid,
+    .two-col {
+        grid-template-columns: 1fr;
+    }
+
+    .season-overview {
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+
+    .season-overview-stat:nth-child(3) {
+        border-right: 1px solid var(--border);
+    }
+
+    .season-overview-stat:nth-child(even) {
+        border-right: 0;
+    }
+
+    .season-overview-stat {
+        border-bottom: 1px solid var(--border);
+    }
+
+    .season-overview-stat:last-child {
+        border-bottom: 0;
+    }
+
+    .section-heading {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .calendar-race {
+        grid-template-columns:
+            45px 90px 1fr;
+    }
+
+    .calendar-laps {
+        display: none;
+    }
+
+    .season-details {
+        grid-template-columns:
+            repeat(3, 1fr);
+    }
+
+    .race {
+        grid-template-columns:
+            55px 1fr;
+    }
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+   ========================================================= */
+
+@media (max-width: 450px) {
+
+    .main-nav > .nav-link {
+        display: none;
+    }
+
+    .nav-dropdown .nav-link {
+        display: flex;
+    }
+
+    .dropdown-menu {
+        width: 220px;
+    }
+
+    .hero h1 {
+        font-size: 44px;
+    }
+
+    .page-head h1 {
+        font-size: 43px;
+    }
+
+    .season-overview {
+        grid-template-columns: 1fr;
+    }
+
+    .season-overview-stat,
+    .season-overview-stat:nth-child(even),
+    .season-overview-stat:nth-child(3) {
+        border-right: 0;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .season-overview-stat:last-child {
+        border-bottom: 0;
+    }
+
+    .calendar-race {
+        grid-template-columns:
+            40px 1fr;
+    }
+
+    .calendar-date {
+        display: none;
+    }
+}
+.nav-link-disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.nav-dropdown:focus-within .dropdown-menu,
+.nav-dropdown.is-open .dropdown-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  pointer-events: auto;
+}

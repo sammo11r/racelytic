@@ -1,0 +1,330 @@
+/* =========================================================
+   Racelytics F1 Championship Table
+   Inspired by F1 results sheets
+   ========================================================= */
+
+
+.championship-table-wrap {
+
+    width: 100%;
+
+    overflow-x: auto;
+
+    background: #ffffff;
+
+    border: 1px solid #b8bec7;
+
+}
+
+
+/* =========================================================
+   Table
+   ========================================================= */
+
+
+.championship-table {
+
+    border-collapse: collapse;
+
+    width: max-content;
+
+    min-width: 100%;
+
+    font-size: 13px;
+
+    color: #111827;
+
+}
+
+
+.championship-table th,
+.championship-table td {
+
+    border: 1px solid #b8bec7;
+
+    padding: 4px 6px;
+
+    text-align: center;
+
+    height: 30px;
+
+}
+
+
+/* =========================================================
+   Header
+   ========================================================= */
+
+
+.championship-table thead th {
+
+    background: #e9edf2;
+
+    color: #1d4ed8;
+
+    font-weight: 700;
+
+    white-space: nowrap;
+
+}
+
+
+.championship-table thead th:first-child,
+.championship-table thead th:nth-child(2) {
+
+    color: #111827;
+
+}
+
+
+/* =========================================================
+   Position column
+   ========================================================= */
+
+
+.position-column {
+
+    width: 40px;
+
+    font-weight: 700;
+
+    background: #f4f5f7;
+
+}
+
+
+/* =========================================================
+   Driver/constructor column
+   ========================================================= */
+
+
+.name-column {
+
+    width: 180px;
+
+    min-width: 180px;
+
+    text-align: left !important;
+
+    background: #ffffff;
+
+    font-weight: 600;
+
+}
+
+
+.name-column a {
+
+    color: #1d4ed8;
+
+    text-decoration: none;
+
+}
+
+
+.name-column a:hover {
+
+    text-decoration: underline;
+
+}
+
+
+/* =========================================================
+   Race cells
+   ========================================================= */
+
+
+.race-column {
+
+    width: 42px;
+
+    min-width: 42px;
+
+}
+
+
+.race-point {
+
+    width: 42px;
+
+    min-width: 42px;
+
+}
+
+
+/* =========================================================
+   Result colours
+   ========================================================= */
+
+
+/* Winner */
+
+.result-p1 {
+
+    background: #f6d365;
+
+    color: #5b4500;
+
+    font-weight: 700;
+
+}
+
+
+/* Second */
+
+.result-p2 {
+
+    background: #d7dce2;
+
+    color: #333;
+
+    font-weight: 700;
+
+}
+
+
+/* Third */
+
+.result-p3 {
+
+    background: #cd7f32;
+
+    color: white;
+
+    font-weight: 700;
+
+}
+
+
+/* Points scoring */
+
+.has-points {
+
+    background: #dff5df;
+
+}
+
+
+/* No result */
+
+.no-points {
+
+    background: #fafafa;
+
+    color: #777;
+
+}
+
+
+/* Retired */
+
+.retired {
+
+    background: #f3d8f3;
+
+}
+
+
+/* Disqualified */
+
+.disqualified {
+
+    background: #333;
+
+    color: white;
+
+}
+
+
+/* =========================================================
+   Championship rows
+   ========================================================= */
+
+
+.championship-table tbody tr:hover td {
+
+    outline: 1px solid #2563eb;
+
+}
+
+
+/* =========================================================
+   Total points
+   ========================================================= */
+
+
+.total-points {
+
+    background: #f1f3f5;
+
+    font-weight: 800;
+
+    min-width: 70px;
+
+}
+
+
+/* =========================================================
+   Sticky driver column
+   ========================================================= */
+
+
+.name-column {
+
+    position: sticky;
+
+    left: 40px;
+
+    z-index: 2;
+
+}
+
+
+.position-column {
+
+    position: sticky;
+
+    left: 0;
+
+    z-index: 3;
+
+}
+
+
+/* =========================================================
+   Header sticky
+   ========================================================= */
+
+
+.championship-table thead th {
+
+    position: sticky;
+
+    top: 0;
+
+    z-index: 5;
+
+}
+
+
+/* =========================================================
+   Mobile
+   ========================================================= */
+
+
+@media(max-width:800px) {
+
+    .championship-table {
+
+        font-size: 12px;
+
+    }
+
+
+    .name-column {
+
+        min-width: 150px;
+
+    }
+
+}
