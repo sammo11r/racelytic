@@ -75,7 +75,7 @@ async function loadRace() {
     const data = await getJSON(`/api/races/${encodeURIComponent(id)}`);
     raceData = data;
     const race = data.race;
-    document.title = `${race.officialName} — Racelytics`;
+    document.title = 'Racelytics';
     document.getElementById('race-head').innerHTML = `
       <div class="detail-hero">
         <div class="eyebrow">ROUND ${esc(race.round)} · ${esc(race.year)}</div>

@@ -21,6 +21,7 @@ function renderChassis() {
 
 getJSON('/api/chassis').then(chassis => {
   allChassis = chassis;
+  document.getElementById('chassis-search').value = params().get('search') || '';
   const manufacturers = new Map();
   chassis.forEach(item => item.engineManufacturerIds.forEach((id,index) => manufacturers.set(id,item.engineManufacturers[index] || id)));
   document.getElementById('chassis-engine').insertAdjacentHTML('beforeend',[...manufacturers].sort((a,b)=>a[1].localeCompare(b[1])).map(([id,name])=>`<option value="${esc(id)}">${esc(name)}</option>`).join(''));

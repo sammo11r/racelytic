@@ -5,7 +5,18 @@
             Racelytics<span>.</span>
         </a>
 
-        <nav class="main-nav">
+        <button class="mobile-nav-toggle" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="main-navigation">
+            <span></span><span></span><span></span>
+        </button>
+
+        <nav class="main-nav" id="main-navigation">
+
+            <div class="global-search" role="search">
+                <label class="visually-hidden" for="global-search-input">Search Racelytics</label>
+                <span class="global-search-icon" aria-hidden="true"></span>
+                <input id="global-search-input" type="search" placeholder="Search Racelytics" autocomplete="off" aria-expanded="false" aria-controls="global-search-results">
+                <div id="global-search-results" class="global-search-results" hidden></div>
+            </div>
 
             <!-- DATABASE -->
 

@@ -1,5 +1,7 @@
-function circuitStat(label, value, suffix = '') {
-  const display = value === null || value === undefined || value === '' ? '—' : `${fmtNumber(value)}${suffix}`;
+function circuitStat(label, value, suffix = '', formatNumber = true) {
+  const display = value === null || value === undefined || value === ''
+    ? '—'
+    : `${formatNumber ? fmtNumber(value) : value}${suffix}`;
   return `<div class="detail-stat"><span>${esc(label)}</span><strong>${esc(display)}</strong></div>`;
 }
 
@@ -18,7 +20,7 @@ async function loadCircuit() {
     const firstYear = years.length ? Math.min(...years) : null;
     const lastYear = years.length ? Math.max(...years) : null;
 
-    document.title = `${c.name} — Racelytics`;
+    document.title = 'Racelytics';
     document.getElementById('circuit-head').innerHTML = `
       <section class="detail-hero profile-hero circuit-hero">
         <div class="profile-hero-copy">
@@ -41,8 +43,8 @@ async function loadCircuit() {
       circuitStat('Length', c.length, ' km'),
       circuitStat('Turns', c.turns),
       circuitStat('Races held', c.totalRacesHeld),
-      circuitStat('First race', firstYear),
-      circuitStat('Latest race', lastYear)
+      circuitStat('First race', firstYear, '', false),
+      circuitStat('Latest race', lastYear, '', false)
     ].join('');
 
     document.getElementById('circuit-years').textContent = firstYear
