@@ -26,15 +26,8 @@
       </label>
       <label class="ruleset-control">
         <span>Points system</span>
-        <select id="simulation-points">
-          <option value="modern">Modern · all results count</option>
-          <option value="modern-fastest">2019–2024 · fastest-lap bonus</option>
-          <option value="2003">2003–2009 · all results count</option>
-          <option value="1991">1991–2002 · all results count</option>
-          <option value="classic-11">Classic · best 11 results</option>
-          <option value="classic-8">Classic · best 8 results</option>
-          <option value="classic-6">Classic · best 6 results</option>
-        </select>
+        <select id="simulation-points"></select>
+        <small>Official full-distance scoring and championship counting rules. Race-specific eligibility and shared-drive exceptions depend on the available result data.</small>
       </label>
       <button class="button primary" id="run-simulation" type="button">Run simulation</button>
     </section>
@@ -61,6 +54,7 @@
   <footer class="footer"><div class="container">Racelytic</div></footer>
   <script src="/js/utils.js"></script>
   <script src="/js/header.js"></script>
+  <script src="/js/f1-points-systems.js"></script>
   <script src="/js/simulator.js"></script>
 </body>
 </html>

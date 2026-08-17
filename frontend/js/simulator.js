@@ -1,33 +1,4 @@
-const POINT_SYSTEMS = {
-  modern: {
-    name: 'Modern', race: [25, 18, 15, 12, 10, 8, 6, 4, 2, 1],
-    sprint: [8, 7, 6, 5, 4, 3, 2, 1], fastestLap: false, countBest: Infinity
-  },
-  'modern-fastest': {
-    name: 'Modern with fastest lap', race: [25, 18, 15, 12, 10, 8, 6, 4, 2, 1],
-    sprint: [8, 7, 6, 5, 4, 3, 2, 1], fastestLap: true, countBest: Infinity
-  },
-  2003: {
-    name: '2003–2009', race: [10, 8, 6, 5, 4, 3, 2, 1],
-    sprint: [], fastestLap: false, countBest: Infinity
-  },
-  1991: {
-    name: '1991–2002', race: [10, 6, 4, 3, 2, 1],
-    sprint: [], fastestLap: false, countBest: Infinity
-  },
-  'classic-11': {
-    name: 'Classic · best 11', race: [9, 6, 4, 3, 2, 1],
-    sprint: [], fastestLap: false, countBest: 11
-  },
-  'classic-8': {
-    name: 'Classic · best 8', race: [9, 6, 4, 3, 2, 1],
-    sprint: [], fastestLap: false, countBest: 8
-  },
-  'classic-6': {
-    name: 'Classic · best 6', race: [9, 6, 4, 3, 2, 1],
-    sprint: [], fastestLap: false, countBest: 6
-  }
-};
+const POINT_SYSTEMS = { ...F1_POINTS_SYSTEMS };
 
 let simulationData = null;
 let simulationRequest = 0;
@@ -49,42 +20,52 @@ function compareCountback(a, b) {
   return a.name.localeCompare(b.name);
 }
 
-function scoreResult(result, system) {
+function scoreResult(result, system, mode = 'drivers', isFinalRound = false) {
   if (!result) return { racePoints: 0, sprintPoints: 0, points: 0 };
-  let racePoints = pointsFor(result.position, system.race);
+  const raceScale = mode === 'constructors' && system.constructorRace ? system.constructorRace : system.race;
+  let racePoints = pointsFor(result.position, raceScale);
   const qualifyingPoints = pointsFor(result.qualifyingPosition, system.qualifying || []);
   const sprintPoints = pointsFor(result.sprintPosition, system.sprint);
   if (result.polePosition) racePoints += Number(system.poleBonus || 0);
-  const fastestBonus = Number(system.fastestLapBonus ?? (system.fastestLap ? 1 : 0));
+  const fastestBonus = Number(mode === 'constructors' && system.constructorFastestLapBonus !== undefined
+    ? system.constructorFastestLapBonus
+    : system.fastestLapBonus ?? (system.fastestLap ? 1 : 0));
   const fastestEligible = system.fastestLapMaxPosition == null
     || Number(result.position) <= Number(system.fastestLapMaxPosition);
   if (fastestBonus && result.fastestLap && fastestEligible) racePoints += fastestBonus;
   racePoints += qualifyingPoints;
+  if (system.doublePointsFinalRound && isFinalRound) racePoints *= 2;
   return { racePoints, sprintPoints, qualifyingPoints, points: racePoints + sprintPoints };
 }
 
-function countRounds(rounds, system) {
+function countRounds(rounds, system, mode = 'drivers') {
   const sprintCountsTowardRound = system.sprintCountsTowardRound !== false;
   const score = round => sprintCountsTowardRound ? round.points : round.racePoints;
+  const constructorOverride = mode === 'constructors' && system.constructorCountBest !== undefined;
+  const countBest = constructorOverride ? system.constructorCountBest : system.countBest;
+  const bestFirstRounds = constructorOverride ? null : system.bestFirstRounds;
+  const firstRoundsWindow = constructorOverride ? null : system.firstRoundsWindow;
+  const bestLastRounds = constructorOverride ? null : system.bestLastRounds;
+  const lastRoundsWindow = constructorOverride ? null : system.lastRoundsWindow;
   let counted;
-  if (system.bestFirstRounds || system.bestLastRounds) {
+  if (bestFirstRounds || bestLastRounds) {
     const selected = new Set();
-    const firstWindow = Math.min(Number(system.firstRoundsWindow || 0), rounds.length);
-    const lastWindow = Math.min(Number(system.lastRoundsWindow || 0), rounds.length);
+    const firstWindow = Math.min(Number(firstRoundsWindow || 0), rounds.length);
+    const lastWindow = Math.min(Number(lastRoundsWindow || 0), rounds.length);
     rounds.forEach((round, index) => {
       const inFirst = firstWindow && index < firstWindow;
       const inLast = lastWindow && index >= rounds.length - lastWindow;
-      if (!inFirst && !inLast) selected.add(index);
+      if (!inFirst && !inLast && !system.countOnlySegments) selected.add(index);
     });
     if (firstWindow) [...rounds.slice(0, firstWindow).keys()]
       .sort((a, b) => score(rounds[b]) - score(rounds[a]))
-      .slice(0, Number(system.bestFirstRounds)).forEach(index => selected.add(index));
+      .slice(0, Number(bestFirstRounds)).forEach(index => selected.add(index));
     if (lastWindow) rounds.map((round, index) => index).slice(rounds.length - lastWindow)
       .sort((a, b) => score(rounds[b]) - score(rounds[a]))
-      .slice(0, Number(system.bestLastRounds)).forEach(index => selected.add(index));
+      .slice(0, Number(bestLastRounds)).forEach(index => selected.add(index));
     counted = [...selected].map(index => rounds[index]);
   } else {
-    counted = [...rounds].sort((a, b) => score(b) - score(a)).slice(0, system.countBest);
+    counted = [...rounds].sort((a, b) => score(b) - score(a)).slice(0, countBest ?? Infinity);
   }
   const points = counted.reduce((sum, round) => sum + (sprintCountsTowardRound ? round.points : round.racePoints), 0)
     + (sprintCountsTowardRound ? 0 : rounds.reduce((sum, round) => sum + round.sprintPoints, 0));
@@ -100,15 +81,15 @@ function rankStandings(entries) {
 function simulateDrivers(data, system) {
   return rankStandings(data.driverChampionship.map(driver => {
     const finishes = {};
-    const rounds = data.calendar.map(race => {
+    const rounds = data.calendar.map((race, index) => {
       const result = driver.raceResults?.[String(race.round)] || null;
       if (result?.position) finishes[result.position] = (finishes[result.position] || 0) + 1;
-      return { round: race.round, ...scoreResult(result, system) };
+      return { round: race.round, ...scoreResult(result, system, 'drivers', index === data.calendar.length - 1) };
     });
     return {
       id: driver.driverId, name: driver.name, abbreviation: driver.abbreviation,
       originalPosition: Number(driver.position), originalPoints: Number(driver.points),
-      ...countRounds(rounds, system), finishes
+      ...countRounds(rounds, system, 'drivers'), finishes
     };
   }));
 }
@@ -121,13 +102,19 @@ function simulateConstructors(data, system) {
   }]));
 
   data.driverChampionship.forEach(driver => Object.entries(driver.raceResults || {}).forEach(([roundNumber, result]) => {
-    const score = scoreResult(result, system);
+    const roundIndex = data.calendar.findIndex(race => Number(race.round) === Number(roundNumber));
+    const score = scoreResult(result, system, 'constructors', roundIndex === data.calendar.length - 1);
     const raceConstructor = constructors.get(String(result.constructorId));
     const sprintConstructor = constructors.get(String(result.sprintConstructorId || result.constructorId));
     if (raceConstructor) {
       const round = raceConstructor.rounds.get(Number(roundNumber));
-      round.racePoints += score.racePoints;
-      round.points += score.racePoints;
+      if (system.constructorScoringCars === 1) {
+        round.racePoints = Math.max(round.racePoints, score.racePoints);
+        round.points = round.racePoints + round.sprintPoints;
+      } else {
+        round.racePoints += score.racePoints;
+        round.points += score.racePoints;
+      }
       if (result.position) raceConstructor.finishes[result.position] = (raceConstructor.finishes[result.position] || 0) + 1;
     }
     if (sprintConstructor) {
@@ -138,7 +125,7 @@ function simulateConstructors(data, system) {
   }));
 
   return rankStandings([...constructors.values()].map(({ rounds, ...constructor }) => ({
-    ...constructor, ...countRounds([...rounds.values()], system)
+    ...constructor, ...countRounds([...rounds.values()], system, 'constructors')
   })));
 }
 
@@ -152,6 +139,14 @@ function renderSimulation() {
   if (!simulationData) return;
   const system = POINT_SYSTEMS[document.getElementById('simulation-points').value];
   const isDrivers = simulationMode === 'drivers';
+  if (!isDrivers && system.constructorsAvailable === false) {
+    document.getElementById('simulation-championship-title').textContent = 'Constructor championship';
+    document.getElementById('simulation-status').textContent = `${simulationData.year} · constructors`;
+    document.getElementById('simulation-explanation').textContent = `${system.name} predates the World Constructors’ Championship, which began in 1958.`;
+    document.getElementById('simulation-summary').innerHTML = '';
+    document.getElementById('simulation-results').innerHTML = '<div class="empty-state">No Constructors’ Championship was awarded under this points system.</div>';
+    return;
+  }
   const standings = isDrivers ? simulateDrivers(simulationData, system) : simulateConstructors(simulationData, system);
   const champion = standings[0];
   const originalChampion = (isDrivers ? simulationData.driverChampionship : simulationData.constructorChampionship)[0];
@@ -159,17 +154,24 @@ function renderSimulation() {
   const changedChampion = String(champion.id) !== String(originalChampionId);
   const label = isDrivers ? 'Driver' : 'Constructor';
   const link = isDrivers ? 'driver' : 'constructor';
+  const displayedFastestLapBonus = Number(!isDrivers && system.constructorFastestLapBonus !== undefined
+    ? system.constructorFastestLapBonus
+    : system.fastestLapBonus ?? (system.fastestLap ? 1 : 0));
 
   document.getElementById('simulation-championship-title').textContent = `${label} championship`;
   document.getElementById('simulation-status').textContent = `${simulationData.year} · ${standings.length} ${simulationMode}`;
   document.getElementById('simulation-explanation').innerHTML = `
-    <strong>${esc(system.name)}</strong> awards ${system.race.join('–')} points in races${system.sprint.length ? ` and ${system.sprint.join('–')} in sprints` : ', with sprint races excluded'}.
+    <strong>${esc(system.name)}</strong> awards ${(isDrivers ? system.race : system.constructorRace || system.race).join('–')} points in races${system.sprint.length ? ` and ${system.sprint.join('–')} in sprints` : ', with sprint races excluded'}.
     ${system.qualifying?.length ? `Qualifying awards ${system.qualifying.join('–')} points.` : 'No qualifying points are awarded.'}
     ${Number(system.poleBonus || 0) ? `Pole position earns ${fmtNumber(system.poleBonus)} bonus points.` : 'No pole-position bonus is awarded.'}
-    ${Number(system.fastestLapBonus ?? (system.fastestLap ? 1 : 0)) ? `Fastest lap earns ${fmtNumber(system.fastestLapBonus ?? 1)} bonus points${system.fastestLapMaxPosition ? ` when finishing in the top ${system.fastestLapMaxPosition}` : ''}.` : 'No fastest-lap bonus is awarded.'}
-    ${system.bestFirstRounds || system.bestLastRounds
+    ${displayedFastestLapBonus ? `Fastest lap earns ${fmtNumber(displayedFastestLapBonus)} bonus points${system.fastestLapMaxPosition ? ` when finishing in the top ${system.fastestLapMaxPosition}` : ''}.` : 'No fastest-lap bonus is awarded.'}
+    ${!isDrivers && system.constructorCountBest !== undefined
+      ? system.constructorCountBest === Infinity ? 'Every constructor result counts.' : `Only the best ${system.constructorCountBest} constructor results count.`
+      : system.bestFirstRounds || system.bestLastRounds
       ? `${system.bestFirstRounds ? `The best ${system.bestFirstRounds} of the first ${system.firstRoundsWindow} races count.` : ''} ${system.bestLastRounds ? `The best ${system.bestLastRounds} of the last ${system.lastRoundsWindow} races count.` : ''}`
-      : system.countBest === Infinity ? 'Every round counts.' : `Only each ${label.toLowerCase()}’s best ${system.countBest} round totals count.`}`;
+      : system.countBest === Infinity ? 'Every round counts.' : `Only each ${label.toLowerCase()}’s best ${system.countBest} round totals count.`}
+    ${!isDrivers && system.constructorScoringCars === 1 ? 'Only the highest-scoring car from each constructor counts at each race.' : ''}
+    ${system.doublePointsFinalRound ? 'The final race awards double points.' : ''}`;
   document.getElementById('simulation-summary').innerHTML = `
     <div class="simulation-champion">
       <span>Simulated champion</span>
@@ -225,6 +227,16 @@ async function initialiseSimulator() {
     select.innerHTML = seasons.map(season => `<option value="${esc(season.year)}">${esc(season.year)}</option>`).join('');
     customSystems = systems;
     const pointsSelect = document.getElementById('simulation-points');
+    const historicalGroup = document.createElement('optgroup');
+    historicalGroup.label = 'Official Formula One systems';
+    Object.entries(F1_POINTS_SYSTEMS).forEach(([key, system]) => {
+      const option = document.createElement('option');
+      option.value = key;
+      option.textContent = system.name;
+      historicalGroup.append(option);
+    });
+    pointsSelect.append(historicalGroup);
+    pointsSelect.value = '2025-present';
     if (customSystems.length) {
       const group = document.createElement('optgroup');
       group.label = 'Custom points systems';
