@@ -1,5 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
+const http = require('node:http');
 const app = require('../backend/server');
 const pool = require('../backend/db');
 
@@ -58,4 +59,42 @@ test('all public API routes remain registered after modularization', () => {
         '/api/seasons',
         '/api/seasons/:year'
     ]);
+});
+
+test('same-origin writes accept HTTPS forwarded by the local reverse proxy', async () => {
+    const server = app.listen(0, '127.0.0.1');
+    await new Promise((resolve, reject) => {
+        server.once('listening', resolve);
+        server.once('error', reject);
+    });
+
+    try {
+        const { port } = server.address();
+        const response = await new Promise((resolve, reject) => {
+            const request = http.request({
+                hostname: '127.0.0.1',
+                port,
+                path: '/api/account/register',
+                method: 'POST',
+                headers: {
+                    'content-type': 'application/json',
+                    host: 'racelytic.com',
+                    origin: 'https://racelytic.com',
+                    'x-forwarded-proto': 'https'
+                }
+            }, incoming => {
+                let body = '';
+                incoming.setEncoding('utf8');
+                incoming.on('data', chunk => { body += chunk; });
+                incoming.on('end', () => resolve({ status: incoming.statusCode, body: JSON.parse(body) }));
+            });
+            request.on('error', reject);
+            request.end('{}');
+        });
+
+        assert.notEqual(response.body.error, 'Invalid request origin.');
+        assert.equal(response.status, 400);
+    } finally {
+        await new Promise((resolve, reject) => server.close(error => error ? reject(error) : resolve()));
+    }
 });

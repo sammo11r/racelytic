@@ -5,6 +5,11 @@ const path = require('path');
 const app = express();
 const PORT = Number(process.env.PORT || 3000);
 
+// Nginx terminates HTTPS locally and forwards the original protocol. Trust only
+// loopback proxies so origin checks see https without accepting spoofed headers
+// from direct external connections.
+app.set('trust proxy', 'loopback');
+
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../frontend')));
 
