@@ -25,7 +25,7 @@ function renderWinnerBoard() {
   const found = revealedWinners.size;
   document.getElementById('quiz-score').textContent = `${found} / ${winnerRows.length}`;
   document.getElementById('quiz-progress-label').textContent = found === winnerRows.length
-    ? 'Perfect score — every winner found!'
+    ? 'Perfect score. Every winner found!'
     : `${winnerRows.length - found} drivers remaining`;
   const names = [...new Set(revealedWinners.values())];
   document.getElementById('guessed-drivers').innerHTML = names.map(name => `<span>${esc(name)}</span>`).join('');
@@ -71,7 +71,7 @@ document.getElementById('winner-guess-form').addEventListener('submit', async ev
       result.matches.forEach(match => revealedWinners.set(match.slot, match.driverName));
       renderWinnerBoard();
       const names = result.matches.map(match => match.driverName).join(' and ');
-      feedback.textContent = newMatches.length ? `Correct — ${names}.` : `${names} already ${result.matches.length > 1 ? 'were' : 'was'} found.`;
+      feedback.textContent = newMatches.length ? `Correct: ${names}.` : `${names} already ${result.matches.length > 1 ? 'were' : 'was'} found.`;
       feedback.className = newMatches.length ? 'is-correct' : '';
     }
     input.value = '';

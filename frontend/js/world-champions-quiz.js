@@ -27,7 +27,7 @@ function renderQuizTable() {
   const found = revealedSeasons.size;
   document.getElementById('quiz-score').textContent = `${found} / ${quizSeasons.length}`;
   document.getElementById('quiz-progress-label').textContent = found === quizSeasons.length
-    ? 'Perfect score — every season found!'
+    ? 'Perfect score. Every season found!'
     : `${quizSeasons.length - found} seasons remaining`;
   document.getElementById('guessed-drivers').innerHTML = [...guessedDriverNames].map(name => `<span>${esc(name)}</span>`).join('');
 }
@@ -73,7 +73,7 @@ document.getElementById('champion-guess-form').addEventListener('submit', async 
       guessedDriverNames.add(result.driverName);
       renderQuizTable();
       feedback.textContent = newYears.length
-        ? `Correct — ${result.driverName} revealed ${newYears.length} ${newYears.length === 1 ? 'season' : 'seasons'}.`
+        ? `Correct: ${result.driverName} revealed ${newYears.length} ${newYears.length === 1 ? 'season' : 'seasons'}.`
         : `${result.driverName} was already found.`;
       feedback.className = newYears.length ? 'is-correct' : '';
     }
