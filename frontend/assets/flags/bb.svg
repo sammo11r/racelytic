@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" id="flag-icons-bb" viewBox="0 0 640 480">
+  <path fill="#00267f" d="M0 0h213.3v480H0zm426.7 0H640v480H426.7z"/>
+  <path fill="#ffc726" d="M213.3 0h213.4v480H213.3z"/>
+  <path fill="#000" d="M306 154h28v82l40-27 15 24-55 37v80h-28v-80l-55-37 15-24 40 27zm-64 1 25 12-24 50-25-12zm156 0 24 50-25 12-24-50z"/>
+</svg>

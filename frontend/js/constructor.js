@@ -12,7 +12,7 @@ async function loadConstructor() {
     const firstSeason = data.standings.length ? data.standings[data.standings.length - 1].year : null;
     const lastSeason = data.standings.length ? data.standings[0].year : null;
 
-    document.title = 'Racelytic';
+    document.title = `${c.name} · Formula 1 · Racelytic`;
     document.getElementById('constructor-head').innerHTML = `
       <section class="detail-hero profile-hero">
         <div class="profile-hero-copy">

@@ -3,6 +3,37 @@ const { withConnection, sendError } = require('../route-helpers');
 
 const router = express.Router();
 
+function f2SessionType(session, sessionIndex, sessionCount, year) {
+    const name = String(session.name || '').toLowerCase();
+    if (name.includes('feature')) return 'F';
+    if (name.includes('sprint')) return 'S';
+    const sessionNumber = Number(session.sessionNumber || 0);
+    if (sessionNumber) {
+        if (Number(year) <= 2020) return sessionNumber <= 4 ? 'F' : 'S';
+        return sessionNumber >= 6 ? 'F' : 'S';
+    }
+    if (Number(year) <= 2020) return sessionIndex === 0 ? 'F' : 'S';
+    return sessionIndex === sessionCount - 1 ? 'F' : 'S';
+}
+
+function f2ResultPoints(result, sessionType, year, polePosition) {
+    if (result.officialPoints !== null && result.officialPoints !== undefined) {
+        return Number(result.officialPoints);
+    }
+    const featurePoints = [25, 18, 15, 12, 10, 8, 6, 4, 2, 1];
+    const sprintPoints = Number(year) <= 2021
+        ? [15, 12, 10, 8, 6, 4, 2, 1]
+        : [10, 8, 6, 5, 4, 3, 2, 1];
+    const position = Number(result.positionNumber || 0);
+    const scale = sessionType === 'F' ? featurePoints : sprintPoints;
+    let points = position > 0 ? Number(scale[position - 1] || 0) : 0;
+    if (['1', 'true'].includes(String(result.fastestLap).toLowerCase()) && position > 0 && position <= 10) {
+        points += Number(year) <= 2021 ? 2 : 1;
+    }
+    if (polePosition) points += Number(year) <= 2021 ? 4 : 2;
+    return points;
+}
+
 // ============================================================
 // Seasons List
 // ============================================================
@@ -10,6 +41,49 @@ const router = express.Router();
 router.get('/api/seasons', async (req, res) => {
 
     try {
+
+        if (String(req.query.series || '').toLowerCase() === 'f2') {
+            const rows = await withConnection(async connection => {
+                const [seasons, raceCounts, driverCounts, constructorCounts, champions] = await Promise.all([
+                    connection.query('SELECT year FROM f2_seasons ORDER BY year DESC'),
+                    connection.query('SELECT year, COUNT(*) AS raceCount FROM f2_races GROUP BY year'),
+                    connection.query('SELECT year, COUNT(DISTINCT driverId) AS driverCount FROM f2_entries WHERE driverId IS NOT NULL GROUP BY year'),
+                    connection.query('SELECT year, COUNT(DISTINCT constructorId) AS constructorCount FROM f2_entries WHERE constructorId IS NOT NULL GROUP BY year'),
+                    connection.query(`
+                        SELECT standings.year, standings.driverId AS championDriverId, drivers.name AS championName
+                        FROM f2_season_driver_standings standings
+                        JOIN f2_drivers drivers ON drivers.id = standings.driverId
+                        LEFT JOIN (
+                            SELECT year, MAX(COALESCE(endDate, date)) AS finalDate
+                            FROM f2_races
+                            GROUP BY year
+                        ) calendars ON calendars.year = standings.year
+                        WHERE standings.positionNumber = 1
+                            AND (
+                                LOWER(CAST(standings.championshipWon AS CHAR)) IN ('1', 'true')
+                                OR calendars.finalDate < CURRENT_DATE()
+                            )
+                    `)
+                ]);
+                const countMap = (items, field) => new Map(items.map(item => [Number(item.year), Number(item[field])]));
+                const raceMap = countMap(raceCounts, 'raceCount');
+                const driverMap = countMap(driverCounts, 'driverCount');
+                const constructorMap = countMap(constructorCounts, 'constructorCount');
+                const championMap = new Map(champions.map(row => [Number(row.year), { id: row.championDriverId, name: row.championName }]));
+
+                return seasons.map(season => {
+                    const year = Number(season.year);
+                    return {
+                        year,
+                        raceCount: raceMap.get(year) || 0,
+                        driverCount: driverMap.get(year) || 0,
+                        constructorCount: constructorMap.get(year) || 0,
+                        champion: championMap.get(year) || null
+                    };
+                });
+            });
+            return res.json(rows);
+        }
 
         const rows = await withConnection(async connection => {
 
@@ -144,6 +218,329 @@ router.get('/api/seasons/:year', async (req, res) => {
 
 
     try {
+
+        if (String(req.query.series || '').toLowerCase() === 'f2') {
+            const data = await withConnection(async connection => {
+                const seasonRows = await connection.query('SELECT year FROM f2_seasons WHERE year = ?', [year]);
+                if (!seasonRows.length) return null;
+
+                const [races, raceSessions, raceResults, featureGridLeaders, qualifyingWinners, officialStandings] = await Promise.all([
+                    connection.query(`
+                        SELECT r.id, r.round, r.date, r.endDate, r.name, r.code, r.circuitId,
+                               c.name AS circuitName, c.placeName
+                        FROM f2_races r
+                        LEFT JOIN f2_circuits c ON c.id = r.circuitId
+                        WHERE r.year = ?
+                        ORDER BY r.round
+                    `, [year]),
+                    connection.query(`
+                        SELECT sessions.id AS sessionId, sessions.raceId, sessions.sessionNumber,
+                               sessions.name AS sessionName, sessions.cancelled, results.driverId,
+                               drivers.name AS winnerName, constructors.name AS constructorName
+                        FROM f2_sessions sessions
+                        LEFT JOIN f2_session_results results ON results.sessionId = sessions.id AND results.positionNumber = 1
+                        LEFT JOIN f2_drivers drivers ON drivers.id = results.driverId
+                        LEFT JOIN f2_constructors constructors ON constructors.id = results.constructorId
+                        WHERE sessions.year = ?
+                            AND (
+                                LOWER(CAST(sessions.isRace AS CHAR)) IN ('1', 'true')
+                                OR (
+                                    LOWER(CAST(sessions.cancelled AS CHAR)) IN ('1', 'true')
+                                    AND LOWER(sessions.name) LIKE '%race%'
+                                )
+                            )
+                        ORDER BY sessions.round, sessions.sessionNumber
+                    `, [year]),
+                    connection.query(`
+                        SELECT sessions.id AS sessionId, results.driverId, results.constructorId,
+                               results.positionNumber, results.points AS officialPoints,
+                               results.status, results.fastestLap, results.polePosition,
+                               constructors.name AS constructorName,
+                               drivers.name AS driverName, drivers.abbreviation
+                        FROM f2_sessions sessions
+                        JOIN f2_session_results results ON results.sessionId = sessions.id
+                        LEFT JOIN f2_constructors constructors ON constructors.id = results.constructorId
+                        LEFT JOIN f2_drivers drivers ON drivers.id = results.driverId
+                        WHERE sessions.year = ?
+                            AND LOWER(CAST(sessions.isRace AS CHAR)) IN ('1', 'true')
+                            AND (sessions.cancelled IS NULL OR LOWER(CAST(sessions.cancelled AS CHAR)) NOT IN ('1', 'true'))
+                        ORDER BY sessions.round, sessions.sessionNumber, results.positionDisplayOrder
+                    `, [year]),
+                    connection.query(`
+                        SELECT sessions.raceId, results.driverId, sessions.sessionNumber
+                        FROM f2_sessions sessions
+                        JOIN f2_session_results results
+                            ON results.sessionId = sessions.id
+                            AND results.positionNumber = 1
+                        WHERE sessions.year = ?
+                            AND LOWER(sessions.name) LIKE '%starting grid%'
+                        ORDER BY sessions.round, sessions.sessionNumber DESC
+                    `, [year]),
+                    connection.query(`
+                        SELECT sessions.raceId, results.driverId, results.timeMillis
+                        FROM f2_sessions sessions
+                        JOIN f2_session_results results
+                            ON results.sessionId = sessions.id
+                            AND results.positionNumber = 1
+                        WHERE sessions.year = ?
+                            AND LOWER(sessions.name) LIKE '%qualif%'
+                        ORDER BY sessions.round,
+                            CASE WHEN results.timeMillis IS NULL THEN 1 ELSE 0 END,
+                            results.timeMillis
+                    `, [year]),
+                    connection.query(`
+                        SELECT driverId, MIN(positionNumber) AS positionNumber,
+                               MAX(points) AS points, MAX(championshipWon) AS championshipWon,
+                               MAX(starts) AS starts, MAX(wins) AS wins, MAX(podiums) AS podiums,
+                               MAX(poles) AS poles, MAX(fastestLaps) AS fastestLaps,
+                               MAX(retirements) AS retirements
+                        FROM f2_season_driver_standings
+                        WHERE year = ?
+                        GROUP BY driverId
+                    `, [year])
+                ]);
+
+                const sessionsByRace = new Map();
+                for (const session of raceSessions) {
+                    if (!sessionsByRace.has(session.raceId)) sessionsByRace.set(session.raceId, []);
+                    sessionsByRace.get(session.raceId).push({
+                        id: session.sessionId,
+                        sessionNumber: Number(session.sessionNumber),
+                        name: session.sessionName,
+                        cancelled: ['1', 'true'].includes(String(session.cancelled).toLowerCase()),
+                        winner: session.winnerName,
+                        driverId: session.driverId,
+                        constructor: session.constructorName
+                    });
+                }
+
+                const resultsByDriver = new Map();
+                for (const result of raceResults) {
+                    const driverId = String(result.driverId);
+                    if (!resultsByDriver.has(driverId)) resultsByDriver.set(driverId, {});
+                    resultsByDriver.get(driverId)[result.sessionId] = {
+                        position: result.positionNumber === null ? null : Number(result.positionNumber),
+                        positionText: result.positionNumber || result.status || null,
+                        points: result.officialPoints === null ? null : Number(result.officialPoints),
+                        constructorId: result.constructorId,
+                        fastestLap: ['1', 'true'].includes(String(result.fastestLap).toLowerCase()),
+                        polePosition: result.polePosition === null
+                            ? null
+                            : ['1', 'true'].includes(String(result.polePosition).toLowerCase())
+                    };
+                }
+
+                const poleDriverByRace = new Map();
+                for (const result of featureGridLeaders) {
+                    if (!poleDriverByRace.has(result.raceId)) {
+                        poleDriverByRace.set(result.raceId, result.driverId);
+                    }
+                }
+                for (const result of qualifyingWinners) {
+                    if (!poleDriverByRace.has(result.raceId)) {
+                        poleDriverByRace.set(result.raceId, result.driverId);
+                    }
+                }
+
+                let officialConstructorStandings = [];
+                try {
+                    officialConstructorStandings = await connection.query(`
+                        SELECT constructorId, positionNumber, points, championshipWon
+                        FROM f2_season_constructor_standings
+                        WHERE year = ?
+                    `, [year]);
+                } catch (error) {
+                    if (error.code !== 'ER_NO_SUCH_TABLE') throw error;
+                }
+
+                const sessionContextById = new Map();
+                for (const [raceId, sessions] of sessionsByRace) {
+                    sessions.forEach((session, sessionIndex) => {
+                        sessionContextById.set(session.id, {
+                            raceId,
+                            type: f2SessionType(session, sessionIndex, sessions.length, year)
+                        });
+                    });
+                }
+
+                const constructorsById = new Map();
+                const driversById = new Map();
+                for (const result of raceResults) {
+                    const context = sessionContextById.get(result.sessionId);
+                    if (!context) continue;
+                    const driverId = String(result.driverId);
+                    if (!driversById.has(driverId)) {
+                        driversById.set(driverId, {
+                            driverId: result.driverId,
+                            name: result.driverName || result.driverId,
+                            abbreviation: result.abbreviation,
+                            constructorId: result.constructorId,
+                            constructor: result.constructorName,
+                            points: 0,
+                            starts: 0,
+                            wins: 0,
+                            podiums: 0,
+                            poles: 0,
+                            fastestLaps: 0,
+                            retirements: 0,
+                            finishCounts: [],
+                            raceResults: resultsByDriver.get(driverId) || {}
+                        });
+                    }
+                    const driver = driversById.get(driverId);
+                    driver.constructorId = result.constructorId || driver.constructorId;
+                    driver.constructor = result.constructorName || driver.constructor;
+                    driver.starts += 1;
+                    const position = Number(result.positionNumber || 0);
+                    const importedPolePosition = result.polePosition === null
+                        ? null
+                        : ['1', 'true'].includes(String(result.polePosition).toLowerCase());
+                    const polePosition = importedPolePosition === null
+                        ? context.type === 'F' && driverId === String(poleDriverByRace.get(context.raceId))
+                        : importedPolePosition;
+                    const points = f2ResultPoints(result, context.type, year, polePosition);
+                    driver.points += points;
+                    if (position === 1) driver.wins += 1;
+                    if (position > 0 && position <= 3) driver.podiums += 1;
+                    if (polePosition) driver.poles += 1;
+                    if (['1', 'true'].includes(String(result.fastestLap).toLowerCase())) driver.fastestLaps += 1;
+                    if (/DNF|RET/i.test(String(result.status || ''))) driver.retirements += 1;
+                    if (position > 0) {
+                        driver.finishCounts[position] = Number(driver.finishCounts[position] || 0) + 1;
+                    }
+
+                    if (!result.constructorId) continue;
+                    const constructorId = String(result.constructorId);
+                    if (!constructorsById.has(constructorId)) {
+                        constructorsById.set(constructorId, {
+                            constructorId: result.constructorId,
+                            name: result.constructorName || result.constructorId,
+                            points: 0,
+                            finishCounts: [],
+                            raceResults: {}
+                        });
+                    }
+                    const constructor = constructorsById.get(constructorId);
+                    const constructorPolePosition = importedPolePosition === null
+                        ? context.type === 'F' && String(result.driverId) === String(poleDriverByRace.get(context.raceId))
+                        : importedPolePosition;
+                    const constructorPoints = f2ResultPoints(result, context.type, year, constructorPolePosition);
+                    constructor.points += constructorPoints;
+                    constructor.raceResults[result.sessionId] =
+                        Number(constructor.raceResults[result.sessionId] || 0) + constructorPoints;
+                    if (position > 0) {
+                        constructor.finishCounts[position] = Number(constructor.finishCounts[position] || 0) + 1;
+                    }
+                }
+
+                const officialConstructorById = new Map(
+                    officialConstructorStandings.map(row => [String(row.constructorId), row])
+                );
+                const constructorChampionship = [...constructorsById.values()]
+                    .sort((first, second) => {
+                        const firstOfficial = officialConstructorById.get(String(first.constructorId));
+                        const secondOfficial = officialConstructorById.get(String(second.constructorId));
+                        if (firstOfficial && secondOfficial) {
+                            return Number(firstOfficial.positionNumber) - Number(secondOfficial.positionNumber);
+                        }
+                        if (firstOfficial) return -1;
+                        if (secondOfficial) return 1;
+                        if (second.points !== first.points) return second.points - first.points;
+                        for (let position = 1; position <= 30; position += 1) {
+                            const difference = Number(second.finishCounts[position] || 0) -
+                                Number(first.finishCounts[position] || 0);
+                            if (difference) return difference;
+                        }
+                        return first.name.localeCompare(second.name);
+                    })
+                    .map((constructor, index) => {
+                        const official = officialConstructorById.get(String(constructor.constructorId));
+                        return {
+                        position: official ? Number(official.positionNumber) : index + 1,
+                        constructorId: constructor.constructorId,
+                        name: constructor.name,
+                        points: official ? Number(official.points) : constructor.points,
+                        champion: official
+                            ? ['1', 'true'].includes(String(official.championshipWon).toLowerCase())
+                            : index === 0,
+                        raceResults: constructor.raceResults
+                    };
+                    });
+
+                const officialByDriver = new Map(
+                    officialStandings.map(row => [String(row.driverId), row])
+                );
+                const championship = [...driversById.values()]
+                    .sort((first, second) => {
+                        const firstOfficial = officialByDriver.get(String(first.driverId));
+                        const secondOfficial = officialByDriver.get(String(second.driverId));
+                        const firstPoints = firstOfficial ? Number(firstOfficial.points) : first.points;
+                        const secondPoints = secondOfficial ? Number(secondOfficial.points) : second.points;
+                        if (secondPoints !== firstPoints) return secondPoints - firstPoints;
+                        if (firstOfficial && secondOfficial) {
+                            return Number(firstOfficial.positionNumber) - Number(secondOfficial.positionNumber);
+                        }
+                        for (let position = 1; position <= 30; position += 1) {
+                            const difference = Number(second.finishCounts[position] || 0) -
+                                Number(first.finishCounts[position] || 0);
+                            if (difference) return difference;
+                        }
+                        return first.name.localeCompare(second.name);
+                    })
+                    .map((driver, index) => {
+                        const official = officialByDriver.get(String(driver.driverId));
+                        return {
+                        position: index + 1,
+                        driverId: driver.driverId,
+                        name: driver.name,
+                        abbreviation: driver.abbreviation,
+                        constructorId: driver.constructorId,
+                        constructor: driver.constructor,
+                        points: official ? Number(official.points) : driver.points,
+                        champion: official
+                            ? ['1', 'true'].includes(String(official.championshipWon).toLowerCase())
+                            : index === 0,
+                        starts: official ? Number(official.starts) : driver.starts,
+                        wins: official ? Number(official.wins) : driver.wins,
+                        podiums: official ? Number(official.podiums) : driver.podiums,
+                        poles: official ? Number(official.poles) : driver.poles,
+                        fastestLaps: official ? Number(official.fastestLaps) : driver.fastestLaps,
+                        retirements: official ? Number(official.retirements) : driver.retirements,
+                        raceResults: driver.raceResults
+                    };
+                    });
+
+                return {
+                    year,
+                    summary: {
+                        rounds: races.length,
+                        drivers: championship.length,
+                        teams: constructorChampionship.length,
+                        first: championship[0] || null,
+                        second: championship[1] || null,
+                        third: championship[2] || null
+                    },
+                    championship,
+                    constructorChampionship,
+                    calendar: races.map(race => ({
+                        id: race.id,
+                        round: Number(race.round),
+                        date: race.date,
+                        endDate: race.endDate,
+                        name: race.name,
+                        code: race.code,
+                        circuitId: race.circuitId,
+                        circuitName: race.circuitName,
+                        placeName: race.placeName,
+                        poleDriverId: poleDriverByRace.get(race.id) || null,
+                        sessions: sessionsByRace.get(race.id) || []
+                    }))
+                };
+            });
+
+            if (!data) return res.status(404).json({ error: 'Season not found.' });
+            return res.json(data);
+        }
 
         const data = await withConnection(async connection => {
 

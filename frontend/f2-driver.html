@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Explore a Formula 2 driver's championship and race history.">
+  <link rel="icon" href="/assets/favicon-f2.svg" type="image/svg+xml">
+  <title>Formula 2 Driver · Racelytic</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/polish.css">
+</head>
+<body class="f2-mode">
+  <div id="header"></div>
+  <main class="container page">
+    <a class="back-link" href="/f2/drivers"><span aria-hidden="true">←</span> All F2 drivers</a>
+    <div id="f2-driver-head"></div>
+    <section class="detail-section">
+      <div class="section-heading"><div><div class="eyebrow">FORMULA 2 RECORD</div><h2>At a glance</h2></div></div>
+      <div id="f2-driver-stats" class="detail-stat-grid"></div>
+    </section>
+    <section class="detail-section">
+      <div class="section-heading"><div><div class="eyebrow">CHAMPIONSHIP HISTORY</div><h2>Season by season</h2></div><div id="f2-driver-career-span" class="section-note"></div></div>
+      <div id="f2-driver-seasons"></div>
+    </section>
+    <section class="detail-section">
+      <div class="section-heading"><div><div class="eyebrow">RACE HISTORY</div><h2>Sprint and feature races</h2></div><div class="section-note">Latest 300 starts</div></div>
+      <div id="f2-driver-results" class="table-wrap detail-results f2-driver-results"></div>
+    </section>
+  </main>
+  <footer class="footer"><div class="container">Racelytic</div></footer>
+  <script src="/js/utils.js"></script>
+  <script src="/js/header.js"></script>
+  <script src="/js/f2-driver.js"></script>
+</body>
+</html>

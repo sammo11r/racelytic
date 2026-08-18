@@ -20,7 +20,7 @@ async function loadCircuit() {
     const firstYear = years.length ? Math.min(...years) : null;
     const lastYear = years.length ? Math.max(...years) : null;
 
-    document.title = 'Racelytic';
+    document.title = `${c.name} · Formula 1 · Racelytic`;
     document.getElementById('circuit-head').innerHTML = `
       <section class="detail-hero profile-hero circuit-hero">
         <div class="profile-hero-copy">

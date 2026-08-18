@@ -14,6 +14,61 @@ async function loadHeader() {
 
         container.innerHTML = await response.text();
 
+        const isF2Mode = window.location.pathname === '/f2' || window.location.pathname.startsWith('/f2/');
+        document.body.classList.toggle('f2-mode', isF2Mode);
+        if (!isF2Mode && !document.title.includes('Formula 1')) {
+            document.title = document.title === 'Racelytic'
+                ? 'Formula 1 · Racelytic'
+                : `${document.title.replace(/\s*·\s*Racelytic$/, '')} · Formula 1 · Racelytic`;
+        }
+        const brand = container.querySelector('.brand');
+        if (brand) brand.href = isF2Mode ? '/f2' : '/';
+
+        let favicon = document.querySelector('link[rel~="icon"]');
+        if (!favicon) {
+            favicon = document.createElement('link');
+            favicon.rel = 'icon';
+            favicon.type = 'image/svg+xml';
+            document.head.appendChild(favicon);
+        }
+        favicon.href = isF2Mode
+            ? '/assets/favicon-f2.svg'
+            : '/assets/favicon-f1.svg';
+
+        container.querySelectorAll('.series-switcher a').forEach(link => {
+            const active = link.dataset.series === (isF2Mode ? 'f2' : 'f1');
+            link.classList.toggle('active', active);
+            if (active) link.setAttribute('aria-current', 'page');
+        });
+        if (isF2Mode) {
+            const navigationDropdowns = [...container.querySelectorAll('.nav-dropdown')];
+            const databaseLinks = [...(navigationDropdowns[0]?.querySelectorAll('.dropdown-menu a') || [])];
+            if (databaseLinks[0]) databaseLinks[0].href = '/f2/database';
+            if (databaseLinks[1]) databaseLinks[1].href = '/f2/seasons';
+            if (databaseLinks[2]) databaseLinks[2].href = '/f2/races';
+            if (databaseLinks[3]) databaseLinks[3].href = '/f2/drivers';
+            if (databaseLinks[4]) databaseLinks[4].href = '/f2/circuits';
+            if (databaseLinks[5]) databaseLinks[5].href = '/f2/constructors';
+            databaseLinks.forEach((link, index) => {
+                if (![0, 1, 2, 3, 4, 5].includes(index)) link.remove();
+            });
+            const f2LandingPages = ['/f2/analysis', '/f2/simulator', '/f2/games'];
+            navigationDropdowns.slice(1).forEach((dropdown, index) => {
+                dropdown.classList.add('f2-direct-nav');
+                dropdown.querySelector('.dropdown-menu')?.remove();
+                const toggle = dropdown.querySelector('.dropdown-toggle');
+                if (toggle) {
+                    const link = document.createElement('a');
+                    link.className = 'nav-link';
+                    link.href = f2LandingPages[index];
+                    link.textContent = toggle.childNodes[0]?.textContent.trim() || '';
+                    toggle.replaceWith(link);
+                }
+            });
+            const aboutLink = container.querySelector('a[href="/about"]');
+            if (aboutLink) aboutLink.href = '/f2/about';
+        }
+
         const dropdowns = [...container.querySelectorAll('.nav-dropdown')];
         const mainNav = container.querySelector('.main-nav');
         const mobileToggle = container.querySelector('.mobile-nav-toggle');
@@ -165,6 +220,15 @@ async function loadFooter() {
         const response = await fetch('/components/footer.html');
         if (!response.ok) throw new Error('Failed to load footer');
         footer.innerHTML = (await response.text()).replace('{{year}}', String(new Date().getFullYear()));
+        const isF2Mode = window.location.pathname === '/f2' || window.location.pathname.startsWith('/f2/');
+        if (isF2Mode) {
+            const paragraphs = footer.querySelectorAll('p');
+            const brand = footer.querySelector('.footer-brand');
+            if (brand) brand.href = '/f2';
+            if (paragraphs[0]) paragraphs[0].textContent = 'Independent Formula 2 history, statistics, and championship analysis.';
+            if (paragraphs[2]) paragraphs[2].textContent = 'Racelytic is an unofficial, independent project and is not affiliated with Formula 2, the FIA, or any Formula 2 team. Formula 2, F2, and related marks are trademarks of their respective owners.';
+            if (paragraphs[3]) paragraphs[3].textContent = 'Formula 2 statistics are compiled from the project dataset and Motorsport Stats. Data may contain errors and should not be treated as an official record.';
+        }
     } catch (error) {
         console.error('Footer error:', error);
     }

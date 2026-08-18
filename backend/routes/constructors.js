@@ -2,6 +2,18 @@ const express = require('express');
 const { withConnection, sendError } = require('../route-helpers');
 
 const router = express.Router();
+const f2ConstructorCountryFallbacks = {
+    'invicta-racing': 'gb',
+    'phm-racing': 'de',
+    'rodin-motorsport': 'nz'
+};
+
+function normalizeF2Constructor(constructor) {
+    return {
+        ...constructor,
+        countryCode: constructor.countryCode || f2ConstructorCountryFallbacks[constructor.id] || ''
+    };
+}
 
 // ============================================================
 // Constructors
@@ -10,6 +22,46 @@ const router = express.Router();
 router.get('/api/constructors', async (req, res) => {
 
     try {
+
+        if (String(req.query.series || '').toLowerCase() === 'f2') {
+            const rows = await withConnection(connection => connection.query(`
+                SELECT constructors.id, constructors.name, constructors.abbreviation,
+                    constructors.countryCode, career.firstYear, career.lastYear,
+                    COALESCE(standings.titles, 0) AS totalChampionshipWins,
+                    COALESCE(results.wins, 0) AS totalRaceWins,
+                    COALESCE(results.podiums, 0) AS totalPodiums,
+                    COALESCE(results.points, 0) AS totalRacePoints,
+                    latest.positionNumber AS latestPosition, latest.points AS latestPoints
+                FROM f2_constructors constructors
+                LEFT JOIN (
+                    SELECT constructorId, MIN(year) AS firstYear, MAX(year) AS lastYear
+                    FROM f2_entries GROUP BY constructorId
+                ) career ON career.constructorId = constructors.id
+                LEFT JOIN (
+                    SELECT constructorId,
+                        SUM(positionNumber = 1 AND (
+                            LOWER(CAST(championshipWon AS CHAR)) IN ('1', 'true')
+                            OR year < YEAR(CURRENT_DATE())
+                        )) AS titles
+                    FROM f2_season_constructor_standings GROUP BY constructorId
+                ) standings ON standings.constructorId = constructors.id
+                LEFT JOIN (
+                    SELECT sessionResults.constructorId,
+                        SUM(sessionResults.positionNumber = 1) AS wins,
+                        SUM(sessionResults.positionNumber BETWEEN 1 AND 3) AS podiums,
+                        SUM(sessionResults.points) AS points
+                    FROM f2_session_results sessionResults
+                    JOIN f2_sessions sessions ON sessions.id = sessionResults.sessionId
+                    WHERE LOWER(CAST(sessions.isRace AS CHAR)) IN ('1', 'true')
+                    GROUP BY sessionResults.constructorId
+                ) results ON results.constructorId = constructors.id
+                LEFT JOIN f2_season_constructor_standings latest
+                    ON latest.constructorId = constructors.id
+                    AND latest.year = career.lastYear
+                ORDER BY constructors.name
+            `));
+            return res.json(rows.map(normalizeF2Constructor));
+        }
 
         const search = String(
             req.query.search || ''
@@ -72,6 +124,116 @@ router.get('/api/constructors', async (req, res) => {
 router.get('/api/constructors/:id', async (req, res) => {
 
     try {
+
+        if (String(req.query.series || '').toLowerCase() === 'f2') {
+            const data = await withConnection(async connection => {
+                const [constructorRows, standings, drivers, results] = await Promise.all([
+                    connection.query(`
+                        SELECT constructors.id, constructors.name, constructors.abbreviation,
+                            constructors.countryCode, MIN(entries.year) AS firstYear,
+                            MAX(entries.year) AS lastYear,
+                            (SELECT SUM(results.positionNumber = 1)
+                                FROM f2_session_results results
+                                JOIN f2_sessions sessions ON sessions.id = results.sessionId
+                                WHERE results.constructorId = constructors.id
+                                    AND LOWER(CAST(sessions.isRace AS CHAR)) IN ('1', 'true')) AS totalRaceWins,
+                            (SELECT SUM(results.positionNumber BETWEEN 1 AND 3)
+                                FROM f2_session_results results
+                                JOIN f2_sessions sessions ON sessions.id = results.sessionId
+                                WHERE results.constructorId = constructors.id
+                                    AND LOWER(CAST(sessions.isRace AS CHAR)) IN ('1', 'true')) AS totalPodiums,
+                            (SELECT SUM(results.points)
+                                FROM f2_session_results results
+                                JOIN f2_sessions sessions ON sessions.id = results.sessionId
+                                WHERE results.constructorId = constructors.id
+                                    AND LOWER(CAST(sessions.isRace AS CHAR)) IN ('1', 'true')) AS totalRacePoints,
+                            (SELECT SUM(LOWER(CAST(results.fastestLap AS CHAR)) IN ('1', 'true'))
+                                FROM f2_session_results results
+                                JOIN f2_sessions sessions ON sessions.id = results.sessionId
+                                WHERE results.constructorId = constructors.id
+                                    AND LOWER(CAST(sessions.isRace AS CHAR)) IN ('1', 'true')) AS totalFastestLaps
+                        FROM f2_constructors constructors
+                        LEFT JOIN f2_entries entries ON entries.constructorId = constructors.id
+                        WHERE constructors.id = ?
+                        GROUP BY constructors.id, constructors.name, constructors.abbreviation,
+                            constructors.countryCode
+                    `, [req.params.id]),
+                    connection.query(`
+                        SELECT standings.year, standings.positionNumber, standings.points,
+                            standings.championshipWon,
+                            GROUP_CONCAT(DISTINCT drivers.name ORDER BY drivers.name SEPARATOR '||') AS drivers,
+                            GROUP_CONCAT(DISTINCT entries.chassisId ORDER BY entries.chassisId SEPARATOR '||') AS chassis
+                        FROM f2_season_constructor_standings standings
+                        LEFT JOIN f2_entries entries ON entries.constructorId = standings.constructorId
+                            AND entries.year = standings.year
+                        LEFT JOIN f2_drivers drivers ON drivers.id = entries.driverId
+                        WHERE standings.constructorId = ?
+                        GROUP BY standings.year, standings.positionNumber, standings.points,
+                            standings.championshipWon
+                        ORDER BY standings.year DESC
+                    `, [req.params.id]),
+                    connection.query(`
+                        SELECT entries.driverId, drivers.name AS driverName,
+                            drivers.countryCode, MIN(entries.year) AS firstYear,
+                            MAX(entries.year) AS lastYear, COUNT(DISTINCT entries.year) AS seasons,
+                            COALESCE(stats.starts, 0) AS starts, COALESCE(stats.wins, 0) AS wins,
+                            COALESCE(stats.podiums, 0) AS podiums, COALESCE(stats.points, 0) AS points
+                        FROM f2_entries entries
+                        JOIN f2_drivers drivers ON drivers.id = entries.driverId
+                        LEFT JOIN (
+                            SELECT sessionResults.constructorId, sessionResults.driverId,
+                                COUNT(*) AS starts, SUM(sessionResults.positionNumber = 1) AS wins,
+                                SUM(sessionResults.positionNumber BETWEEN 1 AND 3) AS podiums,
+                                SUM(sessionResults.points) AS points
+                            FROM f2_session_results sessionResults
+                            JOIN f2_sessions sessions ON sessions.id = sessionResults.sessionId
+                            WHERE LOWER(CAST(sessions.isRace AS CHAR)) IN ('1', 'true')
+                            GROUP BY sessionResults.constructorId, sessionResults.driverId
+                        ) stats ON stats.constructorId = entries.constructorId
+                            AND stats.driverId = entries.driverId
+                        WHERE entries.constructorId = ?
+                        GROUP BY entries.driverId, drivers.name, drivers.countryCode,
+                            stats.starts, stats.wins, stats.podiums, stats.points
+                        ORDER BY lastYear DESC, starts DESC, drivers.name
+                    `, [req.params.id]),
+                    connection.query(`
+                        SELECT sessions.year, sessions.round, sessions.name AS sessionName,
+                            sessionResults.raceId, sessionResults.driverId, drivers.name AS driverName,
+                            sessionResults.positionNumber, sessionResults.status,
+                            sessionResults.points, sessionResults.fastestLap,
+                            races.name AS raceName, races.date
+                        FROM f2_session_results sessionResults
+                        JOIN f2_sessions sessions ON sessions.id = sessionResults.sessionId
+                        JOIN f2_races races ON races.id = sessionResults.raceId
+                        LEFT JOIN f2_drivers drivers ON drivers.id = sessionResults.driverId
+                        WHERE sessionResults.constructorId = ?
+                            AND LOWER(CAST(sessions.isRace AS CHAR)) IN ('1', 'true')
+                        ORDER BY sessions.year DESC, sessions.round DESC,
+                            sessions.sessionNumber DESC, sessionResults.positionDisplayOrder
+                        LIMIT 250
+                    `, [req.params.id])
+                ]);
+                if (!constructorRows.length) return null;
+                const isTrue = value => value === true || Number(value) === 1 || String(value).toLowerCase() === 'true';
+                return {
+                    constructor: normalizeF2Constructor(constructorRows[0]),
+                    standings: standings.map(row => ({
+                        ...row,
+                        championshipWon: Number(row.positionNumber) === 1 && (
+                            isTrue(row.championshipWon) || Number(row.year) < new Date().getFullYear()
+                        )
+                    })),
+                    drivers: drivers.map(row => ({
+                        ...row, firstYear: Number(row.firstYear), lastYear: Number(row.lastYear),
+                        seasons: Number(row.seasons), starts: Number(row.starts), wins: Number(row.wins),
+                        podiums: Number(row.podiums), points: Number(row.points)
+                    })),
+                    results: results.map(row => ({ ...row, fastestLap: isTrue(row.fastestLap) }))
+                };
+            });
+            if (!data) return res.status(404).json({ error: 'Formula 2 constructor not found.' });
+            return res.json(data);
+        }
 
         const data = await withConnection(async connection => {
 

@@ -8,6 +8,8 @@
     "start": "node backend/server.js",
     "dev": "node --watch backend/server.js",
     "import": "node backend/import/all.js",
+    "import:f2-results": "node scripts/import-f2-results.js",
+    "import:f2-standings": "node scripts/import-f2-standings.js",
     "check": "node scripts/check.js",
     "test": "node --test"
   },
@@ -17,6 +19,7 @@
     "dotenv": "^16.4.7",
     "express": "^5.1.0",
     "mariadb": "^3.4.5",
+    "playwright-core": "^1.62.1",
     "topojson-client": "^3.1.0",
     "world-atlas": "^2.0.2"
   }

@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Explore every session from a Formula 2 race weekend.">
+  <link rel="icon" href="/assets/favicon-f2.svg" type="image/svg+xml">
+  <title>Formula 2 Race · Racelytic</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/polish.css">
+</head>
+<body class="f2-mode">
+  <div id="header"></div>
+  <main class="container page">
+    <a class="back-link" href="/f2/races"><span aria-hidden="true">←</span> All F2 races</a>
+    <section id="f2-race-head"></section>
+    <section class="race-session-header f2-session-header">
+      <div><div class="eyebrow">WEEKEND SESSIONS</div><h2 id="f2-session-title">Classification</h2></div>
+      <div id="f2-session-summary" class="section-note"></div>
+    </section>
+    <div id="f2-session-tabs" class="f2-session-tabs" role="tablist" aria-label="Formula 2 weekend sessions"></div>
+    <section id="f2-race-results" class="table-wrap f2-session-results"></section>
+  </main>
+  <footer class="footer"><div class="container">Racelytic</div></footer>
+  <script src="/js/utils.js"></script>
+  <script src="/js/header.js"></script>
+  <script src="/js/f2-race.js"></script>
+</body>
+</html>

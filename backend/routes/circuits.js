@@ -11,6 +11,21 @@ router.get('/api/circuits', async (req, res) => {
 
     try {
 
+        if (String(req.query.series || '').toLowerCase() === 'f2') {
+            const rows = await withConnection(connection => connection.query(`
+                SELECT circuits.id, circuits.name, circuits.type, circuits.direction,
+                    circuits.placeName, circuits.lengthMeters, circuits.turns,
+                    COUNT(DISTINCT races.id) AS totalRacesHeld,
+                    MIN(races.year) AS firstYear, MAX(races.year) AS lastYear
+                FROM f2_circuits circuits
+                LEFT JOIN f2_races races ON races.circuitId = circuits.id
+                GROUP BY circuits.id, circuits.name, circuits.type, circuits.direction,
+                    circuits.placeName, circuits.lengthMeters, circuits.turns
+                ORDER BY circuits.name
+            `));
+            return res.json(rows);
+        }
+
         const search = String(
             req.query.search || ''
         ).trim();
@@ -121,6 +136,66 @@ router.get('/api/circuits/:id/analysis', async (req, res) => {
 router.get('/api/circuits/:id', async (req, res) => {
 
     try {
+
+        if (String(req.query.series || '').toLowerCase() === 'f2') {
+            const data = await withConnection(async connection => {
+                const [circuitRows, races, sessions] = await Promise.all([
+                    connection.query(`
+                        SELECT circuits.id, circuits.name, circuits.type, circuits.direction,
+                            circuits.placeName, circuits.lengthMeters, circuits.turns,
+                            COUNT(DISTINCT races.id) AS totalRacesHeld,
+                            MIN(races.year) AS firstYear, MAX(races.year) AS lastYear
+                        FROM f2_circuits circuits
+                        LEFT JOIN f2_races races ON races.circuitId = circuits.id
+                        WHERE circuits.id = ?
+                        GROUP BY circuits.id, circuits.name, circuits.type, circuits.direction,
+                            circuits.placeName, circuits.lengthMeters, circuits.turns
+                    `, [req.params.id]),
+                    connection.query(`
+                        SELECT id, year, round, date, endDate, name, code
+                        FROM f2_races
+                        WHERE circuitId = ?
+                        ORDER BY year DESC, round DESC
+                    `, [req.params.id]),
+                    connection.query(`
+                        SELECT sessions.raceId, sessions.id, sessions.name,
+                            sessions.sessionNumber, sessions.isRace, sessions.cancelled,
+                            results.driverId AS winnerDriverId, drivers.name AS winnerName,
+                            constructors.name AS winnerConstructorName
+                        FROM f2_sessions sessions
+                        JOIN f2_races races ON races.id = sessions.raceId
+                        LEFT JOIN f2_session_results results
+                            ON results.sessionId = sessions.id AND results.positionNumber = 1
+                        LEFT JOIN f2_drivers drivers ON drivers.id = results.driverId
+                        LEFT JOIN f2_constructors constructors ON constructors.id = results.constructorId
+                        WHERE races.circuitId = ?
+                        ORDER BY races.year DESC, races.round DESC, sessions.sessionNumber
+                    `, [req.params.id])
+                ]);
+                if (!circuitRows.length) return null;
+                const isTrue = value => value === true || Number(value) === 1 || String(value).toLowerCase() === 'true';
+                const sessionsByRace = new Map();
+                sessions.forEach(session => {
+                    const raceId = String(session.raceId);
+                    if (!sessionsByRace.has(raceId)) sessionsByRace.set(raceId, []);
+                    sessionsByRace.get(raceId).push({
+                        ...session,
+                        sessionNumber: Number(session.sessionNumber || 0),
+                        isRace: isTrue(session.isRace),
+                        cancelled: isTrue(session.cancelled)
+                    });
+                });
+                return {
+                    circuit: circuitRows[0],
+                    races: races.map(race => ({
+                        ...race,
+                        sessions: sessionsByRace.get(String(race.id)) || []
+                    }))
+                };
+            });
+            if (!data) return res.status(404).json({ error: 'Formula 2 circuit not found.' });
+            return res.json(data);
+        }
 
         const data = await withConnection(async connection => {
 

@@ -6,11 +6,12 @@ const pool = require('../db');
 const DATA_DIR = path.join(__dirname, '../../data');
 
 function tableNameFromFile(filename) {
-  return filename.replace(/^f1db-/,'').replace(/\.csv$/i,'').replace(/-/g,'_');
+  const series = filename.toLowerCase().startsWith('f2db-') ? 'f2_' : '';
+  return series + filename.replace(/^f[12]db-/i,'').replace(/\.csv$/i,'').replace(/-/g,'_');
 }
 function isInteger(v){ return /^-?\d+$/.test(v); }
 function isDecimal(v){ return /^-?\d+\.\d+$/.test(v); }
-function isBoolean(v){ return v === 'true' || v === 'false'; }
+function isBoolean(v){ return String(v).toLowerCase() === 'true' || String(v).toLowerCase() === 'false'; }
 function isDate(v){ return /^\d{4}-\d{2}-\d{2}$/.test(v); }
 
 function inferType(column, values) {
@@ -47,8 +48,8 @@ async function insertRows(c,table,rows){
   const values=rows.map(row=>cols.map(col=>{
       const v=row[col];
       if(v===undefined||v==='') return null;
-      if(v==='true') return 1;
-      if(v==='false') return 0;
+      if(String(v).toLowerCase()==='true') return 1;
+      if(String(v).toLowerCase()==='false') return 0;
       return v;
     }));
   const batchSize=1000;
@@ -63,7 +64,7 @@ async function importAll(){
     c=await pool.getConnection();
     await c.query('SET FOREIGN_KEY_CHECKS=0');
     foreignKeyChecksDisabled=true;
-    const files=fs.readdirSync(DATA_DIR).filter(f=>/^f1db-.*\.csv$/i.test(f)).sort();
+    const files=fs.readdirSync(DATA_DIR).filter(f=>/^f[12]db-.*\.csv$/i.test(f)).sort();
     for(const file of files){
       console.log(`Importing ${file}`);
       const rows=await readCsv(path.join(DATA_DIR,file));

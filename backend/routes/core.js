@@ -30,6 +30,19 @@ const SEARCH_PAGES = [
     ['Account', 'Your saved creations and community library', '/account']
 ];
 
+const F2_SEARCH_PAGES = [
+    ['Database', 'Browse the Formula 2 archive', '/f2/database'],
+    ['Seasons', 'Formula 2 championship history', '/f2/seasons'],
+    ['Races', 'Formula 2 weekends and sessions', '/f2/races'],
+    ['Drivers', 'Formula 2 driver profiles', '/f2/drivers'],
+    ['Constructors', 'Formula 2 teams and results', '/f2/constructors'],
+    ['Circuits', 'Formula 2 tracks and venues', '/f2/circuits'],
+    ['Analysis', 'Explore Formula 2 data and trends', '/f2/analysis'],
+    ['Simulator', 'Formula 2 championship simulation', '/f2/simulator'],
+    ['Games', 'Games built from Formula 2 history', '/f2/games'],
+    ['About', 'About the Formula 2 archive', '/f2/about']
+];
+
 // ============================================================
 // Health
 // ============================================================
@@ -61,55 +74,69 @@ router.get('/api/search', async (req, res) => {
     try {
         const q = `%${search}%`;
         const databaseResults = await withConnection(async connection => {
-            const seasons = await connection.query(`
+            const [seasons, drivers, constructors, circuits, races, chassis,
+                f2Seasons, f2Drivers, f2Constructors, f2Circuits, f2Races] = await Promise.all([
+              connection.query(`
                 SELECT year FROM seasons
                 WHERE CAST(year AS CHAR) LIKE ?
                 ORDER BY year DESC LIMIT 6
-            `, [q]);
-            const drivers = await connection.query(`
+              `, [q]),
+              connection.query(`
                 SELECT id, name, nationalityCountryId FROM drivers
                 WHERE name LIKE ? OR fullName LIKE ? OR abbreviation LIKE ?
                 ORDER BY totalRaceWins DESC, name LIMIT 6
-            `, [q, q, q]);
-            const constructors = await connection.query(`
+              `, [q, q, q]),
+              connection.query(`
                 SELECT id, name, countryId FROM constructors
                 WHERE name LIKE ? OR fullName LIKE ?
                 ORDER BY totalRaceWins DESC, name LIMIT 6
-            `, [q, q]);
-            const circuits = await connection.query(`
+              `, [q, q]),
+              connection.query(`
                 SELECT id, name, placeName FROM circuits
                 WHERE name LIKE ? OR fullName LIKE ? OR placeName LIKE ?
                 ORDER BY totalRacesHeld DESC, name LIMIT 6
-            `, [q, q, q]);
-            const races = await connection.query(`
+              `, [q, q, q]),
+              connection.query(`
                 SELECT id, year, officialName FROM races
                 WHERE officialName LIKE ? OR CAST(year AS CHAR) LIKE ?
                 ORDER BY year DESC, round DESC LIMIT 6
-            `, [q, q]);
-            const chassis = await connection.query(`
+              `, [q, q]),
+              connection.query(`
                 SELECT ch.id, ch.name, ch.fullName, constructors.name AS constructorName
                 FROM chassis ch
                 LEFT JOIN constructors ON constructors.id = ch.constructorId
                 WHERE ch.name LIKE ? OR ch.fullName LIKE ? OR constructors.name LIKE ?
                 ORDER BY ch.fullName LIMIT 6
-            `, [q, q, q]);
-            return { seasons, drivers, constructors, circuits, races, chassis };
+              `, [q, q, q]),
+              connection.query(`SELECT year FROM f2_seasons WHERE CAST(year AS CHAR) LIKE ? ORDER BY year DESC LIMIT 6`, [q]),
+              connection.query(`SELECT id, name, countryCode FROM f2_drivers WHERE name LIKE ? OR abbreviation LIKE ? ORDER BY name LIMIT 6`, [q, q]),
+              connection.query(`SELECT id, name, countryCode FROM f2_constructors WHERE name LIKE ? OR abbreviation LIKE ? ORDER BY name LIMIT 6`, [q, q]),
+              connection.query(`SELECT id, name, placeName FROM f2_circuits WHERE name LIKE ? OR placeName LIKE ? ORDER BY name LIMIT 6`, [q, q]),
+              connection.query(`SELECT id, year, name FROM f2_races WHERE name LIKE ? OR CAST(year AS CHAR) LIKE ? ORDER BY year DESC, round DESC LIMIT 6`, [q, q])
+            ]);
+            return { seasons, drivers, constructors, circuits, races, chassis, f2Seasons, f2Drivers, f2Constructors, f2Circuits, f2Races };
         });
 
         const lower = search.toLocaleLowerCase();
-        const pages = SEARCH_PAGES.filter(([label, description]) =>
+        const matchingPages = (pages, series) => pages.filter(([label, description]) =>
             `${label} ${description}`.toLocaleLowerCase().includes(lower)
-        ).slice(0, 6).map(([label, meta, url]) => ({ type: 'Page', label, meta, url }));
+        ).slice(0, 4).map(([label, meta, url]) => ({ type: `${series} Page`, label, meta, url }));
+        const pages = [...matchingPages(SEARCH_PAGES, 'F1'), ...matchingPages(F2_SEARCH_PAGES, 'F2')];
 
         res.json([
             ...pages,
-            ...databaseResults.seasons.map(row => ({ type: 'Season', label: String(row.year), meta: 'Formula 1 season', url: `/season?year=${row.year}` })),
-            ...databaseResults.drivers.map(row => ({ type: 'Driver', label: row.name, meta: row.nationalityCountryId || 'Driver profile', url: `/driver?id=${encodeURIComponent(row.id)}` })),
-            ...databaseResults.constructors.map(row => ({ type: 'Constructor', label: row.name, meta: row.countryId || 'Constructor profile', url: `/constructor?id=${encodeURIComponent(row.id)}` })),
-            ...databaseResults.circuits.map(row => ({ type: 'Circuit', label: row.name, meta: row.placeName || 'Circuit profile', url: `/circuit?id=${encodeURIComponent(row.id)}` })),
-            ...databaseResults.races.map(row => ({ type: 'Race', label: row.officialName, meta: String(row.year), url: `/race?id=${encodeURIComponent(row.id)}` })),
-            ...databaseResults.chassis.map(row => ({ type: 'Chassis', label: row.fullName || row.name, meta: row.constructorName || 'Formula 1 chassis', url: `/chassis?search=${encodeURIComponent(row.fullName || row.name)}` }))
-        ].slice(0, 30));
+            ...databaseResults.seasons.map(row => ({ type: 'F1 Season', label: String(row.year), meta: 'Formula 1 season', url: `/season?year=${row.year}` })),
+            ...databaseResults.f2Seasons.map(row => ({ type: 'F2 Season', label: String(row.year), meta: 'Formula 2 season', url: `/f2/season?year=${row.year}` })),
+            ...databaseResults.drivers.map(row => ({ type: 'F1 Driver', label: row.name, meta: row.nationalityCountryId || 'Formula 1 driver', url: `/driver?id=${encodeURIComponent(row.id)}` })),
+            ...databaseResults.f2Drivers.map(row => ({ type: 'F2 Driver', label: row.name, meta: row.countryCode || 'Formula 2 driver', url: `/f2/driver?id=${encodeURIComponent(row.id)}` })),
+            ...databaseResults.constructors.map(row => ({ type: 'F1 Constructor', label: row.name, meta: row.countryId || 'Formula 1 constructor', url: `/constructor?id=${encodeURIComponent(row.id)}` })),
+            ...databaseResults.f2Constructors.map(row => ({ type: 'F2 Constructor', label: row.name, meta: row.countryCode || 'Formula 2 constructor', url: `/f2/constructor?id=${encodeURIComponent(row.id)}` })),
+            ...databaseResults.circuits.map(row => ({ type: 'F1 Circuit', label: row.name, meta: row.placeName || 'Formula 1 circuit', url: `/circuit?id=${encodeURIComponent(row.id)}` })),
+            ...databaseResults.f2Circuits.map(row => ({ type: 'F2 Circuit', label: row.name, meta: row.placeName || 'Formula 2 circuit', url: `/f2/circuit?id=${encodeURIComponent(row.id)}` })),
+            ...databaseResults.races.map(row => ({ type: 'F1 Race', label: row.officialName, meta: String(row.year), url: `/race?id=${encodeURIComponent(row.id)}` })),
+            ...databaseResults.f2Races.map(row => ({ type: 'F2 Race', label: row.name, meta: String(row.year), url: `/f2/race?id=${encodeURIComponent(row.id)}` })),
+            ...databaseResults.chassis.map(row => ({ type: 'F1 Chassis', label: row.fullName || row.name, meta: row.constructorName || 'Formula 1 chassis', url: `/chassis?search=${encodeURIComponent(row.fullName || row.name)}` }))
+        ].slice(0, 36));
     } catch (error) {
         sendError(res, error);
     }
@@ -124,6 +151,13 @@ router.get('/api/dashboard', async (req, res) => {
 
     try {
 
+        const isF2 = String(req.query.series || '').toLowerCase() === 'f2';
+        const tables = isF2 ? {
+            drivers: 'f2_drivers', constructors: 'f2_constructors', circuits: 'f2_circuits', seasons: 'f2_seasons'
+        } : {
+            drivers: 'drivers', constructors: 'constructors', circuits: 'circuits', seasons: 'seasons'
+        };
+
         const data = await withConnection(async connection => {
 
             const [
@@ -136,27 +170,27 @@ router.get('/api/dashboard', async (req, res) => {
 
                 connection.query(`
                     SELECT COUNT(*) AS count
-                    FROM drivers
+                    FROM \`${tables.drivers}\`
                 `),
 
                 connection.query(`
                     SELECT COUNT(*) AS count
-                    FROM constructors
+                    FROM \`${tables.constructors}\`
                 `),
 
                 connection.query(`
                     SELECT COUNT(*) AS count
-                    FROM circuits
+                    FROM \`${tables.circuits}\`
                 `),
 
                 connection.query(`
                     SELECT COUNT(*) AS count
-                    FROM seasons
+                    FROM \`${tables.seasons}\`
                 `),
 
                 connection.query(`
                     SELECT MAX(year) AS year
-                    FROM seasons
+                    FROM \`${tables.seasons}\`
                 `)
 
             ]);

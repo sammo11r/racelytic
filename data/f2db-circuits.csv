@@ -1,0 +1,25 @@
+id,name,type,direction,placeName,lengthMeters,turns
+bahrain-international-circuit_bahrain-international-circuit,Bahrain International Circuit,Race Circuit,Clockwise,"Sakhir, Southern Governorate, Bahrain",5412,15
+circuit-de-barcelona-catalunya_circuit-de-barcelona-catalunya,Circuit de Barcelona-Catalunya,Race Circuit,Clockwise,"Barcelona, Catalunya, Spain",4655,16
+circuit-de-monaco_circuit-de-monaco,Circuit de Monaco,Street Circuit,Clockwise,"Monte Carlo, Monaco",3337,19
+baku-city-circuit_baku-city-circuit,Baku City Circuit,Street Circuit,Anti Clockwise,"Baku, Azerbaijan",6003,20
+red-bull-ring_red-bull-ring,Red Bull Ring,Race Circuit,Clockwise,"Spielberg, Styria, Austria",4318,10
+silverstone-circuit_silverstone-circuit,Silverstone Circuit,Race Circuit,Clockwise,"Silverstone, Northamptonshire, Great Britain",5891,18
+hungaroring_hungaroring,Hungaroring,Race Circuit,Clockwise,"Budapest, Hungary",4381,14
+circuit-de-spa-francorchamps_circuit-de-spa-francorchamps,Circuit de Spa-Francorchamps,Race Circuit,Clockwise,"Francorchamps, Liège, Belgium",7004,19
+autodromo-nazionale-monza_autodromo-nazionale-monza,Autodromo Nazionale Monza,Race Circuit,Clockwise,"Monza, Lombardy, Italy",5793,11
+circuito-de-jerez_circuito-de-jerez,Circuito de Jerez,Race Circuit,Clockwise,"Jerez, Cádiz, Spain",4428,13
+yas-marina-circuit_yas-marina-circuit,Yas Marina Circuit,Race Circuit,Anti Clockwise,"Yas Island, Abu Dhabi, United Arab Emirates",5554,21
+circuit-paul-ricard_paul-ricard-circuit,Paul Ricard Circuit,Race Circuit,,"Le Castellet, Provence-Alpes-Côte d'Azur, France",5842,15
+sochi-autodrom_sochi-autodrom,Sochi Autodrom,Race Circuit,Clockwise,"Sochi, Krasnodar Krai, Russia",5848,18
+circuit-paul-ricard_circuit-paul-ricard-short,Circuit Paul Ricard Short,Race Circuit,Clockwise,"Le Castellet, Provence-Alpes-Côte d'Azur, France",3841,13
+mugello-circuit_mugello-circuit,Mugello Circuit,Race Circuit,Clockwise,"Mugello, Tuscany, Italy",5245,15
+jeddah-corniche-circuit_jeddah-street-circuit,Jeddah Street Circuit,Street Circuit,,Saudi Arabia,6174,27
+yas-marina-circuit_yas-marina-circuit-2,Yas Marina Circuit,Race Circuit,Anti Clockwise,"Yas Island, Abu Dhabi, United Arab Emirates",5281,16
+autodromo-enzo-e-dino-ferrari_autodromo-enzo-e-dino-ferrari-2,Autodromo Enzo e Dino Ferrari,Race Circuit,Anti Clockwise,"Imola, Emilia-Romagna, Italy",4909,21
+circuit-zandvoort_circuit-zandvoort,Circuit Zandvoort,Race Circuit,Clockwise ,"Zandvoort, North Holland, Netherlands",4259,14
+melbourne-grand-prix-circuit_melbourne-grand-prix-circuit-2,Melbourne Grand Prix Circuit,Street Circuit,Clockwise,"Melbourne, Victoria, Australia",5279,14
+losail-international-circuit_losail-international-circuit,Losail International Circuit,Race Circuit,Clockwise,"Doha, Ad-Dawhah, Qatar",5419,16
+miami-international-autodrome_miami-international-autodrome,Miami International Autodrome,Race Circuit,,"Miami Gardens, Florida, USA",5412,19
+circuit-gilles-villeneuve_circuit-gilles-villeneuve,Circuit Gilles Villeneuve,Street Circuit,Clockwise,"Montreal, Quebec, Canada",4361,14
+circuito-de-madring_circuito-de-madring,Circuito de MADRING,Street Circuit,Clockwise,"Barajas, Madrid, Spain",5474,22

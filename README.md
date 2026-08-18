@@ -71,4 +71,25 @@ Run JavaScript syntax and local-link checks with `npm run check`.
 
 Run the automated tests with `npm test`.
 
+Refresh complete Formula 2 practice, qualifying, grid, and race classifications from Motorsport
+Stats with `npm run import:f2-results`. Use `-- --year=2025` to refresh one
+season, `-- --sessions=practice` to import only practice, or
+`-- --sessions=qualifying` to import only qualifying, or
+`-- --sessions=race` to import only races. Add `--csv-only` to update the source
+CSV without updating MariaDB. The importer also accepts
+`-- --cache=path/to/results.json` when direct site access is not available.
+If Motorsport Stats returns HTTP 403, the importer automatically switches to
+an installed Chrome or Edge browser and keeps one browser window open during
+the import. Use `-- --transport=browser` to select it immediately, or set
+`MOTORSPORTSTATS_BROWSER` when the browser is installed in a non-standard
+location. The optional `--headless` flag hides the window, but some site access
+rules may reject headless browsers.
+
+Refresh complete official Formula 2 driver standings, team standings, and
+race-by-race awarded points with `npm run import:f2-standings`. Use
+`-- --year=2025` for one season or `--csv-only` to update CSV files without
+updating MariaDB. Run this after `import:f2-results` so official awarded points
+are applied to the latest classifications. The standings importer uses the
+last completed round and ignores future scheduled rounds.
+
 If your F1DB export uses a different release/version, the SQL may need small column adjustments.

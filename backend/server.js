@@ -26,6 +26,26 @@ for (const file of publicPages) {
     });
 }
 
+for (const [route, file] of [
+    ['/f2/database', 'f2-database.html'],
+    ['/f2/seasons', 'f2-seasons.html'],
+    ['/f2/season', 'f2-season.html'],
+    ['/f2/races', 'f2-races.html'],
+    ['/f2/race', 'f2-race.html'],
+    ['/f2/drivers', 'f2-drivers.html'],
+    ['/f2/driver', 'f2-driver.html'],
+    ['/f2/circuits', 'f2-circuits.html'],
+    ['/f2/circuit', 'f2-circuit.html'],
+    ['/f2/constructors', 'f2-constructors.html'],
+    ['/f2/constructor', 'f2-constructor.html'],
+    ['/f2/about', 'f2-about.html'],
+    ['/f2/analysis', 'f2-analysis.html'],
+    ['/f2/simulator', 'f2-simulator.html'],
+    ['/f2/games', 'f2-games.html']
+]) {
+    app.get(route, (req, res) => res.sendFile(path.join(frontendDirectory, file)));
+}
+
 app.use(express.static(frontendDirectory));
 
 app.get('/', (req, res) => {

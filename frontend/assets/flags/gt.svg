@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" id="flag-icons-gt" viewBox="0 0 640 480">
+  <path fill="#4997d0" d="M0 0h213.3v480H0zm426.7 0H640v480H426.7z"/>
+  <path fill="#fff" d="M213.3 0h213.4v480H213.3z"/>
+  <path fill="#4997d0" d="M315 165h10v150h-10z" transform="rotate(-25 320 240)"/>
+  <path fill="#5b8c3a" d="M274 305c-46-50-42-116 8-154-25 46-20 101 21 137zm92 0c46-50 42-116-8-154 25 46 20 101-21 137z"/>
+</svg>

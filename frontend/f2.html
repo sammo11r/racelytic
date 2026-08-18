@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Explore the drivers, teams, races and history of FIA Formula 2 with Racelytic.">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <title>Formula 2 · Racelytic</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/polish.css">
+</head>
+<body class="f2-mode">
+  <div id="header"></div>
+
+  <main>
+    <section class="hero home-hero container">
+      <div class="eyebrow">FORMULA 2 · EXPLORED</div>
+      <h1>The proving ground.<br><span>Every story behind the step up.</span></h1>
+      <p class="hero-copy">Follow the drivers, teams and races that shape the next generation—through one connected Formula 2 archive.</p>
+      <div class="hero-actions">
+        <a class="button primary" href="#f2-sections">Explore Formula 2</a>
+        <a class="button secondary" id="latest-f2-season-link" href="#f2-archive">Latest season</a>
+      </div>
+    </section>
+
+    <section class="container home-platform" id="f2-sections">
+      <div class="home-section-head">
+        <div><div class="eyebrow">ONE CHAMPIONSHIP · EVERY ANGLE</div><h2>Meet the grid behind tomorrow.</h2></div>
+        <p>Start with a season, follow a driver, trace a team or revisit every race weekend.</p>
+      </div>
+
+      <div class="home-path-grid">
+        <a class="home-path-card home-path-database" href="/f2/database">
+          <span>01 · SEASONS</span>
+          <div><h3>Championship by championship</h3><p>Move through every Formula 2 season, from the opening round to the final standings.</p></div>
+          <strong>Open the F2 database →</strong>
+        </a>
+        <article class="home-path-card home-path-analysis">
+          <span>02 · DRIVERS</span>
+          <div><h3>Follow the next generation</h3><p>Explore the drivers who built their reputations in Formula 2 and see how their campaigns unfolded.</p></div>
+          <strong>Driver archive</strong>
+        </article>
+        <article class="home-path-card home-path-simulator">
+          <span>03 · RACES & SESSIONS</span>
+          <div><h3>Every weekend, in detail</h3><p>Go beyond feature-race results with sprint races, qualifying, practice and lap-level performance context.</p></div>
+          <strong>Race history</strong>
+        </article>
+        <article class="home-path-card home-path-games">
+          <span>04 · TEAMS & CIRCUITS</span>
+          <div><h3>Understand the machinery</h3><p>Connect teams, chassis, engines and venues across the modern Formula 2 era.</p></div>
+          <strong>The complete grid</strong>
+        </article>
+      </div>
+    </section>
+
+    <section class="container home-archive" id="f2-archive">
+      <div class="home-archive-copy">
+        <div class="eyebrow">THE FORMULA 2 ARCHIVE</div>
+        <h2>A feeder series.<br>A history of its own.</h2>
+        <p>Racelytic brings Formula 2 seasons, drivers, constructors, circuits and session results together as a dedicated blue series mode.</p>
+        <p class="f2-data-note">Powered by the new F2 dataset</p>
+      </div>
+      <div class="stats-grid" id="f2-stats">
+        <div class="metric"><span>Seasons</span><strong>—</strong></div>
+        <div class="metric"><span>Drivers</span><strong>—</strong></div>
+        <div class="metric"><span>Teams</span><strong>—</strong></div>
+        <div class="metric"><span>Circuits</span><strong>—</strong></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer"><div class="container">Racelytic</div></footer>
+  <script src="/js/utils.js"></script>
+  <script src="/js/header.js"></script>
+  <script src="/js/f2.js"></script>
+</body>
+</html>

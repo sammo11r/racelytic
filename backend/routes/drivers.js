@@ -4,6 +4,17 @@ const { integerOrDefault } = require('../validation');
 
 const router = express.Router();
 
+const f2CountryCodeOverrides = new Map([
+    ['james-wharton', 'au'],
+    ['laurens-van-hoepen', 'nl'],
+    ['nikita-mazepin', 'ru'],
+    ['rafael-camara', 'br']
+]);
+
+function f2CountryCode(driver) {
+    return f2CountryCodeOverrides.get(String(driver.id)) || String(driver.countryCode || '').toLowerCase() || null;
+}
+
 // ============================================================
 // Drivers
 // ============================================================
@@ -18,6 +29,85 @@ router.get('/api/drivers', async (req, res) => {
 
 
         const limit = integerOrDefault(req.query.limit, 100, { min: 1, max: 1000 });
+
+        if (String(req.query.series || '').toLowerCase() === 'f2') {
+            const q = `%${search}%`;
+            const where = search
+                ? 'WHERE d.name LIKE ? OR d.firstName LIKE ? OR d.lastName LIKE ? OR d.abbreviation LIKE ?'
+                : '';
+            const parameters = search ? [q, q, q, q] : [];
+            const { rows, championRows } = await withConnection(async connection => {
+                const [rows, championRows] = await Promise.all([
+                    connection.query(`
+                SELECT
+                    d.id,
+                    d.name,
+                    d.firstName,
+                    d.lastName,
+                    d.abbreviation,
+                    d.countryCode,
+                    COALESCE(stats.firstSeason, 0) AS firstSeason,
+                    COALESCE(stats.lastSeason, 0) AS lastSeason,
+                    COALESCE(stats.seasons, 0) AS seasons,
+                    COALESCE(stats.bestChampionshipPosition, 0) AS bestChampionshipPosition,
+                    0 AS totalChampionshipWins,
+                    COALESCE(stats.totalStarts, 0) AS totalStarts,
+                    COALESCE(stats.totalRaceWins, 0) AS totalRaceWins,
+                    COALESCE(stats.totalPodiums, 0) AS totalPodiums,
+                    COALESCE(stats.totalPolePositions, 0) AS totalPolePositions,
+                    COALESCE(stats.totalFastestLaps, 0) AS totalFastestLaps,
+                    COALESCE(stats.totalPoints, 0) AS totalPoints,
+                    latest.constructorId AS latestConstructorId,
+                    constructors.name AS latestConstructorName
+                FROM f2_drivers d
+                LEFT JOIN (
+                    SELECT
+                        driverId,
+                        MIN(year) AS firstSeason,
+                        MAX(year) AS lastSeason,
+                        COUNT(DISTINCT year) AS seasons,
+                        MIN(positionNumber) AS bestChampionshipPosition,
+                        SUM(COALESCE(starts, 0)) AS totalStarts,
+                        SUM(COALESCE(wins, 0)) AS totalRaceWins,
+                        SUM(COALESCE(podiums, 0)) AS totalPodiums,
+                        SUM(COALESCE(poles, 0)) AS totalPolePositions,
+                        SUM(COALESCE(fastestLaps, 0)) AS totalFastestLaps,
+                        SUM(COALESCE(points, 0)) AS totalPoints
+                    FROM f2_season_driver_standings
+                    GROUP BY driverId
+                ) stats ON stats.driverId = d.id
+                LEFT JOIN f2_season_driver_standings latest
+                    ON latest.driverId = d.id AND latest.year = stats.lastSeason
+                LEFT JOIN f2_constructors constructors ON constructors.id = latest.constructorId
+                ${where}
+                ORDER BY d.name
+                LIMIT ${limit}
+                    `, parameters),
+                    connection.query(`
+                        SELECT standings.driverId, COUNT(*) AS totalChampionshipWins
+                        FROM f2_season_driver_standings standings
+                        LEFT JOIN (
+                            SELECT year, MAX(COALESCE(endDate, date)) AS finalDate
+                            FROM f2_races
+                            GROUP BY year
+                        ) calendars ON calendars.year = standings.year
+                        WHERE standings.positionNumber = 1
+                            AND (
+                                LOWER(CAST(standings.championshipWon AS CHAR)) IN ('1', 'true')
+                                OR calendars.finalDate < CURRENT_DATE()
+                            )
+                        GROUP BY standings.driverId
+                    `)
+                ]);
+                return { rows, championRows };
+            });
+            const titleMap = new Map(championRows.map(row => [String(row.driverId), Number(row.totalChampionshipWins)]));
+            return res.json(rows.map(row => ({
+                ...row,
+                countryCode: f2CountryCode(row),
+                totalChampionshipWins: titleMap.get(String(row.id)) || 0
+            })));
+        }
 
 
         const rows = await withConnection(connection => {
@@ -200,6 +290,98 @@ router.get('/api/drivers/:id/form', async (req, res) => {
 router.get('/api/drivers/:id', async (req, res) => {
 
     try {
+
+        if (String(req.query.series || '').toLowerCase() === 'f2') {
+            const data = await withConnection(async connection => {
+                const [driverRows, standings, results] = await Promise.all([
+                    connection.query(`
+                        SELECT d.id, d.name, d.firstName, d.lastName, d.abbreviation, d.countryCode,
+                            (SELECT entry.driverNumber
+                                FROM f2_entries entry
+                                WHERE entry.driverId = d.id
+                                ORDER BY entry.year DESC, entry.round DESC
+                                LIMIT 1) AS latestNumber
+                        FROM f2_drivers d
+                        WHERE d.id = ?
+                    `, [req.params.id]),
+                    connection.query(`
+                        SELECT standings.year, standings.positionNumber, standings.points,
+                            standings.championshipWon,
+                            calendars.finalDate AS seasonFinalDate,
+                            standings.starts, standings.wins,
+                            standings.podiums, standings.poles, standings.fastestLaps,
+                            standings.retirements, standings.constructorId,
+                            constructors.name AS constructorName
+                        FROM f2_season_driver_standings standings
+                        LEFT JOIN f2_constructors constructors ON constructors.id = standings.constructorId
+                        LEFT JOIN (
+                            SELECT year, MAX(COALESCE(endDate, date)) AS finalDate
+                            FROM f2_races
+                            GROUP BY year
+                        ) calendars ON calendars.year = standings.year
+                        WHERE standings.driverId = ?
+                        ORDER BY standings.year DESC
+                    `, [req.params.id]),
+                    connection.query(`
+                        SELECT results.sessionId, results.raceId, results.year, results.round,
+                            results.positionNumber, results.positionDisplayOrder, results.points,
+                            results.status, results.driverNumber, results.constructorId,
+                            results.laps, results.time, results.gapMillis, results.gapLaps,
+                            results.fastestLap, results.polePosition,
+                            sessions.name AS sessionName, sessions.sessionNumber,
+                            races.name AS raceName, races.code AS raceCode, races.date,
+                            constructors.name AS constructorName
+                        FROM f2_session_results results
+                        JOIN f2_sessions sessions ON sessions.id = results.sessionId
+                        JOIN f2_races races ON races.id = results.raceId
+                        LEFT JOIN f2_constructors constructors ON constructors.id = results.constructorId
+                        WHERE results.driverId = ?
+                            AND LOWER(CAST(sessions.isRace AS CHAR)) IN ('1', 'true')
+                            AND (sessions.cancelled IS NULL OR LOWER(CAST(sessions.cancelled AS CHAR)) NOT IN ('1', 'true'))
+                        ORDER BY results.year DESC, results.round DESC, sessions.sessionNumber DESC
+                        LIMIT 300
+                    `, [req.params.id])
+                ]);
+
+                if (!driverRows.length) return null;
+                const isTrue = value => value === true || Number(value) === 1 || String(value).toLowerCase() === 'true';
+                return {
+                    driver: {
+                        ...driverRows[0],
+                        countryCode: f2CountryCode(driverRows[0])
+                    },
+                    standings: standings.map(row => ({
+                        ...row,
+                        year: Number(row.year),
+                        positionNumber: row.positionNumber === null ? null : Number(row.positionNumber),
+                        points: Number(row.points || 0),
+                        championshipWon: Number(row.positionNumber) === 1 && (
+                            isTrue(row.championshipWon)
+                            || (row.seasonFinalDate && new Date(row.seasonFinalDate) < new Date())
+                        ),
+                        starts: Number(row.starts || 0),
+                        wins: Number(row.wins || 0),
+                        podiums: Number(row.podiums || 0),
+                        poles: Number(row.poles || 0),
+                        fastestLaps: Number(row.fastestLaps || 0),
+                        retirements: Number(row.retirements || 0)
+                    })),
+                    results: results.map(row => ({
+                        ...row,
+                        year: Number(row.year),
+                        round: Number(row.round),
+                        positionNumber: row.positionNumber === null ? null : Number(row.positionNumber),
+                        points: Number(row.points || 0),
+                        laps: Number(row.laps || 0),
+                        fastestLap: isTrue(row.fastestLap),
+                        polePosition: isTrue(row.polePosition)
+                    }))
+                };
+            });
+
+            if (!data) return res.status(404).json({ error: 'F2 driver not found.' });
+            return res.json(data);
+        }
 
         const data = await withConnection(async connection => {
 

@@ -1,0 +1,33 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Explore a Formula 2 season in Racelytic."><link rel="icon" href="/assets/favicon.svg" type="image/svg+xml"><title>Formula 2 Season · Racelytic</title><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/championship.css"><link rel="stylesheet" href="/css/polish.css"></head>
+<body class="f2-mode"><div id="header"></div><main class="container page">
+  <a class="back-link" href="/f2/seasons" aria-label="Back to all Formula 2 seasons"><span aria-hidden="true">←</span> All F2 seasons</a>
+  <section class="detail-hero"><div class="eyebrow">FORMULA 2 SEASON</div><h1 id="f2-season-year">—</h1><div class="detail-sub">FIA Formula 2 Championship</div></section>
+  <section class="season-overview" aria-label="Season summary">
+    <div class="season-champion"><span class="summary-label">Champion</span><strong id="f2-season-first">—</strong><small id="f2-season-first-points">—</small></div>
+    <div class="season-facts"><div class="season-fact"><span>Rounds</span><strong id="f2-season-rounds">—</strong></div><div class="season-fact"><span>Drivers</span><strong id="f2-season-drivers">—</strong></div><div class="season-fact podium-fact"><span>Runner-up</span><strong id="f2-season-second">—</strong><small id="f2-season-second-points">—</small></div><div class="season-fact podium-fact"><span>Third</span><strong id="f2-season-third">—</strong><small id="f2-season-third-points">—</small></div></div>
+  </section>
+  <section class="season-section"><div class="section-heading"><div><div class="eyebrow">CHAMPIONSHIP</div><h2>Driver standings</h2></div><div class="section-note" id="f2-team-count">— teams</div></div>
+    <div class="f2-standings-mode-row">
+      <div class="standings-mode" role="group" aria-label="Driver standings cell values">
+        <button type="button" class="standings-mode-button active" data-standings-mode="points" aria-pressed="true">Points</button>
+        <button type="button" class="standings-mode-button" data-standings-mode="position" aria-pressed="false">Finish</button>
+      </div>
+    </div>
+    <div class="standings-legend" aria-label="Standings legend">
+      <div><span class="legend-swatch result-win"></span>Winner</div>
+      <div><span class="legend-swatch result-podium"></span>Podium</div>
+      <div><span class="legend-swatch result-points"></span>Points finish</div>
+      <div><span class="legend-swatch result-finish"></span>Classified</div>
+      <div><span class="legend-swatch result-retired"></span>Retired / DNS</div>
+      <div class="legend-markers"><sup>F</sup> Fastest lap</div>
+      <div class="legend-markers"><sub>PP</sub> Pole position</div>
+    </div>
+    <div class="championship-table-wrap"><table id="driver-table" class="championship-table f2-season-table"><thead id="f2-standings-head"></thead><tbody id="f2-standings-body"></tbody></table></div>
+  </section>
+  <section class="season-section">
+    <div class="section-heading"><div><div class="eyebrow">CHAMPIONSHIP</div><h2>Constructor standings</h2></div><div class="section-note">Points by race</div></div>
+    <div class="championship-table-wrap"><table id="constructor-table" class="championship-table f2-season-table"><thead id="f2-constructor-head"></thead><tbody id="f2-constructor-body"></tbody></table></div>
+  </section>
+  <section class="season-section"><div class="section-heading"><div><div class="eyebrow">CALENDAR</div><h2>Race weekends</h2></div><div class="section-note">Round by round</div></div><div id="f2-race-calendar" class="calendar-list"></div></section>
+  <div id="f2-season-error" class="error"></div>
+</main><footer class="footer"><div class="container">Racelytic</div></footer><script src="/js/header.js"></script><script src="/js/utils.js"></script><script src="/js/f2-season.js"></script></body></html>
