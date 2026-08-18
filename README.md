@@ -93,3 +93,22 @@ are applied to the latest classifications. The standings importer uses the
 last completed round and ignores future scheduled rounds.
 
 If your F1DB export uses a different release/version, the SQL may need small column adjustments.
+
+## Private traffic monitor
+
+Racelytic includes anonymous first-party monitoring for visits, unique visitors,
+timestamps, external referrer hosts, page popularity, and active reading time.
+It does not store IP addresses, precise locations, or browser fingerprints, and
+it respects the browser's Do Not Track setting.
+
+Set private dashboard credentials in the VPS `.env` file:
+
+```env
+MONITOR_USERNAME=admin
+MONITOR_PASSWORD=replace-with-a-long-random-password
+```
+
+Restart the Node service and open `/monitor`. The browser will request those
+credentials using HTTP Basic authentication. The `app_analytics_visits` table
+is created automatically on the first tracked visit. Serve the site over HTTPS
+so dashboard credentials and traffic data are encrypted in transit.

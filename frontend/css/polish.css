@@ -145,6 +145,10 @@ body.f2-mode .game-card-featured:hover { border-color: rgba(var(--accent-rgb), .
 
 .dropdown-toggle { gap: 9px; }
 .f2-direct-nav { display: flex; }
+.monitor-page { max-width: var(--max-width); }
+.monitor-page .stats-grid { margin: 10px 0 60px; }
+.monitor-page table td:first-child { font-weight: 700; }
+.monitor-page table a { color: var(--accent-dark); }
 .chevron {
   width: 7px;
   height: 7px;

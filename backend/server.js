@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const path = require('path');
+const { requireMonitorAuth } = require('./monitor-auth');
 
 const app = express();
 const PORT = Number(process.env.PORT || 3000);
@@ -12,6 +13,8 @@ const frontendDirectory = path.join(__dirname, '../frontend');
 app.set('trust proxy', 'loopback');
 
 app.use(express.json());
+
+app.get('/monitor', requireMonitorAuth, (req, res) => res.sendFile(path.join(frontendDirectory, 'monitor.html')));
 
 const publicPages = require('node:fs').readdirSync(frontendDirectory)
     .filter(file => file.endsWith('.html') && file !== 'index.html');
@@ -52,7 +55,7 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(frontendDirectory, 'index.html'));
 });
 
-for (const route of ['core', 'seasons', 'drivers', 'circuits', 'constructors', 'chassis', 'races', 'records', 'games', 'account', 'points-systems', 'custom-championships']) {
+for (const route of ['core', 'seasons', 'drivers', 'circuits', 'constructors', 'chassis', 'races', 'records', 'games', 'account', 'points-systems', 'custom-championships', 'analytics']) {
     app.use(require(`./routes/${route}`));
 }
 
