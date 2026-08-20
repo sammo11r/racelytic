@@ -3,6 +3,22 @@ let activeRaceData = null;
 let focusedDriver = null;
 let raceTooltip = null;
 
+function normalizeF2RaceAnalysis(data) {
+  if (!Array.isArray(data?.sessions)) return data;
+  const raceSessions=data.sessions.filter(session=>session.isRace&&!session.cancelled&&session.results?.length);
+  const selected=[...raceSessions].reverse().find(session=>/feature/i.test(session.name))||raceSessions[raceSessions.length-1];
+  const qualifying=[...data.sessions].reverse().find(session=>/qualif/i.test(session.name)&&session.results?.length);
+  const qualifyingByDriver=new Map((qualifying?.results||[]).map(result=>[String(result.driverId),Number(result.positionNumber)]));
+  const results=(selected?.results||[]).map(result=>({...result,
+    positionText:result.positionNumber||result.status,
+    qualificationPositionNumber:qualifyingByDriver.get(String(result.driverId))||null,
+    gridPositionNumber:qualifyingByDriver.get(String(result.driverId))||result.positionNumber,
+    reasonRetired:/ret|dnf|dns/i.test(String(result.status||''))?result.status:null,
+    gap:result.gapMillis?`${(Number(result.gapMillis)/1000).toFixed(3)}`:null
+  }));
+  return {race:{...data.race,officialName:`${data.race.name} · ${selected?.name||'Race'}`,laps:Math.max(0,...results.map(result=>Number(result.laps||0)))},sessions:{race:results}};
+}
+
 function selectRaceVisualization(value) {
   document.querySelectorAll('[data-race-visual]').forEach(panel => {
     panel.hidden = panel.dataset.raceVisual !== value;
@@ -112,7 +128,7 @@ function renderWeekendConversion(results, styles) {
 async function loadRaceAnalysis() {
   const id=document.getElementById('race-analysis-race').value; if(!id)return;
   try {
-    activeRaceData=await getJSON(`/api/races/${encodeURIComponent(id)}`); focusedDriver=null;
+    activeRaceData=normalizeF2RaceAnalysis(await getJSON(`/api/races/${encodeURIComponent(id)}`)); focusedDriver=null;
     const results=activeRaceData.sessions.race, styles=raceStyles(results), winner=results[0];
     const gains=results.map(result=>({...result,gained:Number(result.gridPositionNumber||result.positionNumber)-Number(result.positionNumber)}));
     const biggest=[...gains].sort((a,b)=>b.gained-a.gained)[0];
@@ -124,7 +140,7 @@ async function loadRaceAnalysis() {
   } catch(error){setError('race-flow-chart',error.message);}
 }
 
-function populateRaces(){const year=document.getElementById('race-analysis-year').value;const races=analysisRaces.filter(race=>String(race.year)===year).sort((a,b)=>a.round-b.round);document.getElementById('race-analysis-race').innerHTML=races.map(race=>`<option value="${esc(race.id)}">R${esc(race.round)} · ${esc(race.officialName)}</option>`).join('');loadRaceAnalysis();}
+function populateRaces(){const year=document.getElementById('race-analysis-year').value;const races=analysisRaces.filter(race=>String(race.year)===year).sort((a,b)=>a.round-b.round);document.getElementById('race-analysis-race').innerHTML=races.map(race=>`<option value="${esc(race.id)}">R${esc(race.round)} · ${esc(race.officialName||race.name)}</option>`).join('');loadRaceAnalysis();}
 getJSON('/api/races').then(races=>{analysisRaces=races;const years=[...new Set(races.map(race=>race.year))].sort((a,b)=>b-a);document.getElementById('race-analysis-year').innerHTML=years.map(year=>`<option value="${esc(year)}">${esc(year)}</option>`).join('');populateRaces();}).catch(error=>setError('race-flow-chart',error.message));
 document.getElementById('race-analysis-year').addEventListener('change',populateRaces);document.getElementById('race-analysis-race').addEventListener('change',loadRaceAnalysis);
 document.querySelectorAll('[data-race-visual-button]').forEach(button => button.addEventListener('click', () => selectRaceVisualization(button.dataset.raceVisualButton)));

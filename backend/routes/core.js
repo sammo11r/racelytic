@@ -38,6 +38,7 @@ const F2_SEARCH_PAGES = [
     ['Constructors', 'Formula 2 teams and results', '/f2/constructors'],
     ['Circuits', 'Formula 2 tracks and venues', '/f2/circuits'],
     ['Analysis', 'Explore Formula 2 data and trends', '/f2/analysis'],
+    ['Season analysis', 'Formula 2 championship progression', '/f2/season-analysis'],
     ['Simulator', 'Formula 2 championship simulation', '/f2/simulator'],
     ['Games', 'Games built from Formula 2 history', '/f2/games'],
     ['About', 'About the Formula 2 archive', '/f2/about']

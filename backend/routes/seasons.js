@@ -510,6 +510,27 @@ router.get('/api/seasons/:year', async (req, res) => {
                     };
                     });
 
+                const comparisonChampionship = championship.map(driver => {
+                    const raceResults = {};
+                    races.forEach(race => {
+                        const sessions = (sessionsByRace.get(race.id) || []).filter(session => !session.cancelled);
+                        const sprint = sessions.find(session => /sprint/i.test(session.name)) || sessions[0];
+                        const feature = [...sessions].reverse().find(session => /feature/i.test(session.name)) || sessions[sessions.length - 1];
+                        const sprintResult = sprint ? driver.raceResults[sprint.id] : null;
+                        const featureResult = feature ? driver.raceResults[feature.id] : null;
+                        if (!sprintResult && !featureResult) return;
+                        raceResults[race.round] = {
+                            ...(featureResult || sprintResult),
+                            points: Number(featureResult?.points || 0),
+                            sprintPoints: sprint && feature && sprint.id !== feature.id ? Number(sprintResult?.points || 0) : 0,
+                            sprintPosition: sprintResult?.position ?? null,
+                            sprintFastestLap: Boolean(sprintResult?.fastestLap),
+                            qualifyingPosition: featureResult?.polePosition ? 1 : null
+                        };
+                    });
+                    return { ...driver, raceResults };
+                });
+
                 return {
                     year,
                     summary: {
@@ -521,6 +542,7 @@ router.get('/api/seasons/:year', async (req, res) => {
                         third: championship[2] || null
                     },
                     championship,
+                    driverChampionship: comparisonChampionship,
                     constructorChampionship,
                     calendar: races.map(race => ({
                         id: race.id,
@@ -528,6 +550,7 @@ router.get('/api/seasons/:year', async (req, res) => {
                         date: race.date,
                         endDate: race.endDate,
                         name: race.name,
+                        officialName: race.name,
                         code: race.code,
                         circuitId: race.circuitId,
                         circuitName: race.circuitName,

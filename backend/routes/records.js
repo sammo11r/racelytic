@@ -89,6 +89,42 @@ router.get('/api/records/explore', async (req, res) => {
     const limit = optionalInteger(req.query.limit, { min: 1, max: 250 }) || 100;
 
     try {
+        if (String(req.query.series || '').toLowerCase() === 'f2') {
+            const data = await withConnection(async connection => {
+                const params = [];
+                const filters = ["LOWER(CAST(sessions.isRace AS CHAR)) IN ('1','true')", "(sessions.cancelled IS NULL OR LOWER(CAST(sessions.cancelled AS CHAR)) NOT IN ('1','true'))"];
+                if (!includeSprints) filters.push("LOWER(sessions.name) NOT LIKE '%sprint%'");
+                if (fromYear) { filters.push('source.year >= ?'); params.push(fromYear); }
+                if (toYear) { filters.push('source.year <= ?'); params.push(toYear); }
+                if (circuitId) { filters.push('races.circuitId = ?'); params.push(circuitId); }
+                if (constructorId) { filters.push('source.constructorId = ?'); params.push(constructorId); }
+                if (nationality) { filters.push(type === 'drivers' ? 'drivers.countryCode = ?' : 'constructors.countryCode = ?'); params.push(nationality); }
+                const entityTable = type === 'drivers' ? 'f2_drivers drivers' : 'f2_constructors constructors';
+                const entityJoin = type === 'drivers' ? 'JOIN f2_drivers drivers ON drivers.id = source.driverId' : 'JOIN f2_constructors constructors ON constructors.id = source.constructorId';
+                const entity = type === 'drivers' ? 'drivers' : 'constructors';
+                const standingsTable = type === 'drivers' ? 'f2_season_driver_standings' : 'f2_season_constructor_standings';
+                const standingsField = type === 'drivers' ? 'driverId' : 'constructorId';
+                let valueExpression = CATEGORIES[category].expression;
+                valueExpression = valueExpression?.replaceAll('source.gridPositionNumber', 'source.positionNumber');
+                const valueParams = [];
+                if (category === 'championships') {
+                    const yearFilters = [];
+                    if (fromYear) { yearFilters.push('standing.year >= ?'); valueParams.push(fromYear); }
+                    if (toYear) { yearFilters.push('standing.year <= ?'); valueParams.push(toYear); }
+                    valueExpression = `(SELECT COUNT(*) FROM ${standingsTable} standing WHERE standing.${standingsField} = ${entity}.id AND standing.positionNumber = 1 AND (LOWER(CAST(standing.championshipWon AS CHAR)) IN ('1','true') OR standing.year < YEAR(CURRENT_DATE()))${yearFilters.length ? ` AND ${yearFilters.join(' AND ')}` : ''})`;
+                }
+                const rows = await connection.query(`SELECT ${entity}.id, ${entity}.name, ${entity}.countryCode AS nationalityCountryId,
+                    ${valueExpression} AS value, COUNT(*) AS starts, SUM(source.positionNumber = 1) AS wins,
+                    SUM(source.positionNumber BETWEEN 1 AND 3) AS podiums, SUM(COALESCE(source.points,0)) AS points,
+                    MIN(source.year) AS firstYear, MAX(source.year) AS lastYear
+                    FROM f2_session_results source JOIN f2_sessions sessions ON sessions.id = source.sessionId
+                    JOIN f2_races races ON races.id = source.raceId ${entityJoin}
+                    WHERE ${filters.join(' AND ')} GROUP BY ${entity}.id, ${entity}.name, ${entity}.countryCode
+                    HAVING value IS NOT NULL AND value > 0 ORDER BY value DESC, wins DESC, podiums DESC, name LIMIT ${limit}`, [...valueParams, ...params]);
+                return rows.map(row=>({...row,value:Number(row.value),starts:Number(row.starts),wins:Number(row.wins),podiums:Number(row.podiums),points:Number(row.points),firstYear:Number(row.firstYear),lastYear:Number(row.lastYear)}));
+            });
+            return res.json({type,category,label:CATEGORIES[category].label,includeSprints,entries:data});
+        }
         const data = await withConnection(async connection => {
             const params = [];
             const filters = [];

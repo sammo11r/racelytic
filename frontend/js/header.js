@@ -14,7 +14,13 @@ async function loadHeader() {
 
         container.innerHTML = await response.text();
 
-        const isF2Mode = window.location.pathname === '/f2' || window.location.pathname.startsWith('/f2/');
+        const requestedSeries = new URLSearchParams(window.location.search).get('series');
+        let rememberedSeries = '';
+        try { rememberedSeries = localStorage.getItem('racelytic-series') || ''; } catch {}
+        const isAccountPage = window.location.pathname === '/account';
+        const isF2Mode = window.location.pathname === '/f2' || window.location.pathname.startsWith('/f2/')
+            || (isAccountPage && (requestedSeries === 'f2' || (!requestedSeries && rememberedSeries === 'f2')));
+        try { localStorage.setItem('racelytic-series', isF2Mode ? 'f2' : 'f1'); } catch {}
         document.body.classList.toggle('f2-mode', isF2Mode);
         if (!isF2Mode && !document.title.includes('Formula 1')) {
             document.title = document.title === 'Racelytic'
@@ -37,10 +43,21 @@ async function loadHeader() {
 
         container.querySelectorAll('.series-switcher a').forEach(link => {
             const active = link.dataset.series === (isF2Mode ? 'f2' : 'f1');
+            if (isAccountPage) link.href = `/account?series=${link.dataset.series}`;
             link.classList.toggle('active', active);
             if (active) link.setAttribute('aria-current', 'page');
         });
         if (isF2Mode) {
+            document.title = document.title
+                .replace('Formula 1', 'Formula 2')
+                .replace(/(^|\s)F1(?=\s|$)/, '$1F2');
+            if (!document.title.includes('Formula 2')) {
+                document.title = document.title === 'Racelytic'
+                    ? 'Formula 2 · Racelytic'
+                    : `${document.title.replace(/\s*·\s*Racelytic$/, '')} · Formula 2 · Racelytic`;
+            }
+            const analysisBackLink = document.querySelector('.back-link[href="/analysis"]');
+            if (analysisBackLink) analysisBackLink.href = '/f2/analysis';
             const navigationDropdowns = [...container.querySelectorAll('.nav-dropdown')];
             const databaseLinks = [...(navigationDropdowns[0]?.querySelectorAll('.dropdown-menu a') || [])];
             if (databaseLinks[0]) databaseLinks[0].href = '/f2/database';
@@ -52,21 +69,108 @@ async function loadHeader() {
             databaseLinks.forEach((link, index) => {
                 if (![0, 1, 2, 3, 4, 5].includes(index)) link.remove();
             });
-            const f2LandingPages = ['/f2/analysis', '/f2/simulator', '/f2/games'];
-            navigationDropdowns.slice(1).forEach((dropdown, index) => {
+            const analysisDropdown = navigationDropdowns[1];
+            const analysisLinks = [...(analysisDropdown?.querySelectorAll('.dropdown-menu a') || [])];
+            const analysisTitle = analysisDropdown?.querySelector('.dropdown-title');
+            if (analysisTitle) analysisTitle.textContent = 'FORMULA 2 ANALYSIS';
+            if (analysisLinks[0]) {
+                analysisLinks[0].href = '/f2/analysis';
+                analysisLinks[0].querySelector('span').textContent = 'Overview';
+                analysisLinks[0].querySelector('small').textContent = 'Choose a Formula 2 analysis';
+            }
+            if (analysisLinks[1]) {
+                analysisLinks[1].href = '/f2/season-analysis';
+                analysisLinks[1].querySelector('span').textContent = 'Season analysis';
+                analysisLinks[1].querySelector('small').textContent = 'Championship progression and results';
+            }
+            const f2AnalysisRoutes = [
+                ['/f2/season-comparison', 'Season comparison', 'Compare two championships'],
+                ['/f2/race-analysis', 'Race analysis', 'Explore a Formula 2 weekend'],
+                ['/f2/driver-comparison', 'Driver comparison', 'Career and teammate battles'],
+                ['/f2/driver-form', 'Driver form', 'Rolling recent-race performance'],
+                ['/f2/teammate-battles', 'Teammate battles', 'Direct intra-team head-to-heads'],
+                ['/f2/circuit-analysis', 'Circuit analysis', 'Performance by venue and era'],
+                ['/f2/records', 'Records', 'Formula 2 all-time leaders']
+            ];
+            analysisLinks.slice(2).forEach((link, index) => {
+                const item = f2AnalysisRoutes[index];
+                if (!item) return link.remove();
+                link.href = item[0];
+                link.querySelector('span').textContent = item[1];
+                link.querySelector('small').textContent = item[2];
+            });
+
+            const simulatorDropdown = navigationDropdowns[2];
+            const simulatorLinks = [...(simulatorDropdown?.querySelectorAll('.dropdown-menu a') || [])];
+            const f2SimulatorRoutes = [
+                ['/f2/simulator', 'Overview', 'Choose a Formula 2 simulation tool'],
+                ['/f2/simulate-season', 'Simulate season', 'Recalculate an F2 championship'],
+                ['/f2/scenario-calculator', 'Scenario calculator', 'Project a championship run-in'],
+                ['/f2/championship-builder', 'Championship builder', 'Create a custom F2 calendar'],
+                ['/f2/points-systems', 'Points systems', 'Create and manage scoring rules']
+            ];
+            simulatorLinks.forEach((link, index) => {
+                const item = f2SimulatorRoutes[index];
+                if (!item) return link.remove();
+                link.href = item[0];
+                link.querySelector('span').textContent = item[1];
+                link.querySelector('small').textContent = item[2];
+            });
+            const simulatorTitle = simulatorDropdown?.querySelector('.dropdown-title');
+            if (simulatorTitle) simulatorTitle.textContent = 'FORMULA 2 SIMULATOR';
+            navigationDropdowns.slice(3).forEach((dropdown, index) => {
                 dropdown.classList.add('f2-direct-nav');
                 dropdown.querySelector('.dropdown-menu')?.remove();
                 const toggle = dropdown.querySelector('.dropdown-toggle');
                 if (toggle) {
                     const link = document.createElement('a');
                     link.className = 'nav-link';
-                    link.href = f2LandingPages[index];
+                    link.href = '/f2/games';
                     link.textContent = toggle.childNodes[0]?.textContent.trim() || '';
                     toggle.replaceWith(link);
                 }
             });
             const aboutLink = container.querySelector('a[href="/about"]');
             if (aboutLink) aboutLink.href = '/f2/about';
+            container.querySelectorAll('a[href="/account"]').forEach(link => { link.href = '/account?series=f2'; });
+            const simulatorBackLink = document.querySelector('.back-link[href="/simulator"], .back-link[href="/simulator-overview"]');
+            if (simulatorBackLink) simulatorBackLink.href = '/f2/simulator';
+            const pointsSimulatorLink = document.querySelector('.points-library-hero a[href="/simulator"]');
+            if (pointsSimulatorLink) pointsSimulatorLink.href = '/f2/simulate-season';
+            const pointsAccountLink = document.querySelector('.points-login-prompt a[href="/account"]');
+            if (pointsAccountLink) pointsAccountLink.href = '/account?series=f2';
+            const accountBuilderLink = document.querySelector('#custom-championship-manager a[href="/championship-builder"]');
+            if (accountBuilderLink) accountBuilderLink.href = '/f2/championship-builder';
+            const f2Copy = {
+                '/f2/simulate-season': ['FORMULA 2 SIMULATOR', 'Rewrite a Formula 2 championship.', 'Apply a different feature, sprint and bonus-points system to any Formula 2 season.'],
+                '/f2/scenario-calculator': ['FORMULA 2 SCENARIOS', 'Shape the Formula 2 title run-in.', 'Freeze the standings after any round, rewrite the remaining feature results and retain each sprint classification.'],
+                '/f2/championship-builder': ['FORMULA 2 CHAMPIONSHIP BUILDER', 'Your weekends. Your rules.', 'Combine Formula 2 weekends, choose the field and calculate a custom championship.'],
+                '/f2/points-systems': ['FORMULA 2 CHAMPIONSHIP RULES', 'Formula 2 points systems.', 'Create reusable feature, sprint, qualifying and bonus-point rules.']
+            }[window.location.pathname];
+            if (f2Copy) {
+                document.title = `${f2Copy[0].replace('FORMULA 2 ', '').replaceAll(' ', ' ').toLowerCase().replace(/(^|\s)\S/g, character => character.toUpperCase())} · Formula 2 · Racelytic`;
+                const hero = document.querySelector('.simulator-hero, .points-library-hero');
+                if (hero) {
+                    const eyebrow = hero.querySelector('.eyebrow');
+                    const heading = hero.querySelector('h1');
+                    const paragraph = hero.querySelector('p');
+                    if (eyebrow) eyebrow.textContent = f2Copy[0];
+                    if (heading) heading.textContent = f2Copy[1];
+                    if (paragraph) paragraph.textContent = f2Copy[2];
+                }
+                const grandPrixLabel = document.querySelector('.builder-race-picker label:nth-child(2) > span');
+                if (grandPrixLabel) grandPrixLabel.textContent = 'Race weekend';
+            }
+            document.addEventListener('click', event => {
+                const link = event.target.closest('a[href]');
+                if (!link || event.defaultPrevented || event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+                const target = new URL(link.href, window.location.origin);
+                if (target.origin !== window.location.origin) return;
+                if (/^\/(driver|constructor|race|season|circuit)(?:$|\/)/.test(target.pathname)) {
+                    event.preventDefault();
+                    window.location.href = `/f2${target.pathname}${target.search}${target.hash}`;
+                }
+            });
         }
 
         const dropdowns = [...container.querySelectorAll('.nav-dropdown')];
@@ -188,7 +292,8 @@ async function loadHeader() {
 
         container.querySelectorAll('a[href]').forEach(link => {
             const linkPath = new URL(link.href, window.location.origin).pathname;
-            if (linkPath === window.location.pathname) {
+            const isSeriesSwitchLink = link.closest('.series-switcher');
+            if (!isSeriesSwitchLink && linkPath === window.location.pathname) {
                 link.classList.add('active');
                 link.setAttribute('aria-current', 'page');
                 link.closest('.nav-dropdown')?.querySelector('.dropdown-toggle')?.classList.add('active');
@@ -197,6 +302,7 @@ async function loadHeader() {
         });
 
         const accountLink = container.querySelector('#account-link');
+        if (accountLink) accountLink.href = `/account?series=${isF2Mode ? 'f2' : 'f1'}`;
         const updateAccountLink = user => {
             if (accountLink) accountLink.textContent = user?.displayName || 'Sign in';
         };

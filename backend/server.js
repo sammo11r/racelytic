@@ -43,7 +43,19 @@ for (const [route, file] of [
     ['/f2/constructor', 'f2-constructor.html'],
     ['/f2/about', 'f2-about.html'],
     ['/f2/analysis', 'f2-analysis.html'],
+    ['/f2/season-analysis', 'f2-season-analysis.html'],
+    ['/f2/season-comparison', 'season-comparison.html'],
+    ['/f2/race-analysis', 'race-analysis.html'],
+    ['/f2/driver-comparison', 'driver-comparison.html'],
+    ['/f2/driver-form', 'driver-form.html'],
+    ['/f2/teammate-battles', 'teammate-battles.html'],
+    ['/f2/circuit-analysis', 'circuit-analysis.html'],
+    ['/f2/records', 'records.html'],
     ['/f2/simulator', 'f2-simulator.html'],
+    ['/f2/simulate-season', 'simulator.html'],
+    ['/f2/scenario-calculator', 'scenario-calculator.html'],
+    ['/f2/championship-builder', 'championship-builder.html'],
+    ['/f2/points-systems', 'points-systems.html'],
     ['/f2/games', 'f2-games.html']
 ]) {
     app.get(route, (req, res) => res.sendFile(path.join(frontendDirectory, file)));

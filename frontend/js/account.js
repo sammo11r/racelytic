@@ -53,7 +53,7 @@ async function loadCustomChampionships() {
   communityChampionships = championships.filter(championship => !championship.owned && championship.visibility === 'public');
   const container = document.getElementById('saved-championships');
   container.innerHTML = ownedChampionships.length ? ownedChampionships.map(championship => `
-    <article class="saved-record-card"><a href="/championship-builder?id=${encodeURIComponent(championship.id)}">
+    <article class="saved-record-card"><a href="${championship.configuration?.series==='f2'?'/f2/championship-builder':'/championship-builder'}?id=${encodeURIComponent(championship.id)}">
       <span>${esc(championship.visibility)} CHAMPIONSHIP</span><strong>${esc(championship.name)}</strong>
       <small>${fmtNumber(championship.configuration.raceIds.length)} races · ${fmtNumber(championship.configuration.driverIds.length)} drivers · ${esc(championship.configuration.pointsSystem.name)}</small>
     </a><button type="button" data-delete-championship="${esc(championship.id)}">Delete</button></article>`).join('')
@@ -184,7 +184,7 @@ function communityItems() {
     ...communityChampionships.map(championship => ({
       type: 'championships', label: 'Championship', name: championship.name, owner: championship.ownerName,
       detail: `${championship.configuration.raceIds.length} races · ${championship.configuration.driverIds.length} drivers · ${championship.configuration.pointsSystem.name}`,
-      url: `/championship-builder?id=${encodeURIComponent(championship.id)}`
+      url: `${championship.configuration?.series==='f2'?'/f2/championship-builder':'/championship-builder'}?id=${encodeURIComponent(championship.id)}`
     }))
   ];
 }

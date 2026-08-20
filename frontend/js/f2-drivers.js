@@ -37,6 +37,12 @@ function compareF2DriverNames(first, second) {
   return String(first.name || '').localeCompare(String(second.name || ''), undefined, { sensitivity: 'base' });
 }
 
+function f2DriverMemorial(driver) {
+  return driver.id === 'anthoine-hubert'
+    ? '<div class="f2-driver-memorial"><span class="memorial-ribbon" aria-hidden="true"></span><span>In memoriam</span><small>1996–2019</small></div>'
+    : '';
+}
+
 function updateF2Drivers() {
   const visible = allF2Drivers
     .filter(driver => `${driver.name} ${driver.abbreviation || ''} ${f2CountryName(driver.countryCode)} ${driver.latestConstructorName || ''}`.toLowerCase().includes(f2DriverSearch))
@@ -61,7 +67,8 @@ function updateF2Drivers() {
   f2DriverPage = paged.page;
   document.getElementById('f2-driver-count').textContent = `${visible.length} driver${visible.length === 1 ? '' : 's'}`;
   document.getElementById('f2-drivers').innerHTML = paged.items.map(driver => `
-    <a class="entity-card driver-browser-card f2-driver-card" href="/f2/driver?id=${encodeURIComponent(driver.id)}">
+    <a class="entity-card driver-browser-card f2-driver-card${driver.id === 'anthoine-hubert' ? ' f2-driver-card-memorial' : ''}" href="/f2/driver?id=${encodeURIComponent(driver.id)}">
+      ${f2DriverMemorial(driver)}
       <div class="driver-card-name"><h3>${esc(driver.name)}</h3>${f2DriverFlag(driver)}</div>
       <p>${esc(driver.abbreviation || 'F2 driver')} · ${esc(f2CountryName(driver.countryCode))} · ${esc(f2DriverCareer(driver))}</p>
       <div class="f2-driver-team">${esc(driver.latestConstructorName || 'Team not recorded')}</div>

@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Analyse Formula 2 championship progression, points and results."><link rel="icon" href="/assets/favicon-f2.svg" type="image/svg+xml"><title>Formula 2 Season Analysis · Racelytic</title><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/polish.css"></head>
+<body class="f2-mode"><div id="header"></div><main class="container page analysis-detail-page">
+  <a class="back-link" href="/f2/analysis">← Analysis</a>
+  <section class="analysis-detail-head"><div><div class="eyebrow">FORMULA 2 SEASON ANALYSIS</div><h1>A championship in motion.</h1><p>Follow how the standings changed through every sprint and feature race without applying Formula 1 assumptions.</p></div><label><span>Season</span><select id="f2-analysis-season"><option>Loading…</option></select></label></section>
+  <section id="f2-analysis-summary" class="analysis-summary-strip"></section>
+  <section class="analysis-visualization-menu"><div class="analysis-visualization-heading"><div class="eyebrow">VISUALIZATION</div><strong>Choose an analysis view</strong></div><div class="analysis-visualization-tabs" role="tablist" aria-label="Formula 2 season analysis visualization">
+    <button type="button" role="tab" aria-selected="true" class="active" data-f2-analysis-button="progression"><span>Progression</span><small>Session by session</small></button>
+    <button type="button" role="tab" aria-selected="false" data-f2-analysis-button="margin"><span>Winning margin</span><small>Title fight</small></button>
+    <button type="button" role="tab" aria-selected="false" data-f2-analysis-button="distribution"><span>Points share</span><small>Distribution</small></button>
+    <button type="button" role="tab" aria-selected="false" data-f2-analysis-button="heatmap"><span>Results</span><small>Sprint and feature</small></button>
+    <button type="button" role="tab" aria-selected="false" data-f2-analysis-button="averages"><span>Averages</span><small>Consistency</small></button>
+  </div></section>
+  <div class="analysis-visualization-workspace">
+    <section class="analysis-chart-section season-progression-section" data-f2-analysis="progression"><div class="section-heading"><div><div class="eyebrow">SESSION BY SESSION</div><h2>Championship progression</h2></div><span class="section-note">Select drivers to show or hide</span></div><div id="f2-progression-legend" class="progression-legend"></div><div id="f2-progression-chart" class="interactive-chart"></div></section>
+    <section class="analysis-chart-section" data-f2-analysis="margin" hidden><div class="section-heading"><div><div class="eyebrow">TITLE FIGHT</div><h2>Championship lead</h2></div></div><div id="f2-margin-chart" class="interactive-chart compact-chart"></div></section>
+    <section class="analysis-chart-section" data-f2-analysis="distribution" hidden><div class="section-heading"><div><div class="eyebrow">POINTS SHARE</div><h2>Points distribution</h2></div></div><div id="f2-distribution-chart"></div></section>
+    <section class="analysis-chart-section" data-f2-analysis="heatmap" hidden><div class="section-heading"><div><div class="eyebrow">RACE BY RACE</div><h2>Results heatmap</h2></div><span class="section-note">Finishing position by session</span></div><div id="f2-results-heatmap" class="results-heatmap-wrap"></div></section>
+    <section class="analysis-chart-section" data-f2-analysis="averages" hidden><div class="section-heading"><div><div class="eyebrow">CONSISTENCY</div><h2>Average race positions</h2></div><span class="section-note">Sprint and feature shown separately</span></div><div id="f2-average-table" class="table-wrap"></div></section>
+  </div>
+</main><footer class="footer"><div class="container">Racelytic</div></footer><script src="/js/utils.js"></script><script src="/js/header.js"></script><script src="/js/team-colors.js"></script><script src="/js/f2-season-analysis.js"></script></body>
+</html>

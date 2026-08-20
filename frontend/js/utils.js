@@ -5,8 +5,21 @@ function esc(value) {
 function params() {
   return new URLSearchParams(window.location.search);
 }
+function activeSeriesAccent() {
+  return window.location.pathname === '/f2' || window.location.pathname.startsWith('/f2/') ? '#1677ff' : '#e32636';
+}
 async function getJSON(url) {
-  const response = await fetch(url);
+  let requestUrl = url;
+  const isF2Page = window.location.pathname === '/f2' || window.location.pathname.startsWith('/f2/');
+  if (isF2Page && String(url).startsWith('/api/')) {
+    const parsed = new URL(url, window.location.origin);
+    const seriesEndpoints = ['/api/seasons', '/api/races', '/api/drivers', '/api/circuits', '/api/constructors', '/api/records/explore'];
+    if (seriesEndpoints.some(endpoint => parsed.pathname === endpoint || parsed.pathname.startsWith(`${endpoint}/`))) {
+      parsed.searchParams.set('series', 'f2');
+      requestUrl = `${parsed.pathname}${parsed.search}`;
+    }
+  }
+  const response = await fetch(requestUrl);
   const contentType = response.headers.get('content-type') || '';
   const data = contentType.includes('application/json')
     ? await response.json()
