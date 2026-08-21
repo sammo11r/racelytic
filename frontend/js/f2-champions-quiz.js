@@ -29,46 +29,35 @@ function preserveMeasuredColumnProportions(board, columnCount) {
 
 function renderQuizTable() {
   const board = document.getElementById('champions-quiz-board');
-  const chronological = [...quizSeasons].sort((a, b) => a.year - b.year);
+  const chronological = [...quizSeasons].sort((first, second) => first.year - second.year);
   const columnCount = responsiveColumnCount(board, chronological.length);
   renderedColumnCount = columnCount;
   const columnSize = Math.ceil(chronological.length / columnCount);
   const columns = Array.from({ length: columnCount }, (_, index) =>
     chronological.slice(index * columnSize, (index + 1) * columnSize)
   ).filter(column => column.length);
-
   board.classList.add('is-measuring');
-  board.innerHTML = columns.map(column => `<div class="quiz-column-table table-wrap">
-    <table class="champions-quiz-table">
-      <thead><tr><th>Season</th><th>Driver</th><th>Team</th></tr></thead>
-      <tbody>${column.map(season => {
-        const driver = revealedSeasons.get(season.year);
-        return `<tr class="${driver ? 'is-revealed' : ''}">
-          <td><strong>${esc(season.year)}</strong></td>
-          <td class="quiz-driver-cell">${driverCellContent(driver, season.driverNameLength)}</td>
-          <td>${season.teams.length ? season.teams.map(esc).join(' / ') : '—'}</td>
-        </tr>`;
-      }).join('')}</tbody>
-    </table>
-  </div>`).join('');
-
-  measuredTableWidth = Math.max(measuredTableWidth, ...[...board.querySelectorAll('.quiz-column-table')].map(table => table.getBoundingClientRect().width));
+  board.innerHTML = columns.map(column => `<div class="quiz-column-table table-wrap"><table class="champions-quiz-table"><thead><tr><th>Season</th><th>Driver</th><th>Team</th></tr></thead><tbody>${column.map(season => {
+    const driver = revealedSeasons.get(season.year);
+    return `<tr class="${driver ? 'is-revealed' : ''}"><td><strong>${esc(season.year)}</strong></td><td class="quiz-driver-cell">${driverCellContent(driver, season.driverNameLength)}</td><td>${season.teams.length ? season.teams.map(esc).join(' / ') : '—'}</td></tr>`;
+  }).join('')}</tbody></table></div>`).join('');
+  measuredTableWidth = Math.max(
+    measuredTableWidth,
+    ...[...board.querySelectorAll('.quiz-column-table')].map(table => table.getBoundingClientRect().width)
+  );
   const fittedColumnCount = responsiveColumnCount(board, chronological.length);
   if (fittedColumnCount !== columnCount) return renderQuizTable();
   preserveMeasuredColumnProportions(board, 3);
   board.classList.remove('is-measuring');
-
   const found = revealedSeasons.size;
   document.getElementById('quiz-score').textContent = `${found} / ${quizSeasons.length}`;
-  document.getElementById('quiz-progress-label').textContent = found === quizSeasons.length
-    ? 'Perfect score. Every season found!'
-    : `${quizSeasons.length - found} seasons remaining`;
+  document.getElementById('quiz-progress-label').textContent = found === quizSeasons.length ? 'Perfect score. Every champion found!' : `${quizSeasons.length - found} seasons remaining`;
   document.getElementById('guessed-drivers').innerHTML = [...guessedDriverNames].map(name => `<span>${esc(name)}</span>`).join('');
 }
 
 async function initialiseChampionsQuiz() {
   try {
-    quizSeasons = await getJSON('/api/games/world-champions');
+    quizSeasons = await getJSON('/api/games/world-champions?series=f2');
     renderQuizTable();
     const form = document.getElementById('champion-guess-form');
     form.elements.guess.disabled = false;
@@ -83,34 +72,23 @@ async function initialiseChampionsQuiz() {
 
 document.getElementById('champion-guess-form').addEventListener('submit', async event => {
   event.preventDefault();
-  const form = event.currentTarget;
-  const input = form.elements.guess;
-  const button = form.querySelector('button');
+  const input = event.currentTarget.elements.guess;
+  const button = event.currentTarget.querySelector('button');
   const feedback = document.getElementById('quiz-feedback');
   const guess = input.value.trim();
   if (!guess) return;
-
   input.disabled = true;
   button.disabled = true;
   try {
-    const response = await fetch('/api/games/world-champions/guess', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ guess })
-    });
+    const response = await fetch('/api/games/world-champions/guess?series=f2', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ guess }) });
     const result = await response.json();
     if (!response.ok) throw new Error(result.error || 'Unable to check that guess.');
-    if (!result.correct) {
-      feedback.textContent = `${guess} is not a World Drivers’ Champion.`;
-      feedback.className = 'is-incorrect';
-    } else {
-      const newYears = result.years.filter(year => !revealedSeasons.has(year));
-      result.years.forEach(year => revealedSeasons.set(year, result.driverName));
-      guessedDriverNames.add(result.driverName);
-      renderQuizTable();
-      feedback.textContent = newYears.length
-        ? `Correct: ${result.driverName} revealed ${newYears.length} ${newYears.length === 1 ? 'season' : 'seasons'}.`
-        : `${result.driverName} was already found.`;
-      feedback.className = newYears.length ? 'is-correct' : '';
-    }
+    const newYears = result.correct ? result.years.filter(year => !revealedSeasons.has(year)) : [];
+    result.years?.forEach(year => revealedSeasons.set(year, result.driverName));
+    if (result.correct) guessedDriverNames.add(result.driverName);
+    renderQuizTable();
+    feedback.textContent = !result.correct ? `${guess} is not an FIA Formula 2 champion.` : newYears.length ? `Correct: ${result.driverName}.` : `${result.driverName} was already found.`;
+    feedback.className = result.correct && newYears.length ? 'is-correct' : result.correct ? '' : 'is-incorrect';
     input.value = '';
   } catch (error) {
     feedback.textContent = error.message;

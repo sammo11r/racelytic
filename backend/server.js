@@ -56,7 +56,10 @@ for (const [route, file] of [
     ['/f2/scenario-calculator', 'scenario-calculator.html'],
     ['/f2/championship-builder', 'championship-builder.html'],
     ['/f2/points-systems', 'points-systems.html'],
-    ['/f2/games', 'f2-games.html']
+    ['/f2/games', 'f2-games.html'],
+    ['/f2/quizzes', 'f2-quizzes.html'],
+    ['/f2/champions-quiz', 'f2-champions-quiz.html'],
+    ['/f2/race-winners-quiz', 'f2-race-winners-quiz.html']
 ]) {
     app.get(route, (req, res) => res.sendFile(path.join(frontendDirectory, file)));
 }

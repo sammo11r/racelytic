@@ -15,6 +15,13 @@ function driverCellContent(driver, nameLength) {
     : '<span class="quiz-empty-answer quiz-answer-overlay" aria-label="Not yet answered"></span>'}`;
 }
 
+function nationCellContent(countryCode) {
+  if (!countryCode) return '<span class="quiz-empty-answer" aria-label="Not yet answered"></span>';
+  const code = String(countryCode).toUpperCase();
+  const nation = new Intl.DisplayNames(['en'], { type: 'region' }).of(code) || code;
+  return `<span class="quiz-nation">${esc(nation)}</span>`;
+}
+
 function preserveMeasuredColumnProportions(board, columnCount) {
   const widths = Array(columnCount).fill(0);
   board.querySelectorAll('table').forEach(table => {
@@ -34,40 +41,28 @@ function renderWinnerBoard() {
   const columns = Array.from({ length: columnCount }, (_, index) =>
     winnerRows.slice(index * columnSize, (index + 1) * columnSize)
   ).filter(column => column.length);
-
   board.classList.add('is-measuring');
-  board.innerHTML = columns.map(column => `<div class="quiz-column-table table-wrap">
-    <table class="champions-quiz-table race-winners-table">
-      <thead><tr><th>Wins</th><th>Driver</th><th>First win</th></tr></thead>
-      <tbody>${column.map(row => {
-        const name = revealedWinners.get(row.slot);
-        return `<tr class="${name ? 'is-revealed' : ''}">
-          <td><strong>${fmtNumber(row.wins)}</strong></td>
-          <td class="quiz-driver-cell">${driverCellContent(name, row.driverNameLength)}</td>
-          <td>${esc(row.firstWinYear)}</td>
-        </tr>`;
-      }).join('')}</tbody>
-    </table>
-  </div>`).join('');
-
-  measuredTableWidth = Math.max(measuredTableWidth, ...[...board.querySelectorAll('.quiz-column-table')].map(table => table.getBoundingClientRect().width));
+  board.innerHTML = columns.map(column => `<div class="quiz-column-table table-wrap"><table class="champions-quiz-table race-winners-table f2-race-winners-table"><thead><tr><th>Wins</th><th>Driver</th><th>Nation</th><th>F</th><th>S</th></tr></thead><tbody>${column.map(row => {
+    const answer = revealedWinners.get(row.slot);
+    return `<tr class="${answer ? 'is-revealed' : ''}"><td><strong>${fmtNumber(row.wins)}</strong></td><td class="quiz-driver-cell">${driverCellContent(answer?.driverName, row.driverNameLength)}</td><td>${nationCellContent(row.countryCode)}</td><td>${fmtNumber(row.featureWins)}</td><td>${fmtNumber(row.sprintWins)}</td></tr>`;
+  }).join('')}</tbody></table></div>`).join('');
+  measuredTableWidth = Math.max(
+    measuredTableWidth,
+    ...[...board.querySelectorAll('.quiz-column-table')].map(table => table.getBoundingClientRect().width)
+  );
   const fittedColumnCount = responsiveColumnCount(board, winnerRows.length);
   if (fittedColumnCount !== columnCount) return renderWinnerBoard();
-  preserveMeasuredColumnProportions(board, 3);
+  preserveMeasuredColumnProportions(board, 5);
   board.classList.remove('is-measuring');
-
   const found = revealedWinners.size;
   document.getElementById('quiz-score').textContent = `${found} / ${winnerRows.length}`;
-  document.getElementById('quiz-progress-label').textContent = found === winnerRows.length
-    ? 'Perfect score. Every winner found!'
-    : `${winnerRows.length - found} drivers remaining`;
-  const names = [...new Set(revealedWinners.values())];
-  document.getElementById('guessed-drivers').innerHTML = names.map(name => `<span>${esc(name)}</span>`).join('');
+  document.getElementById('quiz-progress-label').textContent = found === winnerRows.length ? 'Perfect score. Every winner found!' : `${winnerRows.length - found} drivers remaining`;
+  document.getElementById('guessed-drivers').innerHTML = [...new Set([...revealedWinners.values()].map(answer => answer.driverName))].map(name => `<span>${esc(name)}</span>`).join('');
 }
 
 async function initialiseRaceWinnersQuiz() {
   try {
-    winnerRows = await getJSON('/api/games/race-winners');
+    winnerRows = await getJSON('/api/games/race-winners?series=f2');
     renderWinnerBoard();
     const form = document.getElementById('winner-guess-form');
     form.elements.guess.disabled = false;
@@ -82,32 +77,23 @@ async function initialiseRaceWinnersQuiz() {
 
 document.getElementById('winner-guess-form').addEventListener('submit', async event => {
   event.preventDefault();
-  const form = event.currentTarget;
-  const input = form.elements.guess;
-  const button = form.querySelector('button');
+  const input = event.currentTarget.elements.guess;
+  const button = event.currentTarget.querySelector('button');
   const feedback = document.getElementById('quiz-feedback');
   const guess = input.value.trim();
   if (!guess) return;
   input.disabled = true;
   button.disabled = true;
-
   try {
-    const response = await fetch('/api/games/race-winners/guess', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ guess })
-    });
+    const response = await fetch('/api/games/race-winners/guess?series=f2', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ guess }) });
     const result = await response.json();
     if (!response.ok) throw new Error(result.error || 'Unable to check that guess.');
-    if (!result.correct) {
-      feedback.textContent = `${guess} is not a Formula 1 Grand Prix winner.`;
-      feedback.className = 'is-incorrect';
-    } else {
-      const newMatches = result.matches.filter(match => !revealedWinners.has(match.slot));
-      result.matches.forEach(match => revealedWinners.set(match.slot, match.driverName));
-      renderWinnerBoard();
-      const names = result.matches.map(match => match.driverName).join(' and ');
-      feedback.textContent = newMatches.length ? `Correct: ${names}.` : `${names} already ${result.matches.length > 1 ? 'were' : 'was'} found.`;
-      feedback.className = newMatches.length ? 'is-correct' : '';
-    }
+    const newMatches = result.correct ? result.matches.filter(match => !revealedWinners.has(match.slot)) : [];
+    result.matches?.forEach(match => revealedWinners.set(match.slot, match));
+    renderWinnerBoard();
+    const names = result.matches?.map(match => match.driverName).join(' and ');
+    feedback.textContent = !result.correct ? `${guess} is not an FIA Formula 2 race winner.` : newMatches.length ? `Correct: ${names}.` : `${names} was already found.`;
+    feedback.className = result.correct && newMatches.length ? 'is-correct' : result.correct ? '' : 'is-incorrect';
     input.value = '';
   } catch (error) {
     feedback.textContent = error.message;

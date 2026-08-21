@@ -118,18 +118,21 @@ async function loadHeader() {
             });
             const simulatorTitle = simulatorDropdown?.querySelector('.dropdown-title');
             if (simulatorTitle) simulatorTitle.textContent = 'FORMULA 2 SIMULATOR';
-            navigationDropdowns.slice(3).forEach((dropdown, index) => {
-                dropdown.classList.add('f2-direct-nav');
-                dropdown.querySelector('.dropdown-menu')?.remove();
-                const toggle = dropdown.querySelector('.dropdown-toggle');
-                if (toggle) {
-                    const link = document.createElement('a');
-                    link.className = 'nav-link';
-                    link.href = '/f2/games';
-                    link.textContent = toggle.childNodes[0]?.textContent.trim() || '';
-                    toggle.replaceWith(link);
-                }
+            const gamesDropdown = navigationDropdowns[3];
+            const gamesLinks = [...(gamesDropdown?.querySelectorAll('.dropdown-menu a') || [])];
+            const f2GamesRoutes = [
+                ['/f2/games', 'Overview', 'Choose a Formula 2 game'],
+                ['/f2/quizzes', 'Quizzes', 'Test your Formula 2 knowledge']
+            ];
+            gamesLinks.forEach((link, index) => {
+                const item = f2GamesRoutes[index];
+                if (!item) return link.remove();
+                link.href = item[0];
+                link.querySelector('span').textContent = item[1];
+                link.querySelector('small').textContent = item[2];
             });
+            const gamesTitle = gamesDropdown?.querySelector('.dropdown-title');
+            if (gamesTitle) gamesTitle.textContent = 'FORMULA 2 GAMES';
             const aboutLink = container.querySelector('a[href="/about"]');
             if (aboutLink) aboutLink.href = '/f2/about';
             container.querySelectorAll('a[href="/account"]').forEach(link => { link.href = '/account?series=f2'; });

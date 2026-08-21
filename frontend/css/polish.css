@@ -382,6 +382,13 @@ body.f2-mode .game-card-featured:hover { border-color: rgba(var(--accent-rgb), .
 .driver-browser-card p { margin: 7px 0 13px; font-size: 10px; }
 .driver-browser-card .number { margin-top: 0; font-size: 10px; }
 .f2-driver-card { position: relative; min-height: 190px; }
+.f1-achievement-card { position: relative; }
+.f1-achievement-card:has(.f2-driver-title) h3 { max-width: calc(100% - 115px); }
+.f1-achievement-card:has(.f2-driver-title) .driver-card-name { padding-top: 18px; }
+.f1-achievement-card:has(.f2-driver-title) > h3 { padding-top: 18px; }
+.f1-achievement-card.f2-driver-card-memorial { min-height: 140px; }
+.f1-achievement-card.f2-driver-card-memorial .driver-card-name { padding-top: 25px; }
+.f1-achievement-card.f2-driver-card-memorial:has(.f2-driver-title) .driver-card-name { padding-top: 29px; }
 .f2-driver-card:has(.f2-driver-title) .driver-card-name { padding-top: 12px; }
 .f2-driver-team { margin-top: auto; color: var(--text-secondary); font-size: 11px; font-weight: 750; }
 .f2-driver-card-record { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 12px; }
@@ -1737,6 +1744,14 @@ body.f2-mode .season-comparison-chart .chart-grid + .chart-series { --series-col
 .quiz-choice-card > div { display: flex; align-items: center; justify-content: space-between; gap: 15px; }
 .quiz-choice-card small { color: var(--text-muted); font-size: 10px; }
 .quiz-choice-card strong { color: var(--text); font-size: 12px; }
+.f2-race-winners-table th:nth-child(1),
+.f2-race-winners-table td:nth-child(1),
+.f2-race-winners-table th:nth-child(3),
+.f2-race-winners-table td:nth-child(3),
+.f2-race-winners-table th:nth-child(4),
+.f2-race-winners-table td:nth-child(4) { width: 18%; }
+.f2-race-winners-table th:nth-child(2),
+.f2-race-winners-table td:nth-child(2) { width: 46%; }
 .quiz-game-head {
   display: grid;
   grid-template-columns: minmax(0,1fr) auto;
@@ -2257,16 +2272,19 @@ table td { padding: 14px 16px; }
 /* Multi-column championship quiz board. */
 .champions-quiz-board {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(260px, max-content));
   align-items: start;
+  justify-content: start;
   gap: 10px;
 }
 .quiz-column-table {
+  width: max-content;
+  max-width: 100%;
   overflow: hidden;
   border: 1px solid var(--border);
   border-radius: 10px;
 }
-.quiz-column-table .champions-quiz-table { width: 100%; border: 0; }
+.quiz-column-table .champions-quiz-table { width: auto; border: 0; }
 .quiz-column-table .champions-quiz-table th,
 .quiz-column-table .champions-quiz-table td { border-right: 1px solid var(--border); }
 .quiz-column-table .champions-quiz-table th:last-child,
@@ -2278,39 +2296,95 @@ table td { padding: 14px 16px; }
 .quiz-column-table .champions-quiz-table th:nth-child(3),
 .quiz-column-table .champions-quiz-table td:nth-child(3) { width: 37%; }
 
-@media (max-width: 1000px) {
-  .champions-quiz-board { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-}
-
 @media (max-width: 800px) {
-  .champions-quiz-page .champions-quiz-board { grid-template-columns: 1fr; }
-  .champions-quiz-page .quiz-column-table .champions-quiz-table { min-width: 0; }
+  .champions-quiz-page .quiz-column-table { max-width: 100%; }
 }
 
 .quiz-column-table .champions-quiz-table {
-  width: 100%;
+  width: auto;
   min-width: 0;
-  table-layout: fixed;
+  table-layout: auto;
 }
 .quiz-column-table .champions-quiz-table th:first-child,
 .quiz-column-table .champions-quiz-table td:first-child {
-  width: 72px;
+  width: 1%;
   white-space: nowrap;
 }
 .quiz-column-table .champions-quiz-table th:nth-child(3),
 .quiz-column-table .champions-quiz-table td:nth-child(3) {
-  width: 120px;
-  white-space: normal;
+  width: 1%;
+  white-space: nowrap;
 }
 .quiz-column-table .champions-quiz-table th:nth-child(2),
-.quiz-column-table .champions-quiz-table td:nth-child(2) { width: auto; }
-
-@media (max-width: 1200px) {
-  .quiz-column-table .champions-quiz-table th:first-child,
-  .quiz-column-table .champions-quiz-table td:first-child { width: 65px; }
-  .quiz-column-table .champions-quiz-table th:nth-child(3),
-  .quiz-column-table .champions-quiz-table td:nth-child(3) { width: 105px; }
+.quiz-column-table .champions-quiz-table td:nth-child(2) { width: 1%; white-space: nowrap; }
+.quiz-column-table .f2-race-winners-table th,
+.quiz-column-table .f2-race-winners-table td { width: 1%; white-space: nowrap; }
+.f2-champions-board,
+.f2-winners-board { display: flex; flex-wrap: nowrap; overflow-x: auto; }
+.f2-champions-board .quiz-column-table,
+.f2-winners-board .quiz-column-table { width: auto; max-width: none; flex: 1 1 0; }
+.f2-champions-board .champions-quiz-table,
+.f2-winners-board .f2-race-winners-table { width: 100%; table-layout: fixed; }
+.f2-champions-board.is-measuring .quiz-column-table,
+.f2-winners-board.is-measuring .quiz-column-table { flex: 0 0 auto; }
+.f2-champions-board.is-measuring .champions-quiz-table,
+.f2-winners-board.is-measuring .f2-race-winners-table { width: max-content; table-layout: auto; }
+.f2-champions-board .champions-quiz-table th,
+.f2-champions-board .champions-quiz-table td,
+.f2-winners-board .f2-race-winners-table th,
+.f2-winners-board .f2-race-winners-table td { width: auto; white-space: nowrap; }
+.quiz-driver-cell { position: relative; }
+.quiz-column-sizer { visibility: hidden; white-space: pre; }
+.quiz-answer-overlay {
+  position: absolute;
+  inset: 50% auto auto 13px;
+  max-width: calc(100% - 26px);
+  transform: translateY(-50%);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
+.quiz-empty-answer.quiz-answer-overlay { width: calc(100% - 26px); }
+.f2-champions-board .champions-quiz-table th:nth-child(1),
+.f2-champions-board .champions-quiz-table td:nth-child(1),
+.f2-winners-board .f2-race-winners-table th:nth-child(1),
+.f2-winners-board .f2-race-winners-table td:nth-child(1) { width: var(--quiz-col-1); }
+.f2-champions-board .champions-quiz-table th:nth-child(2),
+.f2-champions-board .champions-quiz-table td:nth-child(2),
+.f2-winners-board .f2-race-winners-table th:nth-child(2),
+.f2-winners-board .f2-race-winners-table td:nth-child(2) { width: var(--quiz-col-2); }
+.f2-champions-board .champions-quiz-table th:nth-child(3),
+.f2-champions-board .champions-quiz-table td:nth-child(3),
+.f2-winners-board .f2-race-winners-table th:nth-child(3),
+.f2-winners-board .f2-race-winners-table td:nth-child(3) { width: var(--quiz-col-3); }
+.f2-winners-board .f2-race-winners-table th:nth-child(4),
+.f2-winners-board .f2-race-winners-table td:nth-child(4) { width: var(--quiz-col-4); }
+.f2-winners-board .f2-race-winners-table th:nth-child(5),
+.f2-winners-board .f2-race-winners-table td:nth-child(5) { width: var(--quiz-col-5); }
+.f2-winners-board .f2-race-winners-table th,
+.f2-winners-board .f2-race-winners-table td { text-align: center; }
+.f2-winners-board .quiz-answer-overlay { right: 0; left: 0; max-width: none; text-align: center; }
+.f2-winners-board .quiz-empty-answer.quiz-answer-overlay { right: auto; left: 12.5%; width: 75%; margin: 0; }
+.quiz-nation { font-size: 10px; font-weight: 750; }
+
+/* Shared content-measured layout for every quiz board. */
+.dynamic-quiz-board { display: flex; flex-wrap: nowrap; overflow-x: auto; }
+.dynamic-quiz-board .quiz-column-table { width: auto; max-width: none; flex: 1 1 0; }
+.dynamic-quiz-board .champions-quiz-table { width: 100%; table-layout: fixed; }
+.dynamic-quiz-board.is-measuring .quiz-column-table { flex: 0 0 auto; }
+.dynamic-quiz-board.is-measuring .champions-quiz-table { width: max-content; table-layout: auto; }
+.dynamic-quiz-board .champions-quiz-table th,
+.dynamic-quiz-board .champions-quiz-table td { white-space: nowrap; }
+.dynamic-quiz-board .champions-quiz-table th:nth-child(1),
+.dynamic-quiz-board .champions-quiz-table td:nth-child(1) { width: var(--quiz-col-1); }
+.dynamic-quiz-board .champions-quiz-table th:nth-child(2),
+.dynamic-quiz-board .champions-quiz-table td:nth-child(2) { width: var(--quiz-col-2); }
+.dynamic-quiz-board .champions-quiz-table th:nth-child(3),
+.dynamic-quiz-board .champions-quiz-table td:nth-child(3) { width: var(--quiz-col-3); }
+.dynamic-quiz-board .champions-quiz-table th:nth-child(4),
+.dynamic-quiz-board .champions-quiz-table td:nth-child(4) { width: var(--quiz-col-4); }
+.dynamic-quiz-board .champions-quiz-table th:nth-child(5),
+.dynamic-quiz-board .champions-quiz-table td:nth-child(5) { width: var(--quiz-col-5); }
 
 /* Homepage product overview */
 .home-hero { padding-top: 52px; padding-bottom: 48px; }

@@ -11,10 +11,11 @@ function renderConstructors(list) {
   const paged = pageItems(list, constructorPage, CONSTRUCTOR_PAGE_SIZE);
   constructorPage = paged.page;
   document.getElementById('constructors').innerHTML = paged.items.map(t => `
-    <a class="entity-card" href="/constructor?id=${encodeURIComponent(t.id)}">
+    <a class="entity-card f1-achievement-card" href="/constructor?id=${encodeURIComponent(t.id)}">
       <h3>${esc(t.name)}</h3>
       <p>${esc(t.fullName || '')}${t.countryName ? ` · ${esc(t.countryName)}` : ''}</p>
       <span class="number">${fmtNumber(t.totalRaceWins)} wins · ${fmtNumber(t.totalChampionshipWins)} titles</span>
+      ${Number(t.totalChampionshipWins || 0) > 0 ? `<em class="f2-driver-title">${Number(t.totalChampionshipWins) > 1 ? `${fmtNumber(t.totalChampionshipWins)}× ` : ''}Constructors’ champion</em>` : ''}
     </a>`).join('');
   renderPagination('constructors', list.length, constructorPage, CONSTRUCTOR_PAGE_SIZE, page => { constructorPage = page; renderConstructors(list); document.getElementById('constructors').scrollIntoView({ behavior: 'smooth', block: 'start' }); });
 }
