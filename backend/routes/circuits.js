@@ -1,7 +1,16 @@
 const express = require('express');
 const { withConnection, sendError } = require('../route-helpers');
+const { f2SessionType, f3SessionType } = require('./seasons');
 
 const router = express.Router();
+
+function withF1CircuitDisplayName(circuit) {
+    return {
+        ...circuit,
+        shortName: circuit.name,
+        name: circuit.fullName || circuit.name
+    };
+}
 
 // ============================================================
 // Circuits
@@ -84,7 +93,7 @@ router.get('/api/circuits', async (req, res) => {
         });
 
 
-        res.json(rows);
+        res.json(rows.map(withF1CircuitDisplayName));
 
     } catch (error) {
 
@@ -103,13 +112,15 @@ router.get('/api/circuits/:id/analysis', async (req, res) => {
         if (['f2', 'f3'].includes(series)) {
             const prefix = `${series}_`;
             const data = await withConnection(async connection => {
-                const [circuits, rows] = await Promise.all([
-                    connection.query(`SELECT id, name, name AS fullName, placeName AS countryName, NULL AS countryId, NULL AS layoutId FROM ${prefix}circuits WHERE id = ?`, [req.params.id]),
-                    connection.query(`SELECT sessions.id AS raceId, races.year, races.round, races.date,
-                        CONCAT(races.name, ' · ', sessions.name) AS officialName, 0 AS raceLaps,
+                const [circuits, rows, gridRows] = await Promise.all([
+                    connection.query(`SELECT id, name, name AS fullName, placeName,
+                        NULL AS countryId, NULL AS layoutId
+                        FROM ${prefix}circuits WHERE id = ?`, [req.params.id]),
+                    connection.query(`SELECT sessions.id AS sessionId, races.id AS raceId,
+                        sessions.sessionNumber, sessions.name AS sessionName,
+                        races.name AS raceName, races.year, races.round, races.date,
                         results.driverId, drivers.name AS driverName, results.constructorId, constructors.name AS constructorName,
-                        results.positionNumber, results.status AS positionText, results.positionNumber AS gridPositionNumber,
-                        results.positionNumber AS qualificationPositionNumber, results.laps, results.gapMillis AS gap,
+                        results.positionNumber, results.status AS positionText, results.laps, results.gapMillis AS gap,
                         results.status AS reasonRetired, results.polePosition, results.fastestLap, results.points
                         FROM ${prefix}races races JOIN ${prefix}sessions sessions ON sessions.raceId = races.id
                         JOIN ${prefix}session_results results ON results.sessionId = sessions.id
@@ -117,13 +128,64 @@ router.get('/api/circuits/:id/analysis', async (req, res) => {
                         LEFT JOIN ${prefix}constructors constructors ON constructors.id = results.constructorId
                         WHERE races.circuitId = ? AND LOWER(CAST(sessions.isRace AS CHAR)) IN ('1','true')
                         AND (sessions.cancelled IS NULL OR LOWER(CAST(sessions.cancelled AS CHAR)) NOT IN ('1','true'))
-                        ORDER BY races.year, races.round, sessions.sessionNumber, results.positionDisplayOrder`, [req.params.id])
+                        ORDER BY races.year, races.round, sessions.sessionNumber, results.positionDisplayOrder`, [req.params.id]),
+                    connection.query(`SELECT sessions.raceId, sessions.sessionNumber,
+                        results.driverId, results.positionNumber
+                        FROM ${prefix}races races
+                        JOIN ${prefix}sessions sessions ON sessions.raceId = races.id
+                        JOIN ${prefix}session_results results ON results.sessionId = sessions.id
+                        WHERE races.circuitId = ? AND LOWER(sessions.name) LIKE '%grid%'
+                            AND results.positionNumber BETWEEN 1 AND 99
+                        ORDER BY races.year, races.round, sessions.sessionNumber DESC,
+                            results.positionNumber`, [req.params.id])
                 ]);
                 if (!circuits.length) return null;
+                const sessionType = series === 'f3' ? f3SessionType : f2SessionType;
+                const rowSessionType = row => sessionType(
+                    { ...row, name: row.sessionName },
+                    0,
+                    0,
+                    row.year
+                );
+                const gridsByRaceDriver = new Map();
+                const featureGridSessionByRace = new Map();
+                const poleDriverByRace = new Map();
+                const featureRaceSessionByRace = new Map();
+                rows.forEach(row => {
+                    if (rowSessionType(row) === 'F') {
+                        featureRaceSessionByRace.set(String(row.raceId), Number(row.sessionNumber));
+                    }
+                });
+                gridRows.forEach(row => {
+                    const raceId = String(row.raceId);
+                    const key = `${raceId}:${row.driverId}`;
+                    if (!gridsByRaceDriver.has(key)) gridsByRaceDriver.set(key, []);
+                    gridsByRaceDriver.get(key).push({
+                        sessionNumber: Number(row.sessionNumber),
+                        position: Number(row.positionNumber)
+                    });
+                    const featureSessionNumber = featureRaceSessionByRace.get(raceId);
+                    if (!featureSessionNumber || Number(row.sessionNumber) >= featureSessionNumber) return;
+                    if (!featureGridSessionByRace.has(raceId)) {
+                        featureGridSessionByRace.set(raceId, Number(row.sessionNumber));
+                    }
+                    if (featureGridSessionByRace.get(raceId) === Number(row.sessionNumber) &&
+                        Number(row.positionNumber) === 1) {
+                        poleDriverByRace.set(raceId, String(row.driverId));
+                    }
+                });
                 const races = new Map();
                 rows.forEach(row => {
-                    if (!races.has(String(row.raceId))) races.set(String(row.raceId), {id:row.raceId,year:Number(row.year),round:Number(row.round),date:row.date,officialName:row.officialName,laps:Number(row.raceLaps||0),results:[]});
-                    races.get(String(row.raceId)).results.push({driverId:row.driverId,driverName:row.driverName,constructorId:row.constructorId,constructorName:row.constructorName,position:row.positionNumber===null?null:Number(row.positionNumber),positionText:row.positionText,grid:row.gridPositionNumber===null?null:Number(row.gridPositionNumber),qualifying:row.qualificationPositionNumber===null?null:Number(row.qualificationPositionNumber),laps:Number(row.laps||0),gap:row.gap,reasonRetired:row.reasonRetired,polePosition:Boolean(row.polePosition),fastestLap:Boolean(row.fastestLap),points:Number(row.points||0)});
+                    const raceId = String(row.raceId);
+                    const type = rowSessionType(row);
+                    const sessionLabel = type === 'F' ? 'Feature' : 'Sprint';
+                    const raceKey = String(row.sessionId);
+                    if (!races.has(raceKey)) races.set(raceKey, {id:row.raceId,sessionId:row.sessionId,year:Number(row.year),round:Number(row.round),date:row.date,officialName:`${row.raceName} ${sessionLabel}`,raceType:type,laps:0,results:[]});
+                    const race = races.get(raceKey);
+                    race.laps = Math.max(race.laps, Number(row.laps || 0));
+                    const grid = gridsByRaceDriver.get(`${raceId}:${row.driverId}`)
+                        ?.find(item => item.sessionNumber < Number(row.sessionNumber))?.position ?? null;
+                    race.results.push({driverId:row.driverId,driverName:row.driverName,constructorId:row.constructorId,constructorName:row.constructorName,position:row.positionNumber===null?null:Number(row.positionNumber),positionText:row.positionText,grid,qualifying:type==='F'?grid:null,laps:Number(row.laps||0),gap:row.gap===null?null:Number(row.gap)/1000,reasonRetired:row.reasonRetired,polePosition:type==='F'&&String(row.driverId)===poleDriverByRace.get(raceId),fastestLap:Boolean(row.fastestLap),points:/\b(?:DSQ|DQ|DISQ|DISQUALIFIED|EXC)\b/i.test(String(row.positionText||''))?0:Number(row.points||0)});
                 });
                 return {circuit:circuits[0],races:[...races.values()]};
             });
@@ -159,7 +221,7 @@ router.get('/api/circuits/:id/analysis', async (req, res) => {
                     polePosition: Boolean(row.polePosition), fastestLap: Boolean(row.fastestLap), points: Number(row.points || 0)
                 });
             });
-            return { circuit: circuits[0], races: [...races.values()] };
+            return { circuit: withF1CircuitDisplayName(circuits[0]), races: [...races.values()] };
         });
         if (!data) return res.status(404).json({ error: 'Circuit not found.' });
         res.json(data);
@@ -300,7 +362,7 @@ router.get('/api/circuits/:id', async (req, res) => {
 
 
             return {
-                circuit: circuitRows[0],
+                circuit: withF1CircuitDisplayName(circuitRows[0]),
                 races
             };
         });

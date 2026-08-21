@@ -311,7 +311,7 @@ router.get('/api/constructors/:id', async (req, res) => {
                         r.officialName,
                         r.date,
 
-                        c.name AS circuitName
+                        COALESCE(NULLIF(c.fullName, ''), c.name) AS circuitName
 
                     FROM races_race_results rr
 

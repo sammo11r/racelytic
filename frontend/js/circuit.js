@@ -26,9 +26,8 @@ async function loadCircuit() {
         <div class="profile-hero-copy">
           <div class="eyebrow">CIRCUIT</div>
           <h1>${esc(c.name)}</h1>
-          <div class="detail-sub">${esc(c.fullName || '')}${c.countryName ? ` · ${esc(c.countryName)}` : ''}</div>
+          <div class="detail-sub">${esc(c.placeName || c.shortName || '')}${c.countryName ? ` · ${esc(c.countryName)}` : ''}</div>
           <div class="profile-meta">
-            ${c.placeName ? `<span>${esc(c.placeName)}</span>` : ''}
             ${c.type ? `<span>${esc(titleCase(c.type))} circuit</span>` : ''}
             ${c.direction ? `<span>${esc(titleCase(c.direction))}</span>` : ''}
           </div>

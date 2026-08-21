@@ -77,8 +77,18 @@ function isRetired(result, raceLaps) {
     || (result.reasonRetired && Number(result.laps) < Number(raceLaps));
 }
 
+function racePositionChange(result) {
+  const grid = Number(result.gridPositionNumber);
+  const finish = Number(result.positionNumber);
+  return grid > 0 && finish > 0 ? grid - finish : null;
+}
+
+function racePositionChangeText(change) {
+  return change === null ? '—' : `${change > 0 ? '+' : ''}${change}`;
+}
+
 function resultTooltip(result, gained) {
-  return `<strong>${esc(result.driverName)}</strong><span>${esc(result.constructorName || '')} · Grid P${result.gridPositionNumber ?? '—'} → ${isRetired(result, activeRaceData.race.laps) ? esc(result.positionText || 'DNF') : `Finish P${result.positionNumber}`}</span><b>${gained > 0 ? '+' : ''}${gained} positions · ${fmtNumber(result.points)} pts</b>`;
+  return `<strong>${esc(result.driverName)}</strong><span>${esc(result.constructorName || '')} · Grid P${result.gridPositionNumber ?? '—'} → ${isRetired(result, activeRaceData.race.laps) ? esc(result.positionText || 'DNF') : `Finish P${result.positionNumber}`}</span><b>${gained === null ? 'Position change unavailable' : `${racePositionChangeText(gained)} positions`} · ${fmtNumber(result.points)} pts</b>`;
 }
 
 function renderRaceFlow(results, styles) {
@@ -93,7 +103,7 @@ function renderRaceFlow(results, styles) {
   const labelsLeft = starters.map(result => `<text x="18" y="${startY.get(String(result.driverId))+4}"><tspan class="flow-position">P${result.gridPositionNumber ?? '—'}</tspan><tspan x="50">${esc(result.driverName)}</tspan></text>`).join('');
   const labelsRight = classification.map(result => `<text x="982" y="${finishY.get(String(result.driverId))+4}" text-anchor="end"><tspan>${esc(result.driverName)}</tspan><tspan class="flow-position"> · ${isRetired(result,activeRaceData.race.laps) ? esc(result.positionText || 'DNF') : `P${result.positionNumber}`}</tspan></text>`).join('');
   const paths = starters.map(result => {
-    const id = String(result.driverId), style = styles.get(id), gained = Number(result.gridPositionNumber || result.positionNumber)-Number(result.positionNumber);
+    const id = String(result.driverId), style = styles.get(id), gained = racePositionChange(result);
     const muted = focusedDriver && focusedDriver !== id;
     return `<path tabindex="0" class="race-flow-line${muted ? ' muted' : ''}" data-driver-flow="${esc(id)}" data-chart-tooltip="${esc(resultTooltip(result,gained))}" style="--flow-color:${style?.color || '#777'}"${style?.dash ? ` stroke-dasharray="${style.dash}"` : ''} d="M210 ${startY.get(id)} C400 ${startY.get(id)},600 ${finishY.get(id)},790 ${finishY.get(id)}"/>`;
   }).join('');
@@ -104,9 +114,9 @@ function renderRaceFlow(results, styles) {
 }
 
 function renderResultMatrix(results) {
-  document.getElementById('race-result-matrix').innerHTML = `<table class="race-analysis-table"><thead><tr><th>Finish</th><th>Driver</th><th>Constructor</th><th>Qual.</th><th>Grid</th><th>Change</th><th>Laps</th><th>Status</th><th>Points</th></tr></thead><tbody>${results.map(result => {
-    const gained=Number(result.gridPositionNumber||result.positionNumber)-Number(result.positionNumber);
-    return `<tr><td><span class="finish-position${Number(result.positionNumber)<=3?' podium':''}">${esc(result.positionText||result.positionNumber)}</span></td><td><a href="/driver?id=${encodeURIComponent(result.driverId)}">${esc(result.driverName)}</a>${result.fastestLap?'<small>Fastest lap</small>':''}</td><td>${esc(result.constructorName||'—')}</td><td>${result.qualificationPositionNumber??'—'}</td><td>${result.gridPositionNumber??'—'}${result.polePosition?'<small>Pole</small>':''}</td><td><span class="position-change ${gained>0?'up':gained<0?'down':'same'}">${gained>0?'+':''}${gained}</span></td><td>${result.laps??'—'}</td><td>${esc(result.reasonRetired||result.time||result.gap||'Finished')}</td><td class="result-points-total">${fmtNumber(result.points)}</td></tr>`;
+  document.getElementById('race-result-matrix').innerHTML = `<table class="race-analysis-table"><thead><tr><th>Finish</th><th>Driver</th><th>Constructor</th><th>Qual.</th><th>Grid</th><th>Change</th><th>Laps</th><th>Time</th><th>Points</th></tr></thead><tbody>${results.map(result => {
+    const gained=racePositionChange(result);
+    return `<tr><td><span class="finish-position${Number(result.positionNumber)<=3?' podium':''}">${esc(result.positionText||result.positionNumber)}</span></td><td><a href="/driver?id=${encodeURIComponent(result.driverId)}">${esc(result.driverName)}</a>${result.fastestLap?'<small>Fastest lap</small>':''}</td><td>${esc(result.constructorName||'—')}</td><td>${result.qualificationPositionNumber??'—'}</td><td>${result.gridPositionNumber??'—'}${result.polePosition?'<small>Pole</small>':''}</td><td><span class="position-change ${gained===null?'unavailable':gained>0?'up':gained<0?'down':'same'}">${racePositionChangeText(gained)}</span></td><td>${result.laps??'—'}</td><td>${esc(result.reasonRetired||result.time||result.gap||'Finished')}</td><td class="result-points-total">${fmtNumber(result.points)}</td></tr>`;
   }).join('')}</tbody></table>`;
 }
 
@@ -134,7 +144,7 @@ function renderWeekendConversion(results, styles) {
   const maximum=Math.max(results.length,20);
   const position=(value)=>Math.max(0,Math.min(100,(Number(value||maximum)-1)/Math.max(maximum-1,1)*100));
   const container=document.getElementById('weekend-conversion-chart');
-  container.innerHTML=`<div class="conversion-head"><span>Driver</span><span>Qualifying</span><span>Grid</span><span>Finish</span></div>${results.map(result=>{const style=styles.get(String(result.driverId)); return `<div class="conversion-row" data-chart-tooltip="${esc(resultTooltip(result,Number(result.gridPositionNumber||result.positionNumber)-Number(result.positionNumber)))}"><a href="/driver?id=${encodeURIComponent(result.driverId)}"><i style="background:${style?.color}"></i>${esc(result.driverName)}</a><span>P${result.qualificationPositionNumber??'—'}</span><span>P${result.gridPositionNumber??'—'}</span><span>${isRetired(result,activeRaceData.race.laps)?esc(result.positionText||'DNF'):`P${result.positionNumber}`}</span><div class="conversion-line"><i style="left:${position(result.qualificationPositionNumber)}%;width:${Math.abs(position(result.positionNumber)-position(result.qualificationPositionNumber))}%;background:${style?.color}"></i></div></div>`;}).join('')}`;
+  container.innerHTML=`<div class="conversion-head"><span>Driver</span><span>Qualifying</span><span>Grid</span><span>Finish</span></div>${results.map(result=>{const style=styles.get(String(result.driverId)); return `<div class="conversion-row" data-chart-tooltip="${esc(resultTooltip(result,racePositionChange(result)))}"><a href="/driver?id=${encodeURIComponent(result.driverId)}"><i style="background:${style?.color}"></i>${esc(result.driverName)}</a><span>P${result.qualificationPositionNumber??'—'}</span><span>P${result.gridPositionNumber??'—'}</span><span>${isRetired(result,activeRaceData.race.laps)?esc(result.positionText||'DNF'):`P${result.positionNumber}`}</span><div class="conversion-line"><i style="left:${position(result.qualificationPositionNumber)}%;width:${Math.abs(position(result.positionNumber)-position(result.qualificationPositionNumber))}%;background:${style?.color}"></i></div></div>`;}).join('')}`;
   bindRaceTooltips(container);
 }
 
@@ -146,12 +156,12 @@ async function loadRaceAnalysis() {
     raceAnalysisDetails.set(String(id),rawData);
     activeRaceData=normalizeF2RaceAnalysis(rawData,sessionId); focusedDriver=null;
     const results=activeRaceData.sessions.race, styles=raceStyles(results), winner=results[0];
-    const gains=results.map(result=>({...result,gained:Number(result.gridPositionNumber||result.positionNumber)-Number(result.positionNumber)}));
-    const biggest=[...gains].sort((a,b)=>b.gained-a.gained)[0];
+    const gains=results.map(result=>({...result,gained:racePositionChange(result)}));
+    const biggest=gains.filter(result=>result.gained!==null).sort((a,b)=>b.gained-a.gained)[0];
     const retirements=results.filter(result=>isRetired(result,activeRaceData.race.laps)).length;
     const teamTotals={}; results.forEach(result=>teamTotals[result.constructorName]=(teamTotals[result.constructorName]||0)+Number(result.points||0));
     const bestTeam=Object.entries(teamTotals).sort((a,b)=>b[1]-a[1])[0];
-    document.getElementById('race-analysis-summary').innerHTML=`<div><span>Winner</span><strong>${esc(winner?.driverName)}</strong><small>${esc(winner?.constructorName)}</small></div><div><span>Biggest mover</span><strong>${esc(biggest?.driverName)}</strong><small>${biggest?.gained>0?'+':''}${biggest?.gained} positions</small></div><div><span>Retirements</span><strong>${retirements}</strong><small>of ${results.length} starters</small></div><div><span>${window.location.pathname.startsWith('/f3/')?'Top team':'Top constructor'}</span><strong>${esc(bestTeam?.[0])}</strong><small>${fmtNumber(bestTeam?.[1])} points</small></div>`;
+    document.getElementById('race-analysis-summary').innerHTML=`<div><span>Winner</span><strong>${esc(winner?.driverName)}</strong><small>${esc(winner?.constructorName)}</small></div><div><span>Biggest mover</span><strong>${esc(biggest?.driverName||'—')}</strong><small>${biggest?`${racePositionChangeText(biggest.gained)} positions`:'No classified movement'}</small></div><div><span>Retirements</span><strong>${retirements}</strong><small>of ${results.length} starters</small></div><div><span>${window.location.pathname.startsWith('/f3/')?'Top team':'Top constructor'}</span><strong>${esc(bestTeam?.[0])}</strong><small>${fmtNumber(bestTeam?.[1])} points</small></div>`;
     renderRaceFlow(results,styles); renderResultMatrix(results); renderConstructorContribution(results); renderAttrition(results); renderWeekendConversion(results,styles);
   } catch(error){setError('race-flow-chart',error.message);}
 }

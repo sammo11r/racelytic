@@ -162,7 +162,7 @@ router.get('/api/races/:id', async (req, res) => {
                 sprintQualifying, preQualifying, practice1, practice2, practice3,
                 practice4, warmingUp] = await Promise.all([
                 connection.query(`
-                    SELECT r.*, c.name AS circuitName, co.name AS countryName
+                    SELECT r.*, COALESCE(NULLIF(c.fullName, ''), c.name) AS circuitName, co.name AS countryName
                     FROM races r
                     LEFT JOIN circuits c ON c.id = r.circuitId
                     LEFT JOIN countries co ON co.id = c.countryId
@@ -296,7 +296,7 @@ router.get('/api/races', async (req, res) => {
                     r.laps,
                     r.distance,
                     r.sprintRaceDate,
-                    c.name AS circuitName,
+                    COALESCE(NULLIF(c.fullName, ''), c.name) AS circuitName,
                     co.name AS countryName
 
                 FROM races r

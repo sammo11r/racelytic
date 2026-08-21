@@ -229,7 +229,7 @@ router.get('/api/search', async (req, res) => {
                 ORDER BY totalRaceWins DESC, name LIMIT 6
               `, [q, q]),
               connection.query(`
-                SELECT id, name, placeName FROM circuits
+                SELECT id, COALESCE(NULLIF(fullName, ''), name) AS name, placeName FROM circuits
                 WHERE name LIKE ? OR fullName LIKE ? OR placeName LIKE ?
                 ORDER BY totalRacesHeld DESC, name LIMIT 6
               `, [q, q, q]),

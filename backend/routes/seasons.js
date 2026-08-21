@@ -754,7 +754,7 @@ router.get('/api/seasons/:year', async (req, res) => {
                         r.circuitId,
                         r.laps,
                         r.distance,
-                        c.name AS circuitName,
+                        COALESCE(NULLIF(c.fullName, ''), c.name) AS circuitName,
                         c.latitude AS circuitLatitude,
                         c.longitude AS circuitLongitude
                     FROM races r
