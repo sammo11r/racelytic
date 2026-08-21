@@ -3,11 +3,16 @@ const assert = require('node:assert/strict');
 const {
   eligibleFastestLapDrivers,
   f2ResultPoints,
+  f2SessionType,
   f3ResultPoints,
   f3SessionType,
   resolveSeasonAwards
 } = require('../backend/routes/seasons');
 const pool = require('../backend/db');
+const {
+  juniorClassificationPosition,
+  juniorClassificationStatus
+} = require('../backend/routes/races');
 
 test.after(async () => {
   await pool.end();
@@ -20,6 +25,24 @@ test('classifies each historical Formula 3 weekend format', () => {
   assert.equal(f3SessionType({ sessionNumber: 6, name: 'Race' }, 1, 3, 2021), 'S');
   assert.equal(f3SessionType({ sessionNumber: 8, name: 'Race' }, 2, 3, 2021), 'F');
   assert.equal(f3SessionType({ sessionNumber: 6, name: 'Race' }, 1, 2, 2025), 'F');
+});
+
+test('classifies each historical Formula 2 weekend format', () => {
+  assert.equal(f2SessionType({ sessionNumber: 4, name: 'Race' }, 0, 2, 2019), 'F');
+  assert.equal(f2SessionType({ sessionNumber: 6, name: 'Race' }, 1, 2, 2019), 'S');
+  assert.equal(f2SessionType({ sessionNumber: 4, name: 'Race' }, 0, 3, 2021), 'S');
+  assert.equal(f2SessionType({ sessionNumber: 6, name: 'Race' }, 1, 3, 2021), 'S');
+  assert.equal(f2SessionType({ sessionNumber: 8, name: 'Race' }, 2, 3, 2021), 'F');
+  assert.equal(f2SessionType({ sessionNumber: 6, name: 'Race' }, 1, 2, 2025), 'F');
+});
+
+test('normalizes non-classified junior session positions', () => {
+  assert.equal(juniorClassificationPosition(1), 1);
+  assert.equal(juniorClassificationPosition(30), 30);
+  assert.equal(juniorClassificationPosition(1001), null);
+  assert.equal(juniorClassificationPosition(null), null);
+  assert.equal(juniorClassificationStatus(null, 1001), 'NC');
+  assert.equal(juniorClassificationStatus('DSQ', 1001), 'DSQ');
 });
 
 test('uses official F3 points before historical scoring fallbacks', () => {

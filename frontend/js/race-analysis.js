@@ -2,21 +2,34 @@ let analysisRaces = [];
 let activeRaceData = null;
 let focusedDriver = null;
 let raceTooltip = null;
+const juniorRaceAnalysis = window.location.pathname.startsWith('/f2/') || window.location.pathname.startsWith('/f3/');
+const raceAnalysisDetails = new Map();
+let racePopulationToken = 0;
 
-function normalizeF2RaceAnalysis(data) {
+function normalizeF2RaceAnalysis(data, selectedSessionId) {
   if (!Array.isArray(data?.sessions)) return data;
   const raceSessions=data.sessions.filter(session=>session.isRace&&!session.cancelled&&session.results?.length);
-  const selected=[...raceSessions].reverse().find(session=>/feature/i.test(session.name))||raceSessions[raceSessions.length-1];
-  const qualifying=[...data.sessions].reverse().find(session=>/qualif/i.test(session.name)&&session.results?.length);
-  const qualifyingByDriver=new Map((qualifying?.results||[]).map(result=>[String(result.driverId),Number(result.positionNumber)]));
+  const selected=raceSessions.find(session=>String(session.id)===String(selectedSessionId))||raceSessions[raceSessions.length-1];
+  const gridSessions=data.sessions.filter(session=>/grid/i.test(session.name)&&session.results?.length);
+  const selectedGrid=[...gridSessions].reverse().find(session=>Number(session.sessionNumber)<Number(selected?.sessionNumber));
+  const featureGrid=gridSessions[gridSessions.length-1];
+  const qualifyingSessions=data.sessions.filter(session=>/qualif/i.test(session.name));
+  const qualifyingByDriver=new Map();
+  if(qualifyingSessions.length===1){
+    (qualifyingSessions[0].results||[]).forEach(result=>{const position=Number(result.positionNumber);if(position>0&&position<100)qualifyingByDriver.set(String(result.driverId),position);});
+  }else{
+    const classifiedDrivers=new Set(qualifyingSessions.flatMap(session=>session.results||[]).filter(result=>Number(result.positionNumber)>0&&Number(result.positionNumber)<100).map(result=>String(result.driverId)));
+    (featureGrid?.results||[]).forEach(result=>{if(classifiedDrivers.has(String(result.driverId)))qualifyingByDriver.set(String(result.driverId),Number(result.positionNumber));});
+  }
+  const gridByDriver=new Map((selectedGrid?.results||[]).map(result=>[String(result.driverId),Number(result.positionNumber)]));
   const results=(selected?.results||[]).map(result=>({...result,
     positionText:result.positionNumber||result.status,
     qualificationPositionNumber:qualifyingByDriver.get(String(result.driverId))||null,
-    gridPositionNumber:qualifyingByDriver.get(String(result.driverId))||result.positionNumber,
+    gridPositionNumber:gridByDriver.get(String(result.driverId))||null,
     reasonRetired:/ret|dnf|dns/i.test(String(result.status||''))?result.status:null,
     gap:result.gapMillis?`${(Number(result.gapMillis)/1000).toFixed(3)}`:null
   }));
-  return {race:{...data.race,officialName:`${data.race.name} · ${selected?.name||'Race'}`,laps:Math.max(0,...results.map(result=>Number(result.laps||0)))},sessions:{race:results}};
+  return {race:{...data.race,officialName:`${data.race.name} · ${selected?.displayName||selected?.name||'Race'}`,laps:Math.max(0,...results.map(result=>Number(result.laps||0)))},sessions:{race:results}};
 }
 
 function selectRaceVisualization(value) {
@@ -126,21 +139,24 @@ function renderWeekendConversion(results, styles) {
 }
 
 async function loadRaceAnalysis() {
-  const id=document.getElementById('race-analysis-race').value; if(!id)return;
+  const selection=document.getElementById('race-analysis-race').value; if(!selection)return;
+  const [id,sessionId]=juniorRaceAnalysis?selection.split('::'):[selection,null];
   try {
-    activeRaceData=normalizeF2RaceAnalysis(await getJSON(`/api/races/${encodeURIComponent(id)}`)); focusedDriver=null;
+    const rawData=raceAnalysisDetails.get(String(id))||await getJSON(`/api/races/${encodeURIComponent(id)}`);
+    raceAnalysisDetails.set(String(id),rawData);
+    activeRaceData=normalizeF2RaceAnalysis(rawData,sessionId); focusedDriver=null;
     const results=activeRaceData.sessions.race, styles=raceStyles(results), winner=results[0];
     const gains=results.map(result=>({...result,gained:Number(result.gridPositionNumber||result.positionNumber)-Number(result.positionNumber)}));
     const biggest=[...gains].sort((a,b)=>b.gained-a.gained)[0];
     const retirements=results.filter(result=>isRetired(result,activeRaceData.race.laps)).length;
     const teamTotals={}; results.forEach(result=>teamTotals[result.constructorName]=(teamTotals[result.constructorName]||0)+Number(result.points||0));
     const bestTeam=Object.entries(teamTotals).sort((a,b)=>b[1]-a[1])[0];
-    document.getElementById('race-analysis-summary').innerHTML=`<div><span>Winner</span><strong>${esc(winner?.driverName)}</strong><small>${esc(winner?.constructorName)}</small></div><div><span>Biggest mover</span><strong>${esc(biggest?.driverName)}</strong><small>${biggest?.gained>0?'+':''}${biggest?.gained} positions</small></div><div><span>Retirements</span><strong>${retirements}</strong><small>of ${results.length} starters</small></div><div><span>Top constructor</span><strong>${esc(bestTeam?.[0])}</strong><small>${fmtNumber(bestTeam?.[1])} points</small></div>`;
+    document.getElementById('race-analysis-summary').innerHTML=`<div><span>Winner</span><strong>${esc(winner?.driverName)}</strong><small>${esc(winner?.constructorName)}</small></div><div><span>Biggest mover</span><strong>${esc(biggest?.driverName)}</strong><small>${biggest?.gained>0?'+':''}${biggest?.gained} positions</small></div><div><span>Retirements</span><strong>${retirements}</strong><small>of ${results.length} starters</small></div><div><span>${window.location.pathname.startsWith('/f3/')?'Top team':'Top constructor'}</span><strong>${esc(bestTeam?.[0])}</strong><small>${fmtNumber(bestTeam?.[1])} points</small></div>`;
     renderRaceFlow(results,styles); renderResultMatrix(results); renderConstructorContribution(results); renderAttrition(results); renderWeekendConversion(results,styles);
   } catch(error){setError('race-flow-chart',error.message);}
 }
 
-function populateRaces(){const year=document.getElementById('race-analysis-year').value;const races=analysisRaces.filter(race=>String(race.year)===year).sort((a,b)=>a.round-b.round);document.getElementById('race-analysis-race').innerHTML=races.map(race=>`<option value="${esc(race.id)}">R${esc(race.round)} · ${esc(race.officialName||race.name)}</option>`).join('');loadRaceAnalysis();}
-getJSON('/api/races').then(races=>{analysisRaces=races;const years=[...new Set(races.map(race=>race.year))].sort((a,b)=>b-a);document.getElementById('race-analysis-year').innerHTML=years.map(year=>`<option value="${esc(year)}">${esc(year)}</option>`).join('');populateRaces();}).catch(error=>setError('race-flow-chart',error.message));
+async function populateRaces(){const token=++racePopulationToken,year=document.getElementById('race-analysis-year').value,races=analysisRaces.filter(race=>String(race.year)===year).sort((a,b)=>a.round-b.round),selector=document.getElementById('race-analysis-race');if(!juniorRaceAnalysis){selector.innerHTML=races.map(race=>`<option value="${esc(race.id)}">R${esc(race.round)} · ${esc(race.officialName||race.name)}</option>`).join('');return loadRaceAnalysis();}selector.innerHTML='<option>Loading race sessions…</option>';try{const weekends=await Promise.all(races.map(async race=>{const data=raceAnalysisDetails.get(String(race.id))||await getJSON(`/api/races/${encodeURIComponent(race.id)}`);raceAnalysisDetails.set(String(race.id),data);return{race,data};}));if(token!==racePopulationToken)return;const options=weekends.flatMap(({race,data})=>data.sessions.filter(session=>session.isRace&&!session.cancelled&&session.results?.length).map(session=>`<option value="${esc(race.id)}::${esc(session.id)}">R${esc(race.round)} · ${esc(race.officialName||race.name)} · ${esc(session.displayName||session.name)}</option>`));selector.innerHTML=options.join('');if(options.length)loadRaceAnalysis();else setError('race-flow-chart','No completed race sessions are available for this season.');}catch(error){if(token===racePopulationToken)setError('race-flow-chart',error.message);}}
+getJSON('/api/races').then(races=>{analysisRaces=races.filter(race=>race.raceSessionCount===undefined||Number(race.raceSessionCount)>0);const years=[...new Set(analysisRaces.map(race=>race.year))].sort((a,b)=>b-a);document.getElementById('race-analysis-year').innerHTML=years.map(year=>`<option value="${esc(year)}">${esc(year)}</option>`).join('');populateRaces();}).catch(error=>setError('race-flow-chart',error.message));
 document.getElementById('race-analysis-year').addEventListener('change',populateRaces);document.getElementById('race-analysis-race').addEventListener('change',loadRaceAnalysis);
 document.querySelectorAll('[data-race-visual-button]').forEach(button => button.addEventListener('click', () => selectRaceVisualization(button.dataset.raceVisualButton)));

@@ -232,14 +232,16 @@ async function closeBrowser() {
 
 function resultRow(session, race, result, displayOrder, entry) {
   const bestLap = result.bestLap || {};
+  const sourcePosition = Number(result.finishPosition);
+  const classifiedPosition = sourcePosition > 0 && sourcePosition < 1000 ? sourcePosition : '';
   return {
     sessionId: session.id,
     raceId: race.id,
     year: session.year,
     round: session.round,
     positionDisplayOrder: displayOrder,
-    positionNumber: Number(result.finishPosition) || '',
-    status: result.classifiedStatus || '',
+    positionNumber: classifiedPosition,
+    status: result.classifiedStatus || (sourcePosition >= 1000 ? 'NC' : ''),
     driverNumber: result.carNumber || entry?.driverNumber || '',
     driverId: entry?.driverId || result.drivers?.[0]?.slug || '',
     constructorId: entry?.constructorId || result.team?.slug || '',

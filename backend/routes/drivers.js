@@ -219,7 +219,7 @@ router.get('/api/drivers/compare', async (req, res) => {
                         COALESCE(SUM(s.poles), 0) AS totalPolePositions, COALESCE(SUM(s.fastestLaps), 0) AS totalFastestLaps,
                         COALESCE(SUM(s.points), 0) AS totalPoints,
                         COALESCE(SUM(s.positionNumber = 1 AND (LOWER(CAST(s.championshipWon AS CHAR)) IN ('1','true') OR s.year < YEAR(CURRENT_DATE()))), 0) AS totalChampionshipWins
-                        FROM f2_drivers d LEFT JOIN f2_season_driver_standings s ON s.driverId = d.id
+                        FROM ${prefix}drivers d LEFT JOIN ${prefix}season_driver_standings s ON s.driverId = d.id
                         WHERE d.id IN (?, ?) GROUP BY d.id, d.name, d.countryCode`, ids),
                     connection.query(`SELECT a.sessionId AS raceId, a.year, a.round, races.name AS officialName, races.date,
                         a.constructorId, constructors.name AS constructorName,
@@ -227,11 +227,11 @@ router.get('/api/drivers/compare', async (req, res) => {
                         a.positionNumber AS firstQualifying, a.positionNumber AS firstGrid, a.points AS firstPoints,
                         b.positionNumber AS secondPosition, b.status AS secondPositionText,
                         b.positionNumber AS secondQualifying, b.positionNumber AS secondGrid, b.points AS secondPoints
-                        FROM f2_session_results a
-                        JOIN f2_session_results b ON b.sessionId = a.sessionId AND b.constructorId = a.constructorId
-                        JOIN f2_sessions sessions ON sessions.id = a.sessionId
-                        JOIN f2_races races ON races.id = a.raceId
-                        LEFT JOIN f2_constructors constructors ON constructors.id = a.constructorId
+                        FROM ${prefix}session_results a
+                        JOIN ${prefix}session_results b ON b.sessionId = a.sessionId AND b.constructorId = a.constructorId
+                        JOIN ${prefix}sessions sessions ON sessions.id = a.sessionId
+                        JOIN ${prefix}races races ON races.id = a.raceId
+                        LEFT JOIN ${prefix}constructors constructors ON constructors.id = a.constructorId
                         WHERE a.driverId = ? AND b.driverId = ? AND LOWER(CAST(sessions.isRace AS CHAR)) IN ('1','true')
                         ORDER BY a.year DESC, a.round DESC, sessions.sessionNumber DESC`, ids)
                 ]);
@@ -267,14 +267,16 @@ router.get('/api/drivers/compare', async (req, res) => {
 
 router.get('/api/drivers/:id/teammates', async (req, res) => {
     try {
-        if (String(req.query.series || '').toLowerCase() === 'f2') {
+        const series = String(req.query.series || '').toLowerCase();
+        if (['f2', 'f3'].includes(series)) {
+            const prefix = `${series}_`;
             const rows = await withConnection(connection => connection.query(`
                 SELECT b.driverId AS id, d.name, d.countryCode AS nationalityCountryId,
                     COUNT(*) AS sharedRaces, MIN(a.year) AS firstSeason, MAX(a.year) AS lastSeason
-                FROM f2_session_results a
-                JOIN f2_session_results b ON b.sessionId = a.sessionId AND b.constructorId = a.constructorId AND b.driverId <> a.driverId
-                JOIN f2_sessions sessions ON sessions.id = a.sessionId
-                JOIN f2_drivers d ON d.id = b.driverId
+                FROM ${prefix}session_results a
+                JOIN ${prefix}session_results b ON b.sessionId = a.sessionId AND b.constructorId = a.constructorId AND b.driverId <> a.driverId
+                JOIN ${prefix}sessions sessions ON sessions.id = a.sessionId
+                JOIN ${prefix}drivers d ON d.id = b.driverId
                 WHERE a.driverId = ? AND LOWER(CAST(sessions.isRace AS CHAR)) IN ('1','true')
                 GROUP BY b.driverId, d.name, d.countryCode ORDER BY sharedRaces DESC, d.name
             `, [req.params.id]));
@@ -297,34 +299,105 @@ router.get('/api/drivers/:id/teammates', async (req, res) => {
 
 router.get('/api/drivers/:id/form', async (req, res) => {
     try {
-        if (String(req.query.series || '').toLowerCase() === 'f2') {
+        const series = String(req.query.series || '').toLowerCase();
+        if (['f2', 'f3'].includes(series)) {
+            const prefix = `${series}_`;
             const data = await withConnection(async connection => {
-                const [drivers, results, teammates] = await Promise.all([
-                    connection.query('SELECT id, name, countryCode AS nationalityCountryId FROM f2_drivers WHERE id = ?', [req.params.id]),
-                    connection.query(`SELECT results.sessionId AS raceId, results.year, results.round, races.date,
+                const [drivers, results, teammates, gridResults, qualifyingResults] = await Promise.all([
+                    connection.query(`SELECT id, name, countryCode AS nationalityCountryId FROM ${prefix}drivers WHERE id = ?`, [req.params.id]),
+                    connection.query(`SELECT results.sessionId, results.raceId, results.year, results.round, races.date,
                         CONCAT(races.name, ' · ', sessions.name) AS officialName, races.circuitId, circuits.name AS circuitName,
                         results.constructorId, constructors.name AS constructorName, results.positionNumber,
-                        results.status AS positionText, results.positionNumber AS qualificationPositionNumber,
-                        results.positionNumber AS gridPositionNumber, results.points, results.laps, results.laps AS raceLaps,
+                        results.status AS positionText, sessions.sessionNumber, results.points,
+                        results.laps, results.laps AS raceLaps,
                         results.status AS reasonRetired, results.fastestLap, results.polePosition
-                        FROM f2_session_results results JOIN f2_sessions sessions ON sessions.id = results.sessionId
-                        JOIN f2_races races ON races.id = results.raceId LEFT JOIN f2_circuits circuits ON circuits.id = races.circuitId
-                        LEFT JOIN f2_constructors constructors ON constructors.id = results.constructorId
+                        FROM ${prefix}session_results results JOIN ${prefix}sessions sessions ON sessions.id = results.sessionId
+                        JOIN ${prefix}races races ON races.id = results.raceId LEFT JOIN ${prefix}circuits circuits ON circuits.id = races.circuitId
+                        LEFT JOIN ${prefix}constructors constructors ON constructors.id = results.constructorId
                         WHERE results.driverId = ? AND LOWER(CAST(sessions.isRace AS CHAR)) IN ('1','true')
                         ORDER BY results.year DESC, results.round DESC, sessions.sessionNumber DESC LIMIT 250`, [req.params.id]),
-                    connection.query(`SELECT own.sessionId AS raceId, mate.driverId, drivers.name AS driverName,
-                        mate.positionNumber, mate.status AS positionText, mate.positionNumber AS qualificationPositionNumber,
-                        mate.positionNumber AS gridPositionNumber, mate.points, mate.status AS reasonRetired
-                        FROM f2_session_results own JOIN f2_session_results mate ON mate.sessionId = own.sessionId
+                    connection.query(`SELECT own.sessionId, own.raceId, sessions.sessionNumber,
+                        mate.driverId, drivers.name AS driverName, mate.positionNumber,
+                        mate.status AS positionText, mate.points, mate.status AS reasonRetired
+                        FROM ${prefix}session_results own JOIN ${prefix}session_results mate ON mate.sessionId = own.sessionId
                         AND mate.constructorId = own.constructorId AND mate.driverId <> own.driverId
-                        JOIN f2_sessions sessions ON sessions.id = own.sessionId JOIN f2_drivers drivers ON drivers.id = mate.driverId
+                        JOIN ${prefix}sessions sessions ON sessions.id = own.sessionId JOIN ${prefix}drivers drivers ON drivers.id = mate.driverId
                         WHERE own.driverId = ? AND LOWER(CAST(sessions.isRace AS CHAR)) IN ('1','true')
-                        ORDER BY own.year DESC, own.round DESC`, [req.params.id])
+                        ORDER BY own.year DESC, own.round DESC`, [req.params.id]),
+                    connection.query(`SELECT sessions.raceId, sessions.sessionNumber,
+                        results.driverId, results.positionNumber
+                        FROM ${prefix}sessions sessions
+                        JOIN ${prefix}session_results results ON results.sessionId = sessions.id
+                        WHERE LOWER(sessions.name) LIKE '%starting grid%'
+                            AND results.positionNumber BETWEEN 1 AND 99
+                            AND sessions.raceId IN (
+                                SELECT DISTINCT own.raceId
+                                FROM ${prefix}session_results own
+                                JOIN ${prefix}sessions raceSession ON raceSession.id = own.sessionId
+                                WHERE own.driverId = ?
+                                    AND LOWER(CAST(raceSession.isRace AS CHAR)) IN ('1','true')
+                            )
+                        ORDER BY sessions.raceId, sessions.sessionNumber DESC`, [req.params.id]),
+                    connection.query(`SELECT sessions.raceId, sessions.id AS sessionId,
+                        results.driverId, results.positionNumber
+                        FROM ${prefix}sessions sessions
+                        LEFT JOIN ${prefix}session_results results ON results.sessionId = sessions.id
+                        WHERE LOWER(sessions.name) LIKE '%qualif%'
+                            AND sessions.raceId IN (
+                                SELECT DISTINCT own.raceId
+                                FROM ${prefix}session_results own
+                                JOIN ${prefix}sessions raceSession ON raceSession.id = own.sessionId
+                                WHERE own.driverId = ?
+                                    AND LOWER(CAST(raceSession.isRace AS CHAR)) IN ('1','true')
+                            )
+                        ORDER BY sessions.raceId, sessions.sessionNumber,
+                            results.positionDisplayOrder`, [req.params.id])
                 ]);
                 if (!drivers.length) return null;
+                const gridsByRaceDriver = new Map();
+                const featureGridByRaceDriver = new Map();
+                gridResults.forEach(row => {
+                    const key = `${row.raceId}:${row.driverId}`;
+                    if (!gridsByRaceDriver.has(key)) gridsByRaceDriver.set(key, []);
+                    gridsByRaceDriver.get(key).push({
+                        sessionNumber: Number(row.sessionNumber),
+                        position: Number(row.positionNumber)
+                    });
+                    if (!featureGridByRaceDriver.has(key)) {
+                        featureGridByRaceDriver.set(key, Number(row.positionNumber));
+                    }
+                });
+                const qualifyingSessionsByRace = new Map();
+                const qualifyingByRaceDriver = new Map();
+                const classifiedQualifyingDriversByRace = new Map();
+                qualifyingResults.forEach(row => {
+                    const raceId = String(row.raceId);
+                    if (!qualifyingSessionsByRace.has(raceId)) qualifyingSessionsByRace.set(raceId, new Set());
+                    qualifyingSessionsByRace.get(raceId).add(String(row.sessionId));
+                    const position = Number(row.positionNumber);
+                    if (!row.driverId || position < 1 || position > 99) return;
+                    if (!classifiedQualifyingDriversByRace.has(raceId)) {
+                        classifiedQualifyingDriversByRace.set(raceId, new Set());
+                    }
+                    classifiedQualifyingDriversByRace.get(raceId).add(String(row.driverId));
+                    qualifyingByRaceDriver.set(`${raceId}:${row.driverId}`, position);
+                });
+                const gridPosition = row => gridsByRaceDriver
+                    .get(`${row.raceId}:${row.driverId}`)
+                    ?.find(grid => grid.sessionNumber < Number(row.sessionNumber))?.position ?? null;
+                const qualifyingPosition = row => {
+                    const raceId = String(row.raceId);
+                    const key = `${raceId}:${row.driverId}`;
+                    const sessionCount = qualifyingSessionsByRace.get(raceId)?.size || 0;
+                    if (sessionCount === 1) return qualifyingByRaceDriver.get(key) ?? null;
+                    if (sessionCount > 1 && !classifiedQualifyingDriversByRace.get(raceId)?.has(String(row.driverId))) {
+                        return null;
+                    }
+                    return featureGridByRaceDriver.get(key) ?? null;
+                };
                 const teammateMap = new Map();
-                teammates.forEach(row => { const key=String(row.raceId); if(!teammateMap.has(key))teammateMap.set(key,[]); teammateMap.get(key).push({driverId:row.driverId,driverName:row.driverName,position:row.positionNumber===null?null:Number(row.positionNumber),positionText:row.positionText,qualifying:row.qualificationPositionNumber===null?null:Number(row.qualificationPositionNumber),grid:row.gridPositionNumber===null?null:Number(row.gridPositionNumber),points:Number(row.points||0),reasonRetired:row.reasonRetired}); });
-                return {driver:drivers[0],results:results.map(row=>({raceId:row.raceId,year:Number(row.year),round:Number(row.round),date:row.date,officialName:row.officialName,circuitId:row.circuitId,circuitName:row.circuitName,constructorId:row.constructorId,constructorName:row.constructorName,position:row.positionNumber===null?null:Number(row.positionNumber),positionText:row.positionText,qualifying:row.qualificationPositionNumber===null?null:Number(row.qualificationPositionNumber),grid:row.gridPositionNumber===null?null:Number(row.gridPositionNumber),points:Number(row.points||0),laps:Number(row.laps||0),raceLaps:Number(row.raceLaps||0),reasonRetired:row.reasonRetired,fastestLap:Boolean(row.fastestLap),polePosition:Boolean(row.polePosition),teammates:teammateMap.get(String(row.raceId))||[]}))};
+                teammates.forEach(row => { const key=String(row.sessionId); if(!teammateMap.has(key))teammateMap.set(key,[]); teammateMap.get(key).push({driverId:row.driverId,driverName:row.driverName,position:row.positionNumber===null?null:Number(row.positionNumber),positionText:row.positionText,qualifying:qualifyingPosition(row),grid:gridPosition(row),points:Number(row.points||0),reasonRetired:row.reasonRetired}); });
+                return {driver:drivers[0],results:results.map(row=>({raceId:row.raceId,sessionId:row.sessionId,year:Number(row.year),round:Number(row.round),date:row.date,officialName:row.officialName,circuitId:row.circuitId,circuitName:row.circuitName,constructorId:row.constructorId,constructorName:row.constructorName,position:row.positionNumber===null?null:Number(row.positionNumber),positionText:row.positionText,qualifying:qualifyingPosition({...row,driverId:req.params.id}),grid:gridPosition({...row,driverId:req.params.id}),points:Number(row.points||0),laps:Number(row.laps||0),raceLaps:Number(row.raceLaps||0),reasonRetired:row.reasonRetired,fastestLap:Boolean(row.fastestLap),polePosition:Boolean(row.polePosition),teammates:teammateMap.get(String(row.sessionId))||[]}))};
             });
             if (!data) return res.status(404).json({ error: 'Driver not found.' });
             return res.json(data);

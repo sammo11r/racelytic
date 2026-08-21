@@ -1,4 +1,11 @@
 let comparedSeasons=[],seasonComparisonTooltip=null;
+if (window.location.pathname.startsWith('/f3/')) {
+  const comparisonContent = document.getElementById('season-comparison-content');
+  const recolorF3Comparison = () => comparisonContent.querySelectorAll('.chart-series').forEach(series => {
+    if (series.style.getPropertyValue('--series-color').trim().toLowerCase() === '#e32636') series.style.setProperty('--series-color', activeSeriesAccent());
+  });
+  new MutationObserver(recolorF3Comparison).observe(comparisonContent, { childList: true, subtree: true });
+}
 function seasonResults(data){return data.driverChampionship.flatMap(driver=>Object.entries(driver.raceResults||{}).map(([round,result])=>({...result,round:Number(round),driverId:driver.driverId,driverName:driver.name})));}
 function isSeasonRetirement(result){return /ret|dns|dnq|dsq|wd|nc/i.test(String(result.positionText||''))||Boolean(result.reasonRetired&& !/finished|running/i.test(result.reasonRetired));}
 function seasonMetrics(data){const results=seasonResults(data),raceResults=results.filter(result=>result.position!==null),winners=raceResults.filter(result=>result.position===1),uniqueWinners=new Set(winners.map(result=>String(result.driverId))),winningTeams=new Set(winners.map(result=>String(result.constructorId)).filter(Boolean)),champion=data.driverChampionship[0],runnerUp=data.driverChampionship[1],totalPoints=data.driverChampionship.reduce((sum,driver)=>sum+Number(driver.points||0),0),topThree=data.driverChampionship.slice(0,3).reduce((sum,driver)=>sum+Number(driver.points||0),0),gridMoves=raceResults.filter(result=>Number(result.qualifyingPosition)>0&&Number(result.position)>0).map(result=>Number(result.qualifyingPosition)-Number(result.position)),retirements=results.filter(isSeasonRetirement).length,races=data.calendar.length;

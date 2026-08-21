@@ -221,12 +221,14 @@ function addConstructor(maps, team) {
 function resultRow(session, race, result, order, awards) {
   const driver = result.drivers?.[0] || {};
   const bestLap = result.bestLap || {};
+  const sourcePosition = Number(result.finishPosition);
+  const classifiedPosition = sourcePosition > 0 && sourcePosition < 1000 ? sourcePosition : '';
   const pole = awards?.poleDrivers?.some(item => item.slug === driver.slug) || false;
   const fastest = awards?.fastestLapDrivers?.some(item => item.slug === driver.slug) || bestLap.fastest || false;
   return {
     sessionId: session.session.slug, raceId: race.id, year: race.year, round: race.round,
-    positionDisplayOrder: order, positionNumber: Number(result.finishPosition) || '', points: '',
-    polePosition: bool(pole), status: result.classifiedStatus || '', driverNumber: result.carNumber || '',
+    positionDisplayOrder: order, positionNumber: classifiedPosition, points: '',
+    polePosition: bool(pole), status: result.classifiedStatus || (sourcePosition >= 1000 ? 'NC' : ''), driverNumber: result.carNumber || '',
     driverId: driver.slug || '', constructorId: result.team?.slug || '', laps: result.laps ?? '',
     time: formatMilliseconds(result.time), timeMillis: result.time || '', gapMillis: result.gap?.timeToLead || 0,
     gapLaps: result.gap?.lapsToLead || 0, fastestLap: bool(fastest), fastestLapNumber: bestLap.lap || '',

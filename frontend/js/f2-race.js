@@ -31,7 +31,7 @@ function f2Gap(result, useTimeFallback = true) {
 }
 
 function f2SessionTabLabel(session) {
-  return `${esc(f2SessionName(session))}${session.cancelled ? '<small>Cancelled</small>' : session.results.length ? `<small>${fmtNumber(session.results.length)} classified</small>` : '<small>No data</small>'}`;
+  return `${esc(f2SessionName(session))}${session.cancelled ? '<small>Cancelled</small>' : session.results.length ? `<small>${fmtNumber(session.results.length)} entries</small>` : '<small>No data</small>'}`;
 }
 
 function renderF2SessionTabs() {
@@ -56,7 +56,7 @@ function renderF2SessionResults() {
   document.getElementById('f2-session-title').textContent = f2SessionName(session);
   document.getElementById('f2-session-summary').textContent = session.cancelled
     ? 'Session cancelled'
-    : `${fmtNumber(session.results.length)} classified${session.startTimeUtc ? ` · ${fmtDate(session.startTimeUtc)}` : ''}`;
+    : `${fmtNumber(session.results.length)} entries${session.startTimeUtc ? ` · ${fmtDate(session.startTimeUtc)}` : ''}`;
   if (session.cancelled) {
     document.getElementById('f2-race-results').innerHTML = '<div class="f2-cancelled-session"><strong>Cancelled</strong><p>This session remained on the weekend schedule but no classification was issued.</p></div>';
     return;

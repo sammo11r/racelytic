@@ -29,6 +29,27 @@ async function loadHeader() {
         const isF2Mode = activeSeries === 'f2';
         const isF3Mode = activeSeries === 'f3';
         try { localStorage.setItem('racelytic-series', activeSeries); } catch {}
+
+        const contentLinkMap = activeSeries === 'f3' ? {
+            '/analysis': '/f3/analysis', '/season': '/f3/season', '/race': '/f3/race',
+            '/f2/analysis': '/f3/analysis',
+            '/driver': '/f3/driver', '/constructor': '/f3/team', '/circuit': '/f3/circuit',
+            '/season-analysis': '/f3/season-analysis', '/season-comparison': '/f3/season-comparison',
+            '/race-analysis': '/f3/race-analysis', '/driver-comparison': '/f3/driver-comparison',
+            '/driver-form': '/f3/driver-form', '/teammate-battles': '/f3/teammate-battles',
+            '/circuit-analysis': '/f3/circuit-analysis', '/records': '/f3/records'
+        } : activeSeries === 'f2' ? {
+            '/analysis': '/f2/analysis', '/season': '/f2/season', '/race': '/f2/race',
+            '/driver': '/f2/driver', '/constructor': '/f2/constructor', '/circuit': '/f2/circuit'
+        } : {};
+        const rewriteContentLinks = root => root?.querySelectorAll?.('a[href]').forEach(link => {
+            const url = new URL(link.href, window.location.origin);
+            if (url.origin !== window.location.origin || !contentLinkMap[url.pathname]) return;
+            link.href = `${contentLinkMap[url.pathname]}${url.search}${url.hash}`;
+        });
+        const mainContent = document.querySelector('main');
+        rewriteContentLinks(mainContent);
+        if (mainContent) new MutationObserver(() => rewriteContentLinks(mainContent)).observe(mainContent, { childList: true, subtree: true });
         document.body.classList.toggle('f2-mode', isF2Mode);
         document.body.classList.toggle('f3-mode', isF3Mode);
         if (activeSeries === 'f1' && !document.title.includes('Formula 1')) {
@@ -67,7 +88,11 @@ async function loadHeader() {
             '/': '/f3', '/database': '/f3/database', '/seasons': '/f3/seasons', '/races': '/f3/races',
             '/drivers': '/f3/drivers', '/constructors': '/f3/teams', '/circuits': '/f3/circuits',
             '/chassis': '/f3/chassis',
-            '/analysis': '/f3/analysis',
+            '/analysis': '/f3/analysis', '/season-analysis': '/f3/season-analysis',
+            '/season-comparison': '/f3/season-comparison', '/race-analysis': '/f3/race-analysis',
+            '/driver-comparison': '/f3/driver-comparison', '/driver-form': '/f3/driver-form',
+            '/teammate-battles': '/f3/teammate-battles', '/circuit-analysis': '/f3/circuit-analysis',
+            '/records': '/f3/records',
             '/simulator-overview': '/f3/simulator', '/games': '/f3/games', '/about': '/f3/about'
         };
         const reverseF3PagePairs = Object.fromEntries(Object.entries(f3PagePairs).map(([f1, f3]) => [f3, f1]));
@@ -162,7 +187,17 @@ async function loadHeader() {
                     ['/f3/circuits', 'Circuits', 'Formula 3 tracks and venues'],
                     ['/f3/chassis', 'Chassis', 'Formula 3 chassis and engine records']
                 ]],
-                ['FORMULA 3 ANALYSIS', [['/f3/analysis', 'Overview', 'Choose a Formula 3 analysis']]],
+                ['FORMULA 3 ANALYSIS', [
+                    ['/f3/analysis', 'Overview', 'Choose a Formula 3 analysis'],
+                    ['/f3/season-analysis', 'Season analysis', 'Championship progression and results'],
+                    ['/f3/season-comparison', 'Season comparison', 'Compare two championships'],
+                    ['/f3/race-analysis', 'Race analysis', 'Explore a Formula 3 race'],
+                    ['/f3/driver-comparison', 'Driver comparison', 'Career and teammate battles'],
+                    ['/f3/driver-form', 'Driver form', 'Rolling recent-race performance'],
+                    ['/f3/teammate-battles', 'Teammate battles', 'Direct intra-team head-to-heads'],
+                    ['/f3/circuit-analysis', 'Circuit analysis', 'Performance by venue'],
+                    ['/f3/records', 'Records', 'Formula 3 all-time leaders']
+                ]],
                 ['FORMULA 3 SIMULATOR', [['/f3/simulator', 'Overview', 'Choose a Formula 3 simulation tool']]],
                 ['FORMULA 3 GAMES', [['/f3/games', 'Overview', 'Choose a Formula 3 game']]]
             ];

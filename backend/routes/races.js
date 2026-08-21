@@ -1,8 +1,18 @@
 const express = require('express');
 const { withConnection, sendError } = require('../route-helpers');
 const { optionalInteger } = require('../validation');
+const { f2SessionType, f3SessionType } = require('./seasons');
 
 const router = express.Router();
+
+function juniorClassificationPosition(value) {
+    const position = Number(value);
+    return Number.isInteger(position) && position > 0 && position < 1000 ? position : null;
+}
+
+function juniorClassificationStatus(status, value) {
+    return status || (Number(value) >= 1000 ? 'NC' : null);
+}
 
 // ============================================================
 // Races
@@ -55,8 +65,20 @@ router.get('/api/races/:id', async (req, res) => {
                 const isDisqualified = row => /\b(?:DSQ|DQ|DISQ|DISQUALIFIED|EXC)\b/i.test(String(row.status || ''));
                 const sessionsById = new Map(sessionRows.map(session => [String(session.id), session]));
                 const raceSessions = sessionRows.filter(session => isTrue(session.isRace));
-                const featureSession = raceSessions.find(session => /feature/i.test(session.name))
+                const sessionType = series === 'f3' ? f3SessionType : f2SessionType;
+                const raceTypeBySession = new Map(raceSessions.map((session, index) => [
+                    String(session.id),
+                    sessionType(session, index, raceSessions.length, raceRows[0].year)
+                ]));
+                const featureSession = raceSessions.find(session => raceTypeBySession.get(String(session.id)) === 'F')
                     || raceSessions.at(-1);
+                const sprintSessions = raceSessions.filter(session => raceTypeBySession.get(String(session.id)) === 'S');
+                const raceLabelBySession = new Map(raceSessions.map(session => {
+                    const type = raceTypeBySession.get(String(session.id));
+                    if (type === 'F') return [String(session.id), 'Feature Race'];
+                    const sprintIndex = sprintSessions.findIndex(candidate => String(candidate.id) === String(session.id));
+                    return [String(session.id), sprintSessions.length > 1 ? `Sprint Race ${sprintIndex + 1}` : 'Sprint Race'];
+                }));
                 const gridSessions = sessionRows.filter(session => /grid/i.test(session.name));
                 const featureGrid = gridSessions.at(-1);
                 const qualifyingSessions = sessionRows.filter(session => /qualif/i.test(session.name));
@@ -90,10 +112,12 @@ router.get('/api/races/:id', async (req, res) => {
                     const sessionId = String(row.sessionId);
                     const session = sessionsById.get(sessionId);
                     const isRace = session && isTrue(session.isRace);
+                    const positionNumber = juniorClassificationPosition(row.positionNumber);
                     if (!resultsBySession.has(sessionId)) resultsBySession.set(sessionId, []);
                     resultsBySession.get(sessionId).push({
                         ...row,
-                        positionNumber: row.positionNumber === null ? null : Number(row.positionNumber),
+                        positionNumber,
+                        status: juniorClassificationStatus(row.status, row.positionNumber),
                         points: isDisqualified(row) ? 0 : row.points === null ? null : Number(row.points),
                         laps: row.laps === null ? null : Number(row.laps),
                         gapMillis: row.gapMillis === null ? null : Number(row.gapMillis),
@@ -111,6 +135,8 @@ router.get('/api/races/:id', async (req, res) => {
                         sessionNumber: Number(session.sessionNumber || 0),
                         isRace: isTrue(session.isRace),
                         cancelled: isTrue(session.cancelled),
+                        raceType: raceTypeBySession.get(String(session.id)) || null,
+                        displayName: raceLabelBySession.get(String(session.id)) || session.name,
                         results: resultsBySession.get(String(session.id)) || []
                     }))
                 };
@@ -296,3 +322,5 @@ router.get('/api/races', async (req, res) => {
 });
 
 module.exports = router;
+module.exports.juniorClassificationPosition = juniorClassificationPosition;
+module.exports.juniorClassificationStatus = juniorClassificationStatus;

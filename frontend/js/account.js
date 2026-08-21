@@ -69,9 +69,10 @@ async function loadCustomChampionships() {
 function savedRecordUrl(configuration) {
   const query = new URLSearchParams();
   Object.entries(configuration || {}).forEach(([key, value]) => {
-    if (value !== null && value !== undefined && value !== '' && value !== false) query.set(key, String(value));
+    if (key !== 'series' && value !== null && value !== undefined && value !== '' && value !== false) query.set(key, String(value));
   });
-  return `/records?${query}`;
+  const base = configuration?.series === 'f3' ? '/f3/records' : configuration?.series === 'f2' ? '/f2/records' : '/records';
+  return `${base}?${query}`;
 }
 
 async function loadSavedRecords() {
@@ -81,7 +82,8 @@ async function loadSavedRecords() {
   const container = document.getElementById('saved-records');
   container.innerHTML = ownedRecords.length ? ownedRecords.map(record => {
     const config = record.configuration || {};
-    const detail = [config.type === 'constructors' ? 'Constructors' : 'Drivers', config.category, config.fromYear || config.toYear ? `${config.fromYear || '1950'}–${config.toYear || 'present'}` : 'All-time', config.includeSprints ? 'Sprints included' : 'Grand Prix only'];
+    const junior = config.series === 'f2' || config.series === 'f3';
+    const detail = [config.type === 'constructors' ? (config.series === 'f3' ? 'Teams' : 'Constructors') : 'Drivers', config.category, config.fromYear || config.toYear ? `${config.fromYear || (config.series === 'f3' ? '2019' : config.series === 'f2' ? '2017' : '1950')}–${config.toYear || 'present'}` : 'All-time', config.includeSprints ? 'Sprints included' : junior ? 'Feature races only' : 'Grand Prix only'];
     return `<article class="saved-record-card"><a href="${esc(savedRecordUrl(config))}"><span>${esc(record.visibility)} RECORD</span><strong>${esc(record.name)}</strong><small>${esc(detail.join(' · '))}</small></a><button type="button" data-delete-record="${esc(record.id)}" aria-label="Delete ${esc(record.name)}">Delete</button></article>`;
   }).join('') : '<div class="empty-state">Your personal record book is empty. Save a result from the Records Explorer to add it here.</div>';
   container.querySelectorAll('[data-delete-record]').forEach(button => button.addEventListener('click', async () => {

@@ -19,9 +19,10 @@ const CATEGORIES = {
 function recordConfiguration(input = {}) {
     const type = input.type === 'constructors' ? 'constructors' : 'drivers';
     const category = CATEGORIES[input.category] ? input.category : 'wins';
+    const series = ['f2', 'f3'].includes(input.series) ? input.series : 'f1';
     const year = value => optionalInteger(value, { min: 1950, max: 2200 });
     return {
-        type, category, fromYear: year(input.fromYear), toYear: year(input.toYear),
+        series, type, category, fromYear: year(input.fromYear), toYear: year(input.toYear),
         circuitId: String(input.circuitId || '').slice(0, 100),
         constructorId: type === 'drivers' ? String(input.constructorId || '').slice(0, 100) : '',
         nationality: String(input.nationality || '').slice(0, 20),
@@ -89,23 +90,35 @@ router.get('/api/records/explore', async (req, res) => {
     const limit = optionalInteger(req.query.limit, { min: 1, max: 250 }) || 100;
 
     try {
-        if (String(req.query.series || '').toLowerCase() === 'f2') {
+        const series = String(req.query.series || '').toLowerCase();
+        if (['f2', 'f3'].includes(series)) {
+            const prefix = `${series}_`;
             const data = await withConnection(async connection => {
                 const params = [];
                 const filters = ["LOWER(CAST(sessions.isRace AS CHAR)) IN ('1','true')", "(sessions.cancelled IS NULL OR LOWER(CAST(sessions.cancelled AS CHAR)) NOT IN ('1','true'))"];
                 if (!includeSprints) filters.push("LOWER(sessions.name) NOT LIKE '%sprint%'");
+                if (category === 'gridGain') filters.push("LOWER(sessions.name) NOT LIKE '%sprint%'");
                 if (fromYear) { filters.push('source.year >= ?'); params.push(fromYear); }
                 if (toYear) { filters.push('source.year <= ?'); params.push(toYear); }
                 if (circuitId) { filters.push('races.circuitId = ?'); params.push(circuitId); }
                 if (constructorId) { filters.push('source.constructorId = ?'); params.push(constructorId); }
                 if (nationality) { filters.push(type === 'drivers' ? 'drivers.countryCode = ?' : 'constructors.countryCode = ?'); params.push(nationality); }
-                const entityTable = type === 'drivers' ? 'f2_drivers drivers' : 'f2_constructors constructors';
-                const entityJoin = type === 'drivers' ? 'JOIN f2_drivers drivers ON drivers.id = source.driverId' : 'JOIN f2_constructors constructors ON constructors.id = source.constructorId';
+                const entityJoin = type === 'drivers' ? `JOIN ${prefix}drivers drivers ON drivers.id = source.driverId` : `JOIN ${prefix}constructors constructors ON constructors.id = source.constructorId`;
                 const entity = type === 'drivers' ? 'drivers' : 'constructors';
-                const standingsTable = type === 'drivers' ? 'f2_season_driver_standings' : 'f2_season_constructor_standings';
+                const standingsTable = type === 'drivers' ? `${prefix}season_driver_standings` : `${prefix}season_constructor_standings`;
                 const standingsField = type === 'drivers' ? 'driverId' : 'constructorId';
                 let valueExpression = CATEGORIES[category].expression;
-                valueExpression = valueExpression?.replaceAll('source.gridPositionNumber', 'source.positionNumber');
+                let qualifyingJoin = '';
+                if (category === 'gridGain') {
+                    valueExpression = 'AVG(CASE WHEN qualifyingPositions.gridPosition BETWEEN 1 AND 99 AND source.positionNumber BETWEEN 1 AND 99 THEN qualifyingPositions.gridPosition - source.positionNumber END)';
+                    qualifyingJoin = `LEFT JOIN (
+                        SELECT qualifying.raceId, qualifying.driverId, MIN(qualifying.positionNumber) AS gridPosition
+                        FROM ${prefix}session_results qualifying
+                        JOIN ${prefix}sessions qualifyingSession ON qualifyingSession.id = qualifying.sessionId
+                        WHERE LOWER(qualifyingSession.name) LIKE '%qualif%' AND qualifying.positionNumber BETWEEN 1 AND 99
+                        GROUP BY qualifying.raceId, qualifying.driverId
+                    ) qualifyingPositions ON qualifyingPositions.raceId = source.raceId AND qualifyingPositions.driverId = source.driverId`;
+                }
                 const valueParams = [];
                 if (category === 'championships') {
                     const yearFilters = [];
@@ -117,8 +130,8 @@ router.get('/api/records/explore', async (req, res) => {
                     ${valueExpression} AS value, COUNT(*) AS starts, SUM(source.positionNumber = 1) AS wins,
                     SUM(source.positionNumber BETWEEN 1 AND 3) AS podiums, SUM(COALESCE(source.points,0)) AS points,
                     MIN(source.year) AS firstYear, MAX(source.year) AS lastYear
-                    FROM f2_session_results source JOIN f2_sessions sessions ON sessions.id = source.sessionId
-                    JOIN f2_races races ON races.id = source.raceId ${entityJoin}
+                    FROM ${prefix}session_results source JOIN ${prefix}sessions sessions ON sessions.id = source.sessionId
+                    JOIN ${prefix}races races ON races.id = source.raceId ${entityJoin} ${qualifyingJoin}
                     WHERE ${filters.join(' AND ')} GROUP BY ${entity}.id, ${entity}.name, ${entity}.countryCode
                     HAVING value IS NOT NULL AND value > 0 ORDER BY value DESC, wins DESC, podiums DESC, name LIMIT ${limit}`, [...valueParams, ...params]);
                 return rows.map(row=>({...row,value:Number(row.value),starts:Number(row.starts),wins:Number(row.wins),podiums:Number(row.podiums),points:Number(row.points),firstYear:Number(row.firstYear),lastYear:Number(row.lastYear)}));

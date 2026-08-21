@@ -6,7 +6,7 @@ function metric(label, first, second) { const a=Number(first||0),b=Number(second
 
 function renderOverview() {
   const [first,second]=comparisonData.drivers;
-  return `<div class="comparison-scorecard">${metric('World championships',first.totalChampionshipWins,second.totalChampionshipWins)}${metric('Race wins',first.totalRaceWins,second.totalRaceWins)}${metric('Podiums',first.totalPodiums,second.totalPodiums)}${metric('Pole positions',first.totalPolePositions,second.totalPolePositions)}${metric('Fastest laps',first.totalFastestLaps,second.totalFastestLaps)}${metric('Career points',first.totalPoints,second.totalPoints)}</div>`;
+  return `<div class="comparison-scorecard">${metric(window.location.pathname.startsWith('/f') ? 'Championships' : 'World championships',first.totalChampionshipWins,second.totalChampionshipWins)}${metric('Race wins',first.totalRaceWins,second.totalRaceWins)}${metric('Podiums',first.totalPodiums,second.totalPodiums)}${metric('Pole positions',first.totalPolePositions,second.totalPolePositions)}${metric('Fastest laps',first.totalFastestLaps,second.totalFastestLaps)}${metric('Career points',first.totalPoints,second.totalPoints)}</div>`;
 }
 
 function renderTeammates() {

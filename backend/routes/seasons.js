@@ -14,6 +14,7 @@ function f2SessionType(session, sessionIndex, sessionCount, year) {
     const sessionNumber = Number(session.sessionNumber || 0);
     if (sessionNumber) {
         if (Number(year) <= 2020) return sessionNumber <= 4 ? 'F' : 'S';
+        if (Number(year) === 2021) return sessionNumber >= 8 ? 'F' : 'S';
         return sessionNumber >= 6 ? 'F' : 'S';
     }
     if (Number(year) <= 2020) return sessionIndex === 0 ? 'F' : 'S';
@@ -303,7 +304,7 @@ router.get('/api/seasons/:year', async (req, res) => {
                 const seasonRows = await connection.query(`SELECT year FROM ${prefix}seasons WHERE year = ?`, [year]);
                 if (!seasonRows.length) return null;
 
-                const [races, raceSessions, raceResults, featureGridLeaders, qualifyingWinners, officialStandings] = await Promise.all([
+                const [races, raceSessions, raceResults, featureGridResults, qualifyingResults, qualifyingWinners, officialStandings] = await Promise.all([
                     connection.query(`
                         SELECT r.id, r.round, r.date, r.endDate, r.name, r.code, r.circuitId,
                                c.name AS circuitName, c.placeName
@@ -347,14 +348,27 @@ router.get('/api/seasons/:year', async (req, res) => {
                         ORDER BY sessions.round, sessions.sessionNumber, results.positionDisplayOrder
                     `, [year]),
                     connection.query(`
-                        SELECT sessions.raceId, results.driverId, sessions.sessionNumber
+                        SELECT sessions.raceId, results.driverId, results.positionNumber,
+                               sessions.sessionNumber
                         FROM ${prefix}sessions sessions
                         JOIN ${prefix}session_results results
                             ON results.sessionId = sessions.id
-                            AND results.positionNumber = 1
                         WHERE sessions.year = ?
                             AND LOWER(sessions.name) LIKE '%starting grid%'
-                        ORDER BY sessions.round, sessions.sessionNumber DESC
+                            AND results.positionNumber BETWEEN 1 AND 99
+                        ORDER BY sessions.round, sessions.sessionNumber DESC,
+                                 results.positionNumber
+                    `, [year]),
+                    connection.query(`
+                        SELECT sessions.raceId, sessions.id AS sessionId,
+                               results.driverId, results.positionNumber
+                        FROM ${prefix}sessions sessions
+                        LEFT JOIN ${prefix}session_results results
+                            ON results.sessionId = sessions.id
+                        WHERE sessions.year = ?
+                            AND LOWER(sessions.name) LIKE '%qualif%'
+                        ORDER BY sessions.round, sessions.sessionNumber,
+                                 results.positionDisplayOrder
                     `, [year]),
                     connection.query(`
                         SELECT sessions.raceId, results.driverId, results.timeMillis
@@ -411,8 +425,49 @@ router.get('/api/seasons/:year', async (req, res) => {
                 }
 
                 const poleDriverByRace = new Map();
-                for (const result of featureGridLeaders) {
-                    if (!poleDriverByRace.has(result.raceId)) {
+                const qualifyingPositionByRaceDriver = new Map();
+                const qualifyingSessionsByRace = new Map();
+                const classifiedQualifyingDriversByRace = new Map();
+                for (const result of qualifyingResults) {
+                    const raceId = String(result.raceId);
+                    if (!qualifyingSessionsByRace.has(raceId)) {
+                        qualifyingSessionsByRace.set(raceId, new Set());
+                    }
+                    qualifyingSessionsByRace.get(raceId).add(String(result.sessionId));
+                    const position = Number(result.positionNumber);
+                    if (result.driverId && position >= 1 && position <= 99) {
+                        if (!classifiedQualifyingDriversByRace.has(raceId)) {
+                            classifiedQualifyingDriversByRace.set(raceId, new Set());
+                        }
+                        classifiedQualifyingDriversByRace.get(raceId).add(String(result.driverId));
+                    }
+                }
+                for (const result of qualifyingResults) {
+                    const raceId = String(result.raceId);
+                    const position = Number(result.positionNumber);
+                    if (qualifyingSessionsByRace.get(raceId)?.size !== 1) continue;
+                    if (!result.driverId || position < 1 || position > 99) continue;
+                    qualifyingPositionByRaceDriver.set(`${raceId}:${result.driverId}`, position);
+                }
+                const featureGridSessionByRace = new Map();
+                for (const result of featureGridResults) {
+                    const raceId = String(result.raceId);
+                    const sessionNumber = Number(result.sessionNumber);
+                    if (!featureGridSessionByRace.has(raceId)) {
+                        featureGridSessionByRace.set(raceId, sessionNumber);
+                    }
+                    if (featureGridSessionByRace.get(raceId) !== sessionNumber) continue;
+                    const qualifyingSessionCount = qualifyingSessionsByRace.get(raceId)?.size || 0;
+                    const hasClassifiedQualifyingResult = classifiedQualifyingDriversByRace
+                        .get(raceId)?.has(String(result.driverId));
+                    if (qualifyingSessionCount !== 1 &&
+                        (qualifyingSessionCount === 0 || hasClassifiedQualifyingResult)) {
+                        qualifyingPositionByRaceDriver.set(
+                            `${raceId}:${result.driverId}`,
+                            Number(result.positionNumber)
+                        );
+                    }
+                    if (Number(result.positionNumber) === 1) {
                         poleDriverByRace.set(result.raceId, result.driverId);
                     }
                 }
@@ -611,7 +666,9 @@ router.get('/api/seasons/:year', async (req, res) => {
                             sprintPoints: sprint && feature && sprint.id !== feature.id ? Number(sprintResult?.points || 0) : 0,
                             sprintPosition: sprintResult?.position ?? null,
                             sprintFastestLap: Boolean(sprintResult?.fastestLap),
-                            qualifyingPosition: featureResult?.polePosition ? 1 : null
+                            qualifyingPosition: qualifyingPositionByRaceDriver.get(
+                                `${race.id}:${driver.driverId}`
+                            ) ?? null
                         };
                     });
                     return { ...driver, raceResults };

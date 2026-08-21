@@ -31,7 +31,7 @@ function f3Gap(result, useTimeFallback = true) {
 }
 
 function f3SessionTabLabel(session) {
-  return `${esc(f3SessionName(session))}${session.cancelled ? '<small>Cancelled</small>' : session.results.length ? `<small>${fmtNumber(session.results.length)} classified</small>` : '<small>No data</small>'}`;
+  return `${esc(f3SessionName(session))}${session.cancelled ? '<small>Cancelled</small>' : session.results.length ? `<small>${fmtNumber(session.results.length)} entries</small>` : '<small>No data</small>'}`;
 }
 
 function renderF3SessionTabs() {
@@ -56,7 +56,7 @@ function renderF3SessionResults() {
   document.getElementById('f3-session-title').textContent = f3SessionName(session);
   document.getElementById('f3-session-summary').textContent = session.cancelled
     ? 'Session cancelled'
-    : `${fmtNumber(session.results.length)} classified${session.startTimeUtc ? ` · ${fmtDate(session.startTimeUtc)}` : ''}`;
+    : `${fmtNumber(session.results.length)} entries${session.startTimeUtc ? ` · ${fmtDate(session.startTimeUtc)}` : ''}`;
   if (session.cancelled) {
     document.getElementById('f3-race-results').innerHTML = '<div class="junior-cancelled-session"><strong>Cancelled</strong><p>This session remained on the weekend schedule but no classification was issued.</p></div>';
     return;
