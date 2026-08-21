@@ -1,0 +1,398 @@
+id,raceId,year,round,sessionNumber,code,name,startTimeUtc,endTimeUtc,isRace,cancelled
+fia-formula-3-championship_2019_catalunya_free-practice,6d03f76e-70cc-4dbd-bc2f-23bfbbf38a32,2019,1,1,,Free Practice,2019-05-10T07:15:00Z,2019-05-10T08:10:00Z,False,False
+fia-formula-3-championship_2019_catalunya_qualifying,6d03f76e-70cc-4dbd-bc2f-23bfbbf38a32,2019,1,2,,Qualifying,2019-05-10T15:50:00Z,2019-05-10T16:20:00Z,False,False
+fia-formula-3-championship_2019_catalunya_grid,6d03f76e-70cc-4dbd-bc2f-23bfbbf38a32,2019,1,3,,Grid,,,False,False
+fia-formula-3-championship_2019_catalunya_race,6d03f76e-70cc-4dbd-bc2f-23bfbbf38a32,2019,1,4,,Race,2019-05-11T08:15:00Z,2019-05-11T08:55:00Z,True,False
+fia-formula-3-championship_2019_catalunya_grid-2,6d03f76e-70cc-4dbd-bc2f-23bfbbf38a32,2019,1,5,,Grid,,,False,False
+fia-formula-3-championship_2019_catalunya_race-2,6d03f76e-70cc-4dbd-bc2f-23bfbbf38a32,2019,1,6,,Race,2019-05-12T08:15:00Z,2019-05-12T08:55:00Z,True,False
+fia-formula-3-championship_2019_paul-ricard_free-practice,b3fa9d64-82ef-4fb3-bd10-468d79f6c0a3,2019,2,1,,Free Practice,2019-06-21T07:25:00Z,2019-06-21T08:10:00Z,False,False
+fia-formula-3-championship_2019_paul-ricard_qualifying,b3fa9d64-82ef-4fb3-bd10-468d79f6c0a3,2019,2,2,,Qualifying,2019-06-21T15:50:00Z,2019-06-21T16:20:00Z,False,False
+fia-formula-3-championship_2019_paul-ricard_grid,b3fa9d64-82ef-4fb3-bd10-468d79f6c0a3,2019,2,3,,Grid,,,False,False
+fia-formula-3-championship_2019_paul-ricard_feature-race,b3fa9d64-82ef-4fb3-bd10-468d79f6c0a3,2019,2,4,,Feature Race,2019-06-22T08:30:00Z,2019-06-22T09:15:00Z,True,False
+fia-formula-3-championship_2019_paul-ricard_grid-2,b3fa9d64-82ef-4fb3-bd10-468d79f6c0a3,2019,2,5,,Grid,,,False,False
+fia-formula-3-championship_2019_paul-ricard_sprint-race,b3fa9d64-82ef-4fb3-bd10-468d79f6c0a3,2019,2,6,,Sprint Race,2019-06-23T07:55:00Z,2019-06-23T08:40:00Z,True,False
+fia-formula-3-championship_2019_red-bull-ring_free-practice,9b4df8cc-0941-41a0-a37e-ec2159b49f28,2019,3,1,,Free Practice,2019-06-28T07:35:00Z,2019-06-28T08:20:00Z,False,False
+fia-formula-3-championship_2019_red-bull-ring_qualifying,9b4df8cc-0941-41a0-a37e-ec2159b49f28,2019,3,2,,Qualifying,2019-06-28T15:50:00Z,2019-06-28T16:20:00Z,False,False
+fia-formula-3-championship_2019_red-bull-ring_grid,9b4df8cc-0941-41a0-a37e-ec2159b49f28,2019,3,3,,Grid,,,False,False
+fia-formula-3-championship_2019_red-bull-ring_feature-race,9b4df8cc-0941-41a0-a37e-ec2159b49f28,2019,3,4,,Feature Race,2019-06-29T08:25:00Z,2019-06-29T09:10:00Z,True,False
+fia-formula-3-championship_2019_red-bull-ring_grid-2,9b4df8cc-0941-41a0-a37e-ec2159b49f28,2019,3,5,,Grid,,,False,False
+fia-formula-3-championship_2019_red-bull-ring_sprint-race,9b4df8cc-0941-41a0-a37e-ec2159b49f28,2019,3,6,,Sprint Race,2019-06-30T07:35:00Z,2019-06-30T08:20:00Z,True,False
+fia-formula-3-championship_2019_silverstone_free-practice,8e8914b2-c12d-4140-8a72-4549781ed60a,2019,4,1,,Free Practice,2019-07-12T07:35:00Z,2019-07-12T08:20:00Z,False,False
+fia-formula-3-championship_2019_silverstone_qualifying,8e8914b2-c12d-4140-8a72-4549781ed60a,2019,4,2,,Qualifying,2019-07-12T14:55:00Z,2019-07-12T15:25:00Z,False,False
+fia-formula-3-championship_2019_silverstone_grid,8e8914b2-c12d-4140-8a72-4549781ed60a,2019,4,3,,Grid,,,False,False
+fia-formula-3-championship_2019_silverstone_feature-race,8e8914b2-c12d-4140-8a72-4549781ed60a,2019,4,4,,Feature Race,2019-07-13T08:25:00Z,2019-07-13T09:10:00Z,True,False
+fia-formula-3-championship_2019_silverstone_grid-2,8e8914b2-c12d-4140-8a72-4549781ed60a,2019,4,5,,Grid,,,False,False
+fia-formula-3-championship_2019_silverstone_sprint-race,8e8914b2-c12d-4140-8a72-4549781ed60a,2019,4,6,,Sprint Race,2019-07-14T07:45:00Z,2019-07-14T08:30:00Z,True,False
+fia-formula-3-championship_2019_hungaroring_free-practice,e7ffdc79-5641-4204-a1f6-12da31e791eb,2019,5,1,,Free Practice,2019-08-02T07:35:00Z,2019-08-02T08:20:00Z,False,False
+fia-formula-3-championship_2019_hungaroring_qualifying,e7ffdc79-5641-4204-a1f6-12da31e791eb,2019,5,2,,Qualifying,2019-08-03T07:00:00Z,2019-08-03T07:30:00Z,False,False
+fia-formula-3-championship_2019_hungaroring_grid,e7ffdc79-5641-4204-a1f6-12da31e791eb,2019,5,3,,Grid,,,False,False
+fia-formula-3-championship_2019_hungaroring_feature-race,e7ffdc79-5641-4204-a1f6-12da31e791eb,2019,5,4,,Feature Race,2019-08-03T14:45:00Z,2019-08-03T15:30:00Z,True,False
+fia-formula-3-championship_2019_hungaroring_grid-2,e7ffdc79-5641-4204-a1f6-12da31e791eb,2019,5,5,,Grid,,,False,False
+fia-formula-3-championship_2019_hungaroring_sprint-race,e7ffdc79-5641-4204-a1f6-12da31e791eb,2019,5,6,,Sprint Race,2019-08-04T08:00:00Z,2019-08-04T08:45:00Z,True,False
+fia-formula-3-championship_2019_spa-francorchamps_free-practice,bcbf1929-7b75-4fc4-a4a8-f60aa81dd771,2019,6,1,,Free Practice,2019-08-30T07:35:00Z,2019-08-30T08:20:00Z,False,False
+fia-formula-3-championship_2019_spa-francorchamps_qualifying,bcbf1929-7b75-4fc4-a4a8-f60aa81dd771,2019,6,2,,Qualifying,2019-08-30T15:50:00Z,2019-08-30T16:20:00Z,False,False
+fia-formula-3-championship_2019_spa-francorchamps_grid,bcbf1929-7b75-4fc4-a4a8-f60aa81dd771,2019,6,3,,Grid,,,False,False
+fia-formula-3-championship_2019_spa-francorchamps_feature-race,bcbf1929-7b75-4fc4-a4a8-f60aa81dd771,2019,6,4,,Feature Race,2019-08-31T08:35:00Z,2019-08-31T09:20:00Z,True,False
+fia-formula-3-championship_2019_spa-francorchamps_grid-2,bcbf1929-7b75-4fc4-a4a8-f60aa81dd771,2019,6,5,,Grid,,,False,False
+fia-formula-3-championship_2019_spa-francorchamps_sprint-race,bcbf1929-7b75-4fc4-a4a8-f60aa81dd771,2019,6,6,,Sprint Race,2019-09-01T07:45:00Z,2019-09-01T08:30:00Z,True,False
+fia-formula-3-championship_2019_monza_free-practice,3509753b-3049-4a5a-be64-373597948a82,2019,7,1,,Free Practice,2019-09-06T07:35:00Z,2019-09-06T08:20:00Z,False,False
+fia-formula-3-championship_2019_monza_qualifying,3509753b-3049-4a5a-be64-373597948a82,2019,7,2,,Qualifying,2019-09-06T15:50:00Z,2019-09-06T16:20:00Z,False,False
+fia-formula-3-championship_2019_monza_grid,3509753b-3049-4a5a-be64-373597948a82,2019,7,3,,Grid,,,False,False
+fia-formula-3-championship_2019_monza_feature-race,3509753b-3049-4a5a-be64-373597948a82,2019,7,4,,Feature Race,2019-09-07T08:30:00Z,2019-09-07T09:15:00Z,True,False
+fia-formula-3-championship_2019_monza_grid-2,3509753b-3049-4a5a-be64-373597948a82,2019,7,5,,Grid,,,False,False
+fia-formula-3-championship_2019_monza_sprint-race,3509753b-3049-4a5a-be64-373597948a82,2019,7,6,,Sprint Race,2019-09-08T07:30:00Z,2019-09-08T08:15:00Z,True,False
+fia-formula-3-championship_2019_sochi_free-practice,08e595dd-2a8f-46c9-9deb-eaafb2b4e846,2019,8,1,,Free Practice,2019-09-27T05:20:00Z,2019-09-27T06:05:00Z,False,False
+fia-formula-3-championship_2019_sochi_qualifying,08e595dd-2a8f-46c9-9deb-eaafb2b4e846,2019,8,2,,Qualifying,2019-09-27T14:00:00Z,2019-09-27T14:30:00Z,False,False
+fia-formula-3-championship_2019_sochi_grid,08e595dd-2a8f-46c9-9deb-eaafb2b4e846,2019,8,3,,Grid,,,False,False
+fia-formula-3-championship_2019_sochi_feature-race,08e595dd-2a8f-46c9-9deb-eaafb2b4e846,2019,8,4,,Feature Race,2019-09-28T07:15:00Z,2019-09-28T08:00:00Z,True,False
+fia-formula-3-championship_2019_sochi_grid-2,08e595dd-2a8f-46c9-9deb-eaafb2b4e846,2019,8,5,,Grid,,,False,False
+fia-formula-3-championship_2019_sochi_sprint-race,08e595dd-2a8f-46c9-9deb-eaafb2b4e846,2019,8,6,,Sprint Race,2019-09-29T06:55:00Z,2019-09-29T07:40:00Z,True,False
+fia-formula-3-championship_2020_spielberg_free-practice,8faa84bc-6f20-42ca-867a-7d37f6d1c671,2020,1,1,,Free Practice,2020-07-03T07:35:00Z,2020-07-03T08:20:00Z,False,False
+fia-formula-3-championship_2020_spielberg_qualifying,8faa84bc-6f20-42ca-867a-7d37f6d1c671,2020,1,2,,Qualifying,2020-07-03T12:05:00Z,2020-07-03T12:35:00Z,False,False
+fia-formula-3-championship_2020_spielberg_grid,8faa84bc-6f20-42ca-867a-7d37f6d1c671,2020,1,3,,Grid,,,False,False
+fia-formula-3-championship_2020_spielberg_race,8faa84bc-6f20-42ca-867a-7d37f6d1c671,2020,1,4,,Race,2020-07-04T08:25:00Z,2020-07-04T09:10:00Z,True,False
+fia-formula-3-championship_2020_spielberg_grid-2,8faa84bc-6f20-42ca-867a-7d37f6d1c671,2020,1,5,,Grid,,,False,False
+fia-formula-3-championship_2020_spielberg_race-2,8faa84bc-6f20-42ca-867a-7d37f6d1c671,2020,1,6,,Race,2020-07-05T07:45:00Z,2020-07-05T08:30:00Z,True,False
+fia-formula-3-championship_2020_spielberg-2_free-practice,8fff3820-270b-4ec7-9402-a7b7e9905cb8,2020,2,1,,Free Practice,2020-07-10T07:35:00Z,2020-07-10T08:20:00Z,False,False
+fia-formula-3-championship_2020_spielberg-2_qualifying,8fff3820-270b-4ec7-9402-a7b7e9905cb8,2020,2,2,,Qualifying,2020-07-10T12:05:00Z,2020-07-10T12:35:00Z,False,False
+fia-formula-3-championship_2020_spielberg-2_grid,8fff3820-270b-4ec7-9402-a7b7e9905cb8,2020,2,3,,Grid,,,False,False
+fia-formula-3-championship_2020_spielberg-2_race,8fff3820-270b-4ec7-9402-a7b7e9905cb8,2020,2,4,,Race,2020-07-11T08:25:00Z,2020-07-11T09:10:00Z,True,False
+fia-formula-3-championship_2020_spielberg-2_grid-2,8fff3820-270b-4ec7-9402-a7b7e9905cb8,2020,2,5,,Grid,,,False,False
+fia-formula-3-championship_2020_spielberg-2_race-2,8fff3820-270b-4ec7-9402-a7b7e9905cb8,2020,2,6,,Race,2020-07-12T07:45:00Z,2020-07-12T08:30:00Z,True,False
+fia-formula-3-championship_2020_budapest_free-practice,ffc0ec06-d531-47f3-a4e6-f9d73f836c14,2020,3,1,,Free Practice,2020-07-17T07:35:00Z,2020-07-17T08:20:00Z,False,False
+fia-formula-3-championship_2020_budapest_qualifying,ffc0ec06-d531-47f3-a4e6-f9d73f836c14,2020,3,2,,Qualifying,2020-07-17T12:05:00Z,2020-07-17T12:35:00Z,False,False
+fia-formula-3-championship_2020_budapest_grid,ffc0ec06-d531-47f3-a4e6-f9d73f836c14,2020,3,3,,Grid,,,False,False
+fia-formula-3-championship_2020_budapest_race,ffc0ec06-d531-47f3-a4e6-f9d73f836c14,2020,3,4,,Race,2020-07-18T08:25:00Z,2020-07-18T09:10:00Z,True,False
+fia-formula-3-championship_2020_budapest_grid-2,ffc0ec06-d531-47f3-a4e6-f9d73f836c14,2020,3,5,,Grid,,,False,False
+fia-formula-3-championship_2020_budapest_race-2,ffc0ec06-d531-47f3-a4e6-f9d73f836c14,2020,3,6,,Race,2020-07-19T07:45:00Z,2020-07-19T08:30:00Z,True,False
+fia-formula-3-championship_2020_silverstone_free-practice,dcb57357-e1d1-4a5c-8f43-6faaa7c4131d,2020,4,1,,Free Practice,2020-07-31T08:35:00Z,2020-07-31T09:20:00Z,False,False
+fia-formula-3-championship_2020_silverstone_qualifying,dcb57357-e1d1-4a5c-8f43-6faaa7c4131d,2020,4,2,,Qualifying,2020-07-31T13:05:00Z,2020-07-31T13:35:00Z,False,False
+fia-formula-3-championship_2020_silverstone_grid,dcb57357-e1d1-4a5c-8f43-6faaa7c4131d,2020,4,3,,Grid,,,False,False
+fia-formula-3-championship_2020_silverstone_race,dcb57357-e1d1-4a5c-8f43-6faaa7c4131d,2020,4,4,,Race,2020-08-01T08:25:00Z,2020-08-01T09:10:00Z,True,False
+fia-formula-3-championship_2020_silverstone_grid-2,dcb57357-e1d1-4a5c-8f43-6faaa7c4131d,2020,4,5,,Grid,,,False,False
+fia-formula-3-championship_2020_silverstone_race-2,dcb57357-e1d1-4a5c-8f43-6faaa7c4131d,2020,4,6,,Race,2020-08-02T07:45:00Z,2020-08-02T08:30:00Z,True,False
+fia-formula-3-championship_2020_silverstone-2_free-practice,0b1d80d6-5900-4cc4-83ac-f7ec83869e96,2020,5,1,,Free Practice,2020-08-07T08:35:00Z,2020-08-07T09:20:00Z,False,False
+fia-formula-3-championship_2020_silverstone-2_qualifying,0b1d80d6-5900-4cc4-83ac-f7ec83869e96,2020,5,2,,Qualifying,2020-08-07T13:05:00Z,2020-08-07T13:35:00Z,False,False
+fia-formula-3-championship_2020_silverstone-2_grid,0b1d80d6-5900-4cc4-83ac-f7ec83869e96,2020,5,3,,Grid,,,False,False
+fia-formula-3-championship_2020_silverstone-2_race,0b1d80d6-5900-4cc4-83ac-f7ec83869e96,2020,5,4,,Race,2020-08-08T08:25:00Z,2020-08-08T09:10:00Z,True,False
+fia-formula-3-championship_2020_silverstone-2_grid-2,0b1d80d6-5900-4cc4-83ac-f7ec83869e96,2020,5,5,,Grid,,,False,False
+fia-formula-3-championship_2020_silverstone-2_race-2,0b1d80d6-5900-4cc4-83ac-f7ec83869e96,2020,5,6,,Race,2020-08-09T07:45:00Z,2020-08-09T08:30:00Z,True,False
+fia-formula-3-championship_2020_barcelona_free-practice,aecb6b15-edbe-4fc7-a65d-9fcf7009090c,2020,6,1,,Free Practice,2020-08-14T07:35:00Z,2020-08-14T08:20:00Z,False,False
+fia-formula-3-championship_2020_barcelona_qualifying,aecb6b15-edbe-4fc7-a65d-9fcf7009090c,2020,6,2,,Qualifying,2020-08-14T12:05:00Z,2020-08-14T12:35:00Z,False,False
+fia-formula-3-championship_2020_barcelona_grid,aecb6b15-edbe-4fc7-a65d-9fcf7009090c,2020,6,3,,Grid,,,False,False
+fia-formula-3-championship_2020_barcelona_race,aecb6b15-edbe-4fc7-a65d-9fcf7009090c,2020,6,4,,Race,2020-08-15T08:25:00Z,2020-08-15T09:10:00Z,True,False
+fia-formula-3-championship_2020_barcelona_grid-2,aecb6b15-edbe-4fc7-a65d-9fcf7009090c,2020,6,5,,Grid,,,False,False
+fia-formula-3-championship_2020_barcelona_race-2,aecb6b15-edbe-4fc7-a65d-9fcf7009090c,2020,6,6,,Race,2020-08-16T07:45:00Z,2020-08-16T08:30:00Z,True,False
+fia-formula-3-championship_2020_spa-francorchamps_free-practice,be93535b-6735-4e37-8cdc-af6337a907f1,2020,7,1,,Free Practice,2020-08-28T07:35:00Z,2020-08-28T08:20:00Z,False,False
+fia-formula-3-championship_2020_spa-francorchamps_qualifying,be93535b-6735-4e37-8cdc-af6337a907f1,2020,7,2,,Qualifying,2020-08-28T12:05:00Z,2020-08-28T12:35:00Z,False,False
+fia-formula-3-championship_2020_spa-francorchamps_grid,be93535b-6735-4e37-8cdc-af6337a907f1,2020,7,3,,Grid,,,False,False
+fia-formula-3-championship_2020_spa-francorchamps_race,be93535b-6735-4e37-8cdc-af6337a907f1,2020,7,4,,Race,2020-08-29T08:25:00Z,2020-08-29T09:10:00Z,True,False
+fia-formula-3-championship_2020_spa-francorchamps_grid-2,be93535b-6735-4e37-8cdc-af6337a907f1,2020,7,5,,Grid,,,False,False
+fia-formula-3-championship_2020_spa-francorchamps_race-2,be93535b-6735-4e37-8cdc-af6337a907f1,2020,7,6,,Race,2020-08-30T07:45:00Z,2020-08-30T08:30:00Z,True,False
+fia-formula-3-championship_2020_monza_practice,45bdb690-fc5d-46b1-9790-e2f96828583c,2020,8,1,,Practice,2020-09-04T07:35:00Z,2020-09-04T08:20:00Z,False,False
+fia-formula-3-championship_2020_monza_qualifying,45bdb690-fc5d-46b1-9790-e2f96828583c,2020,8,2,,Qualifying,2020-09-04T12:05:00Z,2020-09-04T12:35:00Z,False,False
+fia-formula-3-championship_2020_monza_grid,45bdb690-fc5d-46b1-9790-e2f96828583c,2020,8,3,,Grid,,,False,False
+fia-formula-3-championship_2020_monza_race-1,45bdb690-fc5d-46b1-9790-e2f96828583c,2020,8,4,,Race 1,2020-09-05T08:25:00Z,2020-09-05T09:10:00Z,True,False
+fia-formula-3-championship_2020_monza_grid-2,45bdb690-fc5d-46b1-9790-e2f96828583c,2020,8,5,,Grid,,,False,False
+fia-formula-3-championship_2020_monza_race-2,45bdb690-fc5d-46b1-9790-e2f96828583c,2020,8,6,,Race 2,2020-09-06T07:45:00Z,2020-09-06T08:30:00Z,True,False
+fia-formula-3-championship_2020_mugello_practice,6a3b72c3-cf93-493e-8924-f1ed62abfa97,2020,9,1,,Practice,2020-09-11T07:35:00Z,2020-09-11T08:20:00Z,False,False
+fia-formula-3-championship_2020_mugello_qualifying,6a3b72c3-cf93-493e-8924-f1ed62abfa97,2020,9,2,,Qualifying,2020-09-11T12:05:00Z,2020-09-11T12:35:00Z,False,False
+fia-formula-3-championship_2020_mugello_grid,6a3b72c3-cf93-493e-8924-f1ed62abfa97,2020,9,3,,Grid,,,False,False
+fia-formula-3-championship_2020_mugello_race-1,6a3b72c3-cf93-493e-8924-f1ed62abfa97,2020,9,4,,Race 1,2020-09-12T08:25:00Z,2020-09-12T09:10:00Z,True,False
+fia-formula-3-championship_2020_mugello_grid-2,6a3b72c3-cf93-493e-8924-f1ed62abfa97,2020,9,5,,Grid,,,False,False
+fia-formula-3-championship_2020_mugello_race-2,6a3b72c3-cf93-493e-8924-f1ed62abfa97,2020,9,6,,Race 2,2020-09-13T08:30:00Z,2020-09-13T09:15:00Z,True,False
+fia-formula-3-championship_2021_barcelona_free-practice,04fc0d29-690e-4697-9087-73b065895a97,2021,1,1,FP,Free Practice,2021-05-07T08:05:00Z,2021-05-07T08:50:00Z,False,False
+fia-formula-3-championship_2021_barcelona_qualifying,04fc0d29-690e-4697-9087-73b065895a97,2021,1,2,Q,Qualifying,2021-05-07T11:55:00Z,2021-05-07T12:25:00Z,False,False
+fia-formula-3-championship_2021_barcelona_grid,04fc0d29-690e-4697-9087-73b065895a97,2021,1,3,GR,Grid,,,False,False
+fia-formula-3-championship_2021_barcelona_race,04fc0d29-690e-4697-9087-73b065895a97,2021,1,4,Race,Race,2021-05-08T08:35:00Z,2021-05-08T09:20:00Z,True,False
+fia-formula-3-championship_2021_barcelona_grid-2,04fc0d29-690e-4697-9087-73b065895a97,2021,1,5,GR,Grid,,,False,False
+fia-formula-3-championship_2021_barcelona_race-2,04fc0d29-690e-4697-9087-73b065895a97,2021,1,6,Race,Race,2021-05-08T14:45:00Z,2021-05-08T15:30:00Z,True,False
+fia-formula-3-championship_2021_barcelona_grid-3,04fc0d29-690e-4697-9087-73b065895a97,2021,1,7,GR,Grid,,,False,False
+fia-formula-3-championship_2021_barcelona_race-3,04fc0d29-690e-4697-9087-73b065895a97,2021,1,8,Race,Race,2021-05-09T10:05:00Z,2021-05-09T10:50:00Z,True,False
+fia-formula-3-championship_2021_paul-ricard_free-practice,510d2ba3-b1c5-40ea-a20c-a93f6510ec3f,2021,2,1,FP,Free Practice,2021-06-18T08:05:00Z,2021-06-18T08:50:00Z,False,False
+fia-formula-3-championship_2021_paul-ricard_qualifying,510d2ba3-b1c5-40ea-a20c-a93f6510ec3f,2021,2,2,Q,Qualifying,2021-06-18T11:50:00Z,2021-06-18T12:20:00Z,False,False
+fia-formula-3-championship_2021_paul-ricard_grid,510d2ba3-b1c5-40ea-a20c-a93f6510ec3f,2021,2,3,GR,Grid,,,False,False
+fia-formula-3-championship_2021_paul-ricard_race,510d2ba3-b1c5-40ea-a20c-a93f6510ec3f,2021,2,4,Race,Race,2021-06-19T08:10:00Z,2021-06-19T08:50:00Z,True,False
+fia-formula-3-championship_2021_paul-ricard_grid-2,510d2ba3-b1c5-40ea-a20c-a93f6510ec3f,2021,2,5,GR,Grid,,,False,False
+fia-formula-3-championship_2021_paul-ricard_race-2,510d2ba3-b1c5-40ea-a20c-a93f6510ec3f,2021,2,6,Race,Race,2021-06-19T14:40:00Z,2021-06-19T15:20:00Z,True,False
+fia-formula-3-championship_2021_paul-ricard_grid-3,510d2ba3-b1c5-40ea-a20c-a93f6510ec3f,2021,2,7,GR,Grid,,,False,False
+fia-formula-3-championship_2021_paul-ricard_race-3,510d2ba3-b1c5-40ea-a20c-a93f6510ec3f,2021,2,8,Race,Race,2021-06-20T09:40:00Z,2021-06-20T10:20:00Z,True,False
+fia-formula-3-championship_2021_spielberg_free-practice,890ab620-4e33-4c0d-b80c-e18980c692d3,2021,3,1,FP,Free Practice,2021-07-02T07:30:00Z,2021-07-02T08:15:00Z,False,False
+fia-formula-3-championship_2021_spielberg_qualifying,890ab620-4e33-4c0d-b80c-e18980c692d3,2021,3,2,Q,Qualifying,2021-07-02T11:50:00Z,2021-07-02T12:20:00Z,False,False
+fia-formula-3-championship_2021_spielberg_grid,890ab620-4e33-4c0d-b80c-e18980c692d3,2021,3,3,GR,Grid,,,False,False
+fia-formula-3-championship_2021_spielberg_race,890ab620-4e33-4c0d-b80c-e18980c692d3,2021,3,4,Race,Race,2021-07-03T08:35:00Z,2021-07-03T09:15:00Z,True,False
+fia-formula-3-championship_2021_spielberg_grid-2,890ab620-4e33-4c0d-b80c-e18980c692d3,2021,3,5,GR,Grid,,,False,False
+fia-formula-3-championship_2021_spielberg_race-2,890ab620-4e33-4c0d-b80c-e18980c692d3,2021,3,6,Race,Race,2021-07-03T15:30:00Z,2021-07-03T16:10:00Z,True,False
+fia-formula-3-championship_2021_spielberg_grid-3,890ab620-4e33-4c0d-b80c-e18980c692d3,2021,3,7,GR,Grid,,,False,False
+fia-formula-3-championship_2021_spielberg_race-3,890ab620-4e33-4c0d-b80c-e18980c692d3,2021,3,8,Race,Race,2021-07-04T08:15:00Z,2021-07-04T08:55:00Z,True,False
+fia-formula-3-championship_2021_budapest_free-practice,e57991f7-4e8e-4e4f-afbe-6e8056031e30,2021,4,1,FP,Free Practice,2021-07-30T07:30:00Z,2021-07-30T08:15:00Z,False,False
+fia-formula-3-championship_2021_budapest_qualifying,e57991f7-4e8e-4e4f-afbe-6e8056031e30,2021,4,2,Q,Qualifying,2021-07-30T11:50:00Z,2021-07-30T12:20:00Z,False,False
+fia-formula-3-championship_2021_budapest_grid,e57991f7-4e8e-4e4f-afbe-6e8056031e30,2021,4,3,GR,Grid,,,False,False
+fia-formula-3-championship_2021_budapest_race,e57991f7-4e8e-4e4f-afbe-6e8056031e30,2021,4,4,Race,Race,2021-07-31T08:35:00Z,2021-07-31T09:15:00Z,True,False
+fia-formula-3-championship_2021_budapest_grid-2,e57991f7-4e8e-4e4f-afbe-6e8056031e30,2021,4,5,GR,Grid,,,False,False
+fia-formula-3-championship_2021_budapest_race-2,e57991f7-4e8e-4e4f-afbe-6e8056031e30,2021,4,6,Race,Race,2021-07-31T15:30:00Z,2021-07-31T16:10:00Z,True,False
+fia-formula-3-championship_2021_budapest_grid-3,e57991f7-4e8e-4e4f-afbe-6e8056031e30,2021,4,7,GR,Grid,,,False,False
+fia-formula-3-championship_2021_budapest_race-3,e57991f7-4e8e-4e4f-afbe-6e8056031e30,2021,4,8,Race,Race,2021-08-01T08:15:00Z,2021-08-01T08:55:00Z,True,False
+fia-formula-3-championship_2021_spa-francorchamps_free-practice,3dbcad69-5b5c-4488-b5f8-4efdc0b943a2,2021,5,1,FP,Free Practice,2021-08-27T08:05:00Z,2021-08-27T08:50:00Z,False,False
+fia-formula-3-championship_2021_spa-francorchamps_qualifying,3dbcad69-5b5c-4488-b5f8-4efdc0b943a2,2021,5,2,Q,Qualifying,2021-08-27T11:55:00Z,2021-08-27T12:25:00Z,False,False
+fia-formula-3-championship_2021_spa-francorchamps_grid,3dbcad69-5b5c-4488-b5f8-4efdc0b943a2,2021,5,3,GR,Grid,,,False,False
+fia-formula-3-championship_2021_spa-francorchamps_race,3dbcad69-5b5c-4488-b5f8-4efdc0b943a2,2021,5,4,Race,Race,2021-08-28T08:35:00Z,2021-08-28T09:15:00Z,True,False
+fia-formula-3-championship_2021_spa-francorchamps_grid-2,3dbcad69-5b5c-4488-b5f8-4efdc0b943a2,2021,5,5,GR,Grid,,,False,False
+fia-formula-3-championship_2021_spa-francorchamps_race-2,3dbcad69-5b5c-4488-b5f8-4efdc0b943a2,2021,5,6,Race,Race,2021-08-28T15:55:00Z,2021-08-28T16:35:00Z,True,False
+fia-formula-3-championship_2021_spa-francorchamps_grid-3,3dbcad69-5b5c-4488-b5f8-4efdc0b943a2,2021,5,7,GR,Grid,,,False,False
+fia-formula-3-championship_2021_spa-francorchamps_race-3,3dbcad69-5b5c-4488-b5f8-4efdc0b943a2,2021,5,8,Race,Race,2021-08-29T08:40:00Z,2021-08-29T09:20:00Z,True,False
+fia-formula-3-championship_2021_zandvoort_free-practice,8a9cbdcd-c23d-4ee2-b580-9b92f4fe7f2c,2021,6,1,FP,Free Practice,2021-09-03T08:05:00Z,2021-09-03T08:50:00Z,False,False
+fia-formula-3-championship_2021_zandvoort_qualifying,8a9cbdcd-c23d-4ee2-b580-9b92f4fe7f2c,2021,6,2,Q,Qualifying,2021-09-03T11:50:00Z,2021-09-03T12:20:00Z,False,False
+fia-formula-3-championship_2021_zandvoort_grid,8a9cbdcd-c23d-4ee2-b580-9b92f4fe7f2c,2021,6,3,GR,Grid,,,False,False
+fia-formula-3-championship_2021_zandvoort_race,8a9cbdcd-c23d-4ee2-b580-9b92f4fe7f2c,2021,6,4,Race,Race,2021-09-04T08:35:00Z,2021-09-04T09:20:00Z,True,False
+fia-formula-3-championship_2021_zandvoort_grid-2,8a9cbdcd-c23d-4ee2-b580-9b92f4fe7f2c,2021,6,5,GR,Grid,,,False,False
+fia-formula-3-championship_2021_zandvoort_race-2,8a9cbdcd-c23d-4ee2-b580-9b92f4fe7f2c,2021,6,6,Race,Race,2021-09-04T15:55:00Z,2021-09-04T16:40:00Z,True,False
+fia-formula-3-championship_2021_zandvoort_grid-3,8a9cbdcd-c23d-4ee2-b580-9b92f4fe7f2c,2021,6,7,GR,Grid,,,False,False
+fia-formula-3-championship_2021_zandvoort_race-3,8a9cbdcd-c23d-4ee2-b580-9b92f4fe7f2c,2021,6,8,Race,Race,2021-09-05T08:45:00Z,2021-09-05T09:30:00Z,True,False
+fia-formula-3-championship_2021_sochi_free-practice,c829a95e-7655-4798-a97a-c36714f13701,2021,7,1,FP,Free Practice,2021-09-24T07:05:00Z,2021-09-24T07:50:00Z,False,False
+fia-formula-3-championship_2021_sochi_qualifying,c829a95e-7655-4798-a97a-c36714f13701,2021,7,2,Q,Qualifying,2021-09-24T13:25:00Z,2021-09-24T13:55:00Z,False,False
+fia-formula-3-championship_2021_sochi_grid,c829a95e-7655-4798-a97a-c36714f13701,2021,7,3,GR,Grid,,,False,False
+fia-formula-3-championship_2021_sochi_race,c829a95e-7655-4798-a97a-c36714f13701,2021,7,4,Race,Race,2021-09-24T14:25:00Z,2021-09-24T15:10:00Z,True,False
+fia-formula-3-championship_2021_sochi_grid-2,c829a95e-7655-4798-a97a-c36714f13701,2021,7,5,GR,Grid,,,False,False
+fia-formula-3-championship_2021_sochi_race-cancelled,c829a95e-7655-4798-a97a-c36714f13701,2021,7,6,Race,Race - Cancelled,2021-09-25T10:40:00Z,2021-09-25T11:25:00Z,False,True
+fia-formula-3-championship_2021_sochi_grid-3,c829a95e-7655-4798-a97a-c36714f13701,2021,7,7,GR,Grid,,,False,False
+fia-formula-3-championship_2021_sochi_race-2,c829a95e-7655-4798-a97a-c36714f13701,2021,7,8,Race,Race,2021-09-26T06:55:00Z,2021-09-26T07:40:00Z,True,False
+fia-formula-3-championship_2022_sakhir_free-practice,6299358d-b8a6-4581-a8d3-301f6098ad0a,2022,1,1,FP,Free Practice,2022-03-18T08:25:00Z,2022-03-18T09:10:00Z,False,False
+fia-formula-3-championship_2022_sakhir_qualifying,6299358d-b8a6-4581-a8d3-301f6098ad0a,2022,1,2,Q,Qualifying,2022-03-18T13:25:00Z,2022-03-18T13:55:00Z,False,False
+fia-formula-3-championship_2022_sakhir_starting-grid,6299358d-b8a6-4581-a8d3-301f6098ad0a,2022,1,3,GR,Starting Grid,,,False,False
+fia-formula-3-championship_2022_sakhir_race,6299358d-b8a6-4581-a8d3-301f6098ad0a,2022,1,4,Race,Race,2022-03-19T10:05:00Z,2022-03-19T10:50:00Z,True,False
+fia-formula-3-championship_2022_sakhir_starting-grid-2,6299358d-b8a6-4581-a8d3-301f6098ad0a,2022,1,5,GR,Starting Grid,,,False,False
+fia-formula-3-championship_2022_sakhir_race-2,6299358d-b8a6-4581-a8d3-301f6098ad0a,2022,1,6,Race,Race,2022-03-20T09:00:00Z,2022-03-20T09:50:00Z,True,False
+fia-formula-3-championship_2022_imola_free-practice,ce74df8e-5a17-483d-baf1-3d01b94722e8,2022,2,1,FP,Free Practice,2022-04-22T07:55:00Z,2022-04-22T08:40:00Z,False,False
+fia-formula-3-championship_2022_imola_qualifying,ce74df8e-5a17-483d-baf1-3d01b94722e8,2022,2,2,Q,Qualifying,2022-04-22T13:55:00Z,2022-04-22T14:25:00Z,False,False
+fia-formula-3-championship_2022_imola_starting-grid,ce74df8e-5a17-483d-baf1-3d01b94722e8,2022,2,3,GR,Starting Grid,,,False,False
+fia-formula-3-championship_2022_imola_race,ce74df8e-5a17-483d-baf1-3d01b94722e8,2022,2,4,Race,Race,2022-04-23T08:35:00Z,2022-04-23T09:20:00Z,True,False
+fia-formula-3-championship_2022_imola_starting-grid-2,ce74df8e-5a17-483d-baf1-3d01b94722e8,2022,2,5,GR,Starting Grid,,,False,False
+fia-formula-3-championship_2022_imola_race-2,ce74df8e-5a17-483d-baf1-3d01b94722e8,2022,2,6,Race,Race,2022-04-24T06:50:00Z,2022-04-24T07:40:00Z,True,False
+fia-formula-3-championship_2022_barcelona_free-practice,9ba41a94-0636-4c2d-aeba-42abc4b0d56a,2022,3,1,FP,Free Practice,2022-05-20T07:30:00Z,2022-05-20T08:15:00Z,False,False
+fia-formula-3-championship_2022_barcelona_qualifying,9ba41a94-0636-4c2d-aeba-42abc4b0d56a,2022,3,2,Q,Qualifying,2022-05-20T13:30:00Z,2022-05-20T14:00:00Z,False,False
+fia-formula-3-championship_2022_barcelona_starting-grid,9ba41a94-0636-4c2d-aeba-42abc4b0d56a,2022,3,3,GR,Starting Grid,,,False,False
+fia-formula-3-championship_2022_barcelona_race,9ba41a94-0636-4c2d-aeba-42abc4b0d56a,2022,3,4,Race,Race,2022-05-21T09:00:00Z,2022-05-21T09:45:00Z,True,False
+fia-formula-3-championship_2022_barcelona_starting-grid-2,9ba41a94-0636-4c2d-aeba-42abc4b0d56a,2022,3,5,GR,Starting Grid,,,False,False
+fia-formula-3-championship_2022_barcelona_race-2,9ba41a94-0636-4c2d-aeba-42abc4b0d56a,2022,3,6,Race,Race,2022-05-22T08:05:00Z,2022-05-22T08:55:00Z,True,False
+fia-formula-3-championship_2022_silverstone_free-practice,566d728e-09be-4e0e-a874-b68069f6689e,2022,4,1,FP,Free Practice,2022-07-01T08:35:00Z,2022-07-01T09:20:00Z,False,False
+fia-formula-3-championship_2022_silverstone_qualifying,566d728e-09be-4e0e-a874-b68069f6689e,2022,4,2,Q,Qualifying,2022-07-01T13:55:00Z,2022-07-01T14:25:00Z,False,False
+fia-formula-3-championship_2022_silverstone_starting-grid,566d728e-09be-4e0e-a874-b68069f6689e,2022,4,3,GR,Starting Grid,,,False,False
+fia-formula-3-championship_2022_silverstone_race,566d728e-09be-4e0e-a874-b68069f6689e,2022,4,4,Race,Race,2022-07-02T08:55:00Z,2022-07-02T09:40:00Z,True,False
+fia-formula-3-championship_2022_silverstone_starting-grid-2,566d728e-09be-4e0e-a874-b68069f6689e,2022,4,5,GR,Starting Grid,,,False,False
+fia-formula-3-championship_2022_silverstone_race-2,566d728e-09be-4e0e-a874-b68069f6689e,2022,4,6,Race,Race,2022-07-03T07:35:00Z,2022-07-03T08:25:00Z,True,False
+fia-formula-3-championship_2022_spielberg_free-practice,eb629aa4-e491-469f-aace-f164b78a3f14,2022,5,1,FP,Free Practice,2022-07-08T07:35:00Z,2022-07-08T08:20:00Z,False,False
+fia-formula-3-championship_2022_spielberg_qualifying,eb629aa4-e491-469f-aace-f164b78a3f14,2022,5,2,Q,Qualifying,2022-07-08T13:00:00Z,2022-07-08T13:30:00Z,False,False
+fia-formula-3-championship_2022_spielberg_starting-grid,eb629aa4-e491-469f-aace-f164b78a3f14,2022,5,3,GR,Starting Grid,,,False,False
+fia-formula-3-championship_2022_spielberg_race,eb629aa4-e491-469f-aace-f164b78a3f14,2022,5,4,Race,Race,2022-07-09T08:35:00Z,2022-07-09T09:20:00Z,True,False
+fia-formula-3-championship_2022_spielberg_starting-grid-2,eb629aa4-e491-469f-aace-f164b78a3f14,2022,5,5,GR,Starting Grid,,,False,False
+fia-formula-3-championship_2022_spielberg_race-2,eb629aa4-e491-469f-aace-f164b78a3f14,2022,5,6,Race,Race,2022-07-10T06:35:00Z,2022-07-10T07:25:00Z,True,False
+fia-formula-3-championship_2022_budapest_free-practice,5b05b15d-1179-49b0-9281-b3af40bcb8b1,2022,6,1,FP,Free Practice,2022-07-29T08:40:00Z,2022-07-29T09:25:00Z,False,False
+fia-formula-3-championship_2022_budapest_qualifying,5b05b15d-1179-49b0-9281-b3af40bcb8b1,2022,6,2,Q,Qualifying,2022-07-29T16:30:00Z,2022-07-29T17:00:00Z,False,False
+fia-formula-3-championship_2022_budapest_starting-grid,5b05b15d-1179-49b0-9281-b3af40bcb8b1,2022,6,3,GR,Starting Grid,,,False,False
+fia-formula-3-championship_2022_budapest_race,5b05b15d-1179-49b0-9281-b3af40bcb8b1,2022,6,4,Race,Race,2022-07-30T16:00:00Z,2022-07-30T16:50:00Z,True,False
+fia-formula-3-championship_2022_budapest_starting-grid-2,5b05b15d-1179-49b0-9281-b3af40bcb8b1,2022,6,5,GR,Starting Grid,,,False,False
+fia-formula-3-championship_2022_budapest_race-2,5b05b15d-1179-49b0-9281-b3af40bcb8b1,2022,6,6,Race,Race,2022-07-31T09:35:00Z,2022-07-31T10:40:00Z,True,False
+fia-formula-3-championship_2022_spa-francorchamps_free-practice,ab573472-2efd-4e08-b170-51db117aadc0,2022,7,1,FP,Free Practice,2022-08-26T08:25:00Z,2022-08-26T09:10:00Z,False,False
+fia-formula-3-championship_2022_spa-francorchamps_qualifying,ab573472-2efd-4e08-b170-51db117aadc0,2022,7,2,Q,Qualifying,2022-08-26T13:30:00Z,2022-08-26T14:00:00Z,False,False
+fia-formula-3-championship_2022_spa-francorchamps_starting-grid,ab573472-2efd-4e08-b170-51db117aadc0,2022,7,3,GR,Starting Grid,,,False,False
+fia-formula-3-championship_2022_spa-francorchamps_race,ab573472-2efd-4e08-b170-51db117aadc0,2022,7,4,Race,Race,2022-08-27T08:35:00Z,2022-08-27T09:20:00Z,True,False
+fia-formula-3-championship_2022_spa-francorchamps_starting-grid-2,ab573472-2efd-4e08-b170-51db117aadc0,2022,7,5,GR,Starting Grid,,,False,False
+fia-formula-3-championship_2022_spa-francorchamps_race-2,ab573472-2efd-4e08-b170-51db117aadc0,2022,7,6,Race,Race,2022-08-28T06:50:00Z,2022-08-28T07:40:00Z,True,False
+fia-formula-3-championship_2022_zandvoort_free-practice,9fe76735-b7fd-445b-9b22-ed53961cb772,2022,8,1,FP,Free Practice,2022-09-02T06:55:00Z,2022-09-02T07:40:00Z,False,False
+fia-formula-3-championship_2022_zandvoort_qualifying,9fe76735-b7fd-445b-9b22-ed53961cb772,2022,8,2,Q,Qualifying,2022-09-02T12:00:00Z,2022-09-02T12:30:00Z,False,False
+fia-formula-3-championship_2022_zandvoort_starting-grid-rg,9fe76735-b7fd-445b-9b22-ed53961cb772,2022,8,3,GR,Starting Grid RG,,,False,False
+fia-formula-3-championship_2022_zandvoort_race,9fe76735-b7fd-445b-9b22-ed53961cb772,2022,8,4,Race,Race,2022-09-03T08:25:00Z,2022-09-03T09:10:00Z,True,False
+fia-formula-3-championship_2022_zandvoort_starting-grid,9fe76735-b7fd-445b-9b22-ed53961cb772,2022,8,5,GR,Starting Grid,,,False,False
+fia-formula-3-championship_2022_zandvoort_race-2,9fe76735-b7fd-445b-9b22-ed53961cb772,2022,8,6,Race,Race,2022-09-04T06:45:00Z,2022-09-04T07:35:00Z,True,False
+fia-formula-3-championship_2022_monza_free-practice,01266e80-5ad0-4e07-b301-cd115f17dead,2022,9,1,FP,Free Practice,2022-09-09T07:15:00Z,2022-09-09T08:00:00Z,False,False
+fia-formula-3-championship_2022_monza_qualifying,01266e80-5ad0-4e07-b301-cd115f17dead,2022,9,2,Q,Qualifying,2022-09-09T13:30:00Z,2022-09-09T14:00:00Z,False,False
+fia-formula-3-championship_2022_monza_starting-grid,01266e80-5ad0-4e07-b301-cd115f17dead,2022,9,3,GR,Starting Grid,,,False,False
+fia-formula-3-championship_2022_monza_race,01266e80-5ad0-4e07-b301-cd115f17dead,2022,9,4,Race,Race,2022-09-10T08:35:00Z,2022-09-10T09:20:00Z,True,False
+fia-formula-3-championship_2022_monza_starting-grid-2,01266e80-5ad0-4e07-b301-cd115f17dead,2022,9,5,GR,Starting Grid,,,False,False
+fia-formula-3-championship_2022_monza_race-2,01266e80-5ad0-4e07-b301-cd115f17dead,2022,9,6,Race,Race,2022-09-11T06:35:00Z,2022-09-11T07:25:00Z,True,False
+fia-formula-3-championship_2023_sakhir_free-practice,28999cd4-474e-47b3-97a8-0a281a660d4b,2023,1,1,FP,Free Practice,2023-03-03T07:55:00Z,2023-03-03T08:40:00Z,False,False
+fia-formula-3-championship_2023_sakhir_qualifying,28999cd4-474e-47b3-97a8-0a281a660d4b,2023,1,2,Q,Qualifying,2023-03-03T13:00:00Z,2023-03-03T13:30:00Z,False,False
+fia-formula-3-championship_2023_sakhir_starting-grid,28999cd4-474e-47b3-97a8-0a281a660d4b,2023,1,3,GR,Starting Grid,,,False,False
+fia-formula-3-championship_2023_sakhir_race,28999cd4-474e-47b3-97a8-0a281a660d4b,2023,1,4,Race,Race,2023-03-04T09:15:00Z,2023-03-04T10:00:00Z,True,False
+fia-formula-3-championship_2023_sakhir_starting-grid-2,28999cd4-474e-47b3-97a8-0a281a660d4b,2023,1,5,GR,Starting Grid,,,False,False
+fia-formula-3-championship_2023_sakhir_race-2,28999cd4-474e-47b3-97a8-0a281a660d4b,2023,1,6,Race,Race,2023-03-05T08:50:00Z,2023-03-05T09:40:00Z,True,False
+fia-formula-3-championship_2023_melbourne_free-practice,d7d3a7d3-1ef7-4614-8c68-cd4e0e0d8c67,2023,2,1,FP,Free Practice,2023-03-30T21:50:00Z,2023-03-30T22:35:00Z,False,False
+fia-formula-3-championship_2023_melbourne_qualifying,d7d3a7d3-1ef7-4614-8c68-cd4e0e0d8c67,2023,2,2,Q,Qualifying,2023-03-31T03:00:00Z,2023-03-31T03:30:00Z,False,False
+fia-formula-3-championship_2023_melbourne_starting-grid,d7d3a7d3-1ef7-4614-8c68-cd4e0e0d8c67,2023,2,3,GR,Starting Grid,,,False,False
+fia-formula-3-championship_2023_melbourne_race,d7d3a7d3-1ef7-4614-8c68-cd4e0e0d8c67,2023,2,4,Race,Race,2023-04-01T00:00:00Z,2023-04-01T00:45:00Z,True,False
+fia-formula-3-championship_2023_melbourne_starting-grid-2,d7d3a7d3-1ef7-4614-8c68-cd4e0e0d8c67,2023,2,5,GR,Starting Grid,,,False,False
+fia-formula-3-championship_2023_melbourne_race-2,d7d3a7d3-1ef7-4614-8c68-cd4e0e0d8c67,2023,2,6,Race,Race,2023-04-01T23:05:00Z,2023-04-01T23:55:00Z,True,False
+fia-formula-3-championship_2023_monaco_free-practice,3003b6a8-2f16-46f7-9d3b-f78daec2d29c,2023,4,1,FP,Free Practice,2023-05-25T10:30:00Z,2023-05-25T11:15:00Z,False,False
+fia-formula-3-championship_2023_monaco_1st-qualifying,3003b6a8-2f16-46f7-9d3b-f78daec2d29c,2023,4,2,Q1,1st Qualifying,2023-05-26T09:10:00Z,2023-05-26T09:26:00Z,False,False
+fia-formula-3-championship_2023_monaco_2nd-qualifying,3003b6a8-2f16-46f7-9d3b-f78daec2d29c,2023,4,3,Q2,2nd Qualifying,2023-05-26T09:34:00Z,2023-05-26T09:50:00Z,False,False
+fia-formula-3-championship_2023_monaco_starting-grid,3003b6a8-2f16-46f7-9d3b-f78daec2d29c,2023,4,4,GR,Starting Grid,,,False,False
+fia-formula-3-championship_2023_monaco_race,3003b6a8-2f16-46f7-9d3b-f78daec2d29c,2023,4,5,Race,Race,2023-05-27T09:00:00Z,2023-05-27T09:45:00Z,True,False
+fia-formula-3-championship_2023_monaco_starting-grid-2,3003b6a8-2f16-46f7-9d3b-f78daec2d29c,2023,4,6,GR,Starting Grid,,,False,False
+fia-formula-3-championship_2023_monaco_race-2,3003b6a8-2f16-46f7-9d3b-f78daec2d29c,2023,4,7,Race,Race,2023-05-28T06:20:00Z,2023-05-28T07:10:00Z,True,False
+fia-formula-3-championship_2023_catalunya_free-practice,8dcac300-5645-4601-9ac4-d97f344e9b17,2023,5,1,FP,Free Practice,2023-06-02T07:55:00Z,2023-06-02T08:40:00Z,False,False
+fia-formula-3-championship_2023_catalunya_qualifying,8dcac300-5645-4601-9ac4-d97f344e9b17,2023,5,2,Q,Qualifying,2023-06-02T13:00:00Z,2023-06-02T13:30:00Z,False,False
+fia-formula-3-championship_2023_catalunya_starting-grid,8dcac300-5645-4601-9ac4-d97f344e9b17,2023,5,3,GR,Starting Grid,,,False,False
+fia-formula-3-championship_2023_catalunya_race,8dcac300-5645-4601-9ac4-d97f344e9b17,2023,5,4,Race,Race,2023-06-03T08:30:00Z,2023-06-03T09:15:00Z,True,False
+fia-formula-3-championship_2023_catalunya_starting-grid-2,8dcac300-5645-4601-9ac4-d97f344e9b17,2023,5,5,GR,Starting Grid,,,False,False
+fia-formula-3-championship_2023_catalunya_race-2,8dcac300-5645-4601-9ac4-d97f344e9b17,2023,5,6,Race,Race,2023-06-04T08:05:00Z,2023-06-04T08:55:00Z,True,False
+fia-formula-3-championship_2023_red-bull-ring_free-practice,218c7cc4-b343-426e-9a7a-b7d2149a1e2a,2023,6,1,FP,Free Practice,2023-06-30T07:55:00Z,2023-06-30T08:40:00Z,False,False
+fia-formula-3-championship_2023_red-bull-ring_qualifying,218c7cc4-b343-426e-9a7a-b7d2149a1e2a,2023,6,2,Q,Qualifying,2023-06-30T13:00:00Z,2023-06-30T13:30:00Z,False,False
+fia-formula-3-championship_2023_red-bull-ring_starting-grid,218c7cc4-b343-426e-9a7a-b7d2149a1e2a,2023,6,3,GR,Starting Grid,,,False,False
+fia-formula-3-championship_2023_red-bull-ring_race,218c7cc4-b343-426e-9a7a-b7d2149a1e2a,2023,6,4,Race,Race,2023-07-01T08:00:00Z,2023-07-01T08:45:00Z,True,False
+fia-formula-3-championship_2023_red-bull-ring_starting-grid-2,218c7cc4-b343-426e-9a7a-b7d2149a1e2a,2023,6,5,GR,Starting Grid,,,False,False
+fia-formula-3-championship_2023_red-bull-ring_race-2,218c7cc4-b343-426e-9a7a-b7d2149a1e2a,2023,6,6,Race,Race,2023-07-02T06:25:00Z,2023-07-02T07:15:00Z,True,False
+fia-formula-3-championship_2023_silverstone_free-practice,0821400f-ba29-4e9d-8a12-2afa8cc52133,2023,7,1,FP,Free Practice,2023-07-07T07:45:00Z,2023-07-07T08:30:00Z,False,False
+fia-formula-3-championship_2023_silverstone_qualifying,0821400f-ba29-4e9d-8a12-2afa8cc52133,2023,7,2,Q,Qualifying,2023-07-07T13:10:00Z,2023-07-07T13:40:00Z,False,False
+fia-formula-3-championship_2023_silverstone_starting-grid,0821400f-ba29-4e9d-8a12-2afa8cc52133,2023,7,3,GR,Starting Grid,,,False,False
+fia-formula-3-championship_2023_silverstone_race,0821400f-ba29-4e9d-8a12-2afa8cc52133,2023,7,4,Race,Race,2023-07-08T08:20:00Z,2023-07-08T09:05:00Z,True,False
+fia-formula-3-championship_2023_silverstone_starting-grid-2,0821400f-ba29-4e9d-8a12-2afa8cc52133,2023,7,5,GR,Starting Grid,,,False,False
+fia-formula-3-championship_2023_silverstone_race-2,0821400f-ba29-4e9d-8a12-2afa8cc52133,2023,7,6,Race,Race,2023-07-09T07:20:00Z,2023-07-09T08:10:00Z,True,False
+fia-formula-3-championship_2023_hungaroring_free-practice,e5ca6eed-455c-480b-b6cc-8945e045371f,2023,8,1,FP,Free Practice,2023-07-21T07:55:00Z,2023-07-21T08:40:00Z,False,False
+fia-formula-3-championship_2023_hungaroring_qualifying,e5ca6eed-455c-480b-b6cc-8945e045371f,2023,8,2,Q,Qualifying,2023-07-21T13:05:00Z,2023-07-21T13:35:00Z,False,False
+fia-formula-3-championship_2023_hungaroring_starting-grid,e5ca6eed-455c-480b-b6cc-8945e045371f,2023,8,3,GR,Starting Grid,,,False,False
+fia-formula-3-championship_2023_hungaroring_race,e5ca6eed-455c-480b-b6cc-8945e045371f,2023,8,4,Race,Race,2023-07-22T07:50:00Z,2023-07-22T08:35:00Z,True,False
+fia-formula-3-championship_2023_hungaroring_starting-grid-2,e5ca6eed-455c-480b-b6cc-8945e045371f,2023,8,5,GR,Starting Grid,,,False,False
+fia-formula-3-championship_2023_hungaroring_race-2,e5ca6eed-455c-480b-b6cc-8945e045371f,2023,8,6,Race,Race,2023-07-23T06:25:00Z,2023-07-23T07:15:00Z,True,False
+fia-formula-3-championship_2023_spa-francorchamps_free-practice,e1450d1f-25b3-4961-8fd8-91cdbb2f408f,2023,9,1,FP,Free Practice,2023-07-28T07:55:00Z,2023-07-28T08:40:00Z,False,False
+fia-formula-3-championship_2023_spa-francorchamps_qualifying,e1450d1f-25b3-4961-8fd8-91cdbb2f408f,2023,9,2,Q,Qualifying,2023-07-28T13:05:00Z,2023-07-28T13:35:00Z,False,False
+fia-formula-3-championship_2023_spa-francorchamps_starting-grid,e1450d1f-25b3-4961-8fd8-91cdbb2f408f,2023,9,3,GR,Starting Grid,,,False,False
+fia-formula-3-championship_2023_spa-francorchamps_race,e1450d1f-25b3-4961-8fd8-91cdbb2f408f,2023,9,4,Race,Race,2023-07-29T08:00:00Z,2023-07-29T08:45:00Z,True,False
+fia-formula-3-championship_2023_spa-francorchamps_starting-grid-2,e1450d1f-25b3-4961-8fd8-91cdbb2f408f,2023,9,5,GR,Starting Grid,,,False,False
+fia-formula-3-championship_2023_spa-francorchamps_race-2,e1450d1f-25b3-4961-8fd8-91cdbb2f408f,2023,9,6,Race,Race,2023-07-30T06:30:00Z,2023-07-30T07:20:00Z,True,False
+fia-formula-3-championship_2023_monza_free-practice,e55e4f5c-44bd-49f5-be1c-723ae69842d1,2023,10,1,FP,Free Practice,2023-09-01T07:40:00Z,2023-09-01T08:25:00Z,False,False
+fia-formula-3-championship_2023_monza_qualifying,e55e4f5c-44bd-49f5-be1c-723ae69842d1,2023,10,2,Q,Qualifying,2023-09-01T13:05:00Z,2023-09-01T13:35:00Z,False,False
+fia-formula-3-championship_2023_monza_starting-grid,e55e4f5c-44bd-49f5-be1c-723ae69842d1,2023,10,3,GR,Starting Grid,,,False,False
+fia-formula-3-championship_2023_monza_race,e55e4f5c-44bd-49f5-be1c-723ae69842d1,2023,10,4,Race,Race,2023-09-02T07:40:00Z,2023-09-02T08:25:00Z,True,False
+fia-formula-3-championship_2023_monza_starting-grid-2,e55e4f5c-44bd-49f5-be1c-723ae69842d1,2023,10,5,GR,Starting Grid,,,False,False
+fia-formula-3-championship_2023_monza_race-2,e55e4f5c-44bd-49f5-be1c-723ae69842d1,2023,10,6,Race,Race,2023-09-03T06:15:00Z,2023-09-03T07:05:00Z,True,False
+fia-formula-3-championship_2024_sakhir_free-practice,2a71a7b2-3132-41e4-9f86-4ae02b8fb398,2024,1,1,FP,Free Practice,2024-02-29T07:55:00Z,2024-02-29T08:40:00Z,False,False
+fia-formula-3-championship_2024_sakhir_qualifying,2a71a7b2-3132-41e4-9f86-4ae02b8fb398,2024,1,2,Q,Qualifying,2024-02-29T13:00:00Z,2024-02-29T13:30:00Z,False,False
+fia-formula-3-championship_2024_sakhir_starting-grid,2a71a7b2-3132-41e4-9f86-4ae02b8fb398,2024,1,3,GR,Starting Grid,,,False,False
+fia-formula-3-championship_2024_sakhir_race,2a71a7b2-3132-41e4-9f86-4ae02b8fb398,2024,1,4,Race,Race,2024-03-01T10:15:00Z,2024-03-01T11:00:00Z,True,False
+fia-formula-3-championship_2024_sakhir_starting-grid-2,2a71a7b2-3132-41e4-9f86-4ae02b8fb398,2024,1,5,GR,Starting Grid,,,False,False
+fia-formula-3-championship_2024_sakhir_race-2,2a71a7b2-3132-41e4-9f86-4ae02b8fb398,2024,1,6,Race,Race,2024-03-02T09:00:00Z,2024-03-02T09:50:00Z,True,False
+fia-formula-3-championship_2024_melbourne_free-practice,080edcf7-04ff-46d5-b159-c82643dce27b,2024,2,1,FP,Free Practice,2024-03-21T21:50:00Z,2024-03-21T22:35:00Z,False,False
+fia-formula-3-championship_2024_melbourne_qualifying,080edcf7-04ff-46d5-b159-c82643dce27b,2024,2,2,Q,Qualifying,2024-03-22T03:00:00Z,2024-03-22T03:30:00Z,False,False
+fia-formula-3-championship_2024_melbourne_starting-grid,080edcf7-04ff-46d5-b159-c82643dce27b,2024,2,3,GR,Starting Grid,,,False,False
+fia-formula-3-championship_2024_melbourne_race,080edcf7-04ff-46d5-b159-c82643dce27b,2024,2,4,Race,Race,2024-03-23T00:15:00Z,2024-03-23T01:00:00Z,True,False
+fia-formula-3-championship_2024_melbourne_starting-grid-2,080edcf7-04ff-46d5-b159-c82643dce27b,2024,2,5,GR,Starting Grid,,,False,False
+fia-formula-3-championship_2024_melbourne_race-2,080edcf7-04ff-46d5-b159-c82643dce27b,2024,2,6,Race,Race,2024-03-23T22:05:00Z,2024-03-23T22:55:00Z,True,False
+fia-formula-3-championship_2024_imola_free-practice,f1ad5b5b-a625-40b0-87dd-f6a590746ae4,2024,3,1,FP,Free Practice,2024-05-17T07:55:00Z,2024-05-17T08:40:00Z,False,False
+fia-formula-3-championship_2024_imola_qualifying,f1ad5b5b-a625-40b0-87dd-f6a590746ae4,2024,3,2,Q,Qualifying,2024-05-17T13:05:00Z,2024-05-17T13:35:00Z,False,False
+fia-formula-3-championship_2024_imola_starting-grid,f1ad5b5b-a625-40b0-87dd-f6a590746ae4,2024,3,3,GR,Starting Grid,,,False,False
+fia-formula-3-championship_2024_imola_race,f1ad5b5b-a625-40b0-87dd-f6a590746ae4,2024,3,4,Race,Race,2024-05-18T08:05:00Z,2024-05-18T08:50:00Z,True,False
+fia-formula-3-championship_2024_imola_starting-grid-2,f1ad5b5b-a625-40b0-87dd-f6a590746ae4,2024,3,5,GR,Starting Grid,,,False,False
+fia-formula-3-championship_2024_imola_race-2,f1ad5b5b-a625-40b0-87dd-f6a590746ae4,2024,3,6,Race,Race,2024-05-19T06:30:00Z,2024-05-19T07:20:00Z,True,False
+fia-formula-3-championship_2024_monte-carlo_free-practice,f6223b18-3f49-4dcd-8c1c-8f13a32ddcac,2024,4,1,FP,Free Practice,2024-05-23T11:10:00Z,2024-05-23T11:55:00Z,False,False
+fia-formula-3-championship_2024_monte-carlo_1st-qualifying,f6223b18-3f49-4dcd-8c1c-8f13a32ddcac,2024,4,2,Q1,1st Qualifying,2024-05-24T09:05:00Z,2024-05-24T09:21:00Z,False,False
+fia-formula-3-championship_2024_monte-carlo_2nd-qualifying,f6223b18-3f49-4dcd-8c1c-8f13a32ddcac,2024,4,3,Q2,2nd Qualifying,2024-05-24T09:29:00Z,2024-05-24T09:45:00Z,False,False
+fia-formula-3-championship_2024_monte-carlo_starting-grid,f6223b18-3f49-4dcd-8c1c-8f13a32ddcac,2024,4,4,GR,Starting Grid,,,False,False
+fia-formula-3-championship_2024_monte-carlo_race,f6223b18-3f49-4dcd-8c1c-8f13a32ddcac,2024,4,5,Race,Race,2024-05-25T08:45:00Z,2024-05-25T09:30:00Z,True,False
+fia-formula-3-championship_2024_monte-carlo_starting-grid-2,f6223b18-3f49-4dcd-8c1c-8f13a32ddcac,2024,4,6,GR,Starting Grid,,,False,False
+fia-formula-3-championship_2024_monte-carlo_race-2,f6223b18-3f49-4dcd-8c1c-8f13a32ddcac,2024,4,7,Race,Race,2024-05-26T06:00:00Z,2024-05-26T06:50:00Z,True,False
+fia-formula-3-championship_2024_barcelona_free-practice,7a2b5f9d-326a-44e2-b780-96d502a17b4a,2024,5,1,FP,Free Practice,2024-06-21T07:55:00Z,2024-06-21T08:40:00Z,False,False
+fia-formula-3-championship_2024_barcelona_qualifying,7a2b5f9d-326a-44e2-b780-96d502a17b4a,2024,5,2,Q,Qualifying,2024-06-21T13:00:00Z,2024-06-21T13:30:00Z,False,False
+fia-formula-3-championship_2024_barcelona_starting-grid,7a2b5f9d-326a-44e2-b780-96d502a17b4a,2024,5,3,GR,Starting Grid,,,False,False
+fia-formula-3-championship_2024_barcelona_race,7a2b5f9d-326a-44e2-b780-96d502a17b4a,2024,5,4,Race,Race,2024-06-22T08:40:00Z,2024-06-22T09:25:00Z,True,False
+fia-formula-3-championship_2024_barcelona_starting-grid-2,7a2b5f9d-326a-44e2-b780-96d502a17b4a,2024,5,5,GR,Starting Grid,,,False,False
+fia-formula-3-championship_2024_barcelona_race-2,7a2b5f9d-326a-44e2-b780-96d502a17b4a,2024,5,6,Race,Race,2024-06-23T08:05:00Z,2024-06-23T08:55:00Z,True,False
+fia-formula-3-championship_2024_spielburg_free-practice,9df89193-0314-4b5f-8759-b74c4aa56186,2024,6,1,FP,Free Practice,2024-06-28T06:55:00Z,2024-06-28T07:40:00Z,False,False
+fia-formula-3-championship_2024_spielburg_qualifying,9df89193-0314-4b5f-8759-b74c4aa56186,2024,6,2,Q,Qualifying,2024-06-28T12:00:00Z,2024-06-28T12:30:00Z,False,False
+fia-formula-3-championship_2024_spielburg_starting-grid,9df89193-0314-4b5f-8759-b74c4aa56186,2024,6,3,GR,Starting Grid,,,False,False
+fia-formula-3-championship_2024_spielburg_race,9df89193-0314-4b5f-8759-b74c4aa56186,2024,6,4,Race,Race,2024-06-29T07:30:00Z,2024-06-29T08:15:00Z,True,False
+fia-formula-3-championship_2024_spielburg_starting-grid-2,9df89193-0314-4b5f-8759-b74c4aa56186,2024,6,5,GR,Starting Grid,,,False,False
+fia-formula-3-championship_2024_spielburg_race-2,9df89193-0314-4b5f-8759-b74c4aa56186,2024,6,6,Race,Race,2024-06-30T06:30:00Z,2024-06-30T07:20:00Z,True,False
+fia-formula-3-championship_2024_silverstone_free-practice,0e02b48e-cde0-46f0-bae5-bc9a7b257958,2024,7,1,FP,Free Practice,2024-07-05T07:40:00Z,2024-07-05T08:25:00Z,False,False
+fia-formula-3-championship_2024_silverstone_qualifying,0e02b48e-cde0-46f0-bae5-bc9a7b257958,2024,7,2,Q,Qualifying,,,False,False
+fia-formula-3-championship_2024_silverstone_starting-grid,0e02b48e-cde0-46f0-bae5-bc9a7b257958,2024,7,3,GR,Starting Grid,,,False,False
+fia-formula-3-championship_2024_silverstone_race,0e02b48e-cde0-46f0-bae5-bc9a7b257958,2024,7,4,Race,Race,2024-07-06T08:20:00Z,2024-07-06T09:05:00Z,True,False
+fia-formula-3-championship_2024_silverstone_starting-grid-2,0e02b48e-cde0-46f0-bae5-bc9a7b257958,2024,7,5,GR,Starting Grid,,,False,False
+fia-formula-3-championship_2024_silverstone_race-2,0e02b48e-cde0-46f0-bae5-bc9a7b257958,2024,7,6,Race,Race,2024-07-07T07:20:00Z,2024-07-07T08:10:00Z,True,False
+fia-formula-3-championship_2024_budapest_free-practice,e113bbad-95fa-4740-b2bc-39abe0a4e973,2024,8,1,FP,Free Practice,2024-07-19T07:55:00Z,2024-07-19T08:40:00Z,False,False
+fia-formula-3-championship_2024_budapest_qualifying,e113bbad-95fa-4740-b2bc-39abe0a4e973,2024,8,2,Q,Qualifying,2024-07-19T13:05:00Z,2024-07-19T13:35:00Z,False,False
+fia-formula-3-championship_2024_budapest_starting-grid,e113bbad-95fa-4740-b2bc-39abe0a4e973,2024,8,3,GR,Starting Grid,,,False,False
+fia-formula-3-championship_2024_budapest_race,e113bbad-95fa-4740-b2bc-39abe0a4e973,2024,8,4,Race,Race,2024-07-20T07:50:00Z,2024-07-20T08:35:00Z,True,False
+fia-formula-3-championship_2024_budapest_starting-grid-2,e113bbad-95fa-4740-b2bc-39abe0a4e973,2024,8,5,GR,Starting Grid,,,False,False
+fia-formula-3-championship_2024_budapest_race-2,e113bbad-95fa-4740-b2bc-39abe0a4e973,2024,8,6,Race,Race,2024-07-21T06:25:00Z,2024-07-21T07:15:00Z,True,False
+fia-formula-3-championship_2024_spa-francorchamps_free-practice,dc771d20-51c3-4219-9e23-f88d2d076ffe,2024,9,1,FP,Free Practice,2024-07-26T07:55:00Z,2024-07-26T08:40:00Z,False,False
+fia-formula-3-championship_2024_spa-francorchamps_qualifying,dc771d20-51c3-4219-9e23-f88d2d076ffe,2024,9,2,Q,Qualifying,2024-07-26T13:05:00Z,2024-07-26T13:35:00Z,False,False
+fia-formula-3-championship_2024_spa-francorchamps_starting-grid,dc771d20-51c3-4219-9e23-f88d2d076ffe,2024,9,3,GR,Starting Grid,,,False,False
+fia-formula-3-championship_2024_spa-francorchamps_race,dc771d20-51c3-4219-9e23-f88d2d076ffe,2024,9,4,Race,Race,2024-07-27T07:50:00Z,2024-07-27T08:35:00Z,True,False
+fia-formula-3-championship_2024_spa-francorchamps_starting-grid-2,dc771d20-51c3-4219-9e23-f88d2d076ffe,2024,9,5,GR,Starting Grid,,,False,False
+fia-formula-3-championship_2024_spa-francorchamps_race-2,dc771d20-51c3-4219-9e23-f88d2d076ffe,2024,9,6,Race,Race,2024-07-28T06:30:00Z,2024-07-28T07:20:00Z,True,False
+fia-formula-3-championship_2024_monza_free-practice,3bad5a80-7d22-4833-be1a-ad574e8cc2e5,2024,10,1,FP,Free Practice,2024-08-30T07:35:00Z,2024-08-30T08:20:00Z,False,False
+fia-formula-3-championship_2024_monza_1st-qualifying,3bad5a80-7d22-4833-be1a-ad574e8cc2e5,2024,10,2,Q1,1st Qualifying,2024-08-30T13:00:00Z,2024-08-30T13:13:00Z,False,False
+fia-formula-3-championship_2024_monza_2nd-qualifying,3bad5a80-7d22-4833-be1a-ad574e8cc2e5,2024,10,3,Q2,2nd Qualifying,2024-08-30T13:17:00Z,2024-08-30T13:30:00Z,False,False
+fia-formula-3-championship_2024_monza_starting-grid,3bad5a80-7d22-4833-be1a-ad574e8cc2e5,2024,10,4,GR,Starting Grid,,,False,False
+fia-formula-3-championship_2024_monza_race,3bad5a80-7d22-4833-be1a-ad574e8cc2e5,2024,10,5,Race,Race,2024-08-31T07:30:00Z,2024-08-31T08:15:00Z,True,False
+fia-formula-3-championship_2024_monza_starting-grid-2,3bad5a80-7d22-4833-be1a-ad574e8cc2e5,2024,10,6,GR,Starting Grid,,,False,False
+fia-formula-3-championship_2024_monza_race-2,3bad5a80-7d22-4833-be1a-ad574e8cc2e5,2024,10,7,Race,Race,2024-09-01T06:35:00Z,2024-09-01T07:25:00Z,True,False
+fia-formula-3-championship_2025_melbourne_free-practice,8e305df1-b716-44ae-9434-a9dd55b7b99e,2025,1,1,FP,Free Practice,2025-03-13T21:50:00Z,2025-03-13T22:35:00Z,False,False
+fia-formula-3-championship_2025_melbourne_qualifying,8e305df1-b716-44ae-9434-a9dd55b7b99e,2025,1,2,Q,Qualifying,2025-03-14T03:00:00Z,2025-03-14T03:30:00Z,False,False
+fia-formula-3-championship_2025_melbourne_starting-grid,8e305df1-b716-44ae-9434-a9dd55b7b99e,2025,1,3,GR,Starting Grid,,,False,False
+fia-formula-3-championship_2025_melbourne_race,8e305df1-b716-44ae-9434-a9dd55b7b99e,2025,1,4,Race,Race,2025-03-15T00:15:00Z,2025-03-15T01:00:00Z,True,False
+fia-formula-3-championship_2025_melbourne_starting-grid-2,8e305df1-b716-44ae-9434-a9dd55b7b99e,2025,1,5,GR,Starting Grid,,,False,False
+fia-formula-3-championship_2025_melbourne_race-2,8e305df1-b716-44ae-9434-a9dd55b7b99e,2025,1,6,Race,Race,2025-03-15T22:00:00Z,2025-03-15T22:50:00Z,True,False
+fia-formula-3-championship_2025_sakhir_free-practice,2f216b4a-2864-480c-895a-0663a2f427bf,2025,2,1,FP,Free Practice,2025-04-11T07:55:00Z,2025-04-11T08:40:00Z,False,False
+fia-formula-3-championship_2025_sakhir_qualifying,2f216b4a-2864-480c-895a-0663a2f427bf,2025,2,2,Q,Qualifying,2025-04-11T13:00:00Z,2025-04-11T13:30:00Z,False,False
+fia-formula-3-championship_2025_sakhir_starting-grid,2f216b4a-2864-480c-895a-0663a2f427bf,2025,2,3,GR,Starting Grid,,,False,False
+fia-formula-3-championship_2025_sakhir_race,2f216b4a-2864-480c-895a-0663a2f427bf,2025,2,4,Race,Race,2025-04-12T10:15:00Z,2025-04-12T11:00:00Z,True,False
+fia-formula-3-championship_2025_sakhir_starting-grid-2,2f216b4a-2864-480c-895a-0663a2f427bf,2025,2,5,GR,Starting Grid,,,False,False
+fia-formula-3-championship_2025_sakhir_race-2,2f216b4a-2864-480c-895a-0663a2f427bf,2025,2,6,Race,Race,2025-04-13T09:55:00Z,2025-04-13T10:45:00Z,True,False
+fia-formula-3-championship_2025_imola_free-practice,1514a816-7a84-4961-aafb-ba33c4aa8fda,2025,3,1,FP,Free Practice,2025-05-16T07:55:00Z,2025-05-16T08:40:00Z,False,False
+fia-formula-3-championship_2025_imola_qualifying,1514a816-7a84-4961-aafb-ba33c4aa8fda,2025,3,2,Q,Qualifying,2025-05-16T13:05:00Z,2025-05-16T13:35:00Z,False,False
+fia-formula-3-championship_2025_imola_starting-grid,1514a816-7a84-4961-aafb-ba33c4aa8fda,2025,3,3,GR,Starting Grid,,,False,False
+fia-formula-3-championship_2025_imola_race,1514a816-7a84-4961-aafb-ba33c4aa8fda,2025,3,4,Race,Race,2025-05-17T08:05:00Z,2025-05-17T08:50:00Z,True,False
+fia-formula-3-championship_2025_imola_starting-grid-2,1514a816-7a84-4961-aafb-ba33c4aa8fda,2025,3,5,GR,Starting Grid,,,False,False
+fia-formula-3-championship_2025_imola_race-2,1514a816-7a84-4961-aafb-ba33c4aa8fda,2025,3,6,Race,Race,2025-05-18T06:30:00Z,2025-05-18T07:20:00Z,True,False
+fia-formula-3-championship_2025_monaco_free-practice,5046c2a3-6d8d-42b5-8514-39d89ae64688,2025,4,1,FP,Free practice,2025-05-22T11:10:00Z,2025-05-22T11:55:00Z,False,False
+fia-formula-3-championship_2025_monaco_1st-qualifying,5046c2a3-6d8d-42b5-8514-39d89ae64688,2025,4,2,Q1,1st Qualifying,2025-05-23T09:05:00Z,2025-05-23T09:21:00Z,False,False
+fia-formula-3-championship_2025_monaco_2nd-qualifying,5046c2a3-6d8d-42b5-8514-39d89ae64688,2025,4,3,Q2,2nd Qualifying,2025-05-23T09:29:00Z,2025-05-23T09:45:00Z,False,False
+fia-formula-3-championship_2025_monaco_starting-grid,5046c2a3-6d8d-42b5-8514-39d89ae64688,2025,4,4,GR,Starting Grid,,,False,False
+fia-formula-3-championship_2025_monaco_race,5046c2a3-6d8d-42b5-8514-39d89ae64688,2025,4,5,Race,Race,2025-05-24T08:45:00Z,2025-05-24T09:30:00Z,True,False
+fia-formula-3-championship_2025_monaco_starting-grid-2,5046c2a3-6d8d-42b5-8514-39d89ae64688,2025,4,6,GR,Starting Grid,,,False,False
+fia-formula-3-championship_2025_monaco_race-2,5046c2a3-6d8d-42b5-8514-39d89ae64688,2025,4,7,Race,Race,2025-05-25T06:00:00Z,2025-05-25T06:50:00Z,True,False
+fia-formula-3-championship_2025_barcelona_free-practice,c239f997-4cd8-420e-8617-2414a59a1039,2025,5,1,FP,Free Practice,2025-05-30T07:55:00Z,2025-05-30T08:40:00Z,False,False
+fia-formula-3-championship_2025_barcelona_qualifying,c239f997-4cd8-420e-8617-2414a59a1039,2025,5,2,Q,Qualifying,2025-05-30T13:05:00Z,2025-05-30T13:35:00Z,False,False
+fia-formula-3-championship_2025_barcelona_starting-grid,c239f997-4cd8-420e-8617-2414a59a1039,2025,5,3,GR,Starting Grid,,,False,False
+fia-formula-3-championship_2025_barcelona_race,c239f997-4cd8-420e-8617-2414a59a1039,2025,5,4,Race,Race,2025-05-31T08:05:00Z,2025-05-31T08:50:00Z,True,False
+fia-formula-3-championship_2025_barcelona_starting-grid-2,c239f997-4cd8-420e-8617-2414a59a1039,2025,5,5,GR,Starting Grid,,,False,False
+fia-formula-3-championship_2025_barcelona_race-2,c239f997-4cd8-420e-8617-2414a59a1039,2025,5,6,Race,Race,2025-06-01T06:30:00Z,2025-06-01T07:20:00Z,True,False
+fia-formula-3-championship_2025_spielburg_free-practice,c870740f-0aa4-452f-9c42-361a3f082379,2025,6,1,FP,Free Practice,2025-06-27T07:55:00Z,2025-06-27T08:40:00Z,False,False
+fia-formula-3-championship_2025_spielburg_qualifying,c870740f-0aa4-452f-9c42-361a3f082379,2025,6,2,Q,Qualifying,2025-06-27T13:00:00Z,2025-06-27T13:30:00Z,False,False
+fia-formula-3-championship_2025_spielburg_starting-grid,c870740f-0aa4-452f-9c42-361a3f082379,2025,6,3,GR,Starting Grid,,,False,False
+fia-formula-3-championship_2025_spielburg_race,c870740f-0aa4-452f-9c42-361a3f082379,2025,6,4,Race,Race,2025-06-28T07:50:00Z,2025-06-28T08:35:00Z,True,False
+fia-formula-3-championship_2025_spielburg_starting-grid-2,c870740f-0aa4-452f-9c42-361a3f082379,2025,6,5,GR,Starting Grid,,,False,False
+fia-formula-3-championship_2025_spielburg_race-2,c870740f-0aa4-452f-9c42-361a3f082379,2025,6,6,Race,Race,2025-06-29T06:30:00Z,2025-06-29T07:20:00Z,True,False
+fia-formula-3-championship_2025_silverstone_free-practice,d6d51a45-8fb3-44b3-a1a2-ee69c4ab7ded,2025,7,1,FP,Free Practice,2025-07-04T07:50:00Z,2025-07-04T08:35:00Z,False,False
+fia-formula-3-championship_2025_silverstone_qualifying,d6d51a45-8fb3-44b3-a1a2-ee69c4ab7ded,2025,7,2,Q,Qualifying,2025-07-04T13:00:00Z,2025-07-04T13:30:00Z,False,False
+fia-formula-3-championship_2025_silverstone_starting-grid,d6d51a45-8fb3-44b3-a1a2-ee69c4ab7ded,2025,7,3,GR,Starting Grid,,,False,False
+fia-formula-3-championship_2025_silverstone_race,d6d51a45-8fb3-44b3-a1a2-ee69c4ab7ded,2025,7,4,Race,Race,2025-07-05T08:00:00Z,2025-07-05T08:45:00Z,True,False
+fia-formula-3-championship_2025_silverstone_starting-grid-2,d6d51a45-8fb3-44b3-a1a2-ee69c4ab7ded,2025,7,5,GR,Starting Grid,,,False,False
+fia-formula-3-championship_2025_silverstone_race-2,d6d51a45-8fb3-44b3-a1a2-ee69c4ab7ded,2025,7,6,Race,Race,2025-07-06T08:30:00Z,2025-07-06T09:20:00Z,True,False
+fia-formula-3-championship_2025_spa-francorchamps_free-practice,7449765b-3343-4831-8272-f8f91c8362d5,2025,8,1,FP,Free Practice,2025-07-25T06:55:00Z,2025-07-25T07:40:00Z,False,False
+fia-formula-3-championship_2025_spa-francorchamps_qualifying,7449765b-3343-4831-8272-f8f91c8362d5,2025,8,2,Q,Qualifying,2025-07-25T12:00:00Z,2025-07-25T12:30:00Z,False,False
+fia-formula-3-championship_2025_spa-francorchamps_starting-grid,7449765b-3343-4831-8272-f8f91c8362d5,2025,8,3,GR,Starting Grid,,,False,False
+fia-formula-3-championship_2025_spa-francorchamps_race,7449765b-3343-4831-8272-f8f91c8362d5,2025,8,4,Race,Race,2025-07-26T07:15:00Z,2025-07-26T08:00:00Z,True,False
+fia-formula-3-championship_2025_spa-francorchamps_starting-grid-2,7449765b-3343-4831-8272-f8f91c8362d5,2025,8,5,GR,Starting Grid,,,False,False
+fia-formula-3-championship_2025_spa-francorchamps_race-2,7449765b-3343-4831-8272-f8f91c8362d5,2025,8,6,Race,Race,2025-07-27T06:30:00Z,2025-07-27T07:20:00Z,True,False
+fia-formula-3-championship_2025_budapest_free-practice,51899439-a9bf-472c-a6d4-ecef97d62870,2025,9,1,FP,Free Practice,2025-08-01T07:55:00Z,2025-08-01T08:40:00Z,False,False
+fia-formula-3-championship_2025_budapest_qualifying,51899439-a9bf-472c-a6d4-ecef97d62870,2025,9,2,Q,Qualifying,2025-08-01T13:05:00Z,2025-08-01T13:35:00Z,False,False
+fia-formula-3-championship_2025_budapest_starting-grid,51899439-a9bf-472c-a6d4-ecef97d62870,2025,9,3,GR,Starting Grid,,,False,False
+fia-formula-3-championship_2025_budapest_race,51899439-a9bf-472c-a6d4-ecef97d62870,2025,9,4,Race,Race,2025-08-02T08:05:00Z,2025-08-02T08:50:00Z,True,False
+fia-formula-3-championship_2025_budapest_starting-grid-2,51899439-a9bf-472c-a6d4-ecef97d62870,2025,9,5,GR,Starting Grid,,,False,False
+fia-formula-3-championship_2025_budapest_race-2,51899439-a9bf-472c-a6d4-ecef97d62870,2025,9,6,Race,Race,2025-08-03T06:50:00Z,2025-08-03T07:40:00Z,True,False
+fia-formula-3-championship_2025_monza_free-practice,dab83741-3ca0-43a2-b64b-bef555fbef02,2025,10,1,FP,Free Practice,2025-09-05T07:35:00Z,2025-09-05T08:20:00Z,False,False
+fia-formula-3-championship_2025_monza_1st-qualifying,dab83741-3ca0-43a2-b64b-bef555fbef02,2025,10,2,Q1,1st Qualifying,2025-09-05T13:00:00Z,2025-09-05T13:10:00Z,False,False
+fia-formula-3-championship_2025_monza_2nd-qualifying,dab83741-3ca0-43a2-b64b-bef555fbef02,2025,10,3,Q2,2nd Qualifying,2025-09-05T13:20:00Z,2025-09-05T13:30:00Z,False,False
+fia-formula-3-championship_2025_monza_starting-grid,dab83741-3ca0-43a2-b64b-bef555fbef02,2025,10,4,GR,Starting Grid,,,False,False
+fia-formula-3-championship_2025_monza_race,dab83741-3ca0-43a2-b64b-bef555fbef02,2025,10,5,Race,Race,2025-09-06T07:15:00Z,2025-09-06T08:00:00Z,True,False
+fia-formula-3-championship_2025_monza_starting-grid-2,dab83741-3ca0-43a2-b64b-bef555fbef02,2025,10,6,GR,Starting Grid,,,False,False
+fia-formula-3-championship_2025_monza_race-2,dab83741-3ca0-43a2-b64b-bef555fbef02,2025,10,7,Race,Race,2025-09-07T06:15:00Z,2025-09-07T07:05:00Z,True,False
+fia-formula-3-championship_2026_melbourne_free-practice,dd1ec1cb-5a0c-4c0b-8787-7c4867e5c0d6,2026,1,1,FP,Free Practice,2026-03-05T21:50:00Z,2026-03-05T22:35:00Z,False,False
+fia-formula-3-championship_2026_melbourne_qualifying,dd1ec1cb-5a0c-4c0b-8787-7c4867e5c0d6,2026,1,2,Q,Qualifying,2026-03-06T03:00:00Z,2026-03-06T03:30:00Z,False,False
+fia-formula-3-championship_2026_melbourne_starting-grid,dd1ec1cb-5a0c-4c0b-8787-7c4867e5c0d6,2026,1,3,GR,Starting Grid,,,False,False
+fia-formula-3-championship_2026_melbourne_race,dd1ec1cb-5a0c-4c0b-8787-7c4867e5c0d6,2026,1,4,Race,Race,2026-03-07T00:15:00Z,2026-03-07T01:00:00Z,True,False
+fia-formula-3-championship_2026_melbourne_starting-grid-2,dd1ec1cb-5a0c-4c0b-8787-7c4867e5c0d6,2026,1,5,GR,Starting Grid,,,False,False
+fia-formula-3-championship_2026_melbourne_race-2,dd1ec1cb-5a0c-4c0b-8787-7c4867e5c0d6,2026,1,6,Race,Race,2026-03-07T21:50:00Z,2026-03-07T22:40:00Z,True,False

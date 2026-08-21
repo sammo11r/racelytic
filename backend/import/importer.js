@@ -6,13 +6,21 @@ const pool = require('../db');
 const DATA_DIR = path.join(__dirname, '../../data');
 
 function tableNameFromFile(filename) {
-  const series = filename.toLowerCase().startsWith('f2db-') ? 'f2_' : '';
-  return series + filename.replace(/^f[12]db-/i,'').replace(/\.csv$/i,'').replace(/-/g,'_');
+  const match = filename.toLowerCase().match(/^f([123])db-/);
+  const series = match && match[1] !== '1' ? `f${match[1]}_` : '';
+  return series + filename.replace(/^f[123]db-/i,'').replace(/\.csv$/i,'').replace(/-/g,'_');
 }
 function isInteger(v){ return /^-?\d+$/.test(v); }
 function isDecimal(v){ return /^-?\d+\.\d+$/.test(v); }
 function isBoolean(v){ return String(v).toLowerCase() === 'true' || String(v).toLowerCase() === 'false'; }
 function isDate(v){ return /^\d{4}-\d{2}-\d{2}$/.test(v); }
+
+function normalizedImportValue(table, column, value) {
+  if (table === 'f3_entries' && column === 'chassisId' && ['dallara-f3-2020', 'dallara-f3-2021'].includes(value)) {
+    return 'dallara-f3-2019';
+  }
+  return value;
+}
 
 function inferType(column, values) {
   const clean = values.filter(v => v !== null && v !== undefined && v !== '');
@@ -46,7 +54,7 @@ async function insertRows(c,table,rows){
   const cols=Object.keys(rows[0]);
   const sql=`INSERT INTO \`${table}\` (${cols.map(x=>`\`${x.replace(/`/g,'``')}\``).join(',')}) VALUES (${cols.map(()=>'?').join(',')})`;
   const values=rows.map(row=>cols.map(col=>{
-      const v=row[col];
+      const v=normalizedImportValue(table,col,row[col]);
       if(v===undefined||v==='') return null;
       if(String(v).toLowerCase()==='true') return 1;
       if(String(v).toLowerCase()==='false') return 0;
@@ -64,7 +72,7 @@ async function importAll(){
     c=await pool.getConnection();
     await c.query('SET FOREIGN_KEY_CHECKS=0');
     foreignKeyChecksDisabled=true;
-    const files=fs.readdirSync(DATA_DIR).filter(f=>/^f[12]db-.*\.csv$/i.test(f)).sort();
+    const files=fs.readdirSync(DATA_DIR).filter(f=>/^f[123]db-.*\.csv$/i.test(f)).sort();
     for(const file of files){
       console.log(`Importing ${file}`);
       const rows=await readCsv(path.join(DATA_DIR,file));

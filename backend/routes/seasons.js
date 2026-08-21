@@ -3,6 +3,10 @@ const { withConnection, sendError } = require('../route-helpers');
 
 const router = express.Router();
 
+function isDisqualified(result) {
+    return /\b(?:DSQ|DQ|DISQ|DISQUALIFIED|EXC)\b/i.test(String(result.status || result.positionText || ''));
+}
+
 function f2SessionType(session, sessionIndex, sessionCount, year) {
     const name = String(session.name || '').toLowerCase();
     if (name.includes('feature')) return 'F';
@@ -17,6 +21,7 @@ function f2SessionType(session, sessionIndex, sessionCount, year) {
 }
 
 function f2ResultPoints(result, sessionType, year, polePosition) {
+    if (isDisqualified(result)) return 0;
     if (result.officialPoints !== null && result.officialPoints !== undefined) {
         return Number(result.officialPoints);
     }
@@ -34,6 +39,74 @@ function f2ResultPoints(result, sessionType, year, polePosition) {
     return points;
 }
 
+function f3SessionType(session, sessionIndex, sessionCount, year) {
+    const name = String(session.name || '').toLowerCase();
+    if (name.includes('feature')) return 'F';
+    if (name.includes('sprint')) return 'S';
+    const sessionNumber = Number(session.sessionNumber || 0);
+    if (sessionNumber) {
+        if (Number(year) <= 2020) return sessionNumber <= 4 ? 'F' : 'S';
+        if (Number(year) === 2021) return sessionNumber >= 8 ? 'F' : 'S';
+        return sessionNumber >= 6 ? 'F' : 'S';
+    }
+    return sessionIndex === sessionCount - 1 ? 'F' : 'S';
+}
+
+function f3ResultPoints(result, sessionType, year, polePosition) {
+    if (isDisqualified(result)) return 0;
+    if (result.officialPoints !== null && result.officialPoints !== undefined) {
+        return Number(result.officialPoints);
+    }
+    const featurePoints = [25, 18, 15, 12, 10, 8, 6, 4, 2, 1];
+    const sprintPoints = Number(year) <= 2021
+        ? [15, 12, 10, 8, 6, 5, 4, 3, 2, 1]
+        : [10, 9, 8, 7, 6, 5, 4, 3, 2, 1];
+    const position = Number(result.positionNumber || 0);
+    const scale = sessionType === 'F' ? featurePoints : sprintPoints;
+    let points = position > 0 ? Number(scale[position - 1] || 0) : 0;
+    if (['1', 'true'].includes(String(result.fastestLap).toLowerCase()) && position > 0 && position <= 10) {
+        points += Number(year) <= 2021 ? 2 : 1;
+    }
+    if (polePosition) points += Number(year) <= 2021 ? 4 : 2;
+    return points;
+}
+
+function eligibleFastestLapDrivers(results) {
+    const timedCandidates = new Map();
+    const importedCandidates = new Map();
+
+    for (const result of results) {
+        const position = Number(result.positionNumber || 0);
+        if (position < 1 || position > 10 || isDisqualified(result)) continue;
+
+        const sessionId = String(result.sessionId);
+        if (['1', 'true'].includes(String(result.fastestLap).toLowerCase()) && !importedCandidates.has(sessionId)) {
+            importedCandidates.set(sessionId, result.driverId);
+        }
+
+        const lapTime = Number(result.fastestLapTimeMillis);
+        if (!Number.isFinite(lapTime) || lapTime <= 0) continue;
+        const current = timedCandidates.get(sessionId);
+        if (!current || lapTime < current.lapTime) {
+            timedCandidates.set(sessionId, { driverId: result.driverId, lapTime });
+        }
+    }
+
+    const drivers = new Map(importedCandidates);
+    for (const [sessionId, candidate] of timedCandidates) {
+        drivers.set(sessionId, candidate.driverId);
+    }
+    return drivers;
+}
+
+function resolveSeasonAwards(result, context, poleDriverByRace, fastestLapDriverBySession) {
+    const driverId = String(result.driverId);
+    return {
+        polePosition: context.type === 'F' && driverId === String(poleDriverByRace.get(context.raceId)),
+        fastestLap: driverId === String(fastestLapDriverBySession.get(String(result.sessionId)))
+    };
+}
+
 // ============================================================
 // Seasons List
 // ============================================================
@@ -42,20 +115,22 @@ router.get('/api/seasons', async (req, res) => {
 
     try {
 
-        if (String(req.query.series || '').toLowerCase() === 'f2') {
+        const series = String(req.query.series || '').toLowerCase();
+        if (['f2', 'f3'].includes(series)) {
+            const prefix = series === 'f3' ? 'f3_' : 'f2_';
             const rows = await withConnection(async connection => {
                 const [seasons, raceCounts, driverCounts, constructorCounts, champions] = await Promise.all([
-                    connection.query('SELECT year FROM f2_seasons ORDER BY year DESC'),
-                    connection.query('SELECT year, COUNT(*) AS raceCount FROM f2_races GROUP BY year'),
-                    connection.query('SELECT year, COUNT(DISTINCT driverId) AS driverCount FROM f2_entries WHERE driverId IS NOT NULL GROUP BY year'),
-                    connection.query('SELECT year, COUNT(DISTINCT constructorId) AS constructorCount FROM f2_entries WHERE constructorId IS NOT NULL GROUP BY year'),
+                    connection.query(`SELECT year FROM ${prefix}seasons ORDER BY year DESC`),
+                    connection.query(`SELECT year, COUNT(*) AS raceCount FROM ${prefix}races GROUP BY year`),
+                    connection.query(`SELECT year, COUNT(DISTINCT driverId) AS driverCount FROM ${prefix}entries WHERE driverId IS NOT NULL GROUP BY year`),
+                    connection.query(`SELECT year, COUNT(DISTINCT constructorId) AS constructorCount FROM ${prefix}entries WHERE constructorId IS NOT NULL GROUP BY year`),
                     connection.query(`
                         SELECT standings.year, standings.driverId AS championDriverId, drivers.name AS championName
-                        FROM f2_season_driver_standings standings
-                        JOIN f2_drivers drivers ON drivers.id = standings.driverId
+                        FROM ${prefix}season_driver_standings standings
+                        JOIN ${prefix}drivers drivers ON drivers.id = standings.driverId
                         LEFT JOIN (
                             SELECT year, MAX(COALESCE(endDate, date)) AS finalDate
-                            FROM f2_races
+                            FROM ${prefix}races
                             GROUP BY year
                         ) calendars ON calendars.year = standings.year
                         WHERE standings.positionNumber = 1
@@ -219,17 +294,21 @@ router.get('/api/seasons/:year', async (req, res) => {
 
     try {
 
-        if (String(req.query.series || '').toLowerCase() === 'f2') {
+        const series = String(req.query.series || '').toLowerCase();
+        if (['f2', 'f3'].includes(series)) {
+            const prefix = series === 'f3' ? 'f3_' : 'f2_';
+            const sessionType = series === 'f3' ? f3SessionType : f2SessionType;
+            const resultPoints = series === 'f3' ? f3ResultPoints : f2ResultPoints;
             const data = await withConnection(async connection => {
-                const seasonRows = await connection.query('SELECT year FROM f2_seasons WHERE year = ?', [year]);
+                const seasonRows = await connection.query(`SELECT year FROM ${prefix}seasons WHERE year = ?`, [year]);
                 if (!seasonRows.length) return null;
 
                 const [races, raceSessions, raceResults, featureGridLeaders, qualifyingWinners, officialStandings] = await Promise.all([
                     connection.query(`
                         SELECT r.id, r.round, r.date, r.endDate, r.name, r.code, r.circuitId,
                                c.name AS circuitName, c.placeName
-                        FROM f2_races r
-                        LEFT JOIN f2_circuits c ON c.id = r.circuitId
+                        FROM ${prefix}races r
+                        LEFT JOIN ${prefix}circuits c ON c.id = r.circuitId
                         WHERE r.year = ?
                         ORDER BY r.round
                     `, [year]),
@@ -237,10 +316,10 @@ router.get('/api/seasons/:year', async (req, res) => {
                         SELECT sessions.id AS sessionId, sessions.raceId, sessions.sessionNumber,
                                sessions.name AS sessionName, sessions.cancelled, results.driverId,
                                drivers.name AS winnerName, constructors.name AS constructorName
-                        FROM f2_sessions sessions
-                        LEFT JOIN f2_session_results results ON results.sessionId = sessions.id AND results.positionNumber = 1
-                        LEFT JOIN f2_drivers drivers ON drivers.id = results.driverId
-                        LEFT JOIN f2_constructors constructors ON constructors.id = results.constructorId
+                        FROM ${prefix}sessions sessions
+                        LEFT JOIN ${prefix}session_results results ON results.sessionId = sessions.id AND results.positionNumber = 1
+                        LEFT JOIN ${prefix}drivers drivers ON drivers.id = results.driverId
+                        LEFT JOIN ${prefix}constructors constructors ON constructors.id = results.constructorId
                         WHERE sessions.year = ?
                             AND (
                                 LOWER(CAST(sessions.isRace AS CHAR)) IN ('1', 'true')
@@ -254,13 +333,14 @@ router.get('/api/seasons/:year', async (req, res) => {
                     connection.query(`
                         SELECT sessions.id AS sessionId, results.driverId, results.constructorId,
                                results.positionNumber, results.points AS officialPoints,
-                               results.status, results.fastestLap, results.polePosition,
+                               results.status, results.fastestLap, results.fastestLapTimeMillis,
+                               results.polePosition,
                                constructors.name AS constructorName,
                                drivers.name AS driverName, drivers.abbreviation
-                        FROM f2_sessions sessions
-                        JOIN f2_session_results results ON results.sessionId = sessions.id
-                        LEFT JOIN f2_constructors constructors ON constructors.id = results.constructorId
-                        LEFT JOIN f2_drivers drivers ON drivers.id = results.driverId
+                        FROM ${prefix}sessions sessions
+                        JOIN ${prefix}session_results results ON results.sessionId = sessions.id
+                        LEFT JOIN ${prefix}constructors constructors ON constructors.id = results.constructorId
+                        LEFT JOIN ${prefix}drivers drivers ON drivers.id = results.driverId
                         WHERE sessions.year = ?
                             AND LOWER(CAST(sessions.isRace AS CHAR)) IN ('1', 'true')
                             AND (sessions.cancelled IS NULL OR LOWER(CAST(sessions.cancelled AS CHAR)) NOT IN ('1', 'true'))
@@ -268,8 +348,8 @@ router.get('/api/seasons/:year', async (req, res) => {
                     `, [year]),
                     connection.query(`
                         SELECT sessions.raceId, results.driverId, sessions.sessionNumber
-                        FROM f2_sessions sessions
-                        JOIN f2_session_results results
+                        FROM ${prefix}sessions sessions
+                        JOIN ${prefix}session_results results
                             ON results.sessionId = sessions.id
                             AND results.positionNumber = 1
                         WHERE sessions.year = ?
@@ -278,8 +358,8 @@ router.get('/api/seasons/:year', async (req, res) => {
                     `, [year]),
                     connection.query(`
                         SELECT sessions.raceId, results.driverId, results.timeMillis
-                        FROM f2_sessions sessions
-                        JOIN f2_session_results results
+                        FROM ${prefix}sessions sessions
+                        JOIN ${prefix}session_results results
                             ON results.sessionId = sessions.id
                             AND results.positionNumber = 1
                         WHERE sessions.year = ?
@@ -294,7 +374,7 @@ router.get('/api/seasons/:year', async (req, res) => {
                                MAX(starts) AS starts, MAX(wins) AS wins, MAX(podiums) AS podiums,
                                MAX(poles) AS poles, MAX(fastestLaps) AS fastestLaps,
                                MAX(retirements) AS retirements
-                        FROM f2_season_driver_standings
+                        FROM ${prefix}season_driver_standings
                         WHERE year = ?
                         GROUP BY driverId
                     `, [year])
@@ -346,7 +426,7 @@ router.get('/api/seasons/:year', async (req, res) => {
                 try {
                     officialConstructorStandings = await connection.query(`
                         SELECT constructorId, positionNumber, points, championshipWon
-                        FROM f2_season_constructor_standings
+                        FROM ${prefix}season_constructor_standings
                         WHERE year = ?
                     `, [year]);
                 } catch (error) {
@@ -358,10 +438,12 @@ router.get('/api/seasons/:year', async (req, res) => {
                     sessions.forEach((session, sessionIndex) => {
                         sessionContextById.set(session.id, {
                             raceId,
-                            type: f2SessionType(session, sessionIndex, sessions.length, year)
+                            type: sessionType(session, sessionIndex, sessions.length, year)
                         });
                     });
                 }
+
+                const fastestLapDriverBySession = eligibleFastestLapDrivers(raceResults);
 
                 const constructorsById = new Map();
                 const driversById = new Map();
@@ -392,18 +474,25 @@ router.get('/api/seasons/:year', async (req, res) => {
                     driver.constructor = result.constructorName || driver.constructor;
                     driver.starts += 1;
                     const position = Number(result.positionNumber || 0);
-                    const importedPolePosition = result.polePosition === null
-                        ? null
-                        : ['1', 'true'].includes(String(result.polePosition).toLowerCase());
-                    const polePosition = importedPolePosition === null
-                        ? context.type === 'F' && driverId === String(poleDriverByRace.get(context.raceId))
-                        : importedPolePosition;
-                    const points = f2ResultPoints(result, context.type, year, polePosition);
+                    const { polePosition, fastestLap } = resolveSeasonAwards(
+                        result,
+                        context,
+                        poleDriverByRace,
+                        fastestLapDriverBySession
+                    );
+                    result.fastestLap = fastestLap;
+                    const displayedResult = driver.raceResults[result.sessionId];
+                    if (displayedResult) {
+                        displayedResult.polePosition = polePosition;
+                        displayedResult.fastestLap = fastestLap;
+                    }
+                    const points = resultPoints(result, context.type, year, polePosition);
+                    if (displayedResult) displayedResult.points = points;
                     driver.points += points;
                     if (position === 1) driver.wins += 1;
                     if (position > 0 && position <= 3) driver.podiums += 1;
                     if (polePosition) driver.poles += 1;
-                    if (['1', 'true'].includes(String(result.fastestLap).toLowerCase())) driver.fastestLaps += 1;
+                    if (fastestLap) driver.fastestLaps += 1;
                     if (/DNF|RET/i.test(String(result.status || ''))) driver.retirements += 1;
                     if (position > 0) {
                         driver.finishCounts[position] = Number(driver.finishCounts[position] || 0) + 1;
@@ -421,10 +510,7 @@ router.get('/api/seasons/:year', async (req, res) => {
                         });
                     }
                     const constructor = constructorsById.get(constructorId);
-                    const constructorPolePosition = importedPolePosition === null
-                        ? context.type === 'F' && String(result.driverId) === String(poleDriverByRace.get(context.raceId))
-                        : importedPolePosition;
-                    const constructorPoints = f2ResultPoints(result, context.type, year, constructorPolePosition);
+                    const constructorPoints = resultPoints(result, context.type, year, polePosition);
                     constructor.points += constructorPoints;
                     constructor.raceResults[result.sessionId] =
                         Number(constructor.raceResults[result.sessionId] || 0) + constructorPoints;
@@ -1043,3 +1129,10 @@ router.get('/api/seasons/:year', async (req, res) => {
 });
 
 module.exports = router;
+module.exports.eligibleFastestLapDrivers = eligibleFastestLapDrivers;
+module.exports.isDisqualified = isDisqualified;
+module.exports.resolveSeasonAwards = resolveSeasonAwards;
+module.exports.f2ResultPoints = f2ResultPoints;
+module.exports.f2SessionType = f2SessionType;
+module.exports.f3ResultPoints = f3ResultPoints;
+module.exports.f3SessionType = f3SessionType;

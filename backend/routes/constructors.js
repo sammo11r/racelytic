@@ -23,7 +23,9 @@ router.get('/api/constructors', async (req, res) => {
 
     try {
 
-        if (String(req.query.series || '').toLowerCase() === 'f2') {
+        const series = String(req.query.series || '').toLowerCase();
+        if (['f2', 'f3'].includes(series)) {
+            const prefix = `${series}_`;
             const rows = await withConnection(connection => connection.query(`
                 SELECT constructors.id, constructors.name, constructors.abbreviation,
                     constructors.countryCode, career.firstYear, career.lastYear,
@@ -32,10 +34,10 @@ router.get('/api/constructors', async (req, res) => {
                     COALESCE(results.podiums, 0) AS totalPodiums,
                     COALESCE(results.points, 0) AS totalRacePoints,
                     latest.positionNumber AS latestPosition, latest.points AS latestPoints
-                FROM f2_constructors constructors
+                FROM ${prefix}constructors constructors
                 LEFT JOIN (
                     SELECT constructorId, MIN(year) AS firstYear, MAX(year) AS lastYear
-                    FROM f2_entries GROUP BY constructorId
+                    FROM ${prefix}entries GROUP BY constructorId
                 ) career ON career.constructorId = constructors.id
                 LEFT JOIN (
                     SELECT constructorId,
@@ -43,19 +45,19 @@ router.get('/api/constructors', async (req, res) => {
                             LOWER(CAST(championshipWon AS CHAR)) IN ('1', 'true')
                             OR year < YEAR(CURRENT_DATE())
                         )) AS titles
-                    FROM f2_season_constructor_standings GROUP BY constructorId
+                    FROM ${prefix}season_constructor_standings GROUP BY constructorId
                 ) standings ON standings.constructorId = constructors.id
                 LEFT JOIN (
                     SELECT sessionResults.constructorId,
-                        SUM(sessionResults.positionNumber = 1) AS wins,
-                        SUM(sessionResults.positionNumber BETWEEN 1 AND 3) AS podiums,
-                        SUM(sessionResults.points) AS points
-                    FROM f2_session_results sessionResults
-                    JOIN f2_sessions sessions ON sessions.id = sessionResults.sessionId
+                        SUM(CASE WHEN UPPER(COALESCE(sessionResults.status, '')) IN ('DSQ', 'DQ', 'DISQ', 'DISQUALIFIED', 'EXC') THEN 0 ELSE sessionResults.positionNumber = 1 END) AS wins,
+                        SUM(CASE WHEN UPPER(COALESCE(sessionResults.status, '')) IN ('DSQ', 'DQ', 'DISQ', 'DISQUALIFIED', 'EXC') THEN 0 ELSE sessionResults.positionNumber BETWEEN 1 AND 3 END) AS podiums,
+                        SUM(CASE WHEN UPPER(COALESCE(sessionResults.status, '')) IN ('DSQ', 'DQ', 'DISQ', 'DISQUALIFIED', 'EXC') THEN 0 ELSE sessionResults.points END) AS points
+                    FROM ${prefix}session_results sessionResults
+                    JOIN ${prefix}sessions sessions ON sessions.id = sessionResults.sessionId
                     WHERE LOWER(CAST(sessions.isRace AS CHAR)) IN ('1', 'true')
                     GROUP BY sessionResults.constructorId
                 ) results ON results.constructorId = constructors.id
-                LEFT JOIN f2_season_constructor_standings latest
+                LEFT JOIN ${prefix}season_constructor_standings latest
                     ON latest.constructorId = constructors.id
                     AND latest.year = career.lastYear
                 ORDER BY constructors.name
@@ -125,7 +127,9 @@ router.get('/api/constructors/:id', async (req, res) => {
 
     try {
 
-        if (String(req.query.series || '').toLowerCase() === 'f2') {
+        const series = String(req.query.series || '').toLowerCase();
+        if (['f2', 'f3'].includes(series)) {
+            const prefix = `${series}_`;
             const data = await withConnection(async connection => {
                 const [constructorRows, standings, drivers, results] = await Promise.all([
                     connection.query(`
@@ -133,27 +137,29 @@ router.get('/api/constructors/:id', async (req, res) => {
                             constructors.countryCode, MIN(entries.year) AS firstYear,
                             MAX(entries.year) AS lastYear,
                             (SELECT SUM(results.positionNumber = 1)
-                                FROM f2_session_results results
-                                JOIN f2_sessions sessions ON sessions.id = results.sessionId
+                                FROM ${prefix}session_results results
+                                JOIN ${prefix}sessions sessions ON sessions.id = results.sessionId
                                 WHERE results.constructorId = constructors.id
-                                    AND LOWER(CAST(sessions.isRace AS CHAR)) IN ('1', 'true')) AS totalRaceWins,
-                            (SELECT SUM(results.positionNumber BETWEEN 1 AND 3)
-                                FROM f2_session_results results
-                                JOIN f2_sessions sessions ON sessions.id = results.sessionId
+                                    AND LOWER(CAST(sessions.isRace AS CHAR)) IN ('1', 'true')
+                                    AND UPPER(COALESCE(results.status, '')) NOT IN ('DSQ', 'DQ', 'DISQ', 'DISQUALIFIED', 'EXC')) AS totalRaceWins,
+                            (SELECT SUM(results.positionNumber BETWEEN 1 AND 3
+                                    AND UPPER(COALESCE(results.status, '')) NOT IN ('DSQ', 'DQ', 'DISQ', 'DISQUALIFIED', 'EXC'))
+                                FROM ${prefix}session_results results
+                                JOIN ${prefix}sessions sessions ON sessions.id = results.sessionId
                                 WHERE results.constructorId = constructors.id
                                     AND LOWER(CAST(sessions.isRace AS CHAR)) IN ('1', 'true')) AS totalPodiums,
-                            (SELECT SUM(results.points)
-                                FROM f2_session_results results
-                                JOIN f2_sessions sessions ON sessions.id = results.sessionId
+                            (SELECT SUM(CASE WHEN UPPER(COALESCE(results.status, '')) IN ('DSQ', 'DQ', 'DISQ', 'DISQUALIFIED', 'EXC') THEN 0 ELSE results.points END)
+                                FROM ${prefix}session_results results
+                                JOIN ${prefix}sessions sessions ON sessions.id = results.sessionId
                                 WHERE results.constructorId = constructors.id
                                     AND LOWER(CAST(sessions.isRace AS CHAR)) IN ('1', 'true')) AS totalRacePoints,
                             (SELECT SUM(LOWER(CAST(results.fastestLap AS CHAR)) IN ('1', 'true'))
-                                FROM f2_session_results results
-                                JOIN f2_sessions sessions ON sessions.id = results.sessionId
+                                FROM ${prefix}session_results results
+                                JOIN ${prefix}sessions sessions ON sessions.id = results.sessionId
                                 WHERE results.constructorId = constructors.id
                                     AND LOWER(CAST(sessions.isRace AS CHAR)) IN ('1', 'true')) AS totalFastestLaps
-                        FROM f2_constructors constructors
-                        LEFT JOIN f2_entries entries ON entries.constructorId = constructors.id
+                        FROM ${prefix}constructors constructors
+                        LEFT JOIN ${prefix}entries entries ON entries.constructorId = constructors.id
                         WHERE constructors.id = ?
                         GROUP BY constructors.id, constructors.name, constructors.abbreviation,
                             constructors.countryCode
@@ -163,10 +169,10 @@ router.get('/api/constructors/:id', async (req, res) => {
                             standings.championshipWon,
                             GROUP_CONCAT(DISTINCT drivers.name ORDER BY drivers.name SEPARATOR '||') AS drivers,
                             GROUP_CONCAT(DISTINCT entries.chassisId ORDER BY entries.chassisId SEPARATOR '||') AS chassis
-                        FROM f2_season_constructor_standings standings
-                        LEFT JOIN f2_entries entries ON entries.constructorId = standings.constructorId
+                        FROM ${prefix}season_constructor_standings standings
+                        LEFT JOIN ${prefix}entries entries ON entries.constructorId = standings.constructorId
                             AND entries.year = standings.year
-                        LEFT JOIN f2_drivers drivers ON drivers.id = entries.driverId
+                        LEFT JOIN ${prefix}drivers drivers ON drivers.id = entries.driverId
                         WHERE standings.constructorId = ?
                         GROUP BY standings.year, standings.positionNumber, standings.points,
                             standings.championshipWon
@@ -178,15 +184,16 @@ router.get('/api/constructors/:id', async (req, res) => {
                             MAX(entries.year) AS lastYear, COUNT(DISTINCT entries.year) AS seasons,
                             COALESCE(stats.starts, 0) AS starts, COALESCE(stats.wins, 0) AS wins,
                             COALESCE(stats.podiums, 0) AS podiums, COALESCE(stats.points, 0) AS points
-                        FROM f2_entries entries
-                        JOIN f2_drivers drivers ON drivers.id = entries.driverId
+                        FROM ${prefix}entries entries
+                        JOIN ${prefix}drivers drivers ON drivers.id = entries.driverId
                         LEFT JOIN (
                             SELECT sessionResults.constructorId, sessionResults.driverId,
-                                COUNT(*) AS starts, SUM(sessionResults.positionNumber = 1) AS wins,
-                                SUM(sessionResults.positionNumber BETWEEN 1 AND 3) AS podiums,
-                                SUM(sessionResults.points) AS points
-                            FROM f2_session_results sessionResults
-                            JOIN f2_sessions sessions ON sessions.id = sessionResults.sessionId
+                                COUNT(*) AS starts,
+                                SUM(sessionResults.positionNumber = 1 AND UPPER(COALESCE(sessionResults.status, '')) NOT IN ('DSQ', 'DQ', 'DISQ', 'DISQUALIFIED', 'EXC')) AS wins,
+                                SUM(sessionResults.positionNumber BETWEEN 1 AND 3 AND UPPER(COALESCE(sessionResults.status, '')) NOT IN ('DSQ', 'DQ', 'DISQ', 'DISQUALIFIED', 'EXC')) AS podiums,
+                                SUM(CASE WHEN UPPER(COALESCE(sessionResults.status, '')) IN ('DSQ', 'DQ', 'DISQ', 'DISQUALIFIED', 'EXC') THEN 0 ELSE sessionResults.points END) AS points
+                            FROM ${prefix}session_results sessionResults
+                            JOIN ${prefix}sessions sessions ON sessions.id = sessionResults.sessionId
                             WHERE LOWER(CAST(sessions.isRace AS CHAR)) IN ('1', 'true')
                             GROUP BY sessionResults.constructorId, sessionResults.driverId
                         ) stats ON stats.constructorId = entries.constructorId
@@ -202,10 +209,10 @@ router.get('/api/constructors/:id', async (req, res) => {
                             sessionResults.positionNumber, sessionResults.status,
                             sessionResults.points, sessionResults.fastestLap,
                             races.name AS raceName, races.date
-                        FROM f2_session_results sessionResults
-                        JOIN f2_sessions sessions ON sessions.id = sessionResults.sessionId
-                        JOIN f2_races races ON races.id = sessionResults.raceId
-                        LEFT JOIN f2_drivers drivers ON drivers.id = sessionResults.driverId
+                        FROM ${prefix}session_results sessionResults
+                        JOIN ${prefix}sessions sessions ON sessions.id = sessionResults.sessionId
+                        JOIN ${prefix}races races ON races.id = sessionResults.raceId
+                        LEFT JOIN ${prefix}drivers drivers ON drivers.id = sessionResults.driverId
                         WHERE sessionResults.constructorId = ?
                             AND LOWER(CAST(sessions.isRace AS CHAR)) IN ('1', 'true')
                         ORDER BY sessions.year DESC, sessions.round DESC,
@@ -228,10 +235,14 @@ router.get('/api/constructors/:id', async (req, res) => {
                         seasons: Number(row.seasons), starts: Number(row.starts), wins: Number(row.wins),
                         podiums: Number(row.podiums), points: Number(row.points)
                     })),
-                    results: results.map(row => ({ ...row, fastestLap: isTrue(row.fastestLap) }))
+                    results: results.map(row => ({
+                        ...row,
+                        points: /\b(?:DSQ|DQ|DISQ|DISQUALIFIED|EXC)\b/i.test(String(row.status || '')) ? 0 : Number(row.points || 0),
+                        fastestLap: series === 'f2' && isTrue(row.fastestLap)
+                    }))
                 };
             });
-            if (!data) return res.status(404).json({ error: 'Formula 2 constructor not found.' });
+            if (!data) return res.status(404).json({ error: `${series.toUpperCase()} team not found.` });
             return res.json(data);
         }
 

@@ -6,16 +6,19 @@ function params() {
   return new URLSearchParams(window.location.search);
 }
 function activeSeriesAccent() {
+  if (window.location.pathname === '/f3' || window.location.pathname.startsWith('/f3/')) return '#c95300';
   return window.location.pathname === '/f2' || window.location.pathname.startsWith('/f2/') ? '#1677ff' : '#e32636';
 }
 async function getJSON(url) {
   let requestUrl = url;
-  const isF2Page = window.location.pathname === '/f2' || window.location.pathname.startsWith('/f2/');
-  if (isF2Page && String(url).startsWith('/api/')) {
+  const activeSeries = window.location.pathname === '/f3' || window.location.pathname.startsWith('/f3/')
+    ? 'f3'
+    : window.location.pathname === '/f2' || window.location.pathname.startsWith('/f2/') ? 'f2' : 'f1';
+  if (activeSeries !== 'f1' && String(url).startsWith('/api/')) {
     const parsed = new URL(url, window.location.origin);
     const seriesEndpoints = ['/api/seasons', '/api/races', '/api/drivers', '/api/circuits', '/api/constructors', '/api/records/explore'];
     if (seriesEndpoints.some(endpoint => parsed.pathname === endpoint || parsed.pathname.startsWith(`${endpoint}/`))) {
-      parsed.searchParams.set('series', 'f2');
+      parsed.searchParams.set('series', activeSeries);
       requestUrl = `${parsed.pathname}${parsed.search}`;
     }
   }

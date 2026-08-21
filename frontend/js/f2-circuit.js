@@ -1,5 +1,6 @@
-function f2CircuitStat(label, value, suffix = '') {
-  const display = value === null || value === undefined || value === '' ? '—' : `${fmtNumber(value)}${suffix}`;
+function f2CircuitStat(label, value, suffix = '', formatNumber = true) {
+  const formatted = formatNumber ? fmtNumber(value) : String(value);
+  const display = value === null || value === undefined || value === '' ? '—' : `${formatted}${suffix}`;
   return `<div class="detail-stat"><span>${esc(label)}</span><strong>${esc(display)}</strong></div>`;
 }
 
@@ -35,8 +36,8 @@ async function loadF2Circuit() {
       f2CircuitStat('Length', circuit.lengthMeters ? Number(circuit.lengthMeters) / 1000 : null, ' km'),
       f2CircuitStat('Turns', circuit.turns),
       f2CircuitStat('F2 weekends', circuit.totalRacesHeld),
-      f2CircuitStat('First season', circuit.firstYear),
-      f2CircuitStat('Latest season', circuit.lastYear)
+      f2CircuitStat('First season', circuit.firstYear, '', false),
+      f2CircuitStat('Latest season', circuit.lastYear, '', false)
     ].join('');
     document.getElementById('f2-circuit-years').textContent = circuit.firstYear
       ? `${circuit.firstYear}${circuit.lastYear !== circuit.firstYear ? `–${circuit.lastYear}` : ''} · ${fmtNumber(data.races.length)} weekends`

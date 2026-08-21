@@ -68,6 +68,9 @@ function f2SessionHeading(session) {
 
 function f2ResultClass(result) {
   if (!result) return 'result-empty';
+  if (/\b(?:DSQ|DQ|DISQ|DISQUALIFIED|EXC)\b/i.test(String(result.positionText || result.status || ''))) {
+    return 'result-disqualified';
+  }
   const position = Number(result.position || 0);
   let resultClass = 'result-retired';
   if (position === 1) resultClass = 'result-win';
@@ -129,11 +132,10 @@ function renderF2Season(data) {
       ${raceSessions.map(session => {
         const result = driver.raceResults?.[session.id];
         if (result) {
+          const position = Number(result.position || 0);
           result.pointsLimit = session.type === 'F' ? 10 : 8;
-          if (result.polePosition === null || result.polePosition === undefined) {
-            result.polePosition = session.type === 'F' &&
-              String(driver.driverId) === String(session.race.poleDriverId);
-          }
+          result.fastestLap = Boolean(result.fastestLap && position > 0 && position <= 10);
+          result.polePosition = session.type === 'F' && Boolean(result.polePosition);
         }
         return `<td class="race-point ${f2ResultClass(result)}" title="${esc(session.race.name)} · ${esc(session.name)}: finished ${esc(f2ResultLabel(result))}"><span class="result-value">${esc(f2ResultLabel(result))}</span>${result?.fastestLap ? '<sup class="result-marker" title="Fastest lap">F</sup>' : ''}</td>`;
       }).join('')}

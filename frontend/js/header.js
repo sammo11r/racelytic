@@ -18,19 +18,26 @@ async function loadHeader() {
         let rememberedSeries = '';
         try { rememberedSeries = localStorage.getItem('racelytic-series') || ''; } catch {}
         const seriesNeutralPages = ['/account', '/privacy', '/terms'];
-        const isAccountPage = window.location.pathname === '/account';
         const isSeriesNeutralPage = seriesNeutralPages.includes(window.location.pathname);
-        const isF2Mode = window.location.pathname === '/f2' || window.location.pathname.startsWith('/f2/')
-            || (isSeriesNeutralPage && (requestedSeries === 'f2' || (!requestedSeries && rememberedSeries === 'f2')));
-        try { localStorage.setItem('racelytic-series', isF2Mode ? 'f2' : 'f1'); } catch {}
+        const pathSeries = window.location.pathname === '/f3' || window.location.pathname.startsWith('/f3/')
+            ? 'f3'
+            : window.location.pathname === '/f2' || window.location.pathname.startsWith('/f2/') ? 'f2' : 'f1';
+        const neutralSeries = ['f1', 'f2', 'f3'].includes(requestedSeries)
+            ? requestedSeries
+            : ['f1', 'f2', 'f3'].includes(rememberedSeries) ? rememberedSeries : 'f1';
+        const activeSeries = isSeriesNeutralPage ? neutralSeries : pathSeries;
+        const isF2Mode = activeSeries === 'f2';
+        const isF3Mode = activeSeries === 'f3';
+        try { localStorage.setItem('racelytic-series', activeSeries); } catch {}
         document.body.classList.toggle('f2-mode', isF2Mode);
-        if (!isF2Mode && !document.title.includes('Formula 1')) {
+        document.body.classList.toggle('f3-mode', isF3Mode);
+        if (activeSeries === 'f1' && !document.title.includes('Formula 1')) {
             document.title = document.title === 'Racelytic'
                 ? 'Formula 1 · Racelytic'
                 : `${document.title.replace(/\s*·\s*Racelytic$/, '')} · Formula 1 · Racelytic`;
         }
         const brand = container.querySelector('.brand');
-        if (brand) brand.href = isF2Mode ? '/f2' : '/';
+        if (brand) brand.href = activeSeries === 'f3' ? '/f3' : activeSeries === 'f2' ? '/f2' : '/';
 
         let favicon = document.querySelector('link[rel~="icon"]');
         if (!favicon) {
@@ -39,13 +46,12 @@ async function loadHeader() {
             favicon.type = 'image/svg+xml';
             document.head.appendChild(favicon);
         }
-        favicon.href = isF2Mode
-            ? '/assets/favicon-f2.svg'
-            : '/assets/favicon-f1.svg';
+        favicon.href = `/assets/favicon-${activeSeries}.svg`;
 
         const pagePairs = {
             '/': '/f2', '/database': '/f2/database', '/seasons': '/f2/seasons', '/races': '/f2/races',
             '/drivers': '/f2/drivers', '/circuits': '/f2/circuits', '/constructors': '/f2/constructors',
+            '/chassis': '/f2/chassis',
             '/analysis': '/f2/analysis', '/season-analysis': '/f2/season-analysis',
             '/season-comparison': '/f2/season-comparison', '/race-analysis': '/f2/race-analysis',
             '/driver-comparison': '/f2/driver-comparison', '/driver-form': '/f2/driver-form',
@@ -57,16 +63,53 @@ async function loadHeader() {
             '/about': '/f2/about'
         };
         const reversePagePairs = Object.fromEntries(Object.entries(pagePairs).map(([f1, f2]) => [f2, f1]));
+        const f3PagePairs = {
+            '/': '/f3', '/database': '/f3/database', '/seasons': '/f3/seasons', '/races': '/f3/races',
+            '/drivers': '/f3/drivers', '/constructors': '/f3/teams', '/circuits': '/f3/circuits',
+            '/chassis': '/f3/chassis',
+            '/analysis': '/f3/analysis',
+            '/simulator-overview': '/f3/simulator', '/games': '/f3/games', '/about': '/f3/about'
+        };
+        const reverseF3PagePairs = Object.fromEntries(Object.entries(f3PagePairs).map(([f1, f3]) => [f3, f1]));
         const detailPages = {
             '/season': ['season', '/f2/seasons'], '/race': ['race', '/f2/races'],
             '/driver': ['driver', '/f2/drivers'], '/circuit': ['circuit', '/f2/circuits'],
             '/constructor': ['constructor', '/f2/constructors'],
             '/f2/season': ['season', '/seasons'], '/f2/race': ['race', '/races'],
             '/f2/driver': ['driver', '/drivers'], '/f2/circuit': ['circuit', '/circuits'],
-            '/f2/constructor': ['constructor', '/constructors']
+            '/f2/constructor': ['constructor', '/constructors'],
+            '/f3/season': ['season', '/seasons'], '/f3/race': ['race', '/races'],
+            '/f3/driver': ['driver', '/drivers'], '/f3/team': ['constructor', '/constructors'],
+            '/f3/circuit': ['circuit', '/circuits']
         };
         const resolveSeriesTarget = async targetSeries => {
             if (isSeriesNeutralPage) return `${window.location.pathname}?series=${targetSeries}`;
+            const canonicalPage = isF3Mode
+                ? reverseF3PagePairs[window.location.pathname]
+                : isF2Mode ? reversePagePairs[window.location.pathname] : window.location.pathname;
+            const topLevelTarget = targetSeries === 'f3'
+                ? f3PagePairs[canonicalPage]
+                : targetSeries === 'f2' ? pagePairs[canonicalPage] : canonicalPage;
+            if (topLevelTarget) return `${topLevelTarget}${window.location.search}${window.location.hash}`;
+            if (targetSeries === 'f3') {
+                const detail = detailPages[window.location.pathname];
+                if (detail?.[0] === 'season') {
+                    const year = new URLSearchParams(window.location.search).get('year');
+                    if (year) {
+                        try {
+                            const equivalent = await fetch(`/api/series-equivalent?target=f3&type=season&id=${encodeURIComponent(year)}&source=${activeSeries}`);
+                            if (equivalent.ok) return (await equivalent.json()).url;
+                        } catch {}
+                    }
+                    return '/f3/seasons';
+                }
+                const currentPath = canonicalPage || window.location.pathname;
+                if (/analysis|comparison|driver-form|teammate|records/.test(currentPath)) return '/f3/analysis';
+                if (/simulator|scenario|championship-builder|points-systems/.test(currentPath)) return '/f3/simulator';
+                if (/games|quiz/.test(currentPath)) return '/f3/games';
+                if (/database|season|race|driver|constructor|circuit|chassis/.test(currentPath)) return '/f3/database';
+                return '/f3';
+            }
             const targetF2 = targetSeries === 'f2';
             const pair = targetF2 ? pagePairs[window.location.pathname] : reversePagePairs[window.location.pathname];
             if (pair) return `${pair}${window.location.search}${window.location.hash}`;
@@ -76,17 +119,17 @@ async function loadHeader() {
                 const id = new URLSearchParams(window.location.search).get(parameter);
                 if (!id) return detail[1];
                 try {
-                    const equivalent = await fetch(`/api/series-equivalent?target=${targetSeries}&type=${detail[0]}&id=${encodeURIComponent(id)}`);
+                    const equivalent = await fetch(`/api/series-equivalent?target=${targetSeries}&type=${detail[0]}&id=${encodeURIComponent(id)}&source=${activeSeries}`);
                     if (equivalent.ok) return (await equivalent.json()).url;
                 } catch {}
                 return detail[1];
             }
-            if (window.location.pathname === '/chassis' && targetF2) return '/f2/database';
+            if (canonicalPage === '/chassis' && targetF2) return '/f2/database';
             return targetF2 ? '/f2' : '/';
         };
 
         container.querySelectorAll('.series-switcher a').forEach(link => {
-            const active = link.dataset.series === (isF2Mode ? 'f2' : 'f1');
+            const active = link.dataset.series === activeSeries;
             if (active) {
                 link.href = `${window.location.pathname}${window.location.search}${window.location.hash}`;
             } else {
@@ -98,6 +141,49 @@ async function loadHeader() {
             link.classList.toggle('active', active);
             if (active) link.setAttribute('aria-current', 'page');
         });
+        if (isF3Mode) {
+            document.title = document.title
+                .replace('Formula 1', 'Formula 3')
+                .replace('Formula 2', 'Formula 3')
+                .replace(/(^|\s)F[12](?=\s|$)/, '$1F3');
+            if (!document.title.includes('Formula 3')) {
+                document.title = document.title === 'Racelytic'
+                    ? 'Formula 3 · Racelytic'
+                    : `${document.title.replace(/\s*·\s*Racelytic$/, '')} · Formula 3 · Racelytic`;
+            }
+            const navigationDropdowns = [...container.querySelectorAll('.nav-dropdown')];
+            const f3Menus = [
+                ['FORMULA 3 DATABASE', [
+                    ['/f3/database', 'Overview', 'Browse the Formula 3 dataset'],
+                    ['/f3/seasons', 'Seasons', 'Formula 3 championship history'],
+                    ['/f3/races', 'Races', 'Every Formula 3 race weekend'],
+                    ['/f3/drivers', 'Drivers', 'Formula 3 careers and results'],
+                    ['/f3/teams', 'Teams', 'Formula 3 team history and results'],
+                    ['/f3/circuits', 'Circuits', 'Formula 3 tracks and venues'],
+                    ['/f3/chassis', 'Chassis', 'Formula 3 chassis and engine records']
+                ]],
+                ['FORMULA 3 ANALYSIS', [['/f3/analysis', 'Overview', 'Choose a Formula 3 analysis']]],
+                ['FORMULA 3 SIMULATOR', [['/f3/simulator', 'Overview', 'Choose a Formula 3 simulation tool']]],
+                ['FORMULA 3 GAMES', [['/f3/games', 'Overview', 'Choose a Formula 3 game']]]
+            ];
+            navigationDropdowns.forEach((dropdown, index) => {
+                const links = [...dropdown.querySelectorAll('.dropdown-menu a')];
+                const menu = f3Menus[index];
+                if (!menu || !links[0]) return dropdown.remove();
+                links.forEach((link, linkIndex) => {
+                    const item = menu[1][linkIndex];
+                    if (!item) return link.remove();
+                    link.href = item[0];
+                    link.querySelector('span').textContent = item[1];
+                    link.querySelector('small').textContent = item[2];
+                });
+                const title = dropdown.querySelector('.dropdown-title');
+                if (title) title.textContent = menu[0];
+            });
+            const aboutLink = container.querySelector('a[href="/about"]');
+            if (aboutLink) aboutLink.href = '/f3/about';
+            container.querySelectorAll('a[href="/account"]').forEach(link => { link.href = '/account?series=f3'; });
+        }
         if (isF2Mode) {
             document.title = document.title
                 .replace('Formula 1', 'Formula 2')
@@ -117,8 +203,13 @@ async function loadHeader() {
             if (databaseLinks[3]) databaseLinks[3].href = '/f2/drivers';
             if (databaseLinks[4]) databaseLinks[4].href = '/f2/circuits';
             if (databaseLinks[5]) databaseLinks[5].href = '/f2/constructors';
+            if (databaseLinks[6]) {
+                databaseLinks[6].href = '/f2/chassis';
+                databaseLinks[6].querySelector('span').textContent = 'Chassis';
+                databaseLinks[6].querySelector('small').textContent = 'Formula 2 chassis and engine records';
+            }
             databaseLinks.forEach((link, index) => {
-                if (![0, 1, 2, 3, 4, 5].includes(index)) link.remove();
+                if (![0, 1, 2, 3, 4, 5, 6].includes(index)) link.remove();
             });
             const analysisDropdown = navigationDropdowns[1];
             const analysisLinks = [...(analysisDropdown?.querySelectorAll('.dropdown-menu a') || [])];
@@ -369,7 +460,7 @@ async function loadHeader() {
         });
 
         const accountLink = container.querySelector('#account-link');
-        if (accountLink) accountLink.href = `/account?series=${isF2Mode ? 'f2' : 'f1'}`;
+        if (accountLink) accountLink.href = `/account?series=${activeSeries}`;
         const updateAccountLink = user => {
             if (accountLink) accountLink.textContent = user?.displayName || 'Sign in';
         };
@@ -394,6 +485,7 @@ async function loadFooter() {
         if (!response.ok) throw new Error('Failed to load footer');
         footer.innerHTML = (await response.text()).replace('{{year}}', String(new Date().getFullYear()));
         const isF2Mode = window.location.pathname === '/f2' || window.location.pathname.startsWith('/f2/');
+        const isF3Mode = window.location.pathname === '/f3' || window.location.pathname.startsWith('/f3/');
         if (isF2Mode) {
             const paragraphs = footer.querySelectorAll('p');
             const brand = footer.querySelector('.footer-brand');
@@ -401,6 +493,14 @@ async function loadFooter() {
             if (paragraphs[0]) paragraphs[0].textContent = 'Independent Formula 2 history, statistics, and championship analysis.';
             if (paragraphs[2]) paragraphs[2].textContent = 'Racelytic is an unofficial, independent project and is not affiliated with Formula 2, the FIA, or any Formula 2 team. Formula 2, F2, and related marks are trademarks of their respective owners.';
             if (paragraphs[3]) paragraphs[3].textContent = 'Formula 2 statistics are compiled from the project dataset and Motorsport Stats. Data may contain errors and should not be treated as an official record.';
+        }
+        if (isF3Mode) {
+            const paragraphs = footer.querySelectorAll('p');
+            const brand = footer.querySelector('.footer-brand');
+            if (brand) brand.href = '/f3';
+            if (paragraphs[0]) paragraphs[0].textContent = 'Independent Formula 3 history, statistics, and championship analysis.';
+            if (paragraphs[2]) paragraphs[2].textContent = 'Racelytic is an unofficial, independent project and is not affiliated with Formula 3, the FIA, or any Formula 3 team. Formula 3, F3, and related marks are trademarks of their respective owners.';
+            if (paragraphs[3]) paragraphs[3].textContent = 'Formula 3 statistics are compiled from the project dataset and Motorsport Stats. Data may contain errors and should not be treated as an official record.';
         }
         footer.querySelector('[data-privacy-settings]')?.addEventListener('click', () => showAnalyticsChoice(true));
     } catch (error) {

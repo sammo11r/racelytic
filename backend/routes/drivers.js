@@ -30,7 +30,9 @@ router.get('/api/drivers', async (req, res) => {
 
         const limit = integerOrDefault(req.query.limit, 100, { min: 1, max: 1000 });
 
-        if (String(req.query.series || '').toLowerCase() === 'f2') {
+        const series = String(req.query.series || '').toLowerCase();
+        if (['f2', 'f3'].includes(series)) {
+            const prefix = `${series}_`;
             const q = `%${search}%`;
             const where = search
                 ? 'WHERE d.name LIKE ? OR d.firstName LIKE ? OR d.lastName LIKE ? OR d.abbreviation LIKE ?'
@@ -57,9 +59,18 @@ router.get('/api/drivers', async (req, res) => {
                     COALESCE(stats.totalPolePositions, 0) AS totalPolePositions,
                     COALESCE(stats.totalFastestLaps, 0) AS totalFastestLaps,
                     COALESCE(stats.totalPoints, 0) AS totalPoints,
-                    latest.constructorId AS latestConstructorId,
-                    constructors.name AS latestConstructorName
-                FROM f2_drivers d
+                    (SELECT entry.constructorId
+                        FROM ${prefix}entries entry
+                        WHERE entry.driverId = d.id
+                        ORDER BY entry.year DESC, entry.round DESC
+                        LIMIT 1) AS latestConstructorId,
+                    (SELECT constructor.name
+                        FROM ${prefix}entries entry
+                        LEFT JOIN ${prefix}constructors constructor ON constructor.id = entry.constructorId
+                        WHERE entry.driverId = d.id
+                        ORDER BY entry.year DESC, entry.round DESC
+                        LIMIT 1) AS latestConstructorName
+                FROM ${prefix}drivers d
                 LEFT JOIN (
                     SELECT
                         driverId,
@@ -73,22 +84,19 @@ router.get('/api/drivers', async (req, res) => {
                         SUM(COALESCE(poles, 0)) AS totalPolePositions,
                         SUM(COALESCE(fastestLaps, 0)) AS totalFastestLaps,
                         SUM(COALESCE(points, 0)) AS totalPoints
-                    FROM f2_season_driver_standings
+                    FROM ${prefix}season_driver_standings
                     GROUP BY driverId
                 ) stats ON stats.driverId = d.id
-                LEFT JOIN f2_season_driver_standings latest
-                    ON latest.driverId = d.id AND latest.year = stats.lastSeason
-                LEFT JOIN f2_constructors constructors ON constructors.id = latest.constructorId
                 ${where}
                 ORDER BY d.name
                 LIMIT ${limit}
                     `, parameters),
                     connection.query(`
                         SELECT standings.driverId, COUNT(*) AS totalChampionshipWins
-                        FROM f2_season_driver_standings standings
+                        FROM ${prefix}season_driver_standings standings
                         LEFT JOIN (
                             SELECT year, MAX(COALESCE(endDate, date)) AS finalDate
-                            FROM f2_races
+                            FROM ${prefix}races
                             GROUP BY year
                         ) calendars ON calendars.year = standings.year
                         WHERE standings.positionNumber = 1
@@ -201,7 +209,9 @@ router.get('/api/drivers/compare', async (req, res) => {
         return res.status(400).json({ error: 'Choose two different drivers.' });
     }
     try {
-        if (String(req.query.series || '').toLowerCase() === 'f2') {
+        const series = String(req.query.series || '').toLowerCase();
+        if (['f2', 'f3'].includes(series)) {
+            const prefix = `${series}_`;
             const data = await withConnection(async connection => {
                 const [drivers, sharedRaces] = await Promise.all([
                     connection.query(`SELECT d.id, d.name, d.countryCode AS nationalityCountryId,
@@ -370,35 +380,43 @@ router.get('/api/drivers/:id', async (req, res) => {
 
     try {
 
-        if (String(req.query.series || '').toLowerCase() === 'f2') {
+        const series = String(req.query.series || '').toLowerCase();
+        if (['f2', 'f3'].includes(series)) {
+            const prefix = `${series}_`;
             const data = await withConnection(async connection => {
                 const [driverRows, standings, results] = await Promise.all([
                     connection.query(`
                         SELECT d.id, d.name, d.firstName, d.lastName, d.abbreviation, d.countryCode,
                             (SELECT entry.driverNumber
-                                FROM f2_entries entry
+                                FROM ${prefix}entries entry
                                 WHERE entry.driverId = d.id
                                 ORDER BY entry.year DESC, entry.round DESC
                                 LIMIT 1) AS latestNumber
-                        FROM f2_drivers d
+                        FROM ${prefix}drivers d
                         WHERE d.id = ?
                     `, [req.params.id]),
                     connection.query(`
-                        SELECT standings.year, standings.positionNumber, standings.points,
-                            standings.championshipWon,
+                        SELECT standings.year, MIN(standings.positionNumber) AS positionNumber,
+                            SUM(COALESCE(standings.points, 0)) AS points,
+                            MAX(standings.championshipWon) AS championshipWon,
                             calendars.finalDate AS seasonFinalDate,
-                            standings.starts, standings.wins,
-                            standings.podiums, standings.poles, standings.fastestLaps,
-                            standings.retirements, standings.constructorId,
-                            constructors.name AS constructorName
-                        FROM f2_season_driver_standings standings
-                        LEFT JOIN f2_constructors constructors ON constructors.id = standings.constructorId
+                            SUM(COALESCE(standings.starts, 0)) AS starts,
+                            SUM(COALESCE(standings.wins, 0)) AS wins,
+                            SUM(COALESCE(standings.podiums, 0)) AS podiums,
+                            SUM(COALESCE(standings.poles, 0)) AS poles,
+                            SUM(COALESCE(standings.fastestLaps, 0)) AS fastestLaps,
+                            SUM(COALESCE(standings.retirements, 0)) AS retirements,
+                            GROUP_CONCAT(DISTINCT standings.constructorId ORDER BY standings.constructorId SEPARATOR '||') AS constructorId,
+                            GROUP_CONCAT(DISTINCT constructors.name ORDER BY constructors.name SEPARATOR ' / ') AS constructorName
+                        FROM ${prefix}season_driver_standings standings
+                        LEFT JOIN ${prefix}constructors constructors ON constructors.id = standings.constructorId
                         LEFT JOIN (
                             SELECT year, MAX(COALESCE(endDate, date)) AS finalDate
-                            FROM f2_races
+                            FROM ${prefix}races
                             GROUP BY year
                         ) calendars ON calendars.year = standings.year
                         WHERE standings.driverId = ?
+                        GROUP BY standings.year, calendars.finalDate
                         ORDER BY standings.year DESC
                     `, [req.params.id]),
                     connection.query(`
@@ -410,10 +428,10 @@ router.get('/api/drivers/:id', async (req, res) => {
                             sessions.name AS sessionName, sessions.sessionNumber,
                             races.name AS raceName, races.code AS raceCode, races.date,
                             constructors.name AS constructorName
-                        FROM f2_session_results results
-                        JOIN f2_sessions sessions ON sessions.id = results.sessionId
-                        JOIN f2_races races ON races.id = results.raceId
-                        LEFT JOIN f2_constructors constructors ON constructors.id = results.constructorId
+                        FROM ${prefix}session_results results
+                        JOIN ${prefix}sessions sessions ON sessions.id = results.sessionId
+                        JOIN ${prefix}races races ON races.id = results.raceId
+                        LEFT JOIN ${prefix}constructors constructors ON constructors.id = results.constructorId
                         WHERE results.driverId = ?
                             AND LOWER(CAST(sessions.isRace AS CHAR)) IN ('1', 'true')
                             AND (sessions.cancelled IS NULL OR LOWER(CAST(sessions.cancelled AS CHAR)) NOT IN ('1', 'true'))
@@ -450,15 +468,15 @@ router.get('/api/drivers/:id', async (req, res) => {
                         year: Number(row.year),
                         round: Number(row.round),
                         positionNumber: row.positionNumber === null ? null : Number(row.positionNumber),
-                        points: Number(row.points || 0),
+                        points: /\b(?:DSQ|DQ|DISQ|DISQUALIFIED|EXC)\b/i.test(String(row.status || '')) ? 0 : Number(row.points || 0),
                         laps: Number(row.laps || 0),
-                        fastestLap: isTrue(row.fastestLap),
-                        polePosition: isTrue(row.polePosition)
+                        fastestLap: series === 'f2' && isTrue(row.fastestLap),
+                        polePosition: series === 'f2' && isTrue(row.polePosition)
                     }))
                 };
             });
 
-            if (!data) return res.status(404).json({ error: 'F2 driver not found.' });
+            if (!data) return res.status(404).json({ error: `${series.toUpperCase()} driver not found.` });
             return res.json(data);
         }
 

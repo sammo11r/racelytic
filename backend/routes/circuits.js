@@ -11,14 +11,16 @@ router.get('/api/circuits', async (req, res) => {
 
     try {
 
-        if (String(req.query.series || '').toLowerCase() === 'f2') {
+        const series = String(req.query.series || '').toLowerCase();
+        if (['f2', 'f3'].includes(series)) {
+            const prefix = `${series}_`;
             const rows = await withConnection(connection => connection.query(`
                 SELECT circuits.id, circuits.name, circuits.type, circuits.direction,
                     circuits.placeName, circuits.lengthMeters, circuits.turns,
                     COUNT(DISTINCT races.id) AS totalRacesHeld,
                     MIN(races.year) AS firstYear, MAX(races.year) AS lastYear
-                FROM f2_circuits circuits
-                LEFT JOIN f2_races races ON races.circuitId = circuits.id
+                FROM ${prefix}circuits circuits
+                LEFT JOIN ${prefix}races races ON races.circuitId = circuits.id
                 GROUP BY circuits.id, circuits.name, circuits.type, circuits.direction,
                     circuits.placeName, circuits.lengthMeters, circuits.turns
                 ORDER BY circuits.name
@@ -97,20 +99,22 @@ router.get('/api/circuits', async (req, res) => {
 
 router.get('/api/circuits/:id/analysis', async (req, res) => {
     try {
-        if (String(req.query.series || '').toLowerCase() === 'f2') {
+        const series = String(req.query.series || '').toLowerCase();
+        if (['f2', 'f3'].includes(series)) {
+            const prefix = `${series}_`;
             const data = await withConnection(async connection => {
                 const [circuits, rows] = await Promise.all([
-                    connection.query(`SELECT id, name, name AS fullName, placeName AS countryName, NULL AS countryId, NULL AS layoutId FROM f2_circuits WHERE id = ?`, [req.params.id]),
+                    connection.query(`SELECT id, name, name AS fullName, placeName AS countryName, NULL AS countryId, NULL AS layoutId FROM ${prefix}circuits WHERE id = ?`, [req.params.id]),
                     connection.query(`SELECT sessions.id AS raceId, races.year, races.round, races.date,
                         CONCAT(races.name, ' · ', sessions.name) AS officialName, 0 AS raceLaps,
                         results.driverId, drivers.name AS driverName, results.constructorId, constructors.name AS constructorName,
                         results.positionNumber, results.status AS positionText, results.positionNumber AS gridPositionNumber,
                         results.positionNumber AS qualificationPositionNumber, results.laps, results.gapMillis AS gap,
                         results.status AS reasonRetired, results.polePosition, results.fastestLap, results.points
-                        FROM f2_races races JOIN f2_sessions sessions ON sessions.raceId = races.id
-                        JOIN f2_session_results results ON results.sessionId = sessions.id
-                        JOIN f2_drivers drivers ON drivers.id = results.driverId
-                        LEFT JOIN f2_constructors constructors ON constructors.id = results.constructorId
+                        FROM ${prefix}races races JOIN ${prefix}sessions sessions ON sessions.raceId = races.id
+                        JOIN ${prefix}session_results results ON results.sessionId = sessions.id
+                        JOIN ${prefix}drivers drivers ON drivers.id = results.driverId
+                        LEFT JOIN ${prefix}constructors constructors ON constructors.id = results.constructorId
                         WHERE races.circuitId = ? AND LOWER(CAST(sessions.isRace AS CHAR)) IN ('1','true')
                         AND (sessions.cancelled IS NULL OR LOWER(CAST(sessions.cancelled AS CHAR)) NOT IN ('1','true'))
                         ORDER BY races.year, races.round, sessions.sessionNumber, results.positionDisplayOrder`, [req.params.id])
@@ -123,7 +127,7 @@ router.get('/api/circuits/:id/analysis', async (req, res) => {
                 });
                 return {circuit:circuits[0],races:[...races.values()]};
             });
-            if (!data) return res.status(404).json({ error: 'Formula 2 circuit not found.' });
+            if (!data) return res.status(404).json({ error: `${series.toUpperCase()} circuit not found.` });
             return res.json(data);
         }
         const data = await withConnection(async connection => {
@@ -166,7 +170,9 @@ router.get('/api/circuits/:id', async (req, res) => {
 
     try {
 
-        if (String(req.query.series || '').toLowerCase() === 'f2') {
+        const series = String(req.query.series || '').toLowerCase();
+        if (['f2', 'f3'].includes(series)) {
+            const prefix = `${series}_`;
             const data = await withConnection(async connection => {
                 const [circuitRows, races, sessions] = await Promise.all([
                     connection.query(`
@@ -174,15 +180,15 @@ router.get('/api/circuits/:id', async (req, res) => {
                             circuits.placeName, circuits.lengthMeters, circuits.turns,
                             COUNT(DISTINCT races.id) AS totalRacesHeld,
                             MIN(races.year) AS firstYear, MAX(races.year) AS lastYear
-                        FROM f2_circuits circuits
-                        LEFT JOIN f2_races races ON races.circuitId = circuits.id
+                        FROM ${prefix}circuits circuits
+                        LEFT JOIN ${prefix}races races ON races.circuitId = circuits.id
                         WHERE circuits.id = ?
                         GROUP BY circuits.id, circuits.name, circuits.type, circuits.direction,
                             circuits.placeName, circuits.lengthMeters, circuits.turns
                     `, [req.params.id]),
                     connection.query(`
                         SELECT id, year, round, date, endDate, name, code
-                        FROM f2_races
+                        FROM ${prefix}races
                         WHERE circuitId = ?
                         ORDER BY year DESC, round DESC
                     `, [req.params.id]),
@@ -191,12 +197,12 @@ router.get('/api/circuits/:id', async (req, res) => {
                             sessions.sessionNumber, sessions.isRace, sessions.cancelled,
                             results.driverId AS winnerDriverId, drivers.name AS winnerName,
                             constructors.name AS winnerConstructorName
-                        FROM f2_sessions sessions
-                        JOIN f2_races races ON races.id = sessions.raceId
-                        LEFT JOIN f2_session_results results
+                        FROM ${prefix}sessions sessions
+                        JOIN ${prefix}races races ON races.id = sessions.raceId
+                        LEFT JOIN ${prefix}session_results results
                             ON results.sessionId = sessions.id AND results.positionNumber = 1
-                        LEFT JOIN f2_drivers drivers ON drivers.id = results.driverId
-                        LEFT JOIN f2_constructors constructors ON constructors.id = results.constructorId
+                        LEFT JOIN ${prefix}drivers drivers ON drivers.id = results.driverId
+                        LEFT JOIN ${prefix}constructors constructors ON constructors.id = results.constructorId
                         WHERE races.circuitId = ?
                         ORDER BY races.year DESC, races.round DESC, sessions.sessionNumber
                     `, [req.params.id])
@@ -222,7 +228,7 @@ router.get('/api/circuits/:id', async (req, res) => {
                     }))
                 };
             });
-            if (!data) return res.status(404).json({ error: 'Formula 2 circuit not found.' });
+            if (!data) return res.status(404).json({ error: `${series.toUpperCase()} circuit not found.` });
             return res.json(data);
         }
 

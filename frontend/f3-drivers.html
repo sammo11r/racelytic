@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Browse every driver in Racelytic's Formula 3 archive.">
+  <link rel="icon" href="/assets/favicon-f3.svg" type="image/svg+xml">
+  <title>Formula 3 Drivers · Racelytic</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/polish.css">
+</head>
+<body class="f3-mode">
+  <div id="header"></div>
+  <main class="container page">
+    <div class="page-head">
+      <div><div class="eyebrow">FORMULA 3 PADDOCK</div><h1>Drivers</h1><p>Championship campaigns and race records from the FIA Formula 3 era.</p></div>
+      <input class="search" id="f3-driver-search" type="search" aria-label="Search Formula 3 drivers" placeholder="Search drivers...">
+    </div>
+    <div class="browser-toolbar">
+      <div class="browser-count" id="f3-driver-count" aria-live="polite"></div>
+      <label class="sort-control" for="f3-driver-sort"><span>Order by</span><select id="f3-driver-sort"><option value="recent">Most recent season</option><option value="name-asc">Name A–Z</option><option value="name-desc">Name Z–A</option><option value="best-finish">Best championship finish</option><option value="wins-desc">Most race wins</option></select></label>
+    </div>
+    <div id="f3-drivers" class="entity-grid"></div>
+  </main>
+  <footer class="footer"><div class="container">Racelytic</div></footer>
+  <script src="/js/utils.js"></script><script src="/js/header.js"></script><script src="/js/f3-drivers.js"></script>
+</body>
+</html>

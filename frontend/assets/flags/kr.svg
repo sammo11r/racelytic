@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480">
+  <path fill="#fff" d="M0 0h640v480H0z"/>
+  <g transform="translate(320 240) rotate(33.69)">
+    <path fill="#cd2e3a" d="M0-96a96 96 0 1 1 0 192 48 48 0 1 0 0-96 48 48 0 1 1 0-96z"/>
+    <path fill="#0047a0" d="M0 96a96 96 0 1 1 0-192 48 48 0 1 0 0 96 48 48 0 1 1 0 96z"/>
+  </g>
+  <g fill="#000">
+    <g transform="translate(142 104) rotate(-56.31)"><path d="M-48-18h96v10h-96zm0 13h96V5h-96zm0 13h96v10h-96z"/></g>
+    <g transform="translate(498 376) rotate(-56.31)"><path d="M-48-18h40v10h-40zm56 0h40v10H8zM-48-5h96V5h-96zM-48 8h40v10h-40zm56 0h40v10H8z"/></g>
+    <g transform="translate(498 104) rotate(56.31)"><path d="M-48-18h40v10h-40zm56 0h40v10H8zM-48-5h40V5h-40zm56 0h40V5H8zM-48 8h96v10h-96z"/></g>
+    <g transform="translate(142 376) rotate(56.31)"><path d="M-48-18h96v10h-96zM-48-5h40V5h-40zm56 0h40V5H8zM-48 8h96v10h-96z"/></g>
+  </g>
+</svg>

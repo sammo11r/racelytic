@@ -42,7 +42,18 @@ body.f2-mode {
     radial-gradient(circle at 88% 8%, rgba(22,119,255,.09), transparent 25rem),
     linear-gradient(180deg, #fafafa 0, var(--background) 27rem);
 }
+body.f3-mode {
+  --accent: #c95300;
+  --accent-dark: #9f3f00;
+  --accent-light: #fff1e7;
+  --accent-rgb: 201, 83, 0;
+  --accent-gradient-end: #9f3f00;
+  background:
+    radial-gradient(circle at 88% 8%, rgba(201,83,0,.1), transparent 25rem),
+    linear-gradient(180deg, #fafafa 0, var(--background) 27rem);
+}
 html.f2-account { background: #f7f9fc; }
+html.f3-account { background: #fff8f3; }
 
 body.f2-mode :focus-visible { outline-color: rgba(var(--accent-rgb), .25); }
 body.f2-mode .search:focus,
@@ -634,18 +645,20 @@ table tbody tr:last-child td { border-bottom: 0; }
 #driver-table .race-column { min-width: 56px; color: #fff; font-size: 10px; letter-spacing: .06em; }
 #driver-table .race-point { position: relative; min-width: 56px; color: #24262c; font-size: 12px; font-weight: 750; white-space: nowrap; }
 #driver-table .race-point > span { display: inline-block; min-width: 14px; }
-#driver-table .result-marker { position: relative; top: -.2em; margin-left: 1px; }
-#driver-table .pole-position::after { content: 'PP'; position: relative; bottom: -.25em; margin-left: 1px; color: var(--accent-dark); font-size: 9px; font-weight: 900; }
+.championship-table .result-marker { position: relative; top: -.2em; margin-left: 1px; }
+.championship-table .pole-position::after { content: 'PP'; position: relative; bottom: -.25em; margin-left: 1px; color: var(--accent-dark); font-size: 9px; font-weight: 900; }
 #driver-table .sprint-points { position: relative; bottom: -.25em; margin-left: 1px; }
 #driver-table[data-value-mode="position"] .sprint-points { display: none; }
 #driver-table .points-column { position: sticky; right: 0; z-index: 3; min-width: 72px; background: #fff; box-shadow: -7px 0 12px -12px rgba(17,19,24,.65); }
 #driver-table thead .points-column { z-index: 5; background: #17191f; }
-#driver-table .result-win, .legend-swatch.result-win { background: #fff1ad; }
-#driver-table .result-podium, .legend-swatch.result-podium { background: #ffe0ad; }
-#driver-table .result-points, .legend-swatch.result-points { background: #dff4e2; }
-#driver-table .result-finish, .legend-swatch.result-finish { background: #e8ecfb; }
-#driver-table .result-retired, .legend-swatch.result-retired { background: #f6dcea; }
-#driver-table .result-empty { background: #f6f7f8; color: #a7abb2; }
+.championship-table .result-win, .legend-swatch.result-win { background: #fff1ad; }
+.championship-table .result-podium, .legend-swatch.result-podium { background: #ffe0ad; }
+.championship-table .result-points, .legend-swatch.result-points { background: #dff4e2; }
+.championship-table .result-finish, .legend-swatch.result-finish { background: #e8ecfb; }
+.championship-table .result-retired, .legend-swatch.result-retired { background: #f6dcea; }
+.championship-table .result-disqualified, .legend-swatch.result-disqualified { background: #17191f; color: #fff; }
+.championship-table .result-disqualified.pole-position::after { color: #fff; }
+.championship-table .result-empty { background: #f6f7f8; color: #a7abb2; }
 #driver-table tbody tr:hover .name-column,
 #driver-table tbody tr:hover .position-column,
 #driver-table tbody tr:hover .points-column { filter: brightness(.975); }
@@ -864,6 +877,40 @@ table tbody tr:last-child td { border-bottom: 0; }
 .chassis-constructor a { color: var(--text-secondary); }
 .chassis-constructor a:hover { color: var(--accent-dark); }
 .engine-manufacturer-list { margin: 8px 0 16px !important; color: var(--text) !important; font-weight: 750; }
+.junior-chassis-page-head { margin-bottom: 28px; }
+.junior-chassis-page-head h1 { margin-bottom: 8px; }
+.junior-chassis-page-head p { max-width: 620px; }
+.junior-technical-chassis-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,420px),1fr)); gap: 16px; }
+.junior-technical-chassis-card { overflow: hidden; border: 1px solid rgba(var(--accent-rgb),.16); border-radius: 18px; background: #fff; box-shadow: 0 16px 40px rgba(19,25,35,.08); transition: transform .18s ease,box-shadow .18s ease; }
+.junior-technical-chassis-card:hover { box-shadow: 0 20px 48px rgba(19,25,35,.12); transform: translateY(-3px); }
+.junior-technical-chassis-card > header { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; padding: 22px; border-bottom: 1px solid var(--border); background: #f8f9fa; }
+.junior-technical-chassis-card > header span { color: var(--accent); font-size: 9px; font-weight: 850; letter-spacing: .11em; }
+.junior-technical-chassis-card > header h2 { margin: 5px 0 3px; font-size: 24px; letter-spacing: -.04em; }
+.junior-technical-chassis-card > header p { margin: 0; color: var(--text-secondary); font-size: 10px; }
+.junior-technical-chassis-card > header > strong { padding: 6px 8px; border-radius: 6px; background: var(--accent-light); color: var(--accent-dark); font-size: 8px; letter-spacing: .1em; }
+.junior-chassis-quick-specs { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); border-bottom: 1px solid var(--border); }
+.junior-chassis-quick-specs > div { min-width: 0; padding: 14px; border-right: 1px solid var(--border); }
+.junior-chassis-quick-specs > div:last-child { border-right: 0; }
+.junior-chassis-quick-specs span, .junior-chassis-quick-specs small { display: block; color: var(--text-muted); font-size: 8px; }
+.junior-chassis-quick-specs span { margin-bottom: 5px; font-weight: 850; letter-spacing: .1em; }
+.junior-chassis-quick-specs strong { display: block; overflow: hidden; font-size: 12px; text-overflow: ellipsis; }
+.junior-chassis-quick-specs small { margin-top: 3px; line-height: 1.3; }
+.junior-chassis-specification-groups { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 22px; padding: 22px; }
+.junior-chassis-specification-groups h3 { margin: 0 0 10px; font-size: 11px; letter-spacing: -.01em; }
+.junior-chassis-specification-groups dl { display: grid; gap: 9px; margin: 0; }
+.junior-chassis-specification-groups dl > div { display: grid; gap: 2px; }
+.junior-chassis-specification-groups dt { color: var(--text-muted); font-size: 8px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.junior-chassis-specification-groups dd { margin: 0; color: var(--text-secondary); font-size: 10px; line-height: 1.45; }
+.junior-technical-chassis-card > footer { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 0 22px 22px; }
+.junior-technical-chassis-card > footer a { flex: 0 0 auto; color: var(--accent-dark); font-size: 9px; font-weight: 800; }
+
+@media (max-width: 620px) {
+  .junior-chassis-quick-specs { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .junior-chassis-quick-specs > div:nth-child(2) { border-right: 0; }
+  .junior-chassis-quick-specs > div:nth-child(-n+2) { border-bottom: 1px solid var(--border); }
+  .junior-chassis-specification-groups { grid-template-columns: 1fr; }
+  .junior-technical-chassis-card > footer { align-items: flex-start; flex-direction: column; }
+}
 
 /* Race archive and session results */
 .races-page .page-head { margin-bottom: 32px; }
@@ -888,26 +935,30 @@ table tbody tr:last-child td { border-bottom: 0; }
 .race-archive-meta small { padding: 4px 7px; border-radius: 5px; background: var(--accent-light); color: var(--accent-dark); font-size: 8px; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; }
 .race-card-arrow { color: var(--text-muted); font-size: 17px; transition: color .15s ease, transform .15s ease; }
 .race-archive-card:hover .race-card-arrow { color: var(--accent); transform: translateX(3px); }
-.f2-race-archive-card .race-archive-meta { gap: 4px; }
-.f2-race-archive-card .race-archive-meta small { color: var(--text-muted); font-style: normal; }
-.f2-race-archive-card .race-archive-meta em { color: var(--accent); font-size: 8px; font-style: normal; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; }
+.f2-race-archive-card .race-archive-meta,
+.junior-race-archive-card .race-archive-meta { gap: 4px; }
+.f2-race-archive-card .race-archive-meta small,
+.junior-race-archive-card .race-archive-meta small { color: var(--text-muted); font-style: normal; }
+.f2-race-archive-card .race-archive-meta em,
+.junior-race-archive-card .race-archive-meta em { color: var(--accent); font-size: 8px; font-style: normal; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; }
 .race-session-header { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin: 55px 0 16px; }
 .race-session-header h2 { margin: 0; font-size: clamp(27px,3vw,38px); letter-spacing: -.04em; }
 .race-session-tabs { flex-wrap: wrap; }
-.f2-session-header { margin-bottom: 16px; }
-.f2-session-tabs { display: flex; overflow-x: auto; gap: 7px; margin-bottom: 14px; padding: 2px 1px 10px; scroll-snap-type: x proximity; }
-.f2-session-tab { display: flex; min-width: 145px; min-height: 58px; flex-direction: column; justify-content: center; padding: 10px 13px; border: 1px solid var(--border); border-radius: 10px; background: #fff; color: var(--text); font-size: 10px; font-weight: 850; line-height: 1.2; text-align: left; scroll-snap-align: start; }
-.f2-session-tab small { margin-top: 5px; color: var(--text-muted); font-size: 8px; font-weight: 650; }
-.f2-session-tab:hover { border-color: rgba(22,119,255,.35); }
-.f2-session-tab.active { border-color: var(--accent); background: var(--accent); color: #fff; }
-.f2-session-tab.active small { color: rgba(255,255,255,.72); }
-.f2-session-tab.cancelled:not(.active) { border-color: #d8b8bd; background: #fff4f5; color: #7f2531; }
-.f2-session-results { min-height: 150px; }
-.f2-session-results .session-results-table td:nth-child(2) small { display: block; margin-top: 3px; color: var(--text-muted); font-size: 9px; }
-.f2-session-award { display: inline-grid; min-width: 21px; height: 17px; margin: 4px 0 0 4px; place-items: center; border-radius: 4px; background: var(--accent-light); color: var(--accent-dark); font-size: 7px; font-weight: 900; }
-.f2-cancelled-session { padding: 42px; text-align: center; }
-.f2-cancelled-session strong { color: var(--accent); font-size: 26px; letter-spacing: -.03em; }
-.f2-cancelled-session p { max-width: 520px; margin: 9px auto 0; color: var(--text-muted); font-size: 12px; }
+.f2-session-header, .junior-session-header { margin-bottom: 16px; }
+.f2-session-tabs, .junior-session-tabs { display: flex; overflow-x: auto; gap: 7px; margin-bottom: 14px; padding: 2px 1px 10px; scroll-snap-type: x proximity; }
+.f2-session-tab, .junior-session-tab { display: flex; min-width: 145px; min-height: 58px; flex-direction: column; justify-content: center; padding: 10px 13px; border: 1px solid var(--border); border-radius: 10px; background: #fff; color: var(--text); font-size: 10px; font-weight: 850; line-height: 1.2; text-align: left; scroll-snap-align: start; }
+.f2-session-tab small, .junior-session-tab small { margin-top: 5px; color: var(--text-muted); font-size: 8px; font-weight: 650; }
+.f2-session-tab:hover, .junior-session-tab:hover { border-color: rgba(var(--accent-rgb),.35); }
+.f2-session-tab.active, .junior-session-tab.active { border-color: var(--accent); background: var(--accent); color: #fff; }
+.f2-session-tab.active small, .junior-session-tab.active small { color: rgba(255,255,255,.72); }
+.f2-session-tab.cancelled:not(.active), .junior-session-tab.cancelled:not(.active) { border-color: #d8b8bd; background: #fff4f5; color: #7f2531; }
+.f2-session-results, .junior-session-results { min-height: 150px; }
+.f2-session-results .session-results-table td:nth-child(2) small,
+.junior-session-results .session-results-table td:nth-child(2) small { display: block; margin-top: 3px; color: var(--text-muted); font-size: 9px; }
+.f2-session-award, .junior-session-award { display: inline-grid; min-width: 21px; height: 17px; margin: 4px 0 0 4px; place-items: center; border-radius: 4px; background: var(--accent-light); color: var(--accent-dark); font-size: 7px; font-weight: 900; }
+.f2-cancelled-session, .junior-cancelled-session { padding: 42px; text-align: center; }
+.f2-cancelled-session strong, .junior-cancelled-session strong { color: var(--accent); font-size: 26px; letter-spacing: -.03em; }
+.f2-cancelled-session p, .junior-cancelled-session p { max-width: 520px; margin: 9px auto 0; color: var(--text-muted); font-size: 12px; }
 .session-variants { display: flex; gap: 6px; min-height: 34px; margin-bottom: 10px; }
 .session-variant { padding: 7px 11px; border: 1px solid var(--border); border-radius: 7px; background: #fff; color: var(--text-muted); font-size: 10px; font-weight: 750; }
 .session-variant.active { border-color: rgba(var(--accent-rgb),.28); background: var(--accent-light); color: var(--accent-dark); }
@@ -2196,7 +2247,6 @@ table td { padding: 14px 16px; }
 .season-card-champion.has-champion strong {
   color: var(--accent);
 }
-
 @media (max-width: 800px) {
   .season-jump { width: 100%; }
 }
@@ -2498,8 +2548,10 @@ body.f2-mode .home-path-analysis::after,
 body.f2-mode .home-path-games::after { border-color: rgba(22,119,255,.22); }
 body.f2-mode .home-path-simulator { background: #eef5ff; }
 
-.f2-data-note { display: inline-flex; align-items: center; gap: 8px; color: var(--text-secondary); font-size: 12px; font-weight: 750; }
-.f2-data-note::before { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); content: ""; box-shadow: 0 0 0 4px var(--accent-light); }
+.f2-data-note,
+.series-data-note { display: inline-flex; align-items: center; gap: 8px; color: var(--text-secondary); font-size: 12px; font-weight: 750; }
+.f2-data-note::before,
+.series-data-note::before { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); content: ""; box-shadow: 0 0 0 4px var(--accent-light); }
 .f2-preview-card { cursor: default; }
 .f2-preview-card > strong { color: var(--text-muted); }
 .f2-season-table .driver-name small { display: block; margin-top: 3px; color: var(--text-muted); font-size: 9px; font-weight: 600; }

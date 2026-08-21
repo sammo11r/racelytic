@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Browse every Formula 3 team in Racelytic.">
+  <link rel="icon" href="/assets/favicon-f3.svg" type="image/svg+xml">
+  <title>Formula 3 Teams · Racelytic</title>
+  <link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/polish.css">
+</head>
+<body class="f3-mode">
+  <div id="header"></div>
+  <main class="container page">
+    <div class="page-head"><div><div class="eyebrow">FORMULA 3 PADDOCK</div><h1>Teams</h1><p>Explore every team’s FIA Formula 3 championship history, drivers and race results.</p></div><input class="search" id="f3-team-search" type="search" aria-label="Search Formula 3 teams" placeholder="Search teams..."></div>
+    <div class="browser-toolbar"><span id="f3-team-count" class="browser-count">Loading teams…</span><label class="sort-control">Sort <select id="f3-team-sort"><option value="recent">Most recent</option><option value="name">Name</option><option value="wins">Race wins</option><option value="titles">Championships</option></select></label></div>
+    <div id="f3-teams" class="entity-grid"></div>
+  </main>
+  <footer class="footer"><div class="container">Racelytic</div></footer>
+  <script src="/js/utils.js"></script><script src="/js/header.js"></script><script src="/js/f3-teams.js"></script>
+</body>
+</html>

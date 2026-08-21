@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Browse every Formula 3 race weekend in Racelytic.">
+  <link rel="icon" href="/assets/favicon-f3.svg" type="image/svg+xml">
+  <title>Formula 3 Races · Racelytic</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/polish.css">
+</head>
+<body class="f3-mode">
+  <div id="header"></div>
+  <main class="container page races-page">
+    <div class="page-head"><div><div class="eyebrow">FORMULA 3 WEEKEND ARCHIVE</div><h1>Races</h1><p>Practice, qualifying, grids, sprint races and feature races from every FIA Formula 3 round.</p></div></div>
+    <section class="race-filters" aria-label="Formula 3 race filters">
+      <label><span>Search</span><input id="f3-race-search" type="search" placeholder="Event, circuit or location"></label>
+      <label><span>Season</span><select id="f3-race-year"><option value="">All seasons</option></select></label>
+      <label><span>Circuit</span><select id="f3-race-circuit"><option value="">All circuits</option></select></label>
+      <button id="clear-f3-race-filters" class="button" type="button">Clear filters</button>
+    </section>
+    <div class="race-browser-heading"><strong id="f3-race-count">Loading weekends…</strong><span id="f3-race-filter-note"></span></div>
+    <div id="f3-races" class="race-archive"></div>
+  </main>
+  <footer class="footer"><div class="container">Racelytic</div></footer>
+  <script src="/js/utils.js"></script>
+  <script src="/js/header.js"></script>
+  <script src="/js/f3-races.js"></script>
+</body>
+</html>

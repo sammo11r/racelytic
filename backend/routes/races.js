@@ -10,7 +10,9 @@ const router = express.Router();
 
 router.get('/api/races/:id', async (req, res) => {
     try {
-        if (String(req.query.series || '').toLowerCase() === 'f2') {
+        const series = String(req.query.series || '').toLowerCase();
+        if (['f2', 'f3'].includes(series)) {
+            const prefix = `${series}_`;
             const data = await withConnection(async connection => {
                 const [raceRows, sessionRows, resultRows] = await Promise.all([
                     connection.query(`
@@ -19,14 +21,14 @@ router.get('/api/races/:id', async (req, res) => {
                             circuits.name AS circuitName, circuits.placeName,
                             circuits.type AS circuitType, circuits.direction,
                             circuits.lengthMeters, circuits.turns
-                        FROM f2_races races
-                        LEFT JOIN f2_circuits circuits ON circuits.id = races.circuitId
+                        FROM ${prefix}races races
+                        LEFT JOIN ${prefix}circuits circuits ON circuits.id = races.circuitId
                         WHERE races.id = ?
                     `, [req.params.id]),
                     connection.query(`
                         SELECT id, sessionNumber, code, name, startTimeUtc, endTimeUtc,
                             isRace, cancelled
-                        FROM f2_sessions
+                        FROM ${prefix}sessions
                         WHERE raceId = ?
                         ORDER BY sessionNumber, startTimeUtc
                     `, [req.params.id]),
@@ -40,9 +42,9 @@ router.get('/api/races/:id', async (req, res) => {
                             results.fastestLapTime, results.fastestLapTimeMillis,
                             results.averageSpeed, drivers.name AS driverName,
                             drivers.abbreviation, constructors.name AS constructorName
-                        FROM f2_session_results results
-                        LEFT JOIN f2_drivers drivers ON drivers.id = results.driverId
-                        LEFT JOIN f2_constructors constructors ON constructors.id = results.constructorId
+                        FROM ${prefix}session_results results
+                        LEFT JOIN ${prefix}drivers drivers ON drivers.id = results.driverId
+                        LEFT JOIN ${prefix}constructors constructors ON constructors.id = results.constructorId
                         WHERE results.raceId = ?
                         ORDER BY results.sessionId, results.positionDisplayOrder, results.positionNumber
                     `, [req.params.id])
@@ -50,19 +52,55 @@ router.get('/api/races/:id', async (req, res) => {
 
                 if (!raceRows.length) return null;
                 const isTrue = value => value === true || Number(value) === 1 || String(value).toLowerCase() === 'true';
+                const isDisqualified = row => /\b(?:DSQ|DQ|DISQ|DISQUALIFIED|EXC)\b/i.test(String(row.status || ''));
+                const sessionsById = new Map(sessionRows.map(session => [String(session.id), session]));
+                const raceSessions = sessionRows.filter(session => isTrue(session.isRace));
+                const featureSession = raceSessions.find(session => /feature/i.test(session.name))
+                    || raceSessions.at(-1);
+                const gridSessions = sessionRows.filter(session => /grid/i.test(session.name));
+                const featureGrid = gridSessions.at(-1);
+                const qualifyingSessions = sessionRows.filter(session => /qualif/i.test(session.name));
+                const classificationWinner = sessionIds => resultRows
+                    .filter(row => sessionIds.includes(String(row.sessionId)) && Number(row.positionNumber) === 1)
+                    .sort((first, second) => Number(first.timeMillis || Number.MAX_SAFE_INTEGER) - Number(second.timeMillis || Number.MAX_SAFE_INTEGER))[0];
+                const poleDriverId = classificationWinner(featureGrid ? [String(featureGrid.id)] : [])?.driverId
+                    || classificationWinner(qualifyingSessions.map(session => String(session.id)))?.driverId;
+                const fastestLapBySession = new Map();
+                const importedFastestBySession = new Map();
+                resultRows.forEach(row => {
+                    const session = sessionsById.get(String(row.sessionId));
+                    const position = Number(row.positionNumber || 0);
+                    if (!session || !isTrue(session.isRace) || position < 1 || position > 10 || isDisqualified(row)) return;
+                    const sessionId = String(row.sessionId);
+                    if (isTrue(row.fastestLap) && !importedFastestBySession.has(sessionId)) {
+                        importedFastestBySession.set(sessionId, row.driverId);
+                    }
+                    const lapTime = Number(row.fastestLapTimeMillis);
+                    if (!Number.isFinite(lapTime) || lapTime <= 0) return;
+                    const current = fastestLapBySession.get(sessionId);
+                    if (!current || lapTime < current.lapTime) {
+                        fastestLapBySession.set(sessionId, { driverId: row.driverId, lapTime });
+                    }
+                });
+                importedFastestBySession.forEach((driverId, sessionId) => {
+                    if (!fastestLapBySession.has(sessionId)) fastestLapBySession.set(sessionId, { driverId });
+                });
                 const resultsBySession = new Map();
                 resultRows.forEach(row => {
                     const sessionId = String(row.sessionId);
+                    const session = sessionsById.get(sessionId);
+                    const isRace = session && isTrue(session.isRace);
                     if (!resultsBySession.has(sessionId)) resultsBySession.set(sessionId, []);
                     resultsBySession.get(sessionId).push({
                         ...row,
                         positionNumber: row.positionNumber === null ? null : Number(row.positionNumber),
-                        points: row.points === null ? null : Number(row.points),
+                        points: isDisqualified(row) ? 0 : row.points === null ? null : Number(row.points),
                         laps: row.laps === null ? null : Number(row.laps),
                         gapMillis: row.gapMillis === null ? null : Number(row.gapMillis),
                         gapLaps: row.gapLaps === null ? null : Number(row.gapLaps),
-                        polePosition: isTrue(row.polePosition),
-                        fastestLap: isTrue(row.fastestLap)
+                        polePosition: Boolean(isRace && featureSession && sessionId === String(featureSession.id)
+                            && String(row.driverId) === String(poleDriverId)),
+                        fastestLap: Boolean(isRace && String(row.driverId) === String(fastestLapBySession.get(sessionId)?.driverId))
                     });
                 });
 
@@ -78,7 +116,7 @@ router.get('/api/races/:id', async (req, res) => {
                 };
             });
 
-            if (!data) return res.status(404).json({ error: 'F2 race weekend not found.' });
+            if (!data) return res.status(404).json({ error: `${series.toUpperCase()} race weekend not found.` });
             return res.json(data);
         }
 
@@ -164,14 +202,16 @@ router.get('/api/races', async (req, res) => {
     try {
 
         const hasYear = req.query.year !== undefined;
-        const isF2 = String(req.query.series || '').toLowerCase() === 'f2';
-        const year = optionalInteger(req.query.year, { min: isF2 ? 2017 : 1950, max: 9999 });
+        const series = String(req.query.series || '').toLowerCase();
+        const isJuniorSeries = ['f2', 'f3'].includes(series);
+        const year = optionalInteger(req.query.year, { min: series === 'f3' ? 2019 : series === 'f2' ? 2017 : 1950, max: 9999 });
 
         if (hasYear && year === null) {
             return res.status(400).json({ error: 'Invalid year.' });
         }
 
-        if (isF2) {
+        if (isJuniorSeries) {
+            const prefix = `${series}_`;
             const rows = await withConnection(connection => {
                 const conditions = [];
                 const values = [];
@@ -189,9 +229,9 @@ router.get('/api/races', async (req, res) => {
                         COUNT(sessions.id) AS sessionCount,
                         SUM(CASE WHEN LOWER(CAST(sessions.isRace AS CHAR)) IN ('1', 'true') THEN 1 ELSE 0 END) AS raceSessionCount,
                         SUM(CASE WHEN LOWER(CAST(sessions.cancelled AS CHAR)) IN ('1', 'true') THEN 1 ELSE 0 END) AS cancelledSessionCount
-                    FROM f2_races races
-                    LEFT JOIN f2_circuits circuits ON circuits.id = races.circuitId
-                    LEFT JOIN f2_sessions sessions ON sessions.raceId = races.id
+                    FROM ${prefix}races races
+                    LEFT JOIN ${prefix}circuits circuits ON circuits.id = races.circuitId
+                    LEFT JOIN ${prefix}sessions sessions ON sessions.raceId = races.id
                     ${conditions.length ? `WHERE ${conditions.join(' AND ')}` : ''}
                     GROUP BY races.id, races.year, races.round, races.date, races.endDate,
                         races.name, races.code, races.circuitId, circuits.name, circuits.placeName
