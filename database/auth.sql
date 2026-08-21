@@ -1,13 +1,36 @@
 CREATE TABLE IF NOT EXISTS app_users (
     id CHAR(36) NOT NULL,
-    email VARCHAR(254) NOT NULL,
+    username VARCHAR(80) NOT NULL,
     display_name VARCHAR(80) NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
+    terms_version VARCHAR(20) NULL,
+    privacy_version VARCHAR(20) NULL,
+    legal_accepted_at DATETIME NULL,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
-    UNIQUE KEY app_users_email_unique (email)
+    UNIQUE KEY app_users_username_unique (username)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+ALTER TABLE app_users ADD COLUMN IF NOT EXISTS username VARCHAR(80) NULL AFTER id;
+UPDATE app_users SET username = display_name WHERE username IS NULL OR username = '';
+UPDATE app_users account
+JOIN (
+    SELECT LOWER(username) AS normalized_username, MIN(id) AS retained_id
+    FROM app_users
+    GROUP BY LOWER(username)
+    HAVING COUNT(*) > 1
+) duplicates
+    ON LOWER(account.username) = duplicates.normalized_username
+    AND account.id <> duplicates.retained_id
+SET account.username = CONCAT(LEFT(account.username, 67), '-', LEFT(REPLACE(account.id, '-', ''), 8));
+ALTER TABLE app_users MODIFY COLUMN username VARCHAR(80) NOT NULL;
+ALTER TABLE app_users ADD UNIQUE INDEX IF NOT EXISTS app_users_username_unique (username);
+ALTER TABLE app_users DROP INDEX IF EXISTS app_users_email_unique;
+ALTER TABLE app_users DROP COLUMN IF EXISTS email;
+ALTER TABLE app_users ADD COLUMN IF NOT EXISTS terms_version VARCHAR(20) NULL AFTER password_hash;
+ALTER TABLE app_users ADD COLUMN IF NOT EXISTS privacy_version VARCHAR(20) NULL AFTER terms_version;
+ALTER TABLE app_users ADD COLUMN IF NOT EXISTS legal_accepted_at DATETIME NULL AFTER privacy_version;
 
 CREATE TABLE IF NOT EXISTS app_sessions (
     id CHAR(64) NOT NULL,

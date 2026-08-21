@@ -1,6 +1,7 @@
 const crypto = require('node:crypto');
 const express = require('express');
 const { pool, sendError, withConnection } = require('../route-helpers');
+const { PRIVACY_VERSION, TERMS_VERSION } = require('../legal');
 const {
     createSession,
     ensureAuthSchema,
@@ -16,12 +17,12 @@ const {
 const router = express.Router();
 const attempts = new Map();
 
-function normalizeEmail(value) {
+function normalizeUsername(value) {
     return String(value || '').trim().toLowerCase();
 }
 
 function clientKey(req) {
-    return `${req.ip}:${normalizeEmail(req.body?.email)}`;
+    return `${req.ip}:${normalizeUsername(req.body?.username)}`;
 }
 
 function rateLimited(req) {
@@ -54,35 +55,36 @@ router.get('/api/account', async (req, res) => {
 
 router.post('/api/account/register', async (req, res) => {
     if (rateLimited(req)) return res.status(429).json({ error: 'Too many attempts. Try again later.' });
-    const email = normalizeEmail(req.body.email);
-    const displayName = String(req.body.displayName || '').trim();
+    const username = String(req.body.username || '').trim();
     const password = String(req.body.password || '');
 
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 254) {
-        return res.status(400).json({ error: 'Enter a valid email address.' });
-    }
-    if (displayName.length < 2 || displayName.length > 80) {
-        return res.status(400).json({ error: 'Display name must be 2–80 characters.' });
+    if (!/^[A-Za-z0-9_.-]{3,30}$/.test(username)) {
+        return res.status(400).json({ error: 'Username must be 3–30 letters, numbers, dots, underscores or hyphens.' });
     }
     if (password.length < 10 || password.length > 200) {
         return res.status(400).json({ error: 'Password must be at least 10 characters.' });
+    }
+    if (req.body.legalAccepted !== true) {
+        return res.status(400).json({ error: 'You must confirm your age, agree to the Terms, and acknowledge the Privacy Notice.' });
     }
 
     try {
         await ensureAuthSchema();
         const result = await withConnection(async connection => {
-            const existing = await connection.query('SELECT id FROM app_users WHERE email = ?', [email]);
+            const existing = await connection.query('SELECT id FROM app_users WHERE username = ?', [username]);
             if (existing.length) return null;
             const id = crypto.randomUUID();
             const passwordHash = await hashPassword(password);
             await connection.query(
-                'INSERT INTO app_users (id, email, display_name, password_hash) VALUES (?, ?, ?, ?)',
-                [id, email, displayName, passwordHash]
+                `INSERT INTO app_users
+                    (id, username, display_name, password_hash, terms_version, privacy_version, legal_accepted_at)
+                 VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)`,
+                [id, username, username, passwordHash, TERMS_VERSION, PRIVACY_VERSION]
             );
             const token = await createSession(connection, id);
-            return { token, user: { id, email, displayName } };
+            return { token, user: { id, username, displayName: username } };
         });
-        if (!result) return res.status(409).json({ error: 'An account with that email already exists.' });
+        if (!result) return res.status(409).json({ error: 'That username is already taken.' });
         res.setHeader('Set-Cookie', sessionCookie(result.token));
         res.status(201).json({ user: result.user });
     } catch (error) {
@@ -92,22 +94,22 @@ router.post('/api/account/register', async (req, res) => {
 
 router.post('/api/account/login', async (req, res) => {
     if (rateLimited(req)) return res.status(429).json({ error: 'Too many attempts. Try again later.' });
-    const email = normalizeEmail(req.body.email);
+    const username = String(req.body.username || '').trim();
     const password = String(req.body.password || '');
 
     try {
         await ensureAuthSchema();
         const result = await withConnection(async connection => {
             const rows = await connection.query(
-                'SELECT id, email, display_name AS displayName, password_hash AS passwordHash FROM app_users WHERE email = ?',
-                [email]
+                'SELECT id, username, display_name AS displayName, password_hash AS passwordHash FROM app_users WHERE username = ?',
+                [username]
             );
             const record = rows[0];
             if (!record || !await verifyPassword(password, record.passwordHash)) return null;
             const token = await createSession(connection, record.id);
-            return { token, user: { id: record.id, email: record.email, displayName: record.displayName } };
+            return { token, user: { id: record.id, username: record.username, displayName: record.displayName } };
         });
-        if (!result) return res.status(401).json({ error: 'Email or password is incorrect.' });
+        if (!result) return res.status(401).json({ error: 'Username or password is incorrect.' });
         attempts.delete(clientKey(req));
         res.setHeader('Set-Cookie', sessionCookie(result.token));
         res.json({ user: result.user });

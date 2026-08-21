@@ -351,6 +351,7 @@ async function loadFooter() {
             if (paragraphs[2]) paragraphs[2].textContent = 'Racelytic is an unofficial, independent project and is not affiliated with Formula 2, the FIA, or any Formula 2 team. Formula 2, F2, and related marks are trademarks of their respective owners.';
             if (paragraphs[3]) paragraphs[3].textContent = 'Formula 2 statistics are compiled from the project dataset and Motorsport Stats. Data may contain errors and should not be treated as an official record.';
         }
+        footer.querySelector('[data-privacy-settings]')?.addEventListener('click', () => showAnalyticsChoice(true));
     } catch (error) {
         console.error('Footer error:', error);
     }
@@ -358,20 +359,76 @@ async function loadFooter() {
 
 loadFooter();
 
+const ANALYTICS_CONSENT_KEY = 'racelytic-analytics-consent';
+const ANALYTICS_VISITOR_KEY = 'racelytic-visitor-id';
+const ANALYTICS_CONSENT_LIFETIME = 13 * 30.44 * 24 * 60 * 60 * 1000;
+let stopAnalytics = null;
+
+function analyticsChoice() {
+    try {
+        const stored = JSON.parse(localStorage.getItem(ANALYTICS_CONSENT_KEY) || 'null');
+        if (!stored?.choice || Date.now() - Number(stored.decidedAt) >= ANALYTICS_CONSENT_LIFETIME) {
+            localStorage.removeItem(ANALYTICS_CONSENT_KEY);
+            localStorage.removeItem(ANALYTICS_VISITOR_KEY);
+            return null;
+        }
+        return stored.choice;
+    } catch {
+        try {
+            localStorage.removeItem(ANALYTICS_CONSENT_KEY);
+            localStorage.removeItem(ANALYTICS_VISITOR_KEY);
+        } catch {}
+        return null;
+    }
+}
+
+function setAnalyticsChoice(choice) {
+    try {
+        localStorage.setItem(ANALYTICS_CONSENT_KEY, JSON.stringify({ choice, decidedAt: Date.now() }));
+        if (choice !== 'allowed') localStorage.removeItem(ANALYTICS_VISITOR_KEY);
+    } catch {}
+    if (choice === 'allowed') {
+        if (!stopAnalytics) stopAnalytics = startAnonymousAnalytics();
+    } else if (stopAnalytics) {
+        stopAnalytics();
+        stopAnalytics = null;
+    }
+    document.querySelector('.privacy-banner')?.remove();
+}
+
+function showAnalyticsChoice(settings = false) {
+    document.querySelector('.privacy-banner')?.remove();
+    const banner = document.createElement('aside');
+    banner.className = 'privacy-banner';
+    banner.setAttribute('aria-label', 'Analytics privacy choice');
+    banner.innerHTML = `
+        <div class="privacy-banner-copy">
+            <strong>${settings ? 'Analytics privacy settings' : 'Your privacy choice'}</strong>
+            <p>Sam Nijsten uses optional first-party analytics to count visits, pages viewed and active time. If allowed, Racelytic stores a random visitor ID in your browser for up to 13 months. No advertising trackers are used. <a href="/privacy#choices">Privacy Notice</a></p>
+        </div>
+        <div class="privacy-banner-actions">
+            <button type="button" class="button secondary" data-analytics-choice="declined">Decline</button>
+            <button type="button" class="button primary" data-analytics-choice="allowed">Allow analytics</button>
+        </div>`;
+    banner.querySelectorAll('[data-analytics-choice]').forEach(button => button.addEventListener('click', () => setAnalyticsChoice(button.dataset.analyticsChoice)));
+    document.body.appendChild(banner);
+}
+
 function startAnonymousAnalytics() {
-    if (navigator.doNotTrack === '1' || window.location.pathname.startsWith('/monitor')) return;
+    if (navigator.doNotTrack === '1' || window.location.pathname.startsWith('/monitor')) return null;
     const uuid = () => crypto.randomUUID?.() || 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, character => {
         const random = crypto.getRandomValues(new Uint8Array(1))[0] % 16;
         return (character === 'x' ? random : (random & 3) | 8).toString(16);
     });
     let visitorId;
     try {
-        visitorId = localStorage.getItem('racelytic-visitor-id') || uuid();
-        localStorage.setItem('racelytic-visitor-id', visitorId);
+        visitorId = localStorage.getItem(ANALYTICS_VISITOR_KEY) || uuid();
+        localStorage.setItem(ANALYTICS_VISITOR_KEY, visitorId);
     } catch {
         visitorId = uuid();
     }
     const id = uuid();
+    let running = true;
     let activeMilliseconds = 0;
     let activeSince = document.visibilityState === 'visible' ? performance.now() : null;
     const duration = () => Math.round((activeMilliseconds + (activeSince === null ? 0 : performance.now() - activeSince)) / 1000);
@@ -385,10 +442,12 @@ function startAnonymousAnalytics() {
         const referrer = document.referrer && new URL(document.referrer);
         if (referrer && referrer.host !== window.location.host) referrerHost = referrer.host;
     } catch {}
-    send('/api/analytics/visit', { id, visitorId, path: `${location.pathname}${location.search}`, referrerHost });
-    const heartbeat = () => send('/api/analytics/heartbeat', { id, duration: duration() });
+    send('/api/analytics/visit', { id, visitorId, path: location.pathname, referrerHost });
+    const heartbeat = () => {
+        if (running) send('/api/analytics/heartbeat', { id, duration: duration() });
+    };
     const timer = window.setInterval(heartbeat, 15000);
-    document.addEventListener('visibilitychange', () => {
+    const handleVisibility = () => {
         if (document.visibilityState === 'hidden' && activeSince !== null) {
             activeMilliseconds += performance.now() - activeSince;
             activeSince = null;
@@ -396,13 +455,24 @@ function startAnonymousAnalytics() {
         } else if (document.visibilityState === 'visible' && activeSince === null) {
             activeSince = performance.now();
         }
-    });
-    window.addEventListener('pagehide', () => {
+    };
+    const handlePageHide = () => {
         window.clearInterval(timer);
         if (activeSince !== null) activeMilliseconds += performance.now() - activeSince;
         activeSince = null;
         heartbeat();
-    });
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+    window.addEventListener('pagehide', handlePageHide);
+    return () => {
+        running = false;
+        window.clearInterval(timer);
+        activeSince = null;
+        document.removeEventListener('visibilitychange', handleVisibility);
+        window.removeEventListener('pagehide', handlePageHide);
+    };
 }
 
-startAnonymousAnalytics();
+const storedAnalyticsChoice = analyticsChoice();
+if (storedAnalyticsChoice === 'allowed') stopAnalytics = startAnonymousAnalytics();
+else if (!storedAnalyticsChoice && !window.location.pathname.startsWith('/monitor')) showAnalyticsChoice();

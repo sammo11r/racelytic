@@ -36,7 +36,7 @@ function showUser(user) {
   authPanel.hidden = true;
   profilePanel.hidden = false;
   document.getElementById('account-name').textContent = user.displayName;
-  document.getElementById('account-email').textContent = user.email;
+  document.getElementById('account-username').textContent = `@${user.username}`;
   document.getElementById('account-avatar').textContent = user.displayName.slice(0, 2).toUpperCase();
   systemManager.hidden = false;
   recordBook.hidden = false;
@@ -216,10 +216,12 @@ async function submitAccount(form, action) {
   button.textContent = action === 'login' ? 'Signing in…' : 'Creating account…';
   message.textContent = '';
   try {
+    const payload = Object.fromEntries(new FormData(form));
+    if (action === 'register') payload.legalAccepted = form.elements.legalAccepted.checked;
     const response = await fetch(`/api/account/${action}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(Object.fromEntries(new FormData(form)))
+      body: JSON.stringify(payload)
     });
     const data = await response.json();
     if (!response.ok) throw new Error(data.error || 'Request failed.');

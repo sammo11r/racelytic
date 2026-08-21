@@ -120,10 +120,14 @@ test('public pages use extensionless URLs and preserve legacy query strings', as
         const { port } = server.address();
         const clean = await request(port, '/driver?id=max-verstappen');
         const legacy = await request(port, '/driver.html?id=max-verstappen');
+        const privacy = await request(port, '/privacy');
+        const terms = await request(port, '/terms');
 
         assert.equal(clean.statusCode, 200);
         assert.equal(legacy.statusCode, 308);
         assert.equal(legacy.headers.location, '/driver?id=max-verstappen');
+        assert.equal(privacy.statusCode, 200);
+        assert.equal(terms.statusCode, 200);
     } finally {
         await new Promise((resolve, reject) => server.close(error => error ? reject(error) : resolve()));
     }

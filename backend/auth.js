@@ -73,7 +73,7 @@ async function getUserFromRequest(req) {
     const token = parseCookies(req.headers.cookie)[SESSION_COOKIE];
     if (!token) return null;
     const rows = await pool.query(`
-        SELECT u.id, u.email, u.display_name AS displayName
+        SELECT u.id, u.username, u.display_name AS displayName
         FROM app_sessions s
         JOIN app_users u ON u.id = s.user_id
         WHERE s.id = ? AND s.expires_at > NOW()

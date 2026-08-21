@@ -1,0 +1,4 @@
+const TERMS_VERSION = '2026-08-21';
+const PRIVACY_VERSION = '2026-08-21';
+
+module.exports = { TERMS_VERSION, PRIVACY_VERSION };

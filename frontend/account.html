@@ -37,15 +37,15 @@
       </div>
 
       <form id="login-form" class="account-form">
-        <label><span>Email</span><input name="email" type="email" autocomplete="email" required></label>
+        <label><span>Username</span><input name="username" autocomplete="username" required></label>
         <label><span>Password</span><input name="password" type="password" autocomplete="current-password" required></label>
         <button class="button primary" type="submit">Sign in</button>
       </form>
 
       <form id="register-form" class="account-form" hidden>
-        <label><span>Display name</span><input name="displayName" autocomplete="name" minlength="2" maxlength="80" required></label>
-        <label><span>Email</span><input name="email" type="email" autocomplete="email" required></label>
+        <label><span>Username</span><input name="username" autocomplete="username" minlength="3" maxlength="30" pattern="[A-Za-z0-9_.-]+" required><small>3–30 letters, numbers, dots, underscores or hyphens</small></label>
         <label><span>Password</span><input name="password" type="password" autocomplete="new-password" minlength="10" required><small>At least 10 characters</small></label>
+        <label class="account-legal-check"><input name="legalAccepted" type="checkbox" required><span>I confirm that I am at least 16 years old, agree to the <a href="/terms" target="_blank">Terms of Service</a>, and acknowledge the <a href="/privacy" target="_blank">Privacy Notice</a>.</span></label>
         <button class="button primary" type="submit">Create account</button>
       </form>
       <div id="account-message" class="account-message" aria-live="polite"></div>
@@ -53,7 +53,7 @@
 
     <section id="account-profile" class="account-profile" hidden>
       <div class="account-avatar" id="account-avatar"></div>
-      <div><span>Signed in as</span><h2 id="account-name"></h2><p id="account-email"></p></div>
+      <div><span>Signed in as</span><h2 id="account-name"></h2><p id="account-username"></p></div>
       <button class="button secondary" id="logout-button" type="button">Sign out</button>
     </section>
 

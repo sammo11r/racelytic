@@ -5,7 +5,9 @@ const { integerOrDefault } = require('../validation');
 
 const router = express.Router();
 let schemaPromise;
+let lastRetentionCleanup = 0;
 const ingestionWindows = new Map();
+const RETENTION_CLEANUP_INTERVAL = 24 * 60 * 60 * 1000;
 
 function protectIngestion(req, res, next) {
     const origin = req.get('origin');
@@ -42,17 +44,31 @@ function validId(value) {
     return /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(value || ''));
 }
 
+function normalizedPath(value) {
+    const path = String(value || '').split(/[?#]/, 1)[0].slice(0, 500);
+    return path.startsWith('/') ? path : '';
+}
+
+async function applyRetention(connection) {
+    if (Date.now() - lastRetentionCleanup < RETENTION_CLEANUP_INTERVAL) return;
+    await connection.query('DELETE FROM app_analytics_visits WHERE started_at < CURRENT_DATE - INTERVAL 13 MONTH');
+    lastRetentionCleanup = Date.now();
+}
+
 router.post('/api/analytics/visit', async (req, res) => {
     const { id, visitorId } = req.body || {};
-    const path = String(req.body?.path || '').slice(0, 500);
+    const path = normalizedPath(req.body?.path);
     const referrerHost = String(req.body?.referrerHost || '').slice(0, 255) || null;
     if (!validId(id) || !validId(visitorId) || !path.startsWith('/') || path.startsWith('/monitor')) return res.status(400).end();
     try {
         await ensureAnalyticsSchema();
-        await withConnection(connection => connection.query(
-            'INSERT IGNORE INTO app_analytics_visits (id, visitor_id, path, referrer_host) VALUES (?, ?, ?, ?)',
-            [id, visitorId, path, referrerHost]
-        ));
+        await withConnection(async connection => {
+            await applyRetention(connection);
+            await connection.query(
+                'INSERT IGNORE INTO app_analytics_visits (id, visitor_id, path, referrer_host) VALUES (?, ?, ?, ?)',
+                [id, visitorId, path, referrerHost]
+            );
+        });
         res.status(204).end();
     } catch (error) { sendError(res, error); }
 });
@@ -76,6 +92,7 @@ router.get('/api/analytics/report', requireMonitorAuth, async (req, res) => {
     try {
         await ensureAnalyticsSchema();
         const data = await withConnection(async connection => {
+            await applyRetention(connection);
             const params = [days];
             const [summary, daily, pages, recent] = await Promise.all([
                 connection.query(`SELECT COUNT(*) AS visits, COUNT(DISTINCT visitor_id) AS visitors,
