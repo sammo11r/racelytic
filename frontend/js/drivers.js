@@ -52,6 +52,13 @@ function updateDrivers() {
     .filter(d => `${d.name} ${d.abbreviation || ''}`.toLowerCase().includes(driverSearch))
     .sort((a, b) => {
       if (driverSort === 'name-desc') return compareNames(b, a);
+      if (driverSort === 'recent') {
+        return Number(b.lastYear || 0) - Number(a.lastYear || 0) || compareNames(a, b);
+      }
+      if (driverSort === 'best-finish') {
+        return Number(a.bestChampionshipPosition || 999) - Number(b.bestChampionshipPosition || 999)
+          || compareNames(a, b);
+      }
       if (driverSort === 'wins-desc') {
         return Number(b.totalRaceWins || 0) - Number(a.totalRaceWins || 0)
           || Number(b.totalPodiums || 0) - Number(a.totalPodiums || 0)
@@ -67,11 +74,11 @@ function renderDrivers(list) {
   const paged = pageItems(list, driverPage, DRIVER_PAGE_SIZE);
   driverPage = paged.page;
   document.getElementById('drivers').innerHTML = paged.items.map(d => `
-    <a class="entity-card driver-browser-card f1-achievement-card${F1_DRIVER_MEMORIALS.has(String(d.id)) ? ' f2-driver-card-memorial' : ''}" href="/driver?id=${encodeURIComponent(d.id)}">
+    <a class="entity-card driver-browser-card f2-driver-card f1-achievement-card${F1_DRIVER_MEMORIALS.has(String(d.id)) ? ' f2-driver-card-memorial' : ''}" href="/driver?id=${encodeURIComponent(d.id)}">
       ${f1DriverMemorial(d)}
       <div class="driver-card-name"><h3>${esc(d.name)}</h3>${COUNTRY_CODES[d.nationalityCountryId] ? `<img class="driver-card-flag" src="/assets/flags/${COUNTRY_CODES[d.nationalityCountryId].toLowerCase()}.svg" alt="${esc(countryName(d.nationalityCountryId))} flag" loading="lazy">` : ''}</div>
       <p>${esc(d.abbreviation || '')}${d.nationalityCountryId ? ` · ${esc(countryName(d.nationalityCountryId))}` : ''}</p>
-      <span class="number">${fmtNumber(d.totalRaceWins)} wins · ${fmtNumber(d.totalPodiums)} podiums</span>
+      <div class="f2-driver-card-record"><span><strong>${fmtNumber(d.totalRaceWins)}</strong> wins</span><span><strong>${fmtNumber(d.totalPodiums)}</strong> podiums</span><span><strong>${fmtNumber(d.totalChampionshipWins)}</strong> titles</span></div>
       ${f1DriverTitle(d)}
     </a>`).join('');
   renderPagination('drivers', list.length, driverPage, DRIVER_PAGE_SIZE, page => { driverPage = page; updateDrivers(); document.getElementById('drivers').scrollIntoView({ behavior: 'smooth', block: 'start' }); });

@@ -38,12 +38,13 @@ function renderWinnerBoard() {
   board.classList.add('is-measuring');
   board.innerHTML = columns.map(column => `<div class="quiz-column-table table-wrap">
     <table class="champions-quiz-table race-winners-table">
-      <thead><tr><th>Wins</th><th>Driver</th><th>First win</th></tr></thead>
+      <thead><tr><th>Wins</th><th>Driver</th><th>Nation</th><th>First win</th></tr></thead>
       <tbody>${column.map(row => {
         const name = revealedWinners.get(row.slot);
         return `<tr class="${name ? 'is-revealed' : ''}">
           <td><strong>${fmtNumber(row.wins)}</strong></td>
           <td class="quiz-driver-cell">${driverCellContent(name, row.driverNameLength)}</td>
+          <td>${esc(row.countryName || '—')}</td>
           <td>${esc(row.firstWinYear)}</td>
         </tr>`;
       }).join('')}</tbody>
@@ -53,7 +54,7 @@ function renderWinnerBoard() {
   measuredTableWidth = Math.max(measuredTableWidth, ...[...board.querySelectorAll('.quiz-column-table')].map(table => table.getBoundingClientRect().width));
   const fittedColumnCount = responsiveColumnCount(board, winnerRows.length);
   if (fittedColumnCount !== columnCount) return renderWinnerBoard();
-  preserveMeasuredColumnProportions(board, 3);
+  preserveMeasuredColumnProportions(board, 4);
   board.classList.remove('is-measuring');
 
   const found = revealedWinners.size;

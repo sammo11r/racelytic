@@ -2365,6 +2365,10 @@ table td { padding: 14px 16px; }
 .f2-winners-board .f2-race-winners-table td { text-align: center; }
 .f2-winners-board .quiz-answer-overlay { right: 0; left: 0; max-width: none; text-align: center; }
 .f2-winners-board .quiz-empty-answer.quiz-answer-overlay { right: auto; left: 12.5%; width: 75%; margin: 0; }
+.race-winners-quiz-page .dynamic-quiz-board .champions-quiz-table th,
+.race-winners-quiz-page .dynamic-quiz-board .champions-quiz-table td { text-align: center; }
+.race-winners-quiz-page .dynamic-quiz-board .quiz-answer-overlay { right: 0; left: 0; max-width: none; text-align: center; }
+.race-winners-quiz-page .dynamic-quiz-board .quiz-empty-answer.quiz-answer-overlay { right: auto; left: 12.5%; width: 75%; margin: 0; }
 .quiz-nation { font-size: 10px; font-weight: 750; }
 
 /* Shared content-measured layout for every quiz board. */

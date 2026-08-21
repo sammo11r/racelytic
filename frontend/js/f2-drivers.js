@@ -47,6 +47,7 @@ function updateF2Drivers() {
   const visible = allF2Drivers
     .filter(driver => `${driver.name} ${driver.abbreviation || ''} ${f2CountryName(driver.countryCode)} ${driver.latestConstructorName || ''}`.toLowerCase().includes(f2DriverSearch))
     .sort((first, second) => {
+      if (f2DriverSort === 'name-desc') return compareF2DriverNames(second, first);
       if (f2DriverSort === 'name-asc') return compareF2DriverNames(first, second);
       if (f2DriverSort === 'best-finish') {
         const firstPosition = Number(first.bestChampionshipPosition || Number.MAX_SAFE_INTEGER);

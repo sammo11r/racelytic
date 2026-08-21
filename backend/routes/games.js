@@ -5,12 +5,13 @@ const router = express.Router();
 
 async function getRaceWinners() {
     return pool.query(`
-        SELECT drivers.name AS driverName, COUNT(*) AS wins,
+        SELECT drivers.name AS driverName, countries.name AS countryName, COUNT(*) AS wins,
             MIN(results.year) AS firstWinYear, MAX(results.year) AS lastWinYear
         FROM races_race_results results
         JOIN drivers ON drivers.id = results.driverId
+        LEFT JOIN countries ON countries.id = drivers.nationalityCountryId
         WHERE results.positionNumber = 1
-        GROUP BY results.driverId, drivers.name
+        GROUP BY results.driverId, drivers.name, countries.name
         ORDER BY wins DESC, drivers.name
     `);
 }
@@ -179,6 +180,7 @@ router.get('/api/games/race-winners', async (req, res) => {
             slot,
             wins: Number(row.wins),
             driverNameLength,
+            ...(!isF2 ? { countryName: row.countryName || null } : {}),
             ...(isF2 ? {
                 featureWins: Number(row.featureWins),
                 sprintWins: Number(row.sprintWins),

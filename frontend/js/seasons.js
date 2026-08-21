@@ -96,8 +96,9 @@ function renderSeasons(seasons) {
                         ${esc(season.year)}
                     </div>
 
-                    <div class="season-card-champion">
-                        World champion: <strong>${esc(season.champion?.name || 'Not awarded')}</strong>
+                    <div class="season-card-champion${season.champion?.name ? ' has-champion' : ''}">
+                        <span>World champion</span>
+                        <strong>${esc(season.champion?.name || 'To be decided')}</strong>
                     </div>
                 </div>
 

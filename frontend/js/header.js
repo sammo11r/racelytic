@@ -144,6 +144,19 @@ async function loadHeader() {
             if (pointsAccountLink) pointsAccountLink.href = '/account?series=f2';
             const accountBuilderLink = document.querySelector('#custom-championship-manager a[href="/championship-builder"]');
             if (accountBuilderLink) accountBuilderLink.href = '/f2/championship-builder';
+            const rewriteF2Links = root => {
+                const links = root.matches?.('a[href]') ? [root] : [...(root.querySelectorAll?.('a[href]') || [])];
+                links.forEach(link => {
+                    const href = link.getAttribute('href') || '';
+                    if (/^\/(season|race|driver|circuit|constructor)(?=[/?#])/.test(href)) {
+                        link.setAttribute('href', `/f2${href}`);
+                    }
+                });
+            };
+            rewriteF2Links(document.body);
+            new MutationObserver(mutations => mutations.forEach(mutation => mutation.addedNodes.forEach(node => {
+                if (node.nodeType === Node.ELEMENT_NODE) rewriteF2Links(node);
+            }))).observe(document.body, { childList: true, subtree: true });
             const f2Copy = {
                 '/f2/simulate-season': ['FORMULA 2 SIMULATOR', 'Rewrite a Formula 2 championship.', 'Apply a different feature, sprint and bonus-points system to any Formula 2 season.'],
                 '/f2/scenario-calculator': ['FORMULA 2 SCENARIOS', 'Shape the Formula 2 title run-in.', 'Freeze the standings after any round, rewrite the remaining feature results and retain each sprint classification.'],

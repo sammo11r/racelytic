@@ -131,7 +131,9 @@ router.get('/api/drivers', async (req, res) => {
                         totalPolePositions,
                         totalFastestLaps,
                         totalPoints,
-                        totalChampionshipWins
+                        totalChampionshipWins,
+                        (SELECT MAX(year) FROM seasons_driver_standings standings WHERE standings.driverId = drivers.id) AS lastYear,
+                        (SELECT MIN(positionNumber) FROM seasons_driver_standings standings WHERE standings.driverId = drivers.id) AS bestChampionshipPosition
 
                     FROM drivers
 
@@ -165,7 +167,9 @@ router.get('/api/drivers', async (req, res) => {
                     totalPolePositions,
                     totalFastestLaps,
                     totalPoints,
-                    totalChampionshipWins
+                    totalChampionshipWins,
+                    (SELECT MAX(year) FROM seasons_driver_standings standings WHERE standings.driverId = drivers.id) AS lastYear,
+                    (SELECT MIN(positionNumber) FROM seasons_driver_standings standings WHERE standings.driverId = drivers.id) AS bestChampionshipPosition
 
                 FROM drivers
 
