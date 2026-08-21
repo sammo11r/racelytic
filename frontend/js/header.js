@@ -17,9 +17,11 @@ async function loadHeader() {
         const requestedSeries = new URLSearchParams(window.location.search).get('series');
         let rememberedSeries = '';
         try { rememberedSeries = localStorage.getItem('racelytic-series') || ''; } catch {}
+        const seriesNeutralPages = ['/account', '/privacy', '/terms'];
         const isAccountPage = window.location.pathname === '/account';
+        const isSeriesNeutralPage = seriesNeutralPages.includes(window.location.pathname);
         const isF2Mode = window.location.pathname === '/f2' || window.location.pathname.startsWith('/f2/')
-            || (isAccountPage && (requestedSeries === 'f2' || (!requestedSeries && rememberedSeries === 'f2')));
+            || (isSeriesNeutralPage && (requestedSeries === 'f2' || (!requestedSeries && rememberedSeries === 'f2')));
         try { localStorage.setItem('racelytic-series', isF2Mode ? 'f2' : 'f1'); } catch {}
         document.body.classList.toggle('f2-mode', isF2Mode);
         if (!isF2Mode && !document.title.includes('Formula 1')) {
@@ -41,9 +43,58 @@ async function loadHeader() {
             ? '/assets/favicon-f2.svg'
             : '/assets/favicon-f1.svg';
 
+        const pagePairs = {
+            '/': '/f2', '/database': '/f2/database', '/seasons': '/f2/seasons', '/races': '/f2/races',
+            '/drivers': '/f2/drivers', '/circuits': '/f2/circuits', '/constructors': '/f2/constructors',
+            '/analysis': '/f2/analysis', '/season-analysis': '/f2/season-analysis',
+            '/season-comparison': '/f2/season-comparison', '/race-analysis': '/f2/race-analysis',
+            '/driver-comparison': '/f2/driver-comparison', '/driver-form': '/f2/driver-form',
+            '/teammate-battles': '/f2/teammate-battles', '/circuit-analysis': '/f2/circuit-analysis',
+            '/records': '/f2/records', '/simulator-overview': '/f2/simulator', '/simulator': '/f2/simulate-season',
+            '/scenario-calculator': '/f2/scenario-calculator', '/championship-builder': '/f2/championship-builder',
+            '/points-systems': '/f2/points-systems', '/games': '/f2/games', '/quizzes': '/f2/quizzes',
+            '/world-champions-quiz': '/f2/champions-quiz', '/race-winners-quiz': '/f2/race-winners-quiz',
+            '/about': '/f2/about'
+        };
+        const reversePagePairs = Object.fromEntries(Object.entries(pagePairs).map(([f1, f2]) => [f2, f1]));
+        const detailPages = {
+            '/season': ['season', '/f2/seasons'], '/race': ['race', '/f2/races'],
+            '/driver': ['driver', '/f2/drivers'], '/circuit': ['circuit', '/f2/circuits'],
+            '/constructor': ['constructor', '/f2/constructors'],
+            '/f2/season': ['season', '/seasons'], '/f2/race': ['race', '/races'],
+            '/f2/driver': ['driver', '/drivers'], '/f2/circuit': ['circuit', '/circuits'],
+            '/f2/constructor': ['constructor', '/constructors']
+        };
+        const resolveSeriesTarget = async targetSeries => {
+            if (isSeriesNeutralPage) return `${window.location.pathname}?series=${targetSeries}`;
+            const targetF2 = targetSeries === 'f2';
+            const pair = targetF2 ? pagePairs[window.location.pathname] : reversePagePairs[window.location.pathname];
+            if (pair) return `${pair}${window.location.search}${window.location.hash}`;
+            const detail = detailPages[window.location.pathname];
+            if (detail) {
+                const parameter = detail[0] === 'season' ? 'year' : 'id';
+                const id = new URLSearchParams(window.location.search).get(parameter);
+                if (!id) return detail[1];
+                try {
+                    const equivalent = await fetch(`/api/series-equivalent?target=${targetSeries}&type=${detail[0]}&id=${encodeURIComponent(id)}`);
+                    if (equivalent.ok) return (await equivalent.json()).url;
+                } catch {}
+                return detail[1];
+            }
+            if (window.location.pathname === '/chassis' && targetF2) return '/f2/database';
+            return targetF2 ? '/f2' : '/';
+        };
+
         container.querySelectorAll('.series-switcher a').forEach(link => {
             const active = link.dataset.series === (isF2Mode ? 'f2' : 'f1');
-            if (isAccountPage) link.href = `/account?series=${link.dataset.series}`;
+            if (active) {
+                link.href = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+            } else {
+                const fallback = detailPages[window.location.pathname]?.[1]
+                    || (isSeriesNeutralPage ? `${window.location.pathname}?series=${link.dataset.series}` : link.href);
+                link.href = fallback;
+                resolveSeriesTarget(link.dataset.series).then(url => { link.href = url; });
+            }
             link.classList.toggle('active', active);
             if (active) link.setAttribute('aria-current', 'page');
         });
@@ -404,7 +455,7 @@ function showAnalyticsChoice(settings = false) {
     banner.innerHTML = `
         <div class="privacy-banner-copy">
             <strong>${settings ? 'Analytics privacy settings' : 'Your privacy choice'}</strong>
-            <p>Sam Nijsten uses optional first-party analytics to count visits, pages viewed and active time. If allowed, Racelytic stores a random visitor ID in your browser for up to 13 months. No advertising trackers are used. <a href="/privacy#choices">Privacy Notice</a></p>
+            <p>Racelytic uses optional first-party analytics to count visits, pages viewed and active time. If allowed, Racelytic stores a random visitor ID in your browser for up to 13 months. No advertising trackers are used. <a href="/privacy#choices">Privacy Notice</a></p>
         </div>
         <div class="privacy-banner-actions">
             <button type="button" class="button secondary" data-analytics-choice="declined">Decline</button>

@@ -60,7 +60,8 @@ test('all public API routes remain registered after modularization', () => {
         '/api/records/saved/:id',
         '/api/search',
         '/api/seasons',
-        '/api/seasons/:year'
+        '/api/seasons/:year',
+        '/api/series-equivalent'
     ]);
 });
 

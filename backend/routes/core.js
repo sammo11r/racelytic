@@ -68,6 +68,111 @@ router.get('/api/health', async (req, res) => {
     }
 });
 
+const SERIES_PARENTS = {
+    driver: { f1: '/drivers', f2: '/f2/drivers' },
+    constructor: { f1: '/constructors', f2: '/f2/constructors' },
+    circuit: { f1: '/circuits', f2: '/f2/circuits' },
+    race: { f1: '/races', f2: '/f2/races' },
+    season: { f1: '/seasons', f2: '/f2/seasons' }
+};
+
+router.get('/api/series-equivalent', async (req, res) => {
+    const target = String(req.query.target || '').toLowerCase();
+    const type = String(req.query.type || '').toLowerCase();
+    const id = String(req.query.id || '').trim().slice(0, 120);
+    if (!['f1', 'f2'].includes(target) || !SERIES_PARENTS[type] || !id) {
+        return res.status(400).json({ error: 'Invalid series equivalent request.' });
+    }
+
+    try {
+        const equivalentId = await withConnection(async connection => {
+            let rows;
+            if (type === 'season') {
+                const table = target === 'f2' ? 'f2_seasons' : 'seasons';
+                rows = await connection.query(`SELECT year AS id FROM \`${table}\` WHERE year = ? LIMIT 1`, [id]);
+            } else if (type === 'driver') {
+                const sourceTable = target === 'f2' ? 'drivers' : 'f2_drivers';
+                const targetTable = target === 'f2' ? 'f2_drivers' : 'drivers';
+                rows = await connection.query(`
+                    SELECT targetDriver.id
+                    FROM \`${sourceTable}\` sourceDriver
+                    JOIN \`${targetTable}\` targetDriver ON LOWER(targetDriver.name) = LOWER(sourceDriver.name)
+                    WHERE sourceDriver.id = ?
+                    LIMIT 1
+                `, [id]);
+            } else if (type === 'constructor') {
+                const sourceTable = target === 'f2' ? 'constructors' : 'f2_constructors';
+                const targetTable = target === 'f2' ? 'f2_constructors' : 'constructors';
+                const sourceNames = target === 'f2'
+                    ? 'LOWER(targetConstructor.name) IN (LOWER(sourceConstructor.name), LOWER(sourceConstructor.fullName))'
+                    : 'LOWER(sourceConstructor.name) IN (LOWER(targetConstructor.name), LOWER(targetConstructor.fullName))';
+                rows = await connection.query(`
+                    SELECT targetConstructor.id
+                    FROM \`${sourceTable}\` sourceConstructor
+                    JOIN \`${targetTable}\` targetConstructor ON ${sourceNames}
+                    WHERE sourceConstructor.id = ?
+                    LIMIT 1
+                `, [id]);
+            } else if (type === 'circuit') {
+                if (target === 'f2') {
+                    rows = await connection.query(`
+                        SELECT targetCircuit.id
+                        FROM circuits sourceCircuit
+                        JOIN f2_circuits targetCircuit
+                            ON LOWER(targetCircuit.name) IN (LOWER(sourceCircuit.name), LOWER(sourceCircuit.fullName))
+                        WHERE sourceCircuit.id = ?
+                        LIMIT 1
+                    `, [id]);
+                } else {
+                    rows = await connection.query(`
+                        SELECT targetCircuit.id
+                        FROM f2_circuits sourceCircuit
+                        JOIN circuits targetCircuit
+                            ON LOWER(sourceCircuit.name) IN (LOWER(targetCircuit.name), LOWER(targetCircuit.fullName))
+                        WHERE sourceCircuit.id = ?
+                        LIMIT 1
+                    `, [id]);
+                }
+            } else if (target === 'f2') {
+                rows = await connection.query(`
+                    SELECT targetRace.id
+                    FROM races sourceRace
+                    JOIN circuits sourceCircuit ON sourceCircuit.id = sourceRace.circuitId
+                    JOIN f2_circuits targetCircuit
+                        ON LOWER(targetCircuit.name) IN (LOWER(sourceCircuit.name), LOWER(sourceCircuit.fullName))
+                    JOIN f2_races targetRace
+                        ON targetRace.circuitId = targetCircuit.id AND targetRace.year = sourceRace.year
+                    WHERE sourceRace.id = ?
+                    ORDER BY ABS(DATEDIFF(targetRace.date, sourceRace.date)), targetRace.round
+                    LIMIT 1
+                `, [id]);
+            } else {
+                rows = await connection.query(`
+                    SELECT targetRace.id
+                    FROM f2_races sourceRace
+                    JOIN f2_circuits sourceCircuit ON sourceCircuit.id = sourceRace.circuitId
+                    JOIN circuits targetCircuit
+                        ON LOWER(sourceCircuit.name) IN (LOWER(targetCircuit.name), LOWER(targetCircuit.fullName))
+                    JOIN races targetRace
+                        ON targetRace.circuitId = targetCircuit.id AND targetRace.year = sourceRace.year
+                    WHERE sourceRace.id = ?
+                    ORDER BY ABS(DATEDIFF(targetRace.date, sourceRace.date)), targetRace.round
+                    LIMIT 1
+                `, [id]);
+            }
+            return rows[0]?.id ?? null;
+        });
+
+        const parent = SERIES_PARENTS[type][target];
+        if (equivalentId === null) return res.json({ matched: false, url: parent });
+        const prefix = target === 'f2' ? '/f2' : '';
+        const parameter = type === 'season' ? 'year' : 'id';
+        res.json({ matched: true, url: `${prefix}/${type}?${parameter}=${encodeURIComponent(equivalentId)}` });
+    } catch (error) {
+        sendError(res, error);
+    }
+});
+
 router.get('/api/search', async (req, res) => {
     const search = String(req.query.q || '').trim().slice(0, 80);
     if (search.length < 2) return res.json([]);
