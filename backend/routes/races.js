@@ -1,7 +1,9 @@
 const express = require('express');
 const { withConnection, sendError } = require('../route-helpers');
 const { optionalInteger } = require('../validation');
-const { f2SessionType, f3SessionType } = require('./seasons');
+const { f2SessionType, f3SessionType, academySessionType } = require('./seasons');
+const { isJuniorSeries, minimumSeasonYear, seriesPrefix } = require('../series-config');
+const { academyRaceAwardsPole, academyRaceDisplayName, academyRaceGridContext } = require('../academy-race-analysis');
 
 const router = express.Router();
 
@@ -21,8 +23,8 @@ function juniorClassificationStatus(status, value) {
 router.get('/api/races/:id', async (req, res) => {
     try {
         const series = String(req.query.series || '').toLowerCase();
-        if (['f2', 'f3'].includes(series)) {
-            const prefix = `${series}_`;
+        if (isJuniorSeries(series)) {
+            const prefix = seriesPrefix(series);
             const data = await withConnection(async connection => {
                 const [raceRows, sessionRows, resultRows] = await Promise.all([
                     connection.query(`
@@ -65,7 +67,7 @@ router.get('/api/races/:id', async (req, res) => {
                 const isDisqualified = row => /\b(?:DSQ|DQ|DISQ|DISQUALIFIED|EXC)\b/i.test(String(row.status || ''));
                 const sessionsById = new Map(sessionRows.map(session => [String(session.id), session]));
                 const raceSessions = sessionRows.filter(session => isTrue(session.isRace));
-                const sessionType = series === 'f3' ? f3SessionType : f2SessionType;
+                const sessionType = series === 'academy' ? academySessionType : series === 'f3' ? f3SessionType : f2SessionType;
                 const raceTypeBySession = new Map(raceSessions.map((session, index) => [
                     String(session.id),
                     sessionType(session, index, raceSessions.length, raceRows[0].year)
@@ -136,8 +138,39 @@ router.get('/api/races/:id', async (req, res) => {
                         isRace: isTrue(session.isRace),
                         cancelled: isTrue(session.cancelled),
                         raceType: raceTypeBySession.get(String(session.id)) || null,
-                        displayName: raceLabelBySession.get(String(session.id)) || session.name,
-                        results: resultsBySession.get(String(session.id)) || []
+                        displayName: series === 'academy'
+                            ? academyRaceDisplayName(session)
+                            : raceLabelBySession.get(String(session.id)) || session.name,
+                        gridNote: series === 'academy' && isTrue(session.isRace)
+                            ? academyRaceGridContext(
+                                { ...session, isRace: true },
+                                sessionRows.map(candidate => ({ ...candidate, isRace: isTrue(candidate.isRace) })),
+                                resultsBySession,
+                                raceRows[0].year
+                            ).gridNote
+                            : null,
+                        results: (() => {
+                            const results = resultsBySession.get(String(session.id)) || [];
+                            if (series !== 'academy' || !isTrue(session.isRace)) return results;
+                            const context = academyRaceGridContext(
+                                { ...session, isRace: true },
+                                sessionRows.map(candidate => ({ ...candidate, isRace: isTrue(candidate.isRace) })),
+                                resultsBySession,
+                                raceRows[0].year
+                            );
+                            return results.map(result => ({
+                                ...result,
+                                qualificationPositionNumber: context.qualificationByDriver.get(String(result.driverId)) ?? null,
+                                gridPositionNumber: context.gridByDriver.get(String(result.driverId)) ?? null,
+                                polePosition: Boolean(
+                                    academyRaceAwardsPole(
+                                        { ...session, isRace: true },
+                                        sessionRows.map(candidate => ({ ...candidate, isRace: isTrue(candidate.isRace) })),
+                                        raceRows[0].year
+                                    ) && context.gridByDriver.get(String(result.driverId)) === 1
+                                )
+                            }));
+                        })()
                     }))
                 };
             });
@@ -229,15 +262,15 @@ router.get('/api/races', async (req, res) => {
 
         const hasYear = req.query.year !== undefined;
         const series = String(req.query.series || '').toLowerCase();
-        const isJuniorSeries = ['f2', 'f3'].includes(series);
-        const year = optionalInteger(req.query.year, { min: series === 'f3' ? 2019 : series === 'f2' ? 2017 : 1950, max: 9999 });
+        const juniorSeries = isJuniorSeries(series);
+        const year = optionalInteger(req.query.year, { min: minimumSeasonYear(series), max: 9999 });
 
         if (hasYear && year === null) {
             return res.status(400).json({ error: 'Invalid year.' });
         }
 
-        if (isJuniorSeries) {
-            const prefix = `${series}_`;
+        if (juniorSeries) {
+            const prefix = seriesPrefix(series);
             const rows = await withConnection(connection => {
                 const conditions = [];
                 const values = [];

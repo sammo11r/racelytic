@@ -6,12 +6,15 @@ function params() {
   return new URLSearchParams(window.location.search);
 }
 function activeSeriesAccent() {
+  if (window.location.pathname === '/academy' || window.location.pathname.startsWith('/academy/')) return '#7b2cff';
   if (window.location.pathname === '/f3' || window.location.pathname.startsWith('/f3/')) return '#c95300';
   return window.location.pathname === '/f2' || window.location.pathname.startsWith('/f2/') ? '#1677ff' : '#e32636';
 }
 async function getJSON(url) {
   let requestUrl = url;
-  const activeSeries = window.location.pathname === '/f3' || window.location.pathname.startsWith('/f3/')
+  const activeSeries = window.location.pathname === '/academy' || window.location.pathname.startsWith('/academy/')
+    ? 'academy'
+    : window.location.pathname === '/f3' || window.location.pathname.startsWith('/f3/')
     ? 'f3'
     : window.location.pathname === '/f2' || window.location.pathname.startsWith('/f2/') ? 'f2' : 'f1';
   if (activeSeries !== 'f1' && String(url).startsWith('/api/')) {

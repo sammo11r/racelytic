@@ -1,11 +1,13 @@
 const BUILDER_SYSTEMS={modern:{id:'modern',name:'Modern',race:[25,18,15,12,10,8,6,4,2,1],sprint:[8,7,6,5,4,3,2,1],qualifying:[],poleBonus:0,fastestLapBonus:0,fastestLapMaxPosition:null}};
 const isF2Builder=window.location.pathname.startsWith('/f2/');
-const isF3Builder=window.location.pathname.startsWith('/f3/');
+const isAcademyBuilder=window.location.pathname.startsWith('/academy/');
+const isF3Builder=window.location.pathname.startsWith('/f3/')||isAcademyBuilder;
 const isJuniorBuilder=isF2Builder||isF3Builder;
-const builderSeries=isF3Builder?'f3':isF2Builder?'f2':'f1';
-const builderPage=isF3Builder?'/f3/championship-builder':isF2Builder?'/f2/championship-builder':'/championship-builder';
+const builderSeries=isAcademyBuilder?'academy':isF3Builder?'f3':isF2Builder?'f2':'f1';
+const builderPage=isAcademyBuilder?'/academy/championship-builder':isF3Builder?'/f3/championship-builder':isF2Builder?'/f2/championship-builder':'/championship-builder';
 if(isF2Builder)BUILDER_SYSTEMS.modern={id:'f2-current',name:'Formula 2 · current',race:[25,18,15,12,10,8,6,4,2,1],sprint:[10,8,6,5,4,3,2,1],qualifying:[],poleBonus:2,fastestLapBonus:1,fastestLapMaxPosition:10};
 if(isF3Builder){BUILDER_SYSTEMS.modern={id:'f3-current',name:'Formula 3 · current',race:[25,18,15,12,10,8,6,4,2,1],sprint:[10,9,8,7,6,5,4,3,2,1],qualifying:[],poleBonus:2,fastestLapBonus:1,fastestLapMaxPosition:10};BUILDER_SYSTEMS['f3-legacy']={id:'f3-legacy',name:'Formula 3 · 2019–2021',race:[25,18,15,12,10,8,6,4,2,1],sprint:[15,12,10,8,6,5,4,3,2,1],qualifying:[],poleBonus:4,fastestLapBonus:2,fastestLapMaxPosition:10};}
+if(isAcademyBuilder){BUILDER_SYSTEMS.modern={id:'academy-current',name:'F1 Academy · current',race:[25,18,15,12,10,8,6,4,2,1],sprint:[10,8,6,5,4,3,2,1],qualifying:[],poleBonus:2,fastestLapBonus:1,fastestLapMaxPosition:10};delete BUILDER_SYSTEMS['f3-legacy'];}
 let raceArchive=[],builderRaceIds=[],builderRaceData=new Map(),builderWeekendData=new Map(),eligibleDrivers=new Set(),eligibleConstructors=new Set(),knownDrivers=new Set(),knownConstructors=new Set(),builderMode='drivers',builderStandings={drivers:[],constructors:[]};
 function selectedSystem(){return BUILDER_SYSTEMS[document.getElementById('builder-points').value]||BUILDER_SYSTEMS.modern;}
 function pointsAt(position,scale=[]){const index=Number(position)-1;return index>=0&&index<scale.length?Number(scale[index]):0;}

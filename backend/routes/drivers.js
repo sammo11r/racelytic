@@ -1,7 +1,9 @@
 const express = require('express');
 const { withConnection, sendError } = require('../route-helpers');
 const { integerOrDefault } = require('../validation');
-const { f2SessionType, f3SessionType } = require('./seasons');
+const { f2SessionType, f3SessionType, academySessionType } = require('./seasons');
+const { isJuniorSeries, seriesPrefix } = require('../series-config');
+const { academyComparisonLookups, comparisonRaceGroups } = require('../driver-comparison');
 
 const router = express.Router();
 
@@ -64,7 +66,8 @@ function juniorClassificationLookups(gridResults, qualifyingResults) {
 }
 
 function juniorRaceSessionLabel(series, row) {
-    const sessionType = series === 'f3' ? f3SessionType : f2SessionType;
+    if (series === 'academy') return String(row.sessionName || 'Race');
+    const sessionType = series === 'academy' ? academySessionType : series === 'f3' ? f3SessionType : f2SessionType;
     const type = sessionType(row, 0, 0, row.year);
     if (type === 'F') return 'Feature';
     const explicitSprintNumber = String(row.sessionName || '').match(/sprint[^0-9]*([0-9]+)/i)?.[1];
@@ -90,8 +93,8 @@ router.get('/api/drivers', async (req, res) => {
         const limit = integerOrDefault(req.query.limit, 100, { min: 1, max: 1000 });
 
         const series = String(req.query.series || '').toLowerCase();
-        if (['f2', 'f3'].includes(series)) {
-            const prefix = `${series}_`;
+        if (isJuniorSeries(series)) {
+            const prefix = seriesPrefix(series);
             const q = `%${search}%`;
             const where = search
                 ? 'WHERE d.name LIKE ? OR d.firstName LIKE ? OR d.lastName LIKE ? OR d.abbreviation LIKE ?'
@@ -269,8 +272,8 @@ router.get('/api/drivers/compare', async (req, res) => {
     }
     try {
         const series = String(req.query.series || '').toLowerCase();
-        if (['f2', 'f3'].includes(series)) {
-            const prefix = `${series}_`;
+        if (isJuniorSeries(series)) {
+            const prefix = seriesPrefix(series);
             const data = await withConnection(async connection => {
                 const [drivers, sharedRaces, gridResults, qualifyingResults] = await Promise.all([
                     connection.query(`SELECT d.id, d.name, d.countryCode AS nationalityCountryId,
@@ -282,16 +285,19 @@ router.get('/api/drivers/compare', async (req, res) => {
                         WHERE d.id IN (?, ?) GROUP BY d.id, d.name, d.countryCode`, ids),
                     connection.query(`SELECT a.sessionId, a.raceId, sessions.sessionNumber,
                         sessions.name AS sessionName, a.year, a.round, races.name AS raceName, races.date,
-                        a.constructorId, constructors.name AS constructorName,
+                        a.constructorId AS firstConstructorId, firstConstructors.name AS firstConstructorName,
+                        b.constructorId AS secondConstructorId, secondConstructors.name AS secondConstructorName,
+                        (a.constructorId = b.constructorId) AS sameTeam,
                         a.positionNumber AS firstPosition, a.status AS firstPositionText,
                         a.points AS firstPoints,
                         b.positionNumber AS secondPosition, b.status AS secondPositionText,
                         b.points AS secondPoints
                         FROM ${prefix}session_results a
-                        JOIN ${prefix}session_results b ON b.sessionId = a.sessionId AND b.constructorId = a.constructorId
+                        JOIN ${prefix}session_results b ON b.sessionId = a.sessionId
                         JOIN ${prefix}sessions sessions ON sessions.id = a.sessionId
                         JOIN ${prefix}races races ON races.id = a.raceId
-                        LEFT JOIN ${prefix}constructors constructors ON constructors.id = a.constructorId
+                        LEFT JOIN ${prefix}constructors firstConstructors ON firstConstructors.id = a.constructorId
+                        LEFT JOIN ${prefix}constructors secondConstructors ON secondConstructors.id = b.constructorId
                         WHERE a.driverId = ? AND b.driverId = ? AND LOWER(CAST(sessions.isRace AS CHAR)) IN ('1','true')
                         ORDER BY a.year DESC, a.round DESC, sessions.sessionNumber DESC`, ids),
                     connection.query(`SELECT sessions.raceId, sessions.sessionNumber,
@@ -304,13 +310,13 @@ router.get('/api/drivers/compare', async (req, res) => {
                                 SELECT DISTINCT own.raceId
                                 FROM ${prefix}session_results own
                                 JOIN ${prefix}session_results mate ON mate.sessionId = own.sessionId
-                                    AND mate.constructorId = own.constructorId
                                 JOIN ${prefix}sessions sharedSession ON sharedSession.id = own.sessionId
                                 WHERE own.driverId = ? AND mate.driverId = ?
                                     AND LOWER(CAST(sharedSession.isRace AS CHAR)) IN ('1','true')
                             )
                         ORDER BY sessions.raceId, sessions.sessionNumber DESC`, ids),
                     connection.query(`SELECT sessions.raceId, sessions.id AS sessionId,
+                        sessions.name AS sessionName, sessions.sessionNumber,
                         results.driverId, results.positionNumber
                         FROM ${prefix}sessions sessions
                         LEFT JOIN ${prefix}session_results results ON results.sessionId = sessions.id
@@ -319,7 +325,6 @@ router.get('/api/drivers/compare', async (req, res) => {
                                 SELECT DISTINCT own.raceId
                                 FROM ${prefix}session_results own
                                 JOIN ${prefix}session_results mate ON mate.sessionId = own.sessionId
-                                    AND mate.constructorId = own.constructorId
                                 JOIN ${prefix}sessions sharedSession ON sharedSession.id = own.sessionId
                                 WHERE own.driverId = ? AND mate.driverId = ?
                                     AND LOWER(CAST(sharedSession.isRace AS CHAR)) IN ('1','true')
@@ -329,20 +334,26 @@ router.get('/api/drivers/compare', async (req, res) => {
                 ]);
                 if (drivers.length !== 2) return null;
                 const { gridPosition, qualifyingPosition } = juniorClassificationLookups(gridResults, qualifyingResults);
+                const academyLookups = series === 'academy'
+                    ? academyComparisonLookups(sharedRaces, qualifyingResults)
+                    : null;
+                const comparisonRows = sharedRaces.map(row => ({
+                    ...row,
+                    constructorId: row.sameTeam ? row.firstConstructorId : null,
+                    constructorName: row.sameTeam ? row.firstConstructorName : null,
+                    officialName: `${row.raceName} ${juniorRaceSessionLabel(series, row)}`,
+                    firstPosition: row.firstPosition === null ? null : Number(row.firstPosition),
+                    secondPosition: row.secondPosition === null ? null : Number(row.secondPosition),
+                    firstQualifying: academyLookups ? academyLookups.qualifyingPosition(row, ids[0]) : qualifyingPosition({ ...row, driverId: ids[0] }),
+                    secondQualifying: academyLookups ? academyLookups.qualifyingPosition(row, ids[1]) : qualifyingPosition({ ...row, driverId: ids[1] }),
+                    firstGrid: academyLookups ? academyLookups.gridPosition(row, ids[0]) : gridPosition({ ...row, driverId: ids[0] }),
+                    secondGrid: academyLookups ? academyLookups.gridPosition(row, ids[1]) : gridPosition({ ...row, driverId: ids[1] }),
+                    firstPoints: Number(row.firstPoints || 0),
+                    secondPoints: Number(row.secondPoints || 0)
+                }));
                 return {
                     drivers: ids.map(id => drivers.find(driver => String(driver.id) === id)),
-                    sharedRaces: sharedRaces.map(row => ({
-                        ...row,
-                        officialName: `${row.raceName} ${juniorRaceSessionLabel(series, row)}`,
-                        firstPosition: row.firstPosition === null ? null : Number(row.firstPosition),
-                        secondPosition: row.secondPosition === null ? null : Number(row.secondPosition),
-                        firstQualifying: qualifyingPosition({ ...row, driverId: ids[0] }),
-                        secondQualifying: qualifyingPosition({ ...row, driverId: ids[1] }),
-                        firstGrid: gridPosition({ ...row, driverId: ids[0] }),
-                        secondGrid: gridPosition({ ...row, driverId: ids[1] }),
-                        firstPoints: Number(row.firstPoints || 0),
-                        secondPoints: Number(row.secondPoints || 0)
-                    }))
+                    ...comparisonRaceGroups(comparisonRows)
                 };
             });
             if (!data) return res.status(404).json({ error: 'One or both drivers could not be found.' });
@@ -354,18 +365,27 @@ router.get('/api/drivers/compare', async (req, res) => {
                     totalPodiums, totalPolePositions, totalFastestLaps, totalPoints, totalChampionshipWins
                     FROM drivers WHERE id IN (?, ?)`, ids),
                 connection.query(`SELECT a.raceId, a.year, a.round, r.officialName, r.date,
-                    a.constructorId, k.name AS constructorName,
+                    a.constructorId AS firstConstructorId, firstConstructor.name AS firstConstructorName,
+                    b.constructorId AS secondConstructorId, secondConstructor.name AS secondConstructorName,
+                    (a.constructorId = b.constructorId) AS sameTeam,
                     a.positionNumber AS firstPosition, a.positionText AS firstPositionText,
                     a.qualificationPositionNumber AS firstQualifying, a.gridPositionNumber AS firstGrid, a.points AS firstPoints,
                     b.positionNumber AS secondPosition, b.positionText AS secondPositionText,
                     b.qualificationPositionNumber AS secondQualifying, b.gridPositionNumber AS secondGrid, b.points AS secondPoints
                     FROM races_race_results a
-                    JOIN races_race_results b ON b.raceId = a.raceId AND b.constructorId = a.constructorId
-                    JOIN races r ON r.id = a.raceId LEFT JOIN constructors k ON k.id = a.constructorId
+                    JOIN races_race_results b ON b.raceId = a.raceId
+                    JOIN races r ON r.id = a.raceId
+                    LEFT JOIN constructors firstConstructor ON firstConstructor.id = a.constructorId
+                    LEFT JOIN constructors secondConstructor ON secondConstructor.id = b.constructorId
                     WHERE a.driverId = ? AND b.driverId = ? ORDER BY a.year DESC, a.round DESC`, ids)
             ]);
             if (drivers.length !== 2) return null;
-            return { drivers: ids.map(id => drivers.find(driver => String(driver.id) === id)), sharedRaces };
+            const comparisonRows = sharedRaces.map(row => ({
+                ...row,
+                constructorId: row.sameTeam ? row.firstConstructorId : null,
+                constructorName: row.sameTeam ? row.firstConstructorName : null
+            }));
+            return { drivers: ids.map(id => drivers.find(driver => String(driver.id) === id)), ...comparisonRaceGroups(comparisonRows) };
         });
         if (!data) return res.status(404).json({ error: 'One or both drivers could not be found.' });
         res.json(data);
@@ -375,8 +395,8 @@ router.get('/api/drivers/compare', async (req, res) => {
 router.get('/api/drivers/:id/teammates', async (req, res) => {
     try {
         const series = String(req.query.series || '').toLowerCase();
-        if (['f2', 'f3'].includes(series)) {
-            const prefix = `${series}_`;
+        if (isJuniorSeries(series)) {
+            const prefix = seriesPrefix(series);
             const rows = await withConnection(connection => connection.query(`
                 SELECT b.driverId AS id, d.name, d.countryCode AS nationalityCountryId,
                     COUNT(*) AS sharedRaces, MIN(a.year) AS firstSeason, MAX(a.year) AS lastSeason
@@ -407,13 +427,14 @@ router.get('/api/drivers/:id/teammates', async (req, res) => {
 router.get('/api/drivers/:id/form', async (req, res) => {
     try {
         const series = String(req.query.series || '').toLowerCase();
-        if (['f2', 'f3'].includes(series)) {
-            const prefix = `${series}_`;
+        if (isJuniorSeries(series)) {
+            const prefix = seriesPrefix(series);
             const data = await withConnection(async connection => {
                 const [drivers, results, teammates, gridResults, qualifyingResults] = await Promise.all([
                     connection.query(`SELECT id, name, countryCode AS nationalityCountryId FROM ${prefix}drivers WHERE id = ?`, [req.params.id]),
                     connection.query(`SELECT results.sessionId, results.raceId, results.year, results.round, races.date,
-                        CONCAT(races.name, ' · ', sessions.name) AS officialName, races.circuitId, circuits.name AS circuitName,
+                        sessions.name AS sessionName, CONCAT(races.name, ' · ', sessions.name) AS officialName,
+                        races.circuitId, circuits.name AS circuitName,
                         results.constructorId, constructors.name AS constructorName, results.positionNumber,
                         results.status AS positionText, sessions.sessionNumber, results.points,
                         results.laps, results.laps AS raceLaps,
@@ -446,6 +467,7 @@ router.get('/api/drivers/:id/form', async (req, res) => {
                             )
                         ORDER BY sessions.raceId, sessions.sessionNumber DESC`, [req.params.id]),
                     connection.query(`SELECT sessions.raceId, sessions.id AS sessionId,
+                        sessions.name AS sessionName, sessions.sessionNumber,
                         results.driverId, results.positionNumber
                         FROM ${prefix}sessions sessions
                         LEFT JOIN ${prefix}session_results results ON results.sessionId = sessions.id
@@ -461,47 +483,16 @@ router.get('/api/drivers/:id/form', async (req, res) => {
                             results.positionDisplayOrder`, [req.params.id])
                 ]);
                 if (!drivers.length) return null;
-                const gridsByRaceDriver = new Map();
-                const featureGridByRaceDriver = new Map();
-                gridResults.forEach(row => {
-                    const key = `${row.raceId}:${row.driverId}`;
-                    if (!gridsByRaceDriver.has(key)) gridsByRaceDriver.set(key, []);
-                    gridsByRaceDriver.get(key).push({
-                        sessionNumber: Number(row.sessionNumber),
-                        position: Number(row.positionNumber)
-                    });
-                    if (!featureGridByRaceDriver.has(key)) {
-                        featureGridByRaceDriver.set(key, Number(row.positionNumber));
-                    }
-                });
-                const qualifyingSessionsByRace = new Map();
-                const qualifyingByRaceDriver = new Map();
-                const classifiedQualifyingDriversByRace = new Map();
-                qualifyingResults.forEach(row => {
-                    const raceId = String(row.raceId);
-                    if (!qualifyingSessionsByRace.has(raceId)) qualifyingSessionsByRace.set(raceId, new Set());
-                    qualifyingSessionsByRace.get(raceId).add(String(row.sessionId));
-                    const position = Number(row.positionNumber);
-                    if (!row.driverId || position < 1 || position > 99) return;
-                    if (!classifiedQualifyingDriversByRace.has(raceId)) {
-                        classifiedQualifyingDriversByRace.set(raceId, new Set());
-                    }
-                    classifiedQualifyingDriversByRace.get(raceId).add(String(row.driverId));
-                    qualifyingByRaceDriver.set(`${raceId}:${row.driverId}`, position);
-                });
-                const gridPosition = row => gridsByRaceDriver
-                    .get(`${row.raceId}:${row.driverId}`)
-                    ?.find(grid => grid.sessionNumber < Number(row.sessionNumber))?.position ?? null;
-                const qualifyingPosition = row => {
-                    const raceId = String(row.raceId);
-                    const key = `${raceId}:${row.driverId}`;
-                    const sessionCount = qualifyingSessionsByRace.get(raceId)?.size || 0;
-                    if (sessionCount === 1) return qualifyingByRaceDriver.get(key) ?? null;
-                    if (sessionCount > 1 && !classifiedQualifyingDriversByRace.get(raceId)?.has(String(row.driverId))) {
-                        return null;
-                    }
-                    return featureGridByRaceDriver.get(key) ?? null;
-                };
+                const genericLookups = juniorClassificationLookups(gridResults, qualifyingResults);
+                const academyLookups = series === 'academy'
+                    ? academyComparisonLookups(results, qualifyingResults)
+                    : null;
+                const gridPosition = row => academyLookups
+                    ? academyLookups.gridPosition(row, row.driverId)
+                    : genericLookups.gridPosition(row);
+                const qualifyingPosition = row => academyLookups
+                    ? academyLookups.qualifyingPosition(row, row.driverId)
+                    : genericLookups.qualifyingPosition(row);
                 const teammateMap = new Map();
                 teammates.forEach(row => { const key=String(row.sessionId); if(!teammateMap.has(key))teammateMap.set(key,[]); teammateMap.get(key).push({driverId:row.driverId,driverName:row.driverName,position:row.positionNumber===null?null:Number(row.positionNumber),positionText:row.positionText,qualifying:qualifyingPosition(row),grid:gridPosition(row),points:Number(row.points||0),reasonRetired:row.reasonRetired}); });
                 return {driver:drivers[0],results:results.map(row=>({raceId:row.raceId,sessionId:row.sessionId,year:Number(row.year),round:Number(row.round),date:row.date,officialName:row.officialName,circuitId:row.circuitId,circuitName:row.circuitName,constructorId:row.constructorId,constructorName:row.constructorName,position:row.positionNumber===null?null:Number(row.positionNumber),positionText:row.positionText,qualifying:qualifyingPosition({...row,driverId:req.params.id}),grid:gridPosition({...row,driverId:req.params.id}),points:Number(row.points||0),laps:Number(row.laps||0),raceLaps:Number(row.raceLaps||0),reasonRetired:row.reasonRetired,fastestLap:Boolean(row.fastestLap),polePosition:Boolean(row.polePosition),teammates:teammateMap.get(String(row.sessionId))||[]}))};
@@ -561,8 +552,8 @@ router.get('/api/drivers/:id', async (req, res) => {
     try {
 
         const series = String(req.query.series || '').toLowerCase();
-        if (['f2', 'f3'].includes(series)) {
-            const prefix = `${series}_`;
+        if (isJuniorSeries(series)) {
+            const prefix = seriesPrefix(series);
             const data = await withConnection(async connection => {
                 const [driverRows, standings, results] = await Promise.all([
                     connection.query(`
@@ -650,8 +641,8 @@ router.get('/api/drivers/:id', async (req, res) => {
                         positionNumber: row.positionNumber === null ? null : Number(row.positionNumber),
                         points: /\b(?:DSQ|DQ|DISQ|DISQUALIFIED|EXC)\b/i.test(String(row.status || '')) ? 0 : Number(row.points || 0),
                         laps: Number(row.laps || 0),
-                        fastestLap: series === 'f2' && isTrue(row.fastestLap),
-                        polePosition: series === 'f2' && isTrue(row.polePosition)
+                        fastestLap: ['f2', 'academy'].includes(series) && isTrue(row.fastestLap),
+                        polePosition: ['f2', 'academy'].includes(series) && isTrue(row.polePosition)
                     }))
                 };
             });

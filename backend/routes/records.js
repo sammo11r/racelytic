@@ -5,6 +5,7 @@ const { optionalInteger } = require('../validation');
 const { ensureAuthSchema, requireUser } = require('../auth');
 
 const router = express.Router();
+const { isJuniorSeries, seriesPrefix } = require('../series-config');
 const CATEGORIES = {
     wins: { expression: 'SUM(source.positionNumber = 1)', label: 'Wins' },
     championships: { expression: null, label: 'Championships' },
@@ -19,7 +20,7 @@ const CATEGORIES = {
 function recordConfiguration(input = {}) {
     const type = input.type === 'constructors' ? 'constructors' : 'drivers';
     const category = CATEGORIES[input.category] ? input.category : 'wins';
-    const series = ['f2', 'f3'].includes(input.series) ? input.series : 'f1';
+    const series = isJuniorSeries(input.series) ? input.series : 'f1';
     const year = value => optionalInteger(value, { min: 1950, max: 2200 });
     return {
         series, type, category, fromYear: year(input.fromYear), toYear: year(input.toYear),
@@ -91,8 +92,8 @@ router.get('/api/records/explore', async (req, res) => {
 
     try {
         const series = String(req.query.series || '').toLowerCase();
-        if (['f2', 'f3'].includes(series)) {
-            const prefix = `${series}_`;
+        if (isJuniorSeries(series)) {
+            const prefix = seriesPrefix(series);
             const data = await withConnection(async connection => {
                 const params = [];
                 const filters = ["LOWER(CAST(sessions.isRace AS CHAR)) IN ('1','true')", "(sessions.cancelled IS NULL OR LOWER(CAST(sessions.cancelled AS CHAR)) NOT IN ('1','true'))"];

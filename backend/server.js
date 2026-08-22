@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const path = require('path');
+const fs = require('node:fs');
 const { requireMonitorAuth } = require('./monitor-auth');
 
 const app = express();
@@ -68,7 +69,6 @@ for (const [route, file] of [
     ['/f3/championship-builder', 'f3-championship-builder.html'],
     ['/f3/points-systems', 'points-systems.html'],
     ['/f3/games', 'f3-games.html'],
-    ['/f3/pitwall', 'pitwall.html'],
     ['/f3/about', 'f3-about.html'],
     ['/f2/database', 'f2-database.html'],
     ['/f2/seasons', 'f2-seasons.html'],
@@ -98,13 +98,65 @@ for (const [route, file] of [
     ['/f2/championship-builder', 'championship-builder.html'],
     ['/f2/points-systems', 'points-systems.html'],
     ['/f2/games', 'f2-games.html'],
-    ['/f2/pitwall', 'pitwall.html'],
     ['/f2/quizzes', 'f2-quizzes.html'],
     ['/f2/champions-quiz', 'f2-champions-quiz.html'],
     ['/f2/race-winners-quiz', 'f2-race-winners-quiz.html']
 ]) {
     app.get(route, (req, res) => res.sendFile(path.join(frontendDirectory, file)));
 }
+
+const academyPages = {
+    '': 'f3.html', database: 'f3-database.html', seasons: 'f3-seasons.html', season: 'f3-season.html',
+    races: 'f3-races.html', race: 'f3-race.html', drivers: 'f3-drivers.html', driver: 'f3-driver.html',
+    teams: 'f3-teams.html', team: 'f3-team.html', circuits: 'f3-circuits.html', circuit: 'f3-circuit.html',
+    chassis: 'f3-chassis.html', analysis: 'f3-analysis.html',
+    'season-analysis': 'f2-season-analysis.html', 'season-comparison': 'season-comparison.html',
+    'race-analysis': 'race-analysis.html', 'driver-comparison': 'driver-comparison.html',
+    'driver-form': 'driver-form.html', 'teammate-battles': 'teammate-battles.html',
+    'circuit-analysis': 'circuit-analysis.html', records: 'records.html', simulator: 'f3-simulator.html',
+    'simulate-season': 'f3-simulate-season.html', 'scenario-calculator': 'f3-scenario-calculator.html',
+    'championship-builder': 'f3-championship-builder.html', 'points-systems': 'points-systems.html',
+    games: 'f3-games.html', about: 'f3-about.html'
+};
+
+function academyCopy(content) {
+    return content
+        .replaceAll('/assets/favicon-f3.svg', '/assets/favicon-academy.svg')
+        .replaceAll('/assets/favicon.svg', '/assets/favicon-academy.svg')
+        .replaceAll('/js/f3', '/__ACADEMY_F3_SCRIPT__')
+        .replaceAll('/f3', '/academy')
+        .replaceAll('/__ACADEMY_F3_SCRIPT__', '/academy-js/f3')
+        .replaceAll('FORMULA 3', 'F1 ACADEMY')
+        .replaceAll('FIA Formula 3', 'F1 Academy')
+        .replaceAll('Formula 3', 'F1 Academy')
+        .replaceAll('The two Dallara generations used in the F1 Academy Championship.', 'The spec Tatuus T-421-F1A chassis and Autotecnica powertrain used since 2023.')
+        .replaceAll('after any completed round', 'after any completed race')
+        .replaceAll('remaining sprint and feature results', 'remaining individual race results')
+        .replace(/\bF3\b/g, 'F1 Academy')
+        .replaceAll('f3-mode', 'academy-mode')
+        .replaceAll('since 2019', 'since 2023')
+        .replaceAll('from 2019', 'from 2023');
+}
+
+Object.entries(academyPages).forEach(([slug, file]) => {
+    app.get(slug ? `/academy/${slug}` : '/academy', (req, res, next) => {
+        fs.readFile(path.join(frontendDirectory, file), 'utf8', (error, content) => {
+            if (error) return next(error);
+            res.type('html').send(academyCopy(content));
+        });
+    });
+});
+
+app.get('/academy-js/:file', (req, res, next) => {
+    if (!/^f3-[a-z0-9-]+\.js$|^f3\.js$/.test(req.params.file)) return res.sendStatus(404);
+    fs.readFile(path.join(frontendDirectory, 'js', req.params.file), 'utf8', (error, content) => {
+        if (error) return next(error);
+        res.type('application/javascript').send(academyCopy(content)
+            .replaceAll('series=f3', 'series=academy')
+            .replaceAll("series: 'f3'", "series: 'academy'")
+            .replaceAll('series: "f3"', 'series: "academy"'));
+    });
+});
 
 app.use(express.static(frontendDirectory));
 

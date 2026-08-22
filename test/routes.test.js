@@ -112,8 +112,10 @@ test('public pages use extensionless URLs and preserve legacy query strings', as
 
     const request = (port, path) => new Promise((resolve, reject) => {
         http.get({ hostname: '127.0.0.1', port, path }, response => {
-            response.resume();
-            response.once('end', () => resolve(response));
+            let body = '';
+            response.setEncoding('utf8');
+            response.on('data', chunk => { body += chunk; });
+            response.once('end', () => resolve(Object.assign(response, { body })));
         }).once('error', reject);
     });
 
@@ -134,6 +136,14 @@ test('public pages use extensionless URLs and preserve legacy query strings', as
         const f3ScenarioCalculator = await request(port, '/f3/scenario-calculator');
         const f3ChampionshipBuilder = await request(port, '/f3/championship-builder');
         const f3PointsSystems = await request(port, '/f3/points-systems');
+        const academyHome = await request(port, '/academy');
+        const academySeason = await request(port, '/academy/season?year=2025');
+        const academySimulator = await request(port, '/academy/simulate-season');
+        const academyScenario = await request(port, '/academy/scenario-calculator');
+        const academyBuilder = await request(port, '/academy/championship-builder');
+        const academyPoints = await request(port, '/academy/points-systems');
+        const academyPitwall = await request(port, '/academy/pitwall');
+        const academyScript = await request(port, '/academy-js/f3-season.js');
         const pitwallWasm = await request(port, '/pitwall-build/index.wasm');
         const pitwallPack = await request(port, '/pitwall-build/index.pck');
 
@@ -150,16 +160,25 @@ test('public pages use extensionless URLs and preserve legacy query strings', as
         assert.equal(f3RawRoute.headers.location, '/f3/team?id=campos-racing');
         assert.equal(privacy.statusCode, 200);
         assert.equal(terms.statusCode, 200);
-        assert.equal(pitwall.statusCode, 200);
-        assert.equal(f2Pitwall.statusCode, 200);
-        assert.equal(f3Pitwall.statusCode, 200);
+        assert.equal(pitwall.statusCode, 404);
+        assert.equal(f2Pitwall.statusCode, 404);
+        assert.equal(f3Pitwall.statusCode, 404);
         assert.equal(f3Simulator.statusCode, 200);
         assert.equal(f3ScenarioCalculator.statusCode, 200);
         assert.equal(f3ChampionshipBuilder.statusCode, 200);
         assert.equal(f3PointsSystems.statusCode, 200);
-        assert.equal(pitwallWasm.statusCode, 200);
-        assert.equal(pitwallWasm.headers['content-type'], 'application/wasm');
-        assert.equal(pitwallPack.statusCode, 200);
+        assert.equal(academyHome.statusCode, 200);
+        assert.equal(academySeason.statusCode, 200);
+        assert.equal(academySimulator.statusCode, 200);
+        assert.equal(academyScenario.statusCode, 200);
+        assert.match(academyScenario.body, /\/assets\/favicon-academy\.svg/);
+        assert.doesNotMatch(academyScenario.body, /\/assets\/favicon-f3\.svg/);
+        assert.equal(academyBuilder.statusCode, 200);
+        assert.equal(academyPoints.statusCode, 200);
+        assert.equal(academyPitwall.statusCode, 404);
+        assert.equal(academyScript.statusCode, 200);
+        assert.equal(pitwallWasm.statusCode, 404);
+        assert.equal(pitwallPack.statusCode, 404);
     } finally {
         await new Promise((resolve, reject) => server.close(error => error ? reject(error) : resolve()));
     }

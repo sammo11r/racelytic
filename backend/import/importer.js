@@ -6,6 +6,7 @@ const pool = require('../db');
 const DATA_DIR = path.join(__dirname, '../../data');
 
 function tableNameFromFile(filename) {
+  if (/^fadb-/i.test(filename)) return `fa_${filename.replace(/^fadb-/i, '').replace(/\.csv$/i, '').replace(/-/g, '_')}`;
   const match = filename.toLowerCase().match(/^f([123])db-/);
   const series = match && match[1] !== '1' ? `f${match[1]}_` : '';
   return series + filename.replace(/^f[123]db-/i,'').replace(/\.csv$/i,'').replace(/-/g,'_');
@@ -72,7 +73,7 @@ async function importAll(){
     c=await pool.getConnection();
     await c.query('SET FOREIGN_KEY_CHECKS=0');
     foreignKeyChecksDisabled=true;
-    const files=fs.readdirSync(DATA_DIR).filter(f=>/^f[123]db-.*\.csv$/i.test(f)).sort();
+    const files=fs.readdirSync(DATA_DIR).filter(f=>/^(?:f[123]db|fadb)-.*\.csv$/i.test(f)).sort();
     for(const file of files){
       console.log(`Importing ${file}`);
       const rows=await readCsv(path.join(DATA_DIR,file));

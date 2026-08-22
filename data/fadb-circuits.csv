@@ -1,0 +1,17 @@
+id,name,type,direction,placeName,lengthMeters,turns,pictureUrl,mapUrl
+autodromo-nazionale-monza_autodromo-nazionale-monza,Autodromo Nazionale Monza,Race Circuit,Clockwise,"Monza, Italy",5793,11,https://content.motorsportstats.com/venueProfilePicture/venueProfilePicture-6c469655-adb7-4395-b913-6d8c4ce8f0a2-MON.png,https://assets.motorsportstats.com/circuit/master/MSS_Circuit_Default_Monza.svg
+circuit-de-barcelona-catalunya_circuit-de-barcelona-catalunya,Circuit de Barcelona-Catalunya,Race Circuit,Clockwise,"Barcelona, Spain",4675,16,https://content.motorsportstats.com/venueProfilePicture/venueProfilePicture-6603e884-bb0e-4423-aff0-5aa95c6a8e96.png,https://assets.motorsportstats.com/circuit/master/MSS_Circuit_Default_CatalunyaCircuit.svg
+circuit-gilles-villeneuve_circuit-gilles-villeneuve,Circuit Gilles-Villeneuve,Street Circuit,Clockwise,"Montreal, Canada",4361,14,,
+austin,Circuit of the Americas,RACE,ANTI_CLOCKWISE,"Austin, United States",5513,20,,
+circuit-paul-ricard_paul-ricard-circuit,Circuit Paul Ricard,Race Circuit,,"Le Castellet, France",3826,15,https://content.motorsportstats.com/venueProfilePicture/venueProfilePicture-47fbd8c4-5b8e-4127-9eac-6c96a0cd1341.png,
+valencia,Circuit Ricardo Tormo,STREET,CLOCKWISE,"Valencia, Spain",4005,25,,
+circuit-zandvoort_circuit-zandvoort,Circuit Zandvoort ,Race Circuit,Clockwise ,"Zandvoort, Netherlands",4259,14,https://content.motorsportstats.com/venueProfilePicture/venueProfilePicture-be545df0-b6e4-4564-9d86-720f5f7c9977.png,https://assets.motorsportstats.com/circuit/master/MSS_Circuit_Default_CircuitZandvoort.svg
+jeddah,Jeddah Corniche Circuit,STREET,ANTI_CLOCKWISE,"Jeddah, Saudi Arabia",6174,27,,
+las-vegas,Las Vegas Strip Circuit,STREET,ANTI_CLOCKWISE,"Las Vegas, United States",6201,17,,
+lusail,Lusail International Circuit,RACE,CLOCKWISE,"Lusail, Qatar",5419,16,,
+marina-bay,Marina Bay Street Circuit,STREET,ANTI_CLOCKWISE,"Singapore, Singapore",4927,19,,
+miami-international-autodrome_miami-international-autodrome,Miami International Autodrome,Race Circuit,,"Miami, United States",5412,19,,
+red-bull-ring_red-bull-ring,Red Bull Ring,Race Circuit,Clockwise,"Spielberg, Austria",4318,10,https://content.motorsportstats.com/venueProfilePicture/venueProfilePicture-9e7f1072-2b32-4e3c-b62b-ffb33a0a832d.png,https://assets.motorsportstats.com/circuit/master/MSS_Circuit_Default_CircuitRedBullRing.svg
+shanghai,Shanghai International Circuit,RACE,CLOCKWISE,"Shanghai, China",5451,16,,
+silverstone-circuit_silverstone-circuit,Silverstone Circuit,Race Circuit,Clockwise,"Silverstone, Great Britain",5891,18,https://content.motorsportstats.com/venueProfilePicture/venueProfilePicture-a65370c3-6b5c-4f13-b5f8-aa9ae1899068.png,https://assets.motorsportstats.com/circuit/master/MSS_Circuit_Default_Silverstone.svg
+yas-marina-circuit_yas-marina-circuit-2,Yas Marina Circuit,Race Circuit,Anti Clockwise,"Yas Island, United Arab Emirates",5281,16,,

@@ -2,6 +2,7 @@ const express = require('express');
 const { withConnection, sendError } = require('../route-helpers');
 
 const router = express.Router();
+const { isJuniorSeries, seriesPrefix } = require('../series-config');
 const f2ConstructorCountryFallbacks = {
     'invicta-racing': 'gb',
     'phm-racing': 'de',
@@ -24,8 +25,8 @@ router.get('/api/constructors', async (req, res) => {
     try {
 
         const series = String(req.query.series || '').toLowerCase();
-        if (['f2', 'f3'].includes(series)) {
-            const prefix = `${series}_`;
+        if (isJuniorSeries(series)) {
+            const prefix = seriesPrefix(series);
             const rows = await withConnection(connection => connection.query(`
                 SELECT constructors.id, constructors.name, constructors.abbreviation,
                     constructors.countryCode, career.firstYear, career.lastYear,
@@ -128,8 +129,8 @@ router.get('/api/constructors/:id', async (req, res) => {
     try {
 
         const series = String(req.query.series || '').toLowerCase();
-        if (['f2', 'f3'].includes(series)) {
-            const prefix = `${series}_`;
+        if (isJuniorSeries(series)) {
+            const prefix = seriesPrefix(series);
             const data = await withConnection(async connection => {
                 const [constructorRows, standings, drivers, results] = await Promise.all([
                     connection.query(`
@@ -238,7 +239,7 @@ router.get('/api/constructors/:id', async (req, res) => {
                     results: results.map(row => ({
                         ...row,
                         points: /\b(?:DSQ|DQ|DISQ|DISQUALIFIED|EXC)\b/i.test(String(row.status || '')) ? 0 : Number(row.points || 0),
-                        fastestLap: series === 'f2' && isTrue(row.fastestLap)
+                        fastestLap: ['f2', 'academy'].includes(series) && isTrue(row.fastestLap)
                     }))
                 };
             });

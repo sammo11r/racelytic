@@ -1,14 +1,17 @@
 const POINT_SYSTEMS = { ...F1_POINTS_SYSTEMS };
 const isF2Simulator = window.location.pathname.startsWith('/f2/');
 const isF3Simulator = window.location.pathname.startsWith('/f3/');
+const isAcademySimulator = window.location.pathname.startsWith('/academy/');
 const F2_POINTS_SYSTEM = { name: 'Formula 2 · current', race: [25,18,15,12,10,8,6,4,2,1], sprint: [10,8,6,5,4,3,2,1], qualifying: [], poleBonus: 2, fastestLapBonus: 1, fastestLapMaxPosition: 10, countBest: Infinity, preserveOfficialPointsFrom: 2022 };
 const F3_POINTS_SYSTEM = { name: 'Formula 3 · current', race: [25,18,15,12,10,8,6,4,2,1], sprint: [10,9,8,7,6,5,4,3,2,1], qualifying: [], poleBonus: 2, fastestLapBonus: 1, fastestLapMaxPosition: 10, countBest: Infinity, preserveOfficialPointsFrom: 2022 };
 const F3_LEGACY_POINTS_SYSTEM = { name: 'Formula 3 · 2019–2021', race: [25,18,15,12,10,8,6,4,2,1], sprint: [15,12,10,8,6,5,4,3,2,1], qualifying: [], poleBonus: 4, fastestLapBonus: 2, fastestLapMaxPosition: 10, countBest: Infinity };
+const ACADEMY_POINTS_SYSTEM = { name: 'F1 Academy · current', race: [25,18,15,12,10,8,6,4,2,1], sprint: [10,8,6,5,4,3,2,1], qualifying: [], poleBonus: 2, fastestLapBonus: 1, fastestLapMaxPosition: 10, countBest: Infinity, preserveOfficialPointsFrom: 2023 };
 if (isF2Simulator) POINT_SYSTEMS['f2-current'] = F2_POINTS_SYSTEM;
 if (isF3Simulator) {
   POINT_SYSTEMS['f3-current'] = F3_POINTS_SYSTEM;
   POINT_SYSTEMS['f3-legacy'] = F3_LEGACY_POINTS_SYSTEM;
 }
+if (isAcademySimulator) POINT_SYSTEMS['academy-current'] = ACADEMY_POINTS_SYSTEM;
 
 let simulationData = null;
 let simulationRequest = 0;
@@ -228,14 +231,14 @@ function renderSimulation() {
   const originalChampion = (isDrivers ? simulationData.driverChampionship : simulationData.constructorChampionship)[0];
   const originalChampionId = isDrivers ? originalChampion.driverId : originalChampion.constructorId;
   const changedChampion = String(champion.id) !== String(originalChampionId);
-  const label = isDrivers ? 'Driver' : isF3Simulator ? 'Team' : 'Constructor';
-  const link = isDrivers ? (isF3Simulator ? 'f3/driver' : 'driver') : isF3Simulator ? 'f3/team' : 'constructor';
+  const label = isDrivers ? 'Driver' : (isF3Simulator || isAcademySimulator) ? 'Team' : 'Constructor';
+  const link = isDrivers ? (isAcademySimulator ? 'academy/driver' : isF3Simulator ? 'f3/driver' : 'driver') : isAcademySimulator ? 'academy/team' : isF3Simulator ? 'f3/team' : 'constructor';
   const displayedFastestLapBonus = Number(!isDrivers && system.constructorFastestLapBonus !== undefined
     ? system.constructorFastestLapBonus
     : system.fastestLapBonus ?? (system.fastestLap ? 1 : 0));
 
   document.getElementById('simulation-championship-title').textContent = `${label} championship`;
-  document.getElementById('simulation-status').textContent = `${simulationData.year} · ${standings.length} ${isF3Simulator && !isDrivers ? 'teams' : simulationMode}`;
+  document.getElementById('simulation-status').textContent = `${simulationData.year} · ${standings.length} ${(isF3Simulator || isAcademySimulator) && !isDrivers ? 'teams' : simulationMode}`;
   document.getElementById('simulation-explanation').innerHTML = `
     <strong>${esc(system.name)}</strong> awards ${(isDrivers ? system.race : system.constructorRace || system.race).join('–')} points in races${system.sprint.length ? ` and ${system.sprint.join('–')} in sprints` : ', with sprint races excluded'}.
     ${system.qualifying?.length ? `Qualifying awards ${system.qualifying.join('–')} points.` : 'No qualifying points are awarded.'}
@@ -305,8 +308,10 @@ async function initialiseSimulator() {
     customSystems = systems;
     const pointsSelect = document.getElementById('simulation-points');
     const historicalGroup = document.createElement('optgroup');
-    historicalGroup.label = isF3Simulator ? 'Official Formula 3 systems' : isF2Simulator ? 'Official Formula 2 system' : 'Official Formula One systems';
-    const officialSystems = isF3Simulator
+    historicalGroup.label = isAcademySimulator ? 'Official F1 Academy system' : isF3Simulator ? 'Official Formula 3 systems' : isF2Simulator ? 'Official Formula 2 system' : 'Official Formula One systems';
+    const officialSystems = isAcademySimulator
+      ? {'academy-current': ACADEMY_POINTS_SYSTEM}
+      : isF3Simulator
       ? {'f3-current': F3_POINTS_SYSTEM, 'f3-legacy': F3_LEGACY_POINTS_SYSTEM}
       : isF2Simulator ? {'f2-current':F2_POINTS_SYSTEM} : F1_POINTS_SYSTEMS;
     Object.entries(officialSystems).forEach(([key, system]) => {
@@ -316,7 +321,7 @@ async function initialiseSimulator() {
       historicalGroup.append(option);
     });
     pointsSelect.append(historicalGroup);
-    pointsSelect.value = isF3Simulator ? 'f3-current' : isF2Simulator ? 'f2-current' : '2025-present';
+    pointsSelect.value = isAcademySimulator ? 'academy-current' : isF3Simulator ? 'f3-current' : isF2Simulator ? 'f2-current' : '2025-present';
     if (customSystems.length) {
       const group = document.createElement('optgroup');
       group.label = 'Custom points systems';

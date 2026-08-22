@@ -1,5 +1,6 @@
 const express = require('express');
 const { pool, sendError } = require('../route-helpers');
+const { isJuniorSeries, seriesPrefix } = require('../series-config');
 
 const router = express.Router();
 
@@ -16,7 +17,8 @@ async function getRaceWinners() {
     `);
 }
 
-async function getF2RaceWinners() {
+async function getJuniorRaceWinners(series) {
+    const prefix = seriesPrefix(series);
     return pool.query(`
         SELECT drivers.name AS driverName,
             LOWER(CASE drivers.id
@@ -31,9 +33,9 @@ async function getF2RaceWinners() {
             SUM(LOWER(sessions.name) LIKE '%sprint%') AS sprintWins,
             MIN(sessions.year) AS firstWinYear,
             MAX(sessions.year) AS lastWinYear
-        FROM f2_session_results results
-        JOIN f2_sessions sessions ON sessions.id = results.sessionId
-        JOIN f2_drivers drivers ON drivers.id = results.driverId
+        FROM ${prefix}session_results results
+        JOIN ${prefix}sessions sessions ON sessions.id = results.sessionId
+        JOIN ${prefix}drivers drivers ON drivers.id = results.driverId
         WHERE results.positionNumber = 1
             AND LOWER(CAST(sessions.isRace AS CHAR)) IN ('1', 'true')
             AND (sessions.cancelled IS NULL OR LOWER(CAST(sessions.cancelled AS CHAR)) NOT IN ('1', 'true'))
@@ -62,26 +64,28 @@ function nameMatchesGuess(driverName, guess) {
 
 router.get('/api/games/world-champions', async (req, res) => {
     try {
-        if (String(req.query.series || '').toLowerCase() === 'f2') {
+        const series = String(req.query.series || '').toLowerCase();
+        if (isJuniorSeries(series)) {
+            const prefix = seriesPrefix(series);
             const rows = await pool.query(`
                 SELECT standings.year,
                     GROUP_CONCAT(DISTINCT constructors.name ORDER BY constructors.name SEPARATOR '|||') AS teamNames,
                     (
                         SELECT MAX(CHAR_LENGTH(championDrivers.name))
-                        FROM f2_season_driver_standings championStandings
-                        JOIN f2_drivers championDrivers ON championDrivers.id = championStandings.driverId
+                        FROM ${prefix}season_driver_standings championStandings
+                        JOIN ${prefix}drivers championDrivers ON championDrivers.id = championStandings.driverId
                         WHERE championStandings.positionNumber = 1
                             AND (
                                 LOWER(CAST(championStandings.championshipWon AS CHAR)) IN ('1', 'true')
                                 OR championStandings.year < YEAR(CURRENT_DATE())
                             )
                     ) AS driverNameLength
-                FROM f2_season_driver_standings standings
-                LEFT JOIN f2_sessions sessions ON sessions.year = standings.year
-                LEFT JOIN f2_session_results results
+                FROM ${prefix}season_driver_standings standings
+                LEFT JOIN ${prefix}sessions sessions ON sessions.year = standings.year
+                LEFT JOIN ${prefix}session_results results
                     ON results.sessionId = sessions.id
                     AND results.driverId = standings.driverId
-                LEFT JOIN f2_constructors constructors ON constructors.id = results.constructorId
+                LEFT JOIN ${prefix}constructors constructors ON constructors.id = results.constructorId
                 WHERE standings.positionNumber = 1
                     AND (
                         LOWER(CAST(standings.championshipWon AS CHAR)) IN ('1', 'true')
@@ -133,11 +137,13 @@ router.post('/api/games/world-champions/guess', async (req, res) => {
     }
 
     try {
-        if (String(req.query.series || '').toLowerCase() === 'f2') {
+        const series = String(req.query.series || '').toLowerCase();
+        if (isJuniorSeries(series)) {
+            const prefix = seriesPrefix(series);
             const rows = await pool.query(`
                 SELECT standings.year, drivers.name AS driverName
-                FROM f2_season_driver_standings standings
-                JOIN f2_drivers drivers ON drivers.id = standings.driverId
+                FROM ${prefix}season_driver_standings standings
+                JOIN ${prefix}drivers drivers ON drivers.id = standings.driverId
                 WHERE standings.positionNumber = 1
                     AND (
                         LOWER(CAST(standings.championshipWon AS CHAR)) IN ('1', 'true')
@@ -173,15 +179,16 @@ router.post('/api/games/world-champions/guess', async (req, res) => {
 
 router.get('/api/games/race-winners', async (req, res) => {
     try {
-        const isF2 = String(req.query.series || '').toLowerCase() === 'f2';
-        const rows = isF2 ? await getF2RaceWinners() : await getRaceWinners();
+        const series = String(req.query.series || '').toLowerCase();
+        const junior = isJuniorSeries(series);
+        const rows = junior ? await getJuniorRaceWinners(series) : await getRaceWinners();
         const driverNameLength = Math.max(0, ...rows.map(row => String(row.driverName || '').length));
         res.json(rows.map((row, slot) => ({
             slot,
             wins: Number(row.wins),
             driverNameLength,
-            ...(!isF2 ? { countryName: row.countryName || null } : {}),
-            ...(isF2 ? {
+            ...(!junior ? { countryName: row.countryName || null } : {}),
+            ...(junior ? {
                 featureWins: Number(row.featureWins),
                 sprintWins: Number(row.sprintWins),
                 countryCode: row.countryCode || null
@@ -201,8 +208,9 @@ router.post('/api/games/race-winners/guess', async (req, res) => {
     }
 
     try {
-        const rows = String(req.query.series || '').toLowerCase() === 'f2'
-            ? await getF2RaceWinners()
+        const series = String(req.query.series || '').toLowerCase();
+        const rows = isJuniorSeries(series)
+            ? await getJuniorRaceWinners(series)
             : await getRaceWinners();
         const matches = rows.map((row, slot) => ({ row, slot })).filter(({ row }) => {
             return nameMatchesGuess(row.driverName, guess);

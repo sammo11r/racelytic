@@ -1,5 +1,6 @@
 const express = require('express');
 const { withConnection, sendError } = require('../route-helpers');
+const { academySessionType } = require('../series-config');
 
 const router = express.Router();
 
@@ -72,6 +73,12 @@ function f3ResultPoints(result, sessionType, year, polePosition) {
     return points;
 }
 
+function juniorSeriesConfiguration(series) {
+    if (series === 'academy') return { prefix: 'fa_', sessionType: academySessionType, resultPoints: f2ResultPoints };
+    if (series === 'f3') return { prefix: 'f3_', sessionType: f3SessionType, resultPoints: f3ResultPoints };
+    return { prefix: 'f2_', sessionType: f2SessionType, resultPoints: f2ResultPoints };
+}
+
 function eligibleFastestLapDrivers(results) {
     const timedCandidates = new Map();
     const importedCandidates = new Map();
@@ -117,8 +124,8 @@ router.get('/api/seasons', async (req, res) => {
     try {
 
         const series = String(req.query.series || '').toLowerCase();
-        if (['f2', 'f3'].includes(series)) {
-            const prefix = series === 'f3' ? 'f3_' : 'f2_';
+        if (['f2', 'f3', 'academy'].includes(series)) {
+            const { prefix } = juniorSeriesConfiguration(series);
             const rows = await withConnection(async connection => {
                 const [seasons, raceCounts, driverCounts, constructorCounts, champions] = await Promise.all([
                     connection.query(`SELECT year FROM ${prefix}seasons ORDER BY year DESC`),
@@ -296,10 +303,8 @@ router.get('/api/seasons/:year', async (req, res) => {
     try {
 
         const series = String(req.query.series || '').toLowerCase();
-        if (['f2', 'f3'].includes(series)) {
-            const prefix = series === 'f3' ? 'f3_' : 'f2_';
-            const sessionType = series === 'f3' ? f3SessionType : f2SessionType;
-            const resultPoints = series === 'f3' ? f3ResultPoints : f2ResultPoints;
+        if (['f2', 'f3', 'academy'].includes(series)) {
+            const { prefix, sessionType, resultPoints } = juniorSeriesConfiguration(series);
             const data = await withConnection(async connection => {
                 const seasonRows = await connection.query(`SELECT year FROM ${prefix}seasons WHERE year = ?`, [year]);
                 if (!seasonRows.length) return null;
@@ -1205,3 +1210,4 @@ module.exports.f2ResultPoints = f2ResultPoints;
 module.exports.f2SessionType = f2SessionType;
 module.exports.f3ResultPoints = f3ResultPoints;
 module.exports.f3SessionType = f3SessionType;
+module.exports.academySessionType = academySessionType;

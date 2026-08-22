@@ -4,8 +4,9 @@ const csv = require('csv-parser');
 
 const pool = require('../backend/db');
 const DATA_DIR = path.join(__dirname, '../data');
-const SERIES = process.argv.includes('--series=f2') ? 'f2' : 'f3';
-const TABLE_PREFIX = `${SERIES}_`;
+const SERIES = process.argv.includes('--series=academy') ? 'academy' : process.argv.includes('--series=f2') ? 'f2' : 'f3';
+const DATA_PREFIX = SERIES === 'academy' ? 'fa' : SERIES;
+const TABLE_PREFIX = SERIES === 'academy' ? 'fa_' : `${SERIES}_`;
 
 function readCsv(name) {
   return new Promise((resolve, reject) => {
@@ -29,10 +30,10 @@ function numeric(value) {
 
 async function main() {
   const [races, entries, sessions, results, drivers, constructors, chassis, engines, driverStandings, constructorStandings] = await Promise.all([
-    readCsv(`${SERIES}db-races.csv`), readCsv(`${SERIES}db-entries.csv`), readCsv(`${SERIES}db-sessions.csv`),
-    readCsv(`${SERIES}db-session-results.csv`), readCsv(`${SERIES}db-drivers.csv`), readCsv(`${SERIES}db-constructors.csv`),
-    readCsv(`${SERIES}db-chassis.csv`), readCsv(`${SERIES}db-engines.csv`),
-    readCsv(`${SERIES}db-season-driver-standings.csv`), readCsv(`${SERIES}db-season-constructor-standings.csv`)
+    readCsv(`${DATA_PREFIX}db-races.csv`), readCsv(`${DATA_PREFIX}db-entries.csv`), readCsv(`${DATA_PREFIX}db-sessions.csv`),
+    readCsv(`${DATA_PREFIX}db-session-results.csv`), readCsv(`${DATA_PREFIX}db-drivers.csv`), readCsv(`${DATA_PREFIX}db-constructors.csv`),
+    readCsv(`${DATA_PREFIX}db-chassis.csv`), readCsv(`${DATA_PREFIX}db-engines.csv`),
+    readCsv(`${DATA_PREFIX}db-season-driver-standings.csv`), readCsv(`${DATA_PREFIX}db-season-constructor-standings.csv`)
   ]);
   const today = new Date().toISOString().slice(0, 10);
   const raceById = new Map(races.map(race => [race.id, race]));

@@ -1,5 +1,5 @@
 const systemForm = document.getElementById('points-system-form');
-const isF3PointsPage = window.location.pathname.startsWith('/f3/');
+const isF3PointsPage = window.location.pathname.startsWith('/f3/') || window.location.pathname.startsWith('/academy/');
 let systems = [];
 let currentUser = null;
 

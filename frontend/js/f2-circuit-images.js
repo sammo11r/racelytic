@@ -22,6 +22,13 @@ const F2_CIRCUIT_IMAGE_IDS = Object.freeze({
   'losail-international-circuit_losail-international-circuit': 'lusail-1',
   'miami-international-autodrome_miami-international-autodrome': 'miami-1',
   'circuit-gilles-villeneuve_circuit-gilles-villeneuve': 'montreal-6',
+  'austin': 'austin-1',
+  'valencia': 'valencia-1',
+  'jeddah': 'jeddah-1',
+  'las-vegas': 'las-vegas-1',
+  'lusail': 'lusail-1',
+  'marina-bay': 'marina-bay-4',
+  'shanghai': 'shanghai-1',
   'circuito-de-madring_circuito-de-madring': 'madring-1'
 });
 

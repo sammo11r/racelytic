@@ -19,18 +19,31 @@ async function loadHeader() {
         try { rememberedSeries = localStorage.getItem('racelytic-series') || ''; } catch {}
         const seriesNeutralPages = ['/account', '/privacy', '/terms'];
         const isSeriesNeutralPage = seriesNeutralPages.includes(window.location.pathname);
-        const pathSeries = window.location.pathname === '/f3' || window.location.pathname.startsWith('/f3/')
+        const pathSeries = window.location.pathname === '/academy' || window.location.pathname.startsWith('/academy/')
+            ? 'academy'
+            : window.location.pathname === '/f3' || window.location.pathname.startsWith('/f3/')
             ? 'f3'
             : window.location.pathname === '/f2' || window.location.pathname.startsWith('/f2/') ? 'f2' : 'f1';
-        const neutralSeries = ['f1', 'f2', 'f3'].includes(requestedSeries)
+        const neutralSeries = ['f1', 'f2', 'f3', 'academy'].includes(requestedSeries)
             ? requestedSeries
-            : ['f1', 'f2', 'f3'].includes(rememberedSeries) ? rememberedSeries : 'f1';
+            : ['f1', 'f2', 'f3', 'academy'].includes(rememberedSeries) ? rememberedSeries : 'f1';
         const activeSeries = isSeriesNeutralPage ? neutralSeries : pathSeries;
         const isF2Mode = activeSeries === 'f2';
         const isF3Mode = activeSeries === 'f3';
+        const isAcademyMode = activeSeries === 'academy';
         try { localStorage.setItem('racelytic-series', activeSeries); } catch {}
 
-        const contentLinkMap = activeSeries === 'f3' ? {
+        const academyContentLinkMap = {
+            '/analysis': '/academy/analysis', '/season': '/academy/season', '/race': '/academy/race',
+            '/f2/analysis': '/academy/analysis', '/f3/analysis': '/academy/analysis',
+            '/driver': '/academy/driver', '/f3/driver': '/academy/driver', '/constructor': '/academy/team', '/f3/team': '/academy/team', '/circuit': '/academy/circuit',
+            '/season-analysis': '/academy/season-analysis', '/season-comparison': '/academy/season-comparison',
+            '/race-analysis': '/academy/race-analysis', '/driver-comparison': '/academy/driver-comparison',
+            '/driver-form': '/academy/driver-form', '/teammate-battles': '/academy/teammate-battles',
+            '/circuit-analysis': '/academy/circuit-analysis', '/records': '/academy/records',
+            '/championship-builder': '/academy/championship-builder', '/points-systems': '/academy/points-systems'
+        };
+        const contentLinkMap = isAcademyMode ? academyContentLinkMap : activeSeries === 'f3' ? {
             '/analysis': '/f3/analysis', '/season': '/f3/season', '/race': '/f3/race',
             '/f2/analysis': '/f3/analysis',
             '/driver': '/f3/driver', '/constructor': '/f3/team', '/circuit': '/f3/circuit',
@@ -53,13 +66,14 @@ async function loadHeader() {
         if (mainContent) new MutationObserver(() => rewriteContentLinks(mainContent)).observe(mainContent, { childList: true, subtree: true });
         document.body.classList.toggle('f2-mode', isF2Mode);
         document.body.classList.toggle('f3-mode', isF3Mode);
+        document.body.classList.toggle('academy-mode', isAcademyMode);
         if (activeSeries === 'f1' && !document.title.includes('Formula 1')) {
             document.title = document.title === 'Racelytic'
                 ? 'Formula 1 · Racelytic'
                 : `${document.title.replace(/\s*·\s*Racelytic$/, '')} · Formula 1 · Racelytic`;
         }
         const brand = container.querySelector('.brand');
-        if (brand) brand.href = activeSeries === 'f3' ? '/f3' : activeSeries === 'f2' ? '/f2' : '/';
+        if (brand) brand.href = isAcademyMode ? '/academy' : activeSeries === 'f3' ? '/f3' : activeSeries === 'f2' ? '/f2' : '/';
 
         let favicon = document.querySelector('link[rel~="icon"]');
         if (!favicon) {
@@ -80,7 +94,7 @@ async function loadHeader() {
             '/teammate-battles': '/f2/teammate-battles', '/circuit-analysis': '/f2/circuit-analysis',
             '/records': '/f2/records', '/simulator-overview': '/f2/simulator', '/simulator': '/f2/simulate-season',
             '/scenario-calculator': '/f2/scenario-calculator', '/championship-builder': '/f2/championship-builder',
-            '/points-systems': '/f2/points-systems', '/games': '/f2/games', '/pitwall': '/f2/pitwall', '/quizzes': '/f2/quizzes',
+            '/points-systems': '/f2/points-systems', '/games': '/f2/games', '/quizzes': '/f2/quizzes',
             '/world-champions-quiz': '/f2/champions-quiz', '/race-winners-quiz': '/f2/race-winners-quiz',
             '/about': '/f2/about'
         };
@@ -97,9 +111,11 @@ async function loadHeader() {
             '/simulator-overview': '/f3/simulator', '/simulator': '/f3/simulate-season',
             '/scenario-calculator': '/f3/scenario-calculator', '/championship-builder': '/f3/championship-builder',
             '/points-systems': '/f3/points-systems',
-            '/games': '/f3/games', '/pitwall': '/f3/pitwall', '/about': '/f3/about'
+            '/games': '/f3/games', '/about': '/f3/about'
         };
         const reverseF3PagePairs = Object.fromEntries(Object.entries(f3PagePairs).map(([f1, f3]) => [f3, f1]));
+        const academyPagePairs = Object.fromEntries(Object.entries(f3PagePairs).map(([f1, f3]) => [f1, f3.replace('/f3', '/academy')]));
+        const reverseAcademyPagePairs = Object.fromEntries(Object.entries(academyPagePairs).map(([f1, academy]) => [academy, f1]));
         const detailPages = {
             '/season': ['season', '/f2/seasons'], '/race': ['race', '/f2/races'],
             '/driver': ['driver', '/f2/drivers'], '/circuit': ['circuit', '/f2/circuits'],
@@ -109,41 +125,50 @@ async function loadHeader() {
             '/f2/constructor': ['constructor', '/constructors'],
             '/f3/season': ['season', '/seasons'], '/f3/race': ['race', '/races'],
             '/f3/driver': ['driver', '/drivers'], '/f3/team': ['constructor', '/constructors'],
-            '/f3/circuit': ['circuit', '/circuits']
+            '/f3/circuit': ['circuit', '/circuits'],
+            '/academy/season': ['season', '/seasons'], '/academy/race': ['race', '/races'],
+            '/academy/driver': ['driver', '/drivers'], '/academy/team': ['constructor', '/constructors'],
+            '/academy/circuit': ['circuit', '/circuits']
         };
         const seriesDetailParents = {
             f1: { season: '/seasons', race: '/races', driver: '/drivers', constructor: '/constructors', circuit: '/circuits' },
             f2: { season: '/f2/seasons', race: '/f2/races', driver: '/f2/drivers', constructor: '/f2/constructors', circuit: '/f2/circuits' },
-            f3: { season: '/f3/seasons', race: '/f3/races', driver: '/f3/drivers', constructor: '/f3/teams', circuit: '/f3/circuits' }
+            f3: { season: '/f3/seasons', race: '/f3/races', driver: '/f3/drivers', constructor: '/f3/teams', circuit: '/f3/circuits' },
+            academy: { season: '/academy/seasons', race: '/academy/races', driver: '/academy/drivers', constructor: '/academy/teams', circuit: '/academy/circuits' }
         };
         const resolveSeriesTarget = async targetSeries => {
             if (isSeriesNeutralPage) return `${window.location.pathname}?series=${targetSeries}`;
-            const canonicalPage = isF3Mode
+            const canonicalPage = isAcademyMode
+                ? reverseAcademyPagePairs[window.location.pathname]
+                : isF3Mode
                 ? reverseF3PagePairs[window.location.pathname]
                 : isF2Mode ? reversePagePairs[window.location.pathname] : window.location.pathname;
-            const topLevelTarget = targetSeries === 'f3'
+            const topLevelTarget = targetSeries === 'academy'
+                ? academyPagePairs[canonicalPage]
+                : targetSeries === 'f3'
                 ? f3PagePairs[canonicalPage]
                 : targetSeries === 'f2' ? pagePairs[canonicalPage] : canonicalPage;
             if (topLevelTarget) return `${topLevelTarget}${window.location.search}${window.location.hash}`;
-            if (targetSeries === 'f3') {
+            if (['f3', 'academy'].includes(targetSeries)) {
+                const targetBase = targetSeries === 'academy' ? '/academy' : '/f3';
                 const detail = detailPages[window.location.pathname];
                 if (detail) {
                     const parameter = detail[0] === 'season' ? 'year' : 'id';
                     const id = new URLSearchParams(window.location.search).get(parameter);
                     if (id) {
                         try {
-                            const equivalent = await fetch(`/api/series-equivalent?target=f3&type=${detail[0]}&id=${encodeURIComponent(id)}&source=${activeSeries}`);
+                            const equivalent = await fetch(`/api/series-equivalent?target=${targetSeries}&type=${detail[0]}&id=${encodeURIComponent(id)}&source=${activeSeries}`);
                             if (equivalent.ok) return (await equivalent.json()).url;
                         } catch {}
                     }
-                    return seriesDetailParents.f3[detail[0]];
+                    return seriesDetailParents[targetSeries][detail[0]];
                 }
                 const currentPath = canonicalPage || window.location.pathname;
-                if (/analysis|comparison|driver-form|teammate|records/.test(currentPath)) return '/f3/analysis';
-                if (/simulator|scenario|championship-builder|points-systems/.test(currentPath)) return '/f3/simulator';
-                if (/games|quiz/.test(currentPath)) return '/f3/games';
-                if (/database|season|race|driver|constructor|circuit|chassis/.test(currentPath)) return '/f3/database';
-                return '/f3';
+                if (/analysis|comparison|driver-form|teammate|records/.test(currentPath)) return `${targetBase}/analysis`;
+                if (/simulator|scenario|championship-builder|points-systems/.test(currentPath)) return `${targetBase}/simulator`;
+                if (/games|quiz/.test(currentPath)) return `${targetBase}/games`;
+                if (/database|season|race|driver|constructor|circuit|chassis/.test(currentPath)) return `${targetBase}/database`;
+                return targetBase;
             }
             const targetF2 = targetSeries === 'f2';
             const pair = targetF2 ? pagePairs[window.location.pathname] : reversePagePairs[window.location.pathname];
@@ -178,15 +203,18 @@ async function loadHeader() {
             link.classList.toggle('active', active);
             if (active) link.setAttribute('aria-current', 'page');
         });
-        if (isF3Mode) {
+        if (isF3Mode || isAcademyMode) {
+            const seriesBase = isAcademyMode ? '/academy' : '/f3';
+            const seriesName = isAcademyMode ? 'F1 Academy' : 'Formula 3';
+            const seriesShortName = isAcademyMode ? 'F1 Academy' : 'F3';
             document.title = document.title
-                .replace('Formula 1', 'Formula 3')
-                .replace('Formula 2', 'Formula 3')
-                .replace(/(^|\s)F[12](?=\s|$)/, '$1F3');
-            if (!document.title.includes('Formula 3')) {
+                .replace('Formula 1', seriesName)
+                .replace('Formula 2', seriesName)
+                .replace('Formula 3', seriesName);
+            if (!document.title.includes(seriesName)) {
                 document.title = document.title === 'Racelytic'
-                    ? 'Formula 3 · Racelytic'
-                    : `${document.title.replace(/\s*·\s*Racelytic$/, '')} · Formula 3 · Racelytic`;
+                    ? `${seriesName} · Racelytic`
+                    : `${document.title.replace(/\s*·\s*Racelytic$/, '')} · ${seriesName} · Racelytic`;
             }
             const navigationDropdowns = [...container.querySelectorAll('.nav-dropdown')];
             const f3Menus = [
@@ -218,13 +246,21 @@ async function loadHeader() {
                     ['/f3/points-systems', 'Points systems', 'Create and manage scoring rules']
                 ]],
                 ['FORMULA 3 GAMES', [
-                    ['/f3/games', 'Overview', 'Choose a Formula 3 game'],
-                    ['/f3/pitwall', 'Pitwall', 'Play the motorsport strategy game']
+                    ['/f3/games', 'Overview', 'Choose a Formula 3 game']
                 ]]
             ];
+            const seriesMenus = isAcademyMode
+                ? f3Menus.map(([title, items]) => [
+                    title.replace('FORMULA 3', 'F1 ACADEMY'),
+                    items.map(([url, label, description]) => [
+                        url.replace('/f3', '/academy'), label,
+                        description.replace(/Formula 3|F3/g, 'F1 Academy')
+                    ])
+                ])
+                : f3Menus;
             navigationDropdowns.forEach((dropdown, index) => {
                 const links = [...dropdown.querySelectorAll('.dropdown-menu a')];
-                const menu = f3Menus[index];
+                const menu = seriesMenus[index];
                 if (!menu || !links[0]) return dropdown.remove();
                 links.forEach((link, linkIndex) => {
                     const item = menu[1][linkIndex];
@@ -237,18 +273,18 @@ async function loadHeader() {
                 if (title) title.textContent = menu[0];
             });
             const aboutLink = container.querySelector('a[href="/about"]');
-            if (aboutLink) aboutLink.href = '/f3/about';
-            container.querySelectorAll('a[href="/account"]').forEach(link => { link.href = '/account?series=f3'; });
+            if (aboutLink) aboutLink.href = `${seriesBase}/about`;
+            container.querySelectorAll('a[href="/account"]').forEach(link => { link.href = `/account?series=${activeSeries}`; });
             const pointsSimulatorLink = document.querySelector('.points-library-hero a[href="/simulator"]');
-            if (pointsSimulatorLink) pointsSimulatorLink.href = '/f3/simulate-season';
+            if (pointsSimulatorLink) pointsSimulatorLink.href = `${seriesBase}/simulate-season`;
             const pointsAccountLink = document.querySelector('.points-login-prompt a[href="/account"]');
-            if (pointsAccountLink) pointsAccountLink.href = '/account?series=f3';
-            if (window.location.pathname === '/f3/points-systems') {
+            if (pointsAccountLink) pointsAccountLink.href = `/account?series=${activeSeries}`;
+            if (window.location.pathname === `${seriesBase}/points-systems`) {
                 const hero = document.querySelector('.points-library-hero');
                 if (hero) {
-                    hero.querySelector('.eyebrow').textContent = 'FORMULA 3 CHAMPIONSHIP RULES';
-                    hero.querySelector('h1').textContent = 'Formula 3 points systems.';
-                    hero.querySelector('p').textContent = 'Create reusable feature, sprint, qualifying and bonus-point rules for Formula 3 simulations.';
+                    hero.querySelector('.eyebrow').textContent = `${seriesName.toUpperCase()} CHAMPIONSHIP RULES`;
+                    hero.querySelector('h1').textContent = `${seriesName} points systems.`;
+                    hero.querySelector('p').textContent = `Create reusable feature, reverse-grid, qualifying and bonus-point rules for ${seriesName} simulations.`;
                 }
             }
         }
@@ -332,7 +368,6 @@ async function loadHeader() {
             const gamesLinks = [...(gamesDropdown?.querySelectorAll('.dropdown-menu a') || [])];
             const f2GamesRoutes = [
                 ['/f2/games', 'Overview', 'Choose a Formula 2 game'],
-                ['/f2/pitwall', 'Pitwall', 'Play the motorsport strategy game'],
                 ['/f2/quizzes', 'Quizzes', 'Test your Formula 2 knowledge']
             ];
             gamesLinks.forEach((link, index) => {
@@ -477,6 +512,11 @@ async function loadHeader() {
             mainNav?.classList.remove('is-open');
             mobileToggle?.setAttribute('aria-expanded', 'false');
             mobileToggle?.setAttribute('aria-label', 'Open navigation');
+            document.body.classList.remove('mobile-nav-open');
+            dropdowns.forEach(dropdown => {
+                dropdown.classList.remove('is-open');
+                dropdown.querySelector('.dropdown-toggle')?.setAttribute('aria-expanded', 'false');
+            });
         };
 
         mobileToggle?.addEventListener('click', event => {
@@ -484,6 +524,8 @@ async function loadHeader() {
             const open = mainNav.classList.toggle('is-open');
             mobileToggle.setAttribute('aria-expanded', String(open));
             mobileToggle.setAttribute('aria-label', open ? 'Close navigation' : 'Open navigation');
+            document.body.classList.toggle('mobile-nav-open', open);
+            if (!open) closeMobileNavigation();
         });
 
         dropdowns.forEach(dropdown => {
@@ -517,6 +559,17 @@ async function loadHeader() {
             if (container.contains(event.target)) return;
             closeMobileNavigation();
             closeSearch();
+        });
+
+        document.addEventListener('keydown', event => {
+            if (event.key !== 'Escape') return;
+            closeMobileNavigation();
+            closeSearch();
+            mobileToggle?.focus();
+        });
+
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 800) closeMobileNavigation();
         });
 
         container.querySelectorAll('a[href]').forEach(link => {
@@ -557,21 +610,30 @@ async function loadFooter() {
         footer.innerHTML = (await response.text()).replace('{{year}}', String(new Date().getFullYear()));
         const isF2Mode = window.location.pathname === '/f2' || window.location.pathname.startsWith('/f2/');
         const isF3Mode = window.location.pathname === '/f3' || window.location.pathname.startsWith('/f3/');
+        const isAcademyMode = window.location.pathname === '/academy' || window.location.pathname.startsWith('/academy/');
+        const summary = footer.querySelector('[data-footer-summary]');
+        const trademark = footer.querySelector('[data-footer-trademark]');
+        const source = footer.querySelector('[data-footer-source]');
         if (isF2Mode) {
-            const paragraphs = footer.querySelectorAll('p');
             const brand = footer.querySelector('.footer-brand');
             if (brand) brand.href = '/f2';
-            if (paragraphs[0]) paragraphs[0].textContent = 'Independent Formula 2 history, statistics, and championship analysis.';
-            if (paragraphs[2]) paragraphs[2].textContent = 'Racelytic is an unofficial, independent project and is not affiliated with Formula 2, the FIA, or any Formula 2 team. Formula 2, F2, and related marks are trademarks of their respective owners.';
-            if (paragraphs[3]) paragraphs[3].textContent = 'Formula 2 statistics are compiled from the project dataset and Motorsport Stats. Data may contain errors and should not be treated as an official record.';
+            if (summary) summary.textContent = 'Independent Formula 2 history, statistics, and championship analysis.';
+            if (trademark) trademark.textContent = 'Racelytic is unofficial and is not associated with or endorsed by the FIA Formula 2 Championship, the FIA, the Formula 1 companies, or any team. FIA FORMULA 2 CHAMPIONSHIP, FIA FORMULA 2, FORMULA 2, F2 and related marks are trade marks of the Fédération Internationale de l’Automobile and are used by their authorised operators under licence.';
+            if (source) source.innerHTML = 'Formula 2 statistics are compiled from <a href="https://www.motorsportstats.com/" target="_blank" rel="noopener noreferrer">Motorsport Stats</a> classifications and project-maintained corrections. Third-party materials remain subject to their owners’ rights. Data may contain errors and is not an official record.';
         }
         if (isF3Mode) {
-            const paragraphs = footer.querySelectorAll('p');
             const brand = footer.querySelector('.footer-brand');
             if (brand) brand.href = '/f3';
-            if (paragraphs[0]) paragraphs[0].textContent = 'Independent Formula 3 history, statistics, and championship analysis.';
-            if (paragraphs[2]) paragraphs[2].textContent = 'Racelytic is an unofficial, independent project and is not affiliated with Formula 3, the FIA, or any Formula 3 team. Formula 3, F3, and related marks are trademarks of their respective owners.';
-            if (paragraphs[3]) paragraphs[3].textContent = 'Formula 3 statistics are compiled from the project dataset and Motorsport Stats. Data may contain errors and should not be treated as an official record.';
+            if (summary) summary.textContent = 'Independent Formula 3 history, statistics, and championship analysis.';
+            if (trademark) trademark.textContent = 'Racelytic is unofficial and is not associated with or endorsed by the FIA Formula 3 Championship, the FIA, the Formula 1 companies, or any team. FIA FORMULA 3 CHAMPIONSHIP, FIA FORMULA 3, FORMULA 3, F3 and related marks are trade marks of the Fédération Internationale de l’Automobile and are used by their authorised operators under licence.';
+            if (source) source.innerHTML = 'Formula 3 statistics are compiled from <a href="https://www.motorsportstats.com/" target="_blank" rel="noopener noreferrer">Motorsport Stats</a> classifications, official championship sources, and project-maintained corrections. Third-party materials remain subject to their owners’ rights. Data may contain errors and is not an official record.';
+        }
+        if (isAcademyMode) {
+            const brand = footer.querySelector('.footer-brand');
+            if (brand) brand.href = '/academy';
+            if (summary) summary.textContent = 'Independent F1 Academy history, statistics, and championship analysis.';
+            if (trademark) trademark.textContent = 'Racelytic is unofficial and is not associated with or endorsed by F1 Academy, Formula One Management, the FIA, any team, or any driver. F1 ACADEMY, F1, FORMULA 1 and related marks belong to their respective owners.';
+            if (source) source.innerHTML = 'F1 Academy calendars, classifications and standings are compiled from the <a href="https://www.f1academy.com/" target="_blank" rel="noopener noreferrer">official F1 Academy website</a> and project-maintained normalisation. Third-party materials remain subject to their owners’ rights. Data may contain errors and is not an official record.';
         }
         footer.querySelector('[data-privacy-settings]')?.addEventListener('click', () => showAnalyticsChoice(true));
     } catch (error) {

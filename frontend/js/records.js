@@ -1,7 +1,7 @@
 let recordType='drivers',recordEntries=[],recordPage=1;
-const recordTeamLabel = window.location.pathname.startsWith('/f3/') ? 'Team' : 'Constructor';
-const recordSeries = window.location.pathname.startsWith('/f3/') ? 'f3' : window.location.pathname.startsWith('/f2/') ? 'f2' : 'f1';
-if (recordSeries === 'f3') {
+const recordTeamLabel = window.location.pathname.startsWith('/f3/') || window.location.pathname.startsWith('/academy/') ? 'Team' : 'Constructor';
+const recordSeries = window.location.pathname.startsWith('/academy/') ? 'academy' : window.location.pathname.startsWith('/f3/') ? 'f3' : window.location.pathname.startsWith('/f2/') ? 'f2' : 'f1';
+if (recordSeries === 'f3' || recordSeries === 'academy') {
   const teamButton = document.querySelector('[data-record-type="constructors"]');
   if (teamButton) teamButton.textContent = 'Teams';
   const teamLabel = document.querySelector('#record-constructor-label > span');

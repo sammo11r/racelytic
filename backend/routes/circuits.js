@@ -1,6 +1,7 @@
 const express = require('express');
 const { withConnection, sendError } = require('../route-helpers');
-const { f2SessionType, f3SessionType } = require('./seasons');
+const { f2SessionType, f3SessionType, academySessionType } = require('./seasons');
+const { isJuniorSeries, seriesPrefix } = require('../series-config');
 
 const router = express.Router();
 
@@ -21,8 +22,8 @@ router.get('/api/circuits', async (req, res) => {
     try {
 
         const series = String(req.query.series || '').toLowerCase();
-        if (['f2', 'f3'].includes(series)) {
-            const prefix = `${series}_`;
+        if (isJuniorSeries(series)) {
+            const prefix = seriesPrefix(series);
             const rows = await withConnection(connection => connection.query(`
                 SELECT circuits.id, circuits.name, circuits.type, circuits.direction,
                     circuits.placeName, circuits.lengthMeters, circuits.turns,
@@ -109,8 +110,8 @@ router.get('/api/circuits', async (req, res) => {
 router.get('/api/circuits/:id/analysis', async (req, res) => {
     try {
         const series = String(req.query.series || '').toLowerCase();
-        if (['f2', 'f3'].includes(series)) {
-            const prefix = `${series}_`;
+        if (isJuniorSeries(series)) {
+            const prefix = seriesPrefix(series);
             const data = await withConnection(async connection => {
                 const [circuits, rows, gridRows] = await Promise.all([
                     connection.query(`SELECT id, name, name AS fullName, placeName,
@@ -140,7 +141,7 @@ router.get('/api/circuits/:id/analysis', async (req, res) => {
                             results.positionNumber`, [req.params.id])
                 ]);
                 if (!circuits.length) return null;
-                const sessionType = series === 'f3' ? f3SessionType : f2SessionType;
+                const sessionType = series === 'academy' ? academySessionType : series === 'f3' ? f3SessionType : f2SessionType;
                 const rowSessionType = row => sessionType(
                     { ...row, name: row.sessionName },
                     0,
@@ -233,8 +234,8 @@ router.get('/api/circuits/:id', async (req, res) => {
     try {
 
         const series = String(req.query.series || '').toLowerCase();
-        if (['f2', 'f3'].includes(series)) {
-            const prefix = `${series}_`;
+        if (isJuniorSeries(series)) {
+            const prefix = seriesPrefix(series);
             const data = await withConnection(async connection => {
                 const [circuitRows, races, sessions] = await Promise.all([
                     connection.query(`

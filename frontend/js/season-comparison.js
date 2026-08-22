@@ -1,5 +1,5 @@
 let comparedSeasons=[],seasonComparisonTooltip=null;
-if (window.location.pathname.startsWith('/f3/')) {
+if (window.location.pathname.startsWith('/f3/') || window.location.pathname.startsWith('/academy/')) {
   const comparisonContent = document.getElementById('season-comparison-content');
   const recolorF3Comparison = () => comparisonContent.querySelectorAll('.chart-series').forEach(series => {
     if (series.style.getPropertyValue('--series-color').trim().toLowerCase() === '#e32636') series.style.setProperty('--series-color', activeSeriesAccent());

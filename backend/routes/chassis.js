@@ -2,11 +2,45 @@ const express = require('express');
 const { withConnection, sendError } = require('../route-helpers');
 const f3ChassisSpecifications = require('../../data/f3-chassis-specifications.json');
 const f2ChassisSpecifications = require('../../data/f2-chassis-specifications.json');
+const academyChassisSpecifications = require('../../data/academy-chassis-specifications.json');
 
 const router = express.Router();
 
 router.get('/api/chassis', async (req, res) => {
     try {
+        if (String(req.query.series || '').toLowerCase() === 'academy') {
+            const rows = await withConnection(connection => connection.query(`
+                SELECT ch.id, ch.name,
+                    MIN(entries.year) AS firstYear, MAX(entries.year) AS lastYear,
+                    GROUP_CONCAT(DISTINCT entries.year ORDER BY entries.year SEPARATOR '||') AS years,
+                    GROUP_CONCAT(DISTINCT engines.id ORDER BY engines.name SEPARATOR '||') AS engineIds,
+                    GROUP_CONCAT(DISTINCT engines.name ORDER BY engines.name SEPARATOR '||') AS engines,
+                    COUNT(entries.raceId) AS totalEntries,
+                    COUNT(DISTINCT entries.raceId) AS totalWeekends,
+                    COUNT(DISTINCT entries.constructorId) AS totalTeams,
+                    COUNT(DISTINCT entries.driverId) AS totalDrivers
+                FROM fa_chassis ch
+                LEFT JOIN fa_entries entries ON entries.chassisId = ch.id
+                LEFT JOIN fa_engines engines ON engines.id = entries.engineId
+                GROUP BY ch.id, ch.name
+                ORDER BY COALESCE(MAX(entries.year), 0) DESC, ch.name
+            `));
+            const specifications = new Map(academyChassisSpecifications.map(chassis => [chassis.id, chassis]));
+            return res.json(rows.map(row => ({
+                ...(specifications.get(row.id) || {}),
+                id: row.id,
+                name: specifications.get(row.id)?.name || row.name,
+                firstYear: row.firstYear === null ? null : Number(row.firstYear),
+                lastYear: row.lastYear === null ? null : Number(row.lastYear),
+                years: row.years ? row.years.split('||').map(Number) : [],
+                engineIds: row.engineIds ? row.engineIds.split('||') : [],
+                engines: row.engines ? row.engines.split('||') : [],
+                totalEntries: Number(row.totalEntries || 0),
+                totalWeekends: Number(row.totalWeekends || 0),
+                totalTeams: Number(row.totalTeams || 0),
+                totalDrivers: Number(row.totalDrivers || 0)
+            })));
+        }
         if (String(req.query.series || '').toLowerCase() === 'f2') {
             const rows = await withConnection(connection => connection.query(`
                 SELECT ch.id, ch.name,

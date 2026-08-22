@@ -2,7 +2,8 @@ let analysisRaces = [];
 let activeRaceData = null;
 let focusedDriver = null;
 let raceTooltip = null;
-const juniorRaceAnalysis = window.location.pathname.startsWith('/f2/') || window.location.pathname.startsWith('/f3/');
+const juniorRaceAnalysis = window.location.pathname.startsWith('/f2/') || window.location.pathname.startsWith('/f3/') || window.location.pathname.startsWith('/academy/');
+const raceAnalysisSeries = window.location.pathname.startsWith('/academy/') ? 'academy' : window.location.pathname.startsWith('/f3/') ? 'f3' : window.location.pathname.startsWith('/f2/') ? 'f2' : 'f1';
 const raceAnalysisDetails = new Map();
 let racePopulationToken = 0;
 
@@ -15,21 +16,23 @@ function normalizeF2RaceAnalysis(data, selectedSessionId) {
   const featureGrid=gridSessions[gridSessions.length-1];
   const qualifyingSessions=data.sessions.filter(session=>/qualif/i.test(session.name));
   const qualifyingByDriver=new Map();
-  if(qualifyingSessions.length===1){
+  (selected?.results||[]).forEach(result=>{if(Number(result.qualificationPositionNumber)>0)qualifyingByDriver.set(String(result.driverId),Number(result.qualificationPositionNumber));});
+  if(!qualifyingByDriver.size&&qualifyingSessions.length===1){
     (qualifyingSessions[0].results||[]).forEach(result=>{const position=Number(result.positionNumber);if(position>0&&position<100)qualifyingByDriver.set(String(result.driverId),position);});
-  }else{
+  }else if(!qualifyingByDriver.size){
     const classifiedDrivers=new Set(qualifyingSessions.flatMap(session=>session.results||[]).filter(result=>Number(result.positionNumber)>0&&Number(result.positionNumber)<100).map(result=>String(result.driverId)));
     (featureGrid?.results||[]).forEach(result=>{if(classifiedDrivers.has(String(result.driverId)))qualifyingByDriver.set(String(result.driverId),Number(result.positionNumber));});
   }
-  const gridByDriver=new Map((selectedGrid?.results||[]).map(result=>[String(result.driverId),Number(result.positionNumber)]));
+  const gridByDriver=new Map((selected?.results||[]).filter(result=>Number(result.gridPositionNumber)>0).map(result=>[String(result.driverId),Number(result.gridPositionNumber)]));
+  if(!gridByDriver.size)(selectedGrid?.results||[]).forEach(result=>gridByDriver.set(String(result.driverId),Number(result.positionNumber)));
   const results=(selected?.results||[]).map(result=>({...result,
     positionText:result.positionNumber||result.status,
     qualificationPositionNumber:qualifyingByDriver.get(String(result.driverId))||null,
     gridPositionNumber:gridByDriver.get(String(result.driverId))||null,
-    reasonRetired:/ret|dnf|dns/i.test(String(result.status||''))?result.status:null,
+    reasonRetired:/ret|dnf|dns|dnq|dq|dsq|disq|exc|wd|nc/i.test(String(result.status||''))?result.status:null,
     gap:result.gapMillis?`${(Number(result.gapMillis)/1000).toFixed(3)}`:null
   }));
-  return {race:{...data.race,officialName:`${data.race.name} · ${selected?.displayName||selected?.name||'Race'}`,laps:Math.max(0,...results.map(result=>Number(result.laps||0)))},sessions:{race:results}};
+  return {race:{...data.race,officialName:`${data.race.name} · ${selected?.displayName||selected?.name||'Race'}`,laps:Math.max(0,...results.map(result=>Number(result.laps||0))),gridNote:selected?.gridNote||null},sessions:{race:results}};
 }
 
 function selectRaceVisualization(value) {
@@ -73,7 +76,7 @@ function raceStyles(results) {
 }
 
 function isRetired(result, raceLaps) {
-  return /ret|dns|dnq|dsq|wd|nc/i.test(result.positionText || '')
+  return /ret|dnf|dns|dnq|dq|dsq|disq|exc|wd|nc/i.test(result.positionText || '')
     || (result.reasonRetired && Number(result.laps) < Number(raceLaps));
 }
 
@@ -116,8 +119,13 @@ function renderRaceFlow(results, styles) {
 function renderResultMatrix(results) {
   document.getElementById('race-result-matrix').innerHTML = `<table class="race-analysis-table"><thead><tr><th>Finish</th><th>Driver</th><th>Constructor</th><th>Qual.</th><th>Grid</th><th>Change</th><th>Laps</th><th>Time</th><th>Points</th></tr></thead><tbody>${results.map(result => {
     const gained=racePositionChange(result);
-    return `<tr><td><span class="finish-position${Number(result.positionNumber)<=3?' podium':''}">${esc(result.positionText||result.positionNumber)}</span></td><td><a href="/driver?id=${encodeURIComponent(result.driverId)}">${esc(result.driverName)}</a>${result.fastestLap?'<small>Fastest lap</small>':''}</td><td>${esc(result.constructorName||'—')}</td><td>${result.qualificationPositionNumber??'—'}</td><td>${result.gridPositionNumber??'—'}${result.polePosition?'<small>Pole</small>':''}</td><td><span class="position-change ${gained===null?'unavailable':gained>0?'up':gained<0?'down':'same'}">${racePositionChangeText(gained)}</span></td><td>${result.laps??'—'}</td><td>${esc(result.reasonRetired||result.time||result.gap||'Finished')}</td><td class="result-points-total">${fmtNumber(result.points)}</td></tr>`;
+    return `<tr><td><span class="finish-position${Number(result.positionNumber)<=3?' podium':''}">${esc(result.positionText||result.positionNumber)}</span></td><td><a href="${raceEntityUrl('driver',result.driverId)}">${esc(result.driverName)}</a>${result.fastestLap?'<small>Fastest lap</small>':''}</td><td>${esc(result.constructorName||'—')}</td><td>${result.qualificationPositionNumber??'—'}</td><td>${result.gridPositionNumber??'—'}${result.polePosition?'<small>Pole</small>':''}</td><td><span class="position-change ${gained===null?'unavailable':gained>0?'up':gained<0?'down':'same'}">${racePositionChangeText(gained)}</span></td><td>${result.laps??'—'}</td><td>${esc(result.reasonRetired||result.time||result.gap||'Finished')}</td><td class="result-points-total">${fmtNumber(result.points)}</td></tr>`;
   }).join('')}</tbody></table>`;
+}
+
+function raceEntityUrl(type,id) {
+  if(raceAnalysisSeries==='f1')return `/${type==='team'?'constructor':'driver'}?id=${encodeURIComponent(id)}`;
+  return `/${raceAnalysisSeries}/${type==='team'?'team':'driver'}?id=${encodeURIComponent(id)}`;
 }
 
 function renderConstructorContribution(results) {
@@ -128,7 +136,7 @@ function renderConstructorContribution(results) {
   });
   const ordered=[...teams.values()].sort((a,b)=>b.points-a.points), maximum=Math.max(...ordered.map(team=>team.points),1);
   const container=document.getElementById('constructor-contribution-chart');
-  container.innerHTML=`<div class="contribution-chart">${ordered.map(team=>`<div class="contribution-row"><a href="/constructor?id=${encodeURIComponent(team.id)}">${esc(team.name)}</a><div class="contribution-track">${team.drivers.map(driver=>`<span data-chart-tooltip="<strong>${esc(driver.driverName)}</strong><span>${esc(team.name)}</span><b>${fmtNumber(driver.points)} points</b>" style="width:${Number(driver.points)/maximum*100}%;background:${baseConstructorColor(team.id)}"></span>`).join('')}</div><strong>${fmtNumber(team.points)}</strong></div>`).join('')}</div>`;
+  container.innerHTML=`<div class="contribution-chart">${ordered.map(team=>`<div class="contribution-row"><a href="${raceEntityUrl('team',team.id)}">${esc(team.name)}</a><div class="contribution-track">${team.drivers.map(driver=>`<span data-chart-tooltip="<strong>${esc(driver.driverName)}</strong><span>${esc(team.name)}</span><b>${fmtNumber(driver.points)} points</b>" style="width:${Number(driver.points)/maximum*100}%;background:${baseConstructorColor(team.id)}"></span>`).join('')}</div><strong>${fmtNumber(team.points)}</strong></div>`).join('')}</div>`;
   bindRaceTooltips(container);
 }
 
@@ -136,7 +144,7 @@ function renderAttrition(results) {
   const maximum=Math.max(...results.map(result=>Number(result.laps)),1);
   const ordered=[...results].sort((a,b)=>Number(b.laps)-Number(a.laps));
   const container=document.getElementById('attrition-chart');
-  container.innerHTML=`<div class="attrition-chart">${ordered.map(result=>`<div class="attrition-row"><a href="/driver?id=${encodeURIComponent(result.driverId)}">${esc(result.driverName)}</a><div class="attrition-track"><span class="${isRetired(result,maximum)?'retired':''}" data-chart-tooltip="<strong>${esc(result.driverName)}</strong><span>${esc(result.reasonRetired||'Finished')}</span><b>${fmtNumber(result.laps)} of ${fmtNumber(maximum)} laps</b>" style="width:${Number(result.laps)/maximum*100}%"></span></div><strong>${result.laps}</strong></div>`).join('')}</div>`;
+  container.innerHTML=`<div class="attrition-chart">${ordered.map(result=>`<div class="attrition-row"><a href="${raceEntityUrl('driver',result.driverId)}">${esc(result.driverName)}</a><div class="attrition-track"><span class="${isRetired(result,maximum)?'retired':''}" data-chart-tooltip="<strong>${esc(result.driverName)}</strong><span>${esc(result.reasonRetired||'Finished')}</span><b>${fmtNumber(result.laps)} of ${fmtNumber(maximum)} laps</b>" style="width:${Number(result.laps)/maximum*100}%"></span></div><strong>${result.laps}</strong></div>`).join('')}</div>`;
   bindRaceTooltips(container);
 }
 
@@ -144,7 +152,7 @@ function renderWeekendConversion(results, styles) {
   const maximum=Math.max(results.length,20);
   const position=(value)=>Math.max(0,Math.min(100,(Number(value||maximum)-1)/Math.max(maximum-1,1)*100));
   const container=document.getElementById('weekend-conversion-chart');
-  container.innerHTML=`<div class="conversion-head"><span>Driver</span><span>Qualifying</span><span>Grid</span><span>Finish</span></div>${results.map(result=>{const style=styles.get(String(result.driverId)); return `<div class="conversion-row" data-chart-tooltip="${esc(resultTooltip(result,racePositionChange(result)))}"><a href="/driver?id=${encodeURIComponent(result.driverId)}"><i style="background:${style?.color}"></i>${esc(result.driverName)}</a><span>P${result.qualificationPositionNumber??'—'}</span><span>P${result.gridPositionNumber??'—'}</span><span>${isRetired(result,activeRaceData.race.laps)?esc(result.positionText||'DNF'):`P${result.positionNumber}`}</span><div class="conversion-line"><i style="left:${position(result.qualificationPositionNumber)}%;width:${Math.abs(position(result.positionNumber)-position(result.qualificationPositionNumber))}%;background:${style?.color}"></i></div></div>`;}).join('')}`;
+  container.innerHTML=`<div class="conversion-head"><span>Driver</span><span>Qualifying</span><span>Grid</span><span>Finish</span></div>${results.map(result=>{const style=styles.get(String(result.driverId)); return `<div class="conversion-row" data-chart-tooltip="${esc(resultTooltip(result,racePositionChange(result)))}"><a href="${raceEntityUrl('driver',result.driverId)}"><i style="background:${style?.color}"></i>${esc(result.driverName)}</a><span>P${result.qualificationPositionNumber??'—'}</span><span>P${result.gridPositionNumber??'—'}</span><span>${isRetired(result,activeRaceData.race.laps)?esc(result.positionText||'DNF'):`P${result.positionNumber}`}</span><div class="conversion-line"><i style="left:${position(result.qualificationPositionNumber)}%;width:${Math.abs(position(result.positionNumber)-position(result.qualificationPositionNumber))}%;background:${style?.color}"></i></div></div>`;}).join('')}`;
   bindRaceTooltips(container);
 }
 
@@ -155,13 +163,15 @@ async function loadRaceAnalysis() {
     const rawData=raceAnalysisDetails.get(String(id))||await getJSON(`/api/races/${encodeURIComponent(id)}`);
     raceAnalysisDetails.set(String(id),rawData);
     activeRaceData=normalizeF2RaceAnalysis(rawData,sessionId); focusedDriver=null;
-    const results=activeRaceData.sessions.race, styles=raceStyles(results), winner=results[0];
+    const flowNote=document.querySelector('[data-race-visual="flow"] .section-note');
+    if(flowNote)flowNote.textContent=activeRaceData.race.gridNote||'Select a driver to isolate their route';
+    const results=activeRaceData.sessions.race, styles=raceStyles(results), winner=results.find(result=>Number(result.positionNumber)===1)||results[0];
     const gains=results.map(result=>({...result,gained:racePositionChange(result)}));
     const biggest=gains.filter(result=>result.gained!==null).sort((a,b)=>b.gained-a.gained)[0];
     const retirements=results.filter(result=>isRetired(result,activeRaceData.race.laps)).length;
     const teamTotals={}; results.forEach(result=>teamTotals[result.constructorName]=(teamTotals[result.constructorName]||0)+Number(result.points||0));
     const bestTeam=Object.entries(teamTotals).sort((a,b)=>b[1]-a[1])[0];
-    document.getElementById('race-analysis-summary').innerHTML=`<div><span>Winner</span><strong>${esc(winner?.driverName)}</strong><small>${esc(winner?.constructorName)}</small></div><div><span>Biggest mover</span><strong>${esc(biggest?.driverName||'—')}</strong><small>${biggest?`${racePositionChangeText(biggest.gained)} positions`:'No classified movement'}</small></div><div><span>Retirements</span><strong>${retirements}</strong><small>of ${results.length} starters</small></div><div><span>${window.location.pathname.startsWith('/f3/')?'Top team':'Top constructor'}</span><strong>${esc(bestTeam?.[0])}</strong><small>${fmtNumber(bestTeam?.[1])} points</small></div>`;
+    document.getElementById('race-analysis-summary').innerHTML=`<div><span>Winner</span><strong>${esc(winner?.driverName)}</strong><small>${esc(winner?.constructorName)}</small></div><div><span>Biggest mover</span><strong>${esc(biggest?.driverName||'—')}</strong><small>${biggest?`${racePositionChangeText(biggest.gained)} positions`:'No classified movement'}</small></div><div><span>Retirements</span><strong>${retirements}</strong><small>of ${results.length} starters</small></div><div><span>${juniorRaceAnalysis?'Top team':'Top constructor'}</span><strong>${esc(bestTeam?.[0])}</strong><small>${fmtNumber(bestTeam?.[1])} points</small></div>`;
     renderRaceFlow(results,styles); renderResultMatrix(results); renderConstructorContribution(results); renderAttrition(results); renderWeekendConversion(results,styles);
   } catch(error){setError('race-flow-chart',error.message);}
 }
@@ -170,3 +180,7 @@ async function populateRaces(){const token=++racePopulationToken,year=document.g
 getJSON('/api/races').then(races=>{analysisRaces=races.filter(race=>race.raceSessionCount===undefined||Number(race.raceSessionCount)>0);const years=[...new Set(analysisRaces.map(race=>race.year))].sort((a,b)=>b-a);document.getElementById('race-analysis-year').innerHTML=years.map(year=>`<option value="${esc(year)}">${esc(year)}</option>`).join('');populateRaces();}).catch(error=>setError('race-flow-chart',error.message));
 document.getElementById('race-analysis-year').addEventListener('change',populateRaces);document.getElementById('race-analysis-race').addEventListener('change',loadRaceAnalysis);
 document.querySelectorAll('[data-race-visual-button]').forEach(button => button.addEventListener('click', () => selectRaceVisualization(button.dataset.raceVisualButton)));
+if(juniorRaceAnalysis){
+  const intro=document.querySelector('.analysis-detail-head p'); if(intro)intro.textContent='See grid movement and points distribution across a race.';
+  const contributionHeading=document.querySelector('[data-race-visual="contribution"] h2'); if(contributionHeading)contributionHeading.textContent='Team contribution';
+}

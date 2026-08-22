@@ -33,3 +33,18 @@ test('every Formula 3 circuit has a valid track-map asset', () => {
     );
   });
 });
+
+test('every F1 Academy circuit has a valid track-map asset', () => {
+  const circuitIds = fs.readFileSync(path.join(__dirname, '../data/fadb-circuits.csv'), 'utf8')
+    .trim().split(/\r?\n/).slice(1)
+    .map(row => row.slice(0, row.indexOf(',')));
+
+  circuitIds.forEach(circuitId => {
+    const imageId = F2_CIRCUIT_IMAGE_IDS[circuitId];
+    assert.ok(imageId, `Missing track-map mapping for ${circuitId}`);
+    assert.ok(
+      fs.existsSync(path.join(__dirname, `../frontend/assets/circuits/${imageId}.svg`)),
+      `Missing track-map asset for ${circuitId}: ${imageId}.svg`
+    );
+  });
+});

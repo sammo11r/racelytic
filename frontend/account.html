@@ -7,18 +7,19 @@
   <script>
     (() => {
       const querySeries = new URLSearchParams(location.search).get('series');
-      let series = ['f1', 'f2', 'f3'].includes(querySeries) ? querySeries : '';
+      let series = ['f1', 'f2', 'f3', 'academy'].includes(querySeries) ? querySeries : '';
       if (!series) {
         try { series = localStorage.getItem('racelytic-series') || ''; } catch {}
       }
       if (!series && document.referrer) {
         try {
           const referrerPath = new URL(document.referrer).pathname;
-          series = referrerPath === '/f3' || referrerPath.startsWith('/f3/') ? 'f3' : referrerPath === '/f2' || referrerPath.startsWith('/f2/') ? 'f2' : 'f1';
+          series = referrerPath === '/academy' || referrerPath.startsWith('/academy/') ? 'academy' : referrerPath === '/f3' || referrerPath.startsWith('/f3/') ? 'f3' : referrerPath === '/f2' || referrerPath.startsWith('/f2/') ? 'f2' : 'f1';
         } catch {}
       }
       if (series === 'f2') document.documentElement.classList.add('f2-account');
       if (series === 'f3') document.documentElement.classList.add('f3-account');
+      if (series === 'academy') document.documentElement.classList.add('academy-account');
     })();
   </script>
   <link rel="stylesheet" href="/css/style.css">
@@ -28,6 +29,7 @@
   <script>
     if(document.documentElement.classList.contains('f2-account'))document.body.classList.add('f2-mode');
     if(document.documentElement.classList.contains('f3-account'))document.body.classList.add('f3-mode');
+    if(document.documentElement.classList.contains('academy-account'))document.body.classList.add('academy-mode');
   </script>
   <div id="header"></div>
   <main class="container page account-page">

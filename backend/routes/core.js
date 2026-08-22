@@ -26,7 +26,6 @@ const SEARCH_PAGES = [
     ['Scenario calculator', 'Project a championship run-in', '/scenario-calculator'],
     ['Championship builder', 'Create a custom championship', '/championship-builder'],
     ['Games', 'Play with Formula 1 history', '/games'],
-    ['Pitwall', 'Play the motorsport strategy game', '/pitwall'],
     ['Quizzes', 'Test your Formula 1 knowledge', '/quizzes'],
     ['World champions quiz', 'Name every Formula 1 world champion', '/world-champions-quiz'],
     ['Race winners quiz', 'Name Formula 1 Grand Prix winners', '/race-winners-quiz'],
@@ -59,7 +58,6 @@ const F2_SEARCH_PAGES = [
     ['Championship builder', 'Create a custom Formula 2 championship', '/f2/championship-builder'],
     ['Points systems', 'Create and manage Formula 2 scoring rules', '/f2/points-systems'],
     ['Games', 'Games built from Formula 2 history', '/f2/games'],
-    ['Pitwall', 'Play the motorsport strategy game', '/f2/pitwall'],
     ['Quizzes', 'Test your Formula 2 knowledge', '/f2/quizzes'],
     ['Champions quiz', 'Name every Formula 2 champion', '/f2/champions-quiz'],
     ['Race winners quiz', 'Name Formula 2 race winners', '/f2/race-winners-quiz'],
@@ -90,9 +88,13 @@ const F3_SEARCH_PAGES = [
     ['Championship builder', 'Create a custom Formula 3 championship', '/f3/championship-builder'],
     ['Points systems', 'Create and manage Formula 3 scoring rules', '/f3/points-systems'],
     ['Games', 'Games built from Formula 3 history', '/f3/games'],
-    ['Pitwall', 'Play the motorsport strategy game', '/f3/pitwall'],
     ['About', 'About the Formula 3 archive', '/f3/about']
 ];
+const ACADEMY_SEARCH_PAGES = F3_SEARCH_PAGES.map(([label, description, url]) => [
+    label === 'Formula 3' ? 'F1 Academy' : label,
+    description.replace(/Formula 3|FIA Formula 3/g, 'F1 Academy'),
+    url.replace('/f3', '/academy')
+]);
 
 // ============================================================
 // Health
@@ -119,18 +121,19 @@ router.get('/api/health', async (req, res) => {
 });
 
 const SERIES_PARENTS = {
-    driver: { f1: '/drivers', f2: '/f2/drivers', f3: '/f3/drivers' },
-    constructor: { f1: '/constructors', f2: '/f2/constructors', f3: '/f3/teams' },
-    circuit: { f1: '/circuits', f2: '/f2/circuits', f3: '/f3/circuits' },
-    race: { f1: '/races', f2: '/f2/races', f3: '/f3/races' },
-    season: { f1: '/seasons', f2: '/f2/seasons', f3: '/f3/seasons' }
+    driver: { f1: '/drivers', f2: '/f2/drivers', f3: '/f3/drivers', academy: '/academy/drivers' },
+    constructor: { f1: '/constructors', f2: '/f2/constructors', f3: '/f3/teams', academy: '/academy/teams' },
+    circuit: { f1: '/circuits', f2: '/f2/circuits', f3: '/f3/circuits', academy: '/academy/circuits' },
+    race: { f1: '/races', f2: '/f2/races', f3: '/f3/races', academy: '/academy/races' },
+    season: { f1: '/seasons', f2: '/f2/seasons', f3: '/f3/seasons', academy: '/academy/seasons' }
 };
 
 router.get('/api/series-equivalent', async (req, res) => {
     const target = String(req.query.target || '').toLowerCase();
     const type = String(req.query.type || '').toLowerCase();
     const id = String(req.query.id || '').trim().slice(0, 120);
-    const validTarget = ['f1', 'f2', 'f3'].includes(target);
+    const validSeries = ['f1', 'f2', 'f3', 'academy'];
+    const validTarget = validSeries.includes(target);
     if (!validTarget || !SERIES_PARENTS[type] || !id) {
         return res.status(400).json({ error: 'Invalid series equivalent request.' });
     }
@@ -139,13 +142,13 @@ router.get('/api/series-equivalent', async (req, res) => {
         const equivalentId = await withConnection(async connection => {
             let rows;
             if (type === 'season') {
-                const table = target === 'f3' ? 'f3_seasons' : target === 'f2' ? 'f2_seasons' : 'seasons';
+                const table = target === 'academy' ? 'fa_seasons' : target === 'f3' ? 'f3_seasons' : target === 'f2' ? 'f2_seasons' : 'seasons';
                 rows = await connection.query(`SELECT year AS id FROM \`${table}\` WHERE year = ? LIMIT 1`, [id]);
             } else if (type === 'driver') {
-                const source = ['f1', 'f2', 'f3'].includes(String(req.query.source || '').toLowerCase())
+                const source = validSeries.includes(String(req.query.source || '').toLowerCase())
                     ? String(req.query.source).toLowerCase()
                     : target === 'f2' ? 'f1' : 'f2';
-                const driverTables = { f1: 'drivers', f2: 'f2_drivers', f3: 'f3_drivers' };
+                const driverTables = { f1: 'drivers', f2: 'f2_drivers', f3: 'f3_drivers', academy: 'fa_drivers' };
                 const sourceTable = driverTables[source];
                 const targetTable = driverTables[target];
                 rows = await connection.query(`
@@ -156,10 +159,10 @@ router.get('/api/series-equivalent', async (req, res) => {
                     LIMIT 1
                 `, [id]);
             } else if (type === 'constructor') {
-                const source = ['f1', 'f2', 'f3'].includes(String(req.query.source || '').toLowerCase())
+                const source = validSeries.includes(String(req.query.source || '').toLowerCase())
                     ? String(req.query.source).toLowerCase()
                     : target === 'f2' ? 'f1' : 'f2';
-                const constructorTables = { f1: 'constructors', f2: 'f2_constructors', f3: 'f3_constructors' };
+                const constructorTables = { f1: 'constructors', f2: 'f2_constructors', f3: 'f3_constructors', academy: 'fa_constructors' };
                 const sourceTable = constructorTables[source];
                 const targetTable = constructorTables[target];
                 const sourceNames = source === 'f1'
@@ -175,10 +178,10 @@ router.get('/api/series-equivalent', async (req, res) => {
                     LIMIT 1
                 `, [id]);
             } else if (type === 'circuit') {
-                const source = ['f1', 'f2', 'f3'].includes(String(req.query.source || '').toLowerCase())
+                const source = validSeries.includes(String(req.query.source || '').toLowerCase())
                     ? String(req.query.source).toLowerCase()
                     : target === 'f2' ? 'f1' : 'f2';
-                const circuitTables = { f1: 'circuits', f2: 'f2_circuits', f3: 'f3_circuits' };
+                const circuitTables = { f1: 'circuits', f2: 'f2_circuits', f3: 'f3_circuits', academy: 'fa_circuits' };
                 const sourceTable = circuitTables[source];
                 const targetTable = circuitTables[target];
                 const circuitNames = source === 'f1'
@@ -194,11 +197,11 @@ router.get('/api/series-equivalent', async (req, res) => {
                     LIMIT 1
                 `, [id]);
             } else {
-                const source = ['f1', 'f2', 'f3'].includes(String(req.query.source || '').toLowerCase())
+                const source = validSeries.includes(String(req.query.source || '').toLowerCase())
                     ? String(req.query.source).toLowerCase()
                     : target === 'f1' ? 'f2' : 'f1';
-                const raceTables = { f1: 'races', f2: 'f2_races', f3: 'f3_races' };
-                const circuitTables = { f1: 'circuits', f2: 'f2_circuits', f3: 'f3_circuits' };
+                const raceTables = { f1: 'races', f2: 'f2_races', f3: 'f3_races', academy: 'fa_races' };
+                const circuitTables = { f1: 'circuits', f2: 'f2_circuits', f3: 'f3_circuits', academy: 'fa_circuits' };
                 const sourceRaceTable = raceTables[source];
                 const targetRaceTable = raceTables[target];
                 const sourceCircuitTable = circuitTables[source];
@@ -225,9 +228,9 @@ router.get('/api/series-equivalent', async (req, res) => {
 
         const parent = SERIES_PARENTS[type][target];
         if (equivalentId === null) return res.json({ matched: false, url: parent });
-        const prefix = target === 'f3' ? '/f3' : target === 'f2' ? '/f2' : '';
+        const prefix = target === 'academy' ? '/academy' : target === 'f3' ? '/f3' : target === 'f2' ? '/f2' : '';
         const parameter = type === 'season' ? 'year' : 'id';
-        const targetPath = target === 'f3' && type === 'constructor' ? 'team' : type;
+        const targetPath = ['f3', 'academy'].includes(target) && type === 'constructor' ? 'team' : type;
         res.json({ matched: true, url: `${prefix}/${targetPath}?${parameter}=${encodeURIComponent(equivalentId)}` });
     } catch (error) {
         sendError(res, error);
@@ -289,10 +292,19 @@ router.get('/api/search', async (req, res) => {
               connection.query(`SELECT id, year, name FROM f3_races WHERE name LIKE ? OR CAST(year AS CHAR) LIKE ? ORDER BY year DESC, round DESC LIMIT 6`, [q, q]),
               connection.query(`SELECT id, name FROM f3_chassis WHERE id NOT IN ('dallara-f3-2020', 'dallara-f3-2021') AND name LIKE ? ORDER BY name LIMIT 6`, [q])
             ]);
+            const [academySeasons, academyDrivers, academyConstructors, academyCircuits, academyRaces, academyChassis] = await Promise.all([
+                connection.query(`SELECT year FROM fa_seasons WHERE CAST(year AS CHAR) LIKE ? ORDER BY year DESC LIMIT 6`, [q]),
+                connection.query(`SELECT id, name, countryCode FROM fa_drivers WHERE name LIKE ? OR abbreviation LIKE ? ORDER BY name LIMIT 6`, [q, q]),
+                connection.query(`SELECT id, name, countryCode FROM fa_constructors WHERE name LIKE ? OR abbreviation LIKE ? ORDER BY name LIMIT 6`, [q, q]),
+                connection.query(`SELECT id, name, placeName FROM fa_circuits WHERE name LIKE ? OR placeName LIKE ? ORDER BY name LIMIT 6`, [q, q]),
+                connection.query(`SELECT id, year, name FROM fa_races WHERE name LIKE ? OR CAST(year AS CHAR) LIKE ? ORDER BY year DESC, round DESC LIMIT 6`, [q, q]),
+                connection.query(`SELECT id, name FROM fa_chassis WHERE name LIKE ? ORDER BY name LIMIT 6`, [q])
+            ]);
             return {
                 seasons, drivers, constructors, circuits, races, chassis,
                 f2Seasons, f2Drivers, f2Constructors, f2Circuits, f2Races, f2Chassis,
-                f3Seasons, f3Drivers, f3Constructors, f3Circuits, f3Races, f3Chassis
+                f3Seasons, f3Drivers, f3Constructors, f3Circuits, f3Races, f3Chassis,
+                academySeasons, academyDrivers, academyConstructors, academyCircuits, academyRaces, academyChassis
             };
         });
 
@@ -303,7 +315,8 @@ router.get('/api/search', async (req, res) => {
         const pages = [
             ...matchingPages(SEARCH_PAGES, 'F1'),
             ...matchingPages(F2_SEARCH_PAGES, 'F2'),
-            ...matchingPages(F3_SEARCH_PAGES, 'F3')
+            ...matchingPages(F3_SEARCH_PAGES, 'F3'),
+            ...matchingPages(ACADEMY_SEARCH_PAGES, 'F1 Academy')
         ];
 
         res.json([
@@ -311,21 +324,27 @@ router.get('/api/search', async (req, res) => {
             ...databaseResults.seasons.map(row => ({ type: 'F1 Season', label: String(row.year), meta: 'Formula 1 season', url: `/season?year=${row.year}` })),
             ...databaseResults.f2Seasons.map(row => ({ type: 'F2 Season', label: String(row.year), meta: 'Formula 2 season', url: `/f2/season?year=${row.year}` })),
             ...databaseResults.f3Seasons.map(row => ({ type: 'F3 Season', label: String(row.year), meta: 'Formula 3 season', url: `/f3/season?year=${row.year}` })),
+            ...databaseResults.academySeasons.map(row => ({ type: 'F1 Academy Season', label: String(row.year), meta: 'F1 Academy season', url: `/academy/season?year=${row.year}` })),
             ...databaseResults.drivers.map(row => ({ type: 'F1 Driver', label: row.name, meta: row.nationalityCountryId || 'Formula 1 driver', url: `/driver?id=${encodeURIComponent(row.id)}` })),
             ...databaseResults.f2Drivers.map(row => ({ type: 'F2 Driver', label: row.name, meta: row.countryCode || 'Formula 2 driver', url: `/f2/driver?id=${encodeURIComponent(row.id)}` })),
             ...databaseResults.f3Drivers.map(row => ({ type: 'F3 Driver', label: row.name, meta: row.countryCode || 'Formula 3 driver', url: `/f3/driver?id=${encodeURIComponent(row.id)}` })),
+            ...databaseResults.academyDrivers.map(row => ({ type: 'F1 Academy Driver', label: row.name, meta: row.countryCode || 'F1 Academy driver', url: `/academy/driver?id=${encodeURIComponent(row.id)}` })),
             ...databaseResults.constructors.map(row => ({ type: 'F1 Constructor', label: row.name, meta: row.countryId || 'Formula 1 constructor', url: `/constructor?id=${encodeURIComponent(row.id)}` })),
             ...databaseResults.f2Constructors.map(row => ({ type: 'F2 Constructor', label: row.name, meta: row.countryCode || 'Formula 2 constructor', url: `/f2/constructor?id=${encodeURIComponent(row.id)}` })),
             ...databaseResults.f3Constructors.map(row => ({ type: 'F3 Team', label: row.name, meta: row.countryCode || 'Formula 3 team', url: `/f3/team?id=${encodeURIComponent(row.id)}` })),
+            ...databaseResults.academyConstructors.map(row => ({ type: 'F1 Academy Team', label: row.name, meta: row.countryCode || 'F1 Academy team', url: `/academy/team?id=${encodeURIComponent(row.id)}` })),
             ...databaseResults.circuits.map(row => ({ type: 'F1 Circuit', label: row.name, meta: row.placeName || 'Formula 1 circuit', url: `/circuit?id=${encodeURIComponent(row.id)}` })),
             ...databaseResults.f2Circuits.map(row => ({ type: 'F2 Circuit', label: row.name, meta: row.placeName || 'Formula 2 circuit', url: `/f2/circuit?id=${encodeURIComponent(row.id)}` })),
             ...databaseResults.f3Circuits.map(row => ({ type: 'F3 Circuit', label: row.name, meta: row.placeName || 'Formula 3 circuit', url: `/f3/circuit?id=${encodeURIComponent(row.id)}` })),
+            ...databaseResults.academyCircuits.map(row => ({ type: 'F1 Academy Circuit', label: row.name, meta: row.placeName || 'F1 Academy circuit', url: `/academy/circuit?id=${encodeURIComponent(row.id)}` })),
             ...databaseResults.races.map(row => ({ type: 'F1 Race', label: row.officialName, meta: String(row.year), url: `/race?id=${encodeURIComponent(row.id)}` })),
             ...databaseResults.f2Races.map(row => ({ type: 'F2 Race', label: row.name, meta: String(row.year), url: `/f2/race?id=${encodeURIComponent(row.id)}` })),
             ...databaseResults.f3Races.map(row => ({ type: 'F3 Race', label: row.name, meta: String(row.year), url: `/f3/race?id=${encodeURIComponent(row.id)}` })),
+            ...databaseResults.academyRaces.map(row => ({ type: 'F1 Academy Race', label: row.name, meta: String(row.year), url: `/academy/race?id=${encodeURIComponent(row.id)}` })),
             ...databaseResults.chassis.map(row => ({ type: 'F1 Chassis', label: row.fullName || row.name, meta: row.constructorName || 'Formula 1 chassis', url: `/chassis?search=${encodeURIComponent(row.fullName || row.name)}` })),
             ...databaseResults.f2Chassis.map(row => ({ type: 'F2 Chassis', label: row.name, meta: 'Formula 2 chassis', url: '/f2/chassis' })),
-            ...databaseResults.f3Chassis.map(row => ({ type: 'F3 Chassis', label: row.name, meta: 'Formula 3 chassis', url: '/f3/chassis' }))
+            ...databaseResults.f3Chassis.map(row => ({ type: 'F3 Chassis', label: row.name, meta: 'Formula 3 chassis', url: '/f3/chassis' })),
+            ...databaseResults.academyChassis.map(row => ({ type: 'F1 Academy Chassis', label: row.name, meta: 'F1 Academy chassis', url: '/academy/chassis' }))
         ].slice(0, 36));
     } catch (error) {
         sendError(res, error);
@@ -346,7 +365,8 @@ router.get('/api/dashboard', async (req, res) => {
             f1: { drivers: 'drivers', constructors: 'constructors', circuits: 'circuits', seasons: 'seasons' },
             f2: { drivers: 'f2_drivers', constructors: 'f2_constructors', circuits: 'f2_circuits', seasons: 'f2_seasons' },
             f3: { drivers: 'f3_drivers', constructors: 'f3_constructors', circuits: 'f3_circuits', seasons: 'f3_seasons' }
-        }[['f2', 'f3'].includes(series) ? series : 'f1'];
+            , academy: { drivers: 'fa_drivers', constructors: 'fa_constructors', circuits: 'fa_circuits', seasons: 'fa_seasons' }
+        }[['f2', 'f3', 'academy'].includes(series) ? series : 'f1'];
 
         const data = await withConnection(async connection => {
 
