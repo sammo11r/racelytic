@@ -101,6 +101,28 @@ function latestCompletedEvents(races, sessions, results) {
   return [...latestByYear.values()].sort((first, second) => Number(first.year) - Number(second.year));
 }
 
+function standingsStats(driverId, year, sessions, results) {
+  const sessionById = new Map(sessions.map(session => [session.id, session]));
+  const driverResults = results.filter(result => result.year === year && result.driverId === driverId);
+  const raceResults = driverResults.filter(result => {
+    const session = sessionById.get(result.sessionId);
+    return session && ['1', 'true'].includes(String(session.isRace).toLowerCase()) &&
+      !['1', 'true'].includes(String(session.cancelled).toLowerCase());
+  });
+  const started = result => !['DNS', 'DNQ', 'DNPQ'].includes(String(result.status || '').toUpperCase());
+  return {
+    starts: raceResults.filter(started).length,
+    wins: raceResults.filter(result => Number(result.positionNumber) === 1).length,
+    podiums: raceResults.filter(result => Number(result.positionNumber) >= 1 && Number(result.positionNumber) <= 3).length,
+    poles: driverResults.filter(result => ['1', 'true'].includes(String(result.polePosition).toLowerCase())).length,
+    fastestLaps: raceResults.filter(result => ['1', 'true'].includes(String(result.fastestLap).toLowerCase())).length,
+    retirements: raceResults.filter(result => {
+      const status = String(result.status || '').toUpperCase();
+      return started(result) && status && !['CLA', 'FINISHED'].includes(status);
+    }).length
+  };
+}
+
 async function extractStandings(page, type) {
   if (type === 'team') {
     await page.evaluate(() => {
@@ -226,7 +248,6 @@ async function main() {
   ]);
   const events = latestCompletedEvents(races, sessions, results);
   if (!events.length) throw new Error('No completed F2 seasons or rounds found.');
-  const existingDriverByKey = new Map(existingDrivers.map(row => [`${row.year}:${row.driverId}`, row]));
   const importedDrivers = [];
   const importedConstructors = [];
   const importedPoints = [];
@@ -266,7 +287,7 @@ async function main() {
       const standings = await scrapeEvent(page, race, raceSessions);
       const seasonComplete = Number(race.round) === Number(finalRoundByYear.get(race.year));
       standings.driverRows.forEach(row => {
-        const existing = existingDriverByKey.get(`${race.year}:${row.id}`) || {};
+        const stats = standingsStats(row.id, race.year, sessions, results);
         importedDrivers.push({
           year: race.year,
           positionNumber: row.positionNumber,
@@ -274,8 +295,7 @@ async function main() {
           constructorId: row.constructorId,
           points: row.points,
           championshipWon: seasonComplete && row.positionNumber === 1 ? 'True' : 'False',
-          starts: existing.starts || '', wins: existing.wins || '', podiums: existing.podiums || '',
-          poles: existing.poles || '', fastestLaps: existing.fastestLaps || '', retirements: existing.retirements || ''
+          ...stats
         });
         row.racePoints.forEach((points, index) => {
           if (points === null) return;
@@ -341,4 +361,4 @@ if (require.main === module) {
     });
 }
 
-module.exports = { databaseValue, latestCompletedEvents, slugFromHref, validateStandings };
+module.exports = { databaseValue, latestCompletedEvents, slugFromHref, standingsStats, validateStandings };

@@ -396,3 +396,27 @@ fia-formula-3-championship_2026_melbourne_starting-grid,dd1ec1cb-5a0c-4c0b-8787-
 fia-formula-3-championship_2026_melbourne_race,dd1ec1cb-5a0c-4c0b-8787-7c4867e5c0d6,2026,1,4,Race,Race,2026-03-07T00:15:00Z,2026-03-07T01:00:00Z,True,False
 fia-formula-3-championship_2026_melbourne_starting-grid-2,dd1ec1cb-5a0c-4c0b-8787-7c4867e5c0d6,2026,1,5,GR,Starting Grid,,,False,False
 fia-formula-3-championship_2026_melbourne_race-2,dd1ec1cb-5a0c-4c0b-8787-7c4867e5c0d6,2026,1,6,Race,Race,2026-03-07T21:50:00Z,2026-03-07T22:40:00Z,True,False
+fia-formula-3-championship_2026_monaco_free-practice,290dbf0d-dfcf-4fea-8fdd-a86b3c0eee14,2026,2,1,,Free Practice,,,False,False
+fia-formula-3-championship_2026_monaco_qualifying,290dbf0d-dfcf-4fea-8fdd-a86b3c0eee14,2026,2,2,,Qualifying,,,False,False
+fia-formula-3-championship_2026_monaco_race,290dbf0d-dfcf-4fea-8fdd-a86b3c0eee14,2026,2,4,,Race,,,True,False
+fia-formula-3-championship_2026_monaco_race-2,290dbf0d-dfcf-4fea-8fdd-a86b3c0eee14,2026,2,6,,Race,,,True,False
+fia-formula-3-championship_2026_catalunya_free-practice,a5d44299-9d44-41de-9616-840e165541d9,2026,3,1,,Free Practice,,,False,False
+fia-formula-3-championship_2026_catalunya_qualifying,a5d44299-9d44-41de-9616-840e165541d9,2026,3,2,,Qualifying,,,False,False
+fia-formula-3-championship_2026_catalunya_race,a5d44299-9d44-41de-9616-840e165541d9,2026,3,4,,Race,,,True,False
+fia-formula-3-championship_2026_catalunya_race-2,a5d44299-9d44-41de-9616-840e165541d9,2026,3,6,,Race,,,True,False
+fia-formula-3-championship_2026_spielberg_free-practice,8dbb185a-7473-40aa-a096-fe87659e3b7b,2026,4,1,,Free Practice,,,False,False
+fia-formula-3-championship_2026_spielberg_qualifying,8dbb185a-7473-40aa-a096-fe87659e3b7b,2026,4,2,,Qualifying,,,False,False
+fia-formula-3-championship_2026_spielberg_race,8dbb185a-7473-40aa-a096-fe87659e3b7b,2026,4,4,,Race,,,True,False
+fia-formula-3-championship_2026_spielberg_race-2,8dbb185a-7473-40aa-a096-fe87659e3b7b,2026,4,6,,Race,,,True,False
+fia-formula-3-championship_2026_silverstone_free-practice,9c3a6969-034e-4fb1-9b02-bedf81055bef,2026,5,1,,Free Practice,,,False,False
+fia-formula-3-championship_2026_silverstone_qualifying,9c3a6969-034e-4fb1-9b02-bedf81055bef,2026,5,2,,Qualifying,,,False,False
+fia-formula-3-championship_2026_silverstone_race,9c3a6969-034e-4fb1-9b02-bedf81055bef,2026,5,4,,Race,,,True,False
+fia-formula-3-championship_2026_silverstone_race-2,9c3a6969-034e-4fb1-9b02-bedf81055bef,2026,5,6,,Race,,,True,False
+fia-formula-3-championship_2026_spa-francorchamps_free-practice,c97a56b9-a4c3-447c-80f7-54ba85e1cdb7,2026,6,1,,Free Practice,,,False,False
+fia-formula-3-championship_2026_spa-francorchamps_qualifying,c97a56b9-a4c3-447c-80f7-54ba85e1cdb7,2026,6,2,,Qualifying,,,False,False
+fia-formula-3-championship_2026_spa-francorchamps_race,c97a56b9-a4c3-447c-80f7-54ba85e1cdb7,2026,6,4,,Race,,,True,False
+fia-formula-3-championship_2026_spa-francorchamps_race-2,c97a56b9-a4c3-447c-80f7-54ba85e1cdb7,2026,6,6,,Race,,,True,False
+fia-formula-3-championship_2026_budapest_free-practice,7b52ce97-35f4-4ce8-802f-137dd291cf17,2026,7,1,,Free Practice,,,False,False
+fia-formula-3-championship_2026_budapest_qualifying,7b52ce97-35f4-4ce8-802f-137dd291cf17,2026,7,2,,Qualifying,,,False,False
+fia-formula-3-championship_2026_budapest_race,7b52ce97-35f4-4ce8-802f-137dd291cf17,2026,7,4,,Race,,,True,False
+fia-formula-3-championship_2026_budapest_race-2,7b52ce97-35f4-4ce8-802f-137dd291cf17,2026,7,6,,Race,,,True,False

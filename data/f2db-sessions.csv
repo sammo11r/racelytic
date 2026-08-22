@@ -695,3 +695,31 @@ fia-formula-2-championship_2026_miami_starting-grid,215440cc-d273-4d46-8eff-95c4
 fia-formula-2-championship_2026_miami_race,215440cc-d273-4d46-8eff-95c43acc7d12,2026,2,4,Race,Race,2026-05-02T14:00:00Z,2026-05-02T14:50:00Z,True,False
 fia-formula-2-championship_2026_miami_starting-grid-2,215440cc-d273-4d46-8eff-95c43acc7d12,2026,2,5,GR,Starting Grid,,,False,False
 fia-formula-2-championship_2026_miami_race-2,215440cc-d273-4d46-8eff-95c43acc7d12,2026,2,6,Race,Race,2026-05-03T16:30:00Z,2026-05-03T17:35:00Z,True,False
+fia-formula-2-championship_2026_montreal_free-practice,1a1e0b5e-8481-4660-b108-d1fa932e3803,2026,3,1,,Free Practice,,,False,False
+fia-formula-2-championship_2026_montreal_qualifying,1a1e0b5e-8481-4660-b108-d1fa932e3803,2026,3,2,,Qualifying,,,False,False
+fia-formula-2-championship_2026_montreal_race,1a1e0b5e-8481-4660-b108-d1fa932e3803,2026,3,4,,Race,,,True,False
+fia-formula-2-championship_2026_montreal_race-2,1a1e0b5e-8481-4660-b108-d1fa932e3803,2026,3,6,,Race,,,True,False
+fia-formula-2-championship_2026_monte-carlo_free-practice,b3aae6bb-854a-4915-9fc3-85363196fc7c,2026,4,1,,Free Practice,,,False,False
+fia-formula-2-championship_2026_monte-carlo_qualifying,b3aae6bb-854a-4915-9fc3-85363196fc7c,2026,4,2,,Qualifying,,,False,False
+fia-formula-2-championship_2026_monte-carlo_race,b3aae6bb-854a-4915-9fc3-85363196fc7c,2026,4,4,,Race,,,True,False
+fia-formula-2-championship_2026_monte-carlo_race-2,b3aae6bb-854a-4915-9fc3-85363196fc7c,2026,4,6,,Race,,,True,False
+fia-formula-2-championship_2026_barcelona_free-practice,edf5e377-c873-4b2f-9c80-0ad90e6179bc,2026,5,1,,Free Practice,,,False,False
+fia-formula-2-championship_2026_barcelona_qualifying,edf5e377-c873-4b2f-9c80-0ad90e6179bc,2026,5,2,,Qualifying,,,False,False
+fia-formula-2-championship_2026_barcelona_race,edf5e377-c873-4b2f-9c80-0ad90e6179bc,2026,5,4,,Race,,,True,False
+fia-formula-2-championship_2026_barcelona_race-2,edf5e377-c873-4b2f-9c80-0ad90e6179bc,2026,5,6,,Race,,,True,False
+fia-formula-2-championship_2026_spielburg_free-practice,b10e4629-c2ef-4222-a516-22bc6549e448,2026,6,1,,Free Practice,,,False,False
+fia-formula-2-championship_2026_spielburg_qualifying,b10e4629-c2ef-4222-a516-22bc6549e448,2026,6,2,,Qualifying,,,False,False
+fia-formula-2-championship_2026_spielburg_race,b10e4629-c2ef-4222-a516-22bc6549e448,2026,6,4,,Race,,,True,False
+fia-formula-2-championship_2026_spielburg_race-2,b10e4629-c2ef-4222-a516-22bc6549e448,2026,6,6,,Race,,,True,False
+fia-formula-2-championship_2026_silverstone_free-practice,9fe381fb-6a53-4b0a-a417-619a11474bf9,2026,7,1,,Free Practice,,,False,False
+fia-formula-2-championship_2026_silverstone_qualifying,9fe381fb-6a53-4b0a-a417-619a11474bf9,2026,7,2,,Qualifying,,,False,False
+fia-formula-2-championship_2026_silverstone_race,9fe381fb-6a53-4b0a-a417-619a11474bf9,2026,7,4,,Race,,,True,False
+fia-formula-2-championship_2026_silverstone_race-2,9fe381fb-6a53-4b0a-a417-619a11474bf9,2026,7,6,,Race,,,True,False
+fia-formula-2-championship_2026_spa-francorchamps_free-practice,a9f0699c-831d-4af0-b989-36a752e0cd34,2026,8,1,,Free Practice,,,False,False
+fia-formula-2-championship_2026_spa-francorchamps_qualifying,a9f0699c-831d-4af0-b989-36a752e0cd34,2026,8,2,,Qualifying,,,False,False
+fia-formula-2-championship_2026_spa-francorchamps_race,a9f0699c-831d-4af0-b989-36a752e0cd34,2026,8,4,,Race,,,True,False
+fia-formula-2-championship_2026_spa-francorchamps_race-2,a9f0699c-831d-4af0-b989-36a752e0cd34,2026,8,6,,Race,,,True,False
+fia-formula-2-championship_2026_budapest_free-practice,0ee16b9b-496d-4f26-b63d-518c74e7f3f0,2026,9,1,,Free Practice,,,False,False
+fia-formula-2-championship_2026_budapest_qualifying,0ee16b9b-496d-4f26-b63d-518c74e7f3f0,2026,9,2,,Qualifying,,,False,False
+fia-formula-2-championship_2026_budapest_race,0ee16b9b-496d-4f26-b63d-518c74e7f3f0,2026,9,4,,Race,,,True,False
+fia-formula-2-championship_2026_budapest_race-2,0ee16b9b-496d-4f26-b63d-518c74e7f3f0,2026,9,6,,Race,,,True,False

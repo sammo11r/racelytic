@@ -37,7 +37,8 @@ async function loadHeader() {
             '/season-analysis': '/f3/season-analysis', '/season-comparison': '/f3/season-comparison',
             '/race-analysis': '/f3/race-analysis', '/driver-comparison': '/f3/driver-comparison',
             '/driver-form': '/f3/driver-form', '/teammate-battles': '/f3/teammate-battles',
-            '/circuit-analysis': '/f3/circuit-analysis', '/records': '/f3/records'
+            '/circuit-analysis': '/f3/circuit-analysis', '/records': '/f3/records',
+            '/championship-builder': '/f3/championship-builder', '/points-systems': '/f3/points-systems'
         } : activeSeries === 'f2' ? {
             '/analysis': '/f2/analysis', '/season': '/f2/season', '/race': '/f2/race',
             '/driver': '/f2/driver', '/constructor': '/f2/constructor', '/circuit': '/f2/circuit'
@@ -79,7 +80,7 @@ async function loadHeader() {
             '/teammate-battles': '/f2/teammate-battles', '/circuit-analysis': '/f2/circuit-analysis',
             '/records': '/f2/records', '/simulator-overview': '/f2/simulator', '/simulator': '/f2/simulate-season',
             '/scenario-calculator': '/f2/scenario-calculator', '/championship-builder': '/f2/championship-builder',
-            '/points-systems': '/f2/points-systems', '/games': '/f2/games', '/quizzes': '/f2/quizzes',
+            '/points-systems': '/f2/points-systems', '/games': '/f2/games', '/pitwall': '/f2/pitwall', '/quizzes': '/f2/quizzes',
             '/world-champions-quiz': '/f2/champions-quiz', '/race-winners-quiz': '/f2/race-winners-quiz',
             '/about': '/f2/about'
         };
@@ -93,7 +94,10 @@ async function loadHeader() {
             '/driver-comparison': '/f3/driver-comparison', '/driver-form': '/f3/driver-form',
             '/teammate-battles': '/f3/teammate-battles', '/circuit-analysis': '/f3/circuit-analysis',
             '/records': '/f3/records',
-            '/simulator-overview': '/f3/simulator', '/games': '/f3/games', '/about': '/f3/about'
+            '/simulator-overview': '/f3/simulator', '/simulator': '/f3/simulate-season',
+            '/scenario-calculator': '/f3/scenario-calculator', '/championship-builder': '/f3/championship-builder',
+            '/points-systems': '/f3/points-systems',
+            '/games': '/f3/games', '/pitwall': '/f3/pitwall', '/about': '/f3/about'
         };
         const reverseF3PagePairs = Object.fromEntries(Object.entries(f3PagePairs).map(([f1, f3]) => [f3, f1]));
         const detailPages = {
@@ -198,8 +202,17 @@ async function loadHeader() {
                     ['/f3/circuit-analysis', 'Circuit analysis', 'Performance by venue'],
                     ['/f3/records', 'Records', 'Formula 3 all-time leaders']
                 ]],
-                ['FORMULA 3 SIMULATOR', [['/f3/simulator', 'Overview', 'Choose a Formula 3 simulation tool']]],
-                ['FORMULA 3 GAMES', [['/f3/games', 'Overview', 'Choose a Formula 3 game']]]
+                ['FORMULA 3 SIMULATOR', [
+                    ['/f3/simulator', 'Overview', 'Choose a Formula 3 simulation tool'],
+                    ['/f3/simulate-season', 'Simulate season', 'Recalculate an F3 championship'],
+                    ['/f3/scenario-calculator', 'Scenario calculator', 'Project a championship run-in'],
+                    ['/f3/championship-builder', 'Championship builder', 'Create a custom F3 calendar'],
+                    ['/f3/points-systems', 'Points systems', 'Create and manage scoring rules']
+                ]],
+                ['FORMULA 3 GAMES', [
+                    ['/f3/games', 'Overview', 'Choose a Formula 3 game'],
+                    ['/f3/pitwall', 'Pitwall', 'Play the motorsport strategy game']
+                ]]
             ];
             navigationDropdowns.forEach((dropdown, index) => {
                 const links = [...dropdown.querySelectorAll('.dropdown-menu a')];
@@ -218,6 +231,18 @@ async function loadHeader() {
             const aboutLink = container.querySelector('a[href="/about"]');
             if (aboutLink) aboutLink.href = '/f3/about';
             container.querySelectorAll('a[href="/account"]').forEach(link => { link.href = '/account?series=f3'; });
+            const pointsSimulatorLink = document.querySelector('.points-library-hero a[href="/simulator"]');
+            if (pointsSimulatorLink) pointsSimulatorLink.href = '/f3/simulate-season';
+            const pointsAccountLink = document.querySelector('.points-login-prompt a[href="/account"]');
+            if (pointsAccountLink) pointsAccountLink.href = '/account?series=f3';
+            if (window.location.pathname === '/f3/points-systems') {
+                const hero = document.querySelector('.points-library-hero');
+                if (hero) {
+                    hero.querySelector('.eyebrow').textContent = 'FORMULA 3 CHAMPIONSHIP RULES';
+                    hero.querySelector('h1').textContent = 'Formula 3 points systems.';
+                    hero.querySelector('p').textContent = 'Create reusable feature, sprint, qualifying and bonus-point rules for Formula 3 simulations.';
+                }
+            }
         }
         if (isF2Mode) {
             document.title = document.title
@@ -299,6 +324,7 @@ async function loadHeader() {
             const gamesLinks = [...(gamesDropdown?.querySelectorAll('.dropdown-menu a') || [])];
             const f2GamesRoutes = [
                 ['/f2/games', 'Overview', 'Choose a Formula 2 game'],
+                ['/f2/pitwall', 'Pitwall', 'Play the motorsport strategy game'],
                 ['/f2/quizzes', 'Quizzes', 'Test your Formula 2 knowledge']
             ];
             gamesLinks.forEach((link, index) => {
@@ -324,6 +350,7 @@ async function loadHeader() {
             const rewriteF2Links = root => {
                 const links = root.matches?.('a[href]') ? [root] : [...(root.querySelectorAll?.('a[href]') || [])];
                 links.forEach(link => {
+                    if (link.closest('.series-switcher')) return;
                     const href = link.getAttribute('href') || '';
                     if (/^\/(season|race|driver|circuit|constructor)(?=[/?#])/.test(href)) {
                         link.setAttribute('href', `/f2${href}`);
@@ -337,7 +364,7 @@ async function loadHeader() {
             const f2Copy = {
                 '/f2/simulate-season': ['FORMULA 2 SIMULATOR', 'Rewrite a Formula 2 championship.', 'Apply a different feature, sprint and bonus-points system to any Formula 2 season.'],
                 '/f2/scenario-calculator': ['FORMULA 2 SCENARIOS', 'Shape the Formula 2 title run-in.', 'Freeze the standings after any round, rewrite the remaining feature results and retain each sprint classification.'],
-                '/f2/championship-builder': ['FORMULA 2 CHAMPIONSHIP BUILDER', 'Your weekends. Your rules.', 'Combine Formula 2 weekends, choose the field and calculate a custom championship.'],
+                '/f2/championship-builder': ['FORMULA 2 CHAMPIONSHIP BUILDER', 'Your races. Your rules.', 'Combine individual Formula 2 sprint and feature races, choose the field and calculate a custom championship.'],
                 '/f2/points-systems': ['FORMULA 2 CHAMPIONSHIP RULES', 'Formula 2 points systems.', 'Create reusable feature, sprint, qualifying and bonus-point rules.']
             }[window.location.pathname];
             if (f2Copy) {
@@ -357,6 +384,7 @@ async function loadHeader() {
             document.addEventListener('click', event => {
                 const link = event.target.closest('a[href]');
                 if (!link || event.defaultPrevented || event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+                if (link.closest('.series-switcher')) return;
                 const target = new URL(link.href, window.location.origin);
                 if (target.origin !== window.location.origin) return;
                 if (/^\/(driver|constructor|race|season|circuit)(?:$|\/)/.test(target.pathname)) {

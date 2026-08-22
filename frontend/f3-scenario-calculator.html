@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Project Formula 3 championship scenarios by changing the remaining sprint and feature-race results.">
+  <link rel="icon" href="/assets/favicon-f3.svg" type="image/svg+xml">
+  <title>Scenario Calculator · Formula 3 · Racelytic</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/polish.css">
+</head>
+<body class="f3-mode">
+  <div id="header"></div>
+  <main class="container page scenario-page">
+    <a class="back-link" href="/f3/simulator">← Formula 3 simulator</a>
+    <section class="simulator-hero scenario-hero">
+      <div>
+        <div class="eyebrow">FORMULA 3 SCENARIOS</div>
+        <h1>Shape the title run-in.</h1>
+        <p>Freeze the Formula 3 standings after any completed round, rewrite the remaining sprint and feature results, and see who can still win.</p>
+      </div>
+      <div class="simulator-hero-mark" aria-hidden="true">?</div>
+    </section>
+    <section class="scenario-controls">
+      <label><span>Season</span><select id="scenario-season"><option>Loading seasons…</option></select></label>
+      <label><span>Standings after</span><select id="scenario-cutoff"></select></label>
+      <label><span>Points system</span><select id="scenario-points"><option value="modern">Formula 3 · current</option><option value="f3-legacy">Formula 3 · 2019–2021</option></select></label>
+      <button id="reset-scenario" type="button">Reset predictions</button>
+    </section>
+    <section class="scenario-workspace">
+      <div class="scenario-editor">
+        <div class="section-heading"><div><div class="eyebrow">PREDICTIONS</div><h2>Edit the run-in</h2></div><label class="scenario-race-choice"><span>Race</span><select id="scenario-race"></select></label></div>
+        <div id="scenario-grid"><div class="empty-state">Choose a season to begin.</div></div>
+      </div>
+      <aside class="scenario-outlook">
+        <div class="section-heading"><div><div class="eyebrow">TITLE OUTLOOK</div><h2>Projected standings</h2></div></div>
+        <div id="scenario-summary"></div>
+        <div id="scenario-standings"></div>
+      </aside>
+    </section>
+  </main>
+  <footer class="footer"><div class="container">Racelytic</div></footer>
+  <script src="/js/utils.js"></script>
+  <script src="/js/header.js"></script>
+  <script src="/js/scenario-calculator.js"></script>
+</body>
+</html>

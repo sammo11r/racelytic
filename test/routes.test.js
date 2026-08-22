@@ -123,12 +123,31 @@ test('public pages use extensionless URLs and preserve legacy query strings', as
         const legacy = await request(port, '/driver.html?id=max-verstappen');
         const privacy = await request(port, '/privacy');
         const terms = await request(port, '/terms');
+        const pitwall = await request(port, '/pitwall');
+        const f2Pitwall = await request(port, '/f2/pitwall');
+        const f3Pitwall = await request(port, '/f3/pitwall');
+        const f3Simulator = await request(port, '/f3/simulate-season');
+        const f3ScenarioCalculator = await request(port, '/f3/scenario-calculator');
+        const f3ChampionshipBuilder = await request(port, '/f3/championship-builder');
+        const f3PointsSystems = await request(port, '/f3/points-systems');
+        const pitwallWasm = await request(port, '/pitwall-build/index.wasm');
+        const pitwallPack = await request(port, '/pitwall-build/index.pck');
 
         assert.equal(clean.statusCode, 200);
         assert.equal(legacy.statusCode, 308);
         assert.equal(legacy.headers.location, '/driver?id=max-verstappen');
         assert.equal(privacy.statusCode, 200);
         assert.equal(terms.statusCode, 200);
+        assert.equal(pitwall.statusCode, 200);
+        assert.equal(f2Pitwall.statusCode, 200);
+        assert.equal(f3Pitwall.statusCode, 200);
+        assert.equal(f3Simulator.statusCode, 200);
+        assert.equal(f3ScenarioCalculator.statusCode, 200);
+        assert.equal(f3ChampionshipBuilder.statusCode, 200);
+        assert.equal(f3PointsSystems.statusCode, 200);
+        assert.equal(pitwallWasm.statusCode, 200);
+        assert.equal(pitwallWasm.headers['content-type'], 'application/wasm');
+        assert.equal(pitwallPack.statusCode, 200);
     } finally {
         await new Promise((resolve, reject) => server.close(error => error ? reject(error) : resolve()));
     }

@@ -1,4 +1,5 @@
 const systemForm = document.getElementById('points-system-form');
+const isF3PointsPage = window.location.pathname.startsWith('/f3/');
 let systems = [];
 let currentUser = null;
 
@@ -69,11 +70,11 @@ function editSystem(system = null) {
   systemForm.elements.id.value = system?.id || '';
   systemForm.elements.name.value = system?.name || '';
   systemForm.elements.racePoints.value = system?.racePoints?.join(', ') || '25, 18, 15, 12, 10, 8, 6, 4, 2, 1';
-  systemForm.elements.sprintPoints.value = system?.sprintPoints?.join(', ') || '';
+  systemForm.elements.sprintPoints.value = system ? system.sprintPoints?.join(', ') || '' : isF3PointsPage ? '10, 9, 8, 7, 6, 5, 4, 3, 2, 1' : '';
   systemForm.elements.qualifyingPoints.value = system?.qualifyingPoints?.join(', ') || '';
-  systemForm.elements.poleBonus.value = system?.poleBonus || 0;
-  systemForm.elements.fastestLapBonus.value = system?.fastestLapBonus || 0;
-  systemForm.elements.fastestLapMaxPosition.value = system?.fastestLapMaxPosition || '';
+  systemForm.elements.poleBonus.value = system?.poleBonus ?? (isF3PointsPage ? 2 : 0);
+  systemForm.elements.fastestLapBonus.value = system?.fastestLapBonus ?? (isF3PointsPage ? 1 : 0);
+  systemForm.elements.fastestLapMaxPosition.value = system?.fastestLapMaxPosition ?? (isF3PointsPage ? 10 : '');
   systemForm.elements.countBestRounds.value = system?.countBestRounds || '';
   systemForm.elements.bestFirstRounds.value = system?.bestFirstRounds || '';
   systemForm.elements.firstRoundsWindow.value = system?.firstRoundsWindow || '';

@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Recalculate any FIA Formula 3 season with alternate feature, sprint and bonus-point rules.">
+  <link rel="icon" href="/assets/favicon-f3.svg" type="image/svg+xml">
+  <title>Simulate Season · Formula 3 · Racelytic</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/polish.css">
+</head>
+<body class="f3-mode">
+  <div id="header"></div>
+  <main class="container page simulator-page">
+    <section class="simulator-hero">
+      <div>
+        <div class="eyebrow">FORMULA 3 SIMULATOR</div>
+        <h1>Rewrite a Formula 3 championship.</h1>
+        <p>Apply a different feature, sprint and bonus-points system to any FIA Formula 3 season.</p>
+      </div>
+      <div class="simulator-hero-mark" aria-hidden="true">Σ</div>
+    </section>
+
+    <section class="simulator-controls" aria-label="Simulation settings">
+      <label>
+        <span>Season</span>
+        <select id="simulation-season"><option value="">Loading seasons…</option></select>
+      </label>
+      <label class="ruleset-control">
+        <span>Points system</span>
+        <select id="simulation-points"></select>
+        <small>Choose current or 2019–2021 Formula 3 scoring, or apply a custom ruleset to the complete season.</small>
+      </label>
+      <button class="button primary" id="run-simulation" type="button">Run simulation</button>
+    </section>
+
+    <section id="simulation-explanation" class="simulation-explanation" aria-live="polite"></section>
+
+    <section class="simulator-results">
+      <div class="section-heading">
+        <div><div class="eyebrow">RECALCULATED</div><h2 id="simulation-championship-title">Driver championship</h2></div>
+        <div class="simulation-heading-actions">
+          <div class="standings-mode" role="group" aria-label="Championship standings">
+            <button class="standings-mode-button active" type="button" data-simulation-mode="drivers" aria-pressed="true">Drivers</button>
+            <button class="standings-mode-button" type="button" data-simulation-mode="constructors" aria-pressed="false">Teams</button>
+          </div>
+          <div id="simulation-status" class="section-note"></div>
+        </div>
+      </div>
+      <div id="simulation-summary" class="simulation-summary"></div>
+      <div id="simulation-results" class="table-wrap simulation-table-wrap">
+        <div class="empty-state">Choose your settings and run the simulation.</div>
+      </div>
+    </section>
+  </main>
+  <footer class="footer"><div class="container">Racelytic</div></footer>
+  <script src="/js/utils.js"></script>
+  <script src="/js/header.js"></script>
+  <script src="/js/f1-points-systems.js"></script>
+  <script src="/js/simulator.js"></script>
+</body>
+</html>

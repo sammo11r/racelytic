@@ -655,17 +655,29 @@ router.get('/api/seasons/:year', async (req, res) => {
                     const raceResults = {};
                     races.forEach(race => {
                         const sessions = (sessionsByRace.get(race.id) || []).filter(session => !session.cancelled);
-                        const sprint = sessions.find(session => /sprint/i.test(session.name)) || sessions[0];
-                        const feature = [...sessions].reverse().find(session => /feature/i.test(session.name)) || sessions[sessions.length - 1];
-                        const sprintResult = sprint ? driver.raceResults[sprint.id] : null;
+                        const typedSessions = sessions.map((session, index) => ({
+                            ...session,
+                            type: sessionType(session, index, sessions.length, year)
+                        }));
+                        const feature = [...typedSessions].reverse().find(session => session.type === 'F')
+                            || typedSessions[typedSessions.length - 1];
+                        const sprintSessions = typedSessions.filter(session => session.type === 'S');
+                        const sprintResults = sprintSessions
+                            .map(session => driver.raceResults[session.id])
+                            .filter(Boolean);
                         const featureResult = feature ? driver.raceResults[feature.id] : null;
-                        if (!sprintResult && !featureResult) return;
+                        if (!sprintResults.length && !featureResult) return;
                         raceResults[race.round] = {
-                            ...(featureResult || sprintResult),
+                            ...(featureResult || sprintResults[0]),
                             points: Number(featureResult?.points || 0),
-                            sprintPoints: sprint && feature && sprint.id !== feature.id ? Number(sprintResult?.points || 0) : 0,
-                            sprintPosition: sprintResult?.position ?? null,
-                            sprintFastestLap: Boolean(sprintResult?.fastestLap),
+                            sprintPoints: sprintResults.reduce((sum, result) => sum + Number(result.points || 0), 0),
+                            sprintPosition: sprintResults[0]?.position ?? null,
+                            sprintFastestLap: Boolean(sprintResults[0]?.fastestLap),
+                            sprintResults: sprintResults.map(result => ({
+                                position: result.position,
+                                fastestLap: Boolean(result.fastestLap),
+                                constructorId: result.constructorId
+                            })),
                             qualifyingPosition: qualifyingPositionByRaceDriver.get(
                                 `${race.id}:${driver.driverId}`
                             ) ?? null

@@ -423,6 +423,44 @@ function validateCollectedSeason(year, rows) {
   }
 }
 
+function consolidateDriverStandings(standings, entries) {
+  const grouped = new Map();
+  const additiveFields = ['points', 'starts', 'wins', 'podiums', 'poles', 'fastestLaps', 'retirements'];
+  for (const row of standings) {
+    const key = `${row.year}:${row.driverId}`;
+    if (!grouped.has(key)) {
+      grouped.set(key, { ...row });
+      continue;
+    }
+    const existing = grouped.get(key);
+    for (const field of additiveFields) existing[field] = Number(existing[field] || 0) + Number(row[field] || 0);
+    existing.positionNumber ||= row.positionNumber;
+    existing.championshipWon = bool(existing.championshipWon === 'True' || row.championshipWon === 'True');
+  }
+  for (const row of grouped.values()) {
+    row.constructorId = entries
+      .filter(entry => entry.year === String(row.year) && entry.driverId === row.driverId)
+      .sort((a, b) => Number(b.round) - Number(a.round))[0]?.constructorId || row.constructorId;
+  }
+  return [...grouped.values()];
+}
+
+function markCompletedSeasonChampions(rows) {
+  const today = new Date().toISOString().slice(0, 10);
+  const years = new Set(rows.races.map(race => race.year));
+  for (const year of years) {
+    const races = rows.races.filter(race => race.year === year);
+    const complete = races.length > 0 && races.every(race => (race.endDate || race.date) <= today);
+    if (!complete) continue;
+    rows.driverStandings
+      .filter(row => row.year === year)
+      .forEach(row => { row.championshipWon = bool(Number(row.positionNumber) === 1); });
+    rows.constructorStandings
+      .filter(row => row.year === year)
+      .forEach(row => { row.championshipWon = bool(Number(row.positionNumber) === 1); });
+  }
+}
+
 async function main() {
   fs.mkdirSync(DATA_DIR, { recursive: true });
   const years = selectedYear ? [selectedYear] : Array.from({ length: toYear - fromYear + 1 }, (_, index) => fromYear + index);
@@ -446,6 +484,8 @@ async function main() {
     }
     await enrichNationalities(page, dataset.maps, countryFallbacks);
   } finally { await browser.close(); }
+  dataset.rows.driverStandings = consolidateDriverStandings(dataset.rows.driverStandings, dataset.rows.entries);
+  markCompletedSeasonChampions(dataset.rows);
   validate(dataset.maps, dataset.rows);
   for (const key of ENTITY_KEYS) writeCsv(key, [...dataset.maps[key].values()].sort((a, b) => a.name.localeCompare(b.name)));
   for (const key of ROW_KEYS) writeCsv(key, dataset.rows[key]);
@@ -454,4 +494,15 @@ async function main() {
 
 if (require.main === module) main().catch(error => { console.error(error); process.exitCode = 1; });
 
-module.exports = { canonicalChassisId, countryCode, createDataset, dateTimeValue, dateValue, mergeDataset, resultRow, slug };
+module.exports = {
+  canonicalChassisId,
+  consolidateDriverStandings,
+  countryCode,
+  createDataset,
+  dateTimeValue,
+  dateValue,
+  markCompletedSeasonChampions,
+  mergeDataset,
+  resultRow,
+  slug
+};

@@ -1,5 +1,5 @@
 year,positionNumber,constructorId,points,championshipWon
-2019,1,prema-racing,527,False
+2019,1,prema-racing,527,True
 2019,2,hitech-racing,223,False
 2019,3,art-grand-prix,174,False
 2019,4,trident-motorsport,134,False
@@ -9,7 +9,7 @@ year,positionNumber,constructorId,points,championshipWon
 2019,8,sauber-junior-team-by-charouz,15,False
 2019,9,carlin,14,False
 2019,10,campos-racing,5,False
-2020,1,prema-racing,470.5,False
+2020,1,prema-racing,470.5,True
 2020,2,trident-motorsport,261.5,False
 2020,3,art-grand-prix,251,False
 2020,4,hitech-racing,167,False
@@ -19,7 +19,7 @@ year,positionNumber,constructorId,points,championshipWon
 2020,8,carlin,46,False
 2020,9,jenzer-motorsport,11,False
 2020,10,charouz-racing-system,5,False
-2021,1,trident-motorsport,381,False
+2021,1,trident-motorsport,381,True
 2021,2,prema-racing,377,False
 2021,3,art-grand-prix,256,False
 2021,4,mp-motorsport,224,False
@@ -29,7 +29,7 @@ year,positionNumber,constructorId,points,championshipWon
 2021,8,campos-racing,32,False
 2021,9,jenzer-motorsport,29,False
 2021,10,carlin,25,False
-2022,1,prema-racing,355,False
+2022,1,prema-racing,355,True
 2022,2,trident-motorsport,301,False
 2022,3,art-grand-prix,208,False
 2022,4,mp-motorsport,195,False
@@ -39,7 +39,7 @@ year,positionNumber,constructorId,points,championshipWon
 2022,8,campos-racing,53,False
 2022,9,jenzer-motorsport,26,False
 2022,10,charouz-racing-system,1,False
-2023,1,prema-racing,327,False
+2023,1,prema-racing,327,True
 2023,2,trident-motorsport,308,False
 2023,3,mp-motorsport,194,False
 2023,4,campos-racing,179,False
@@ -49,7 +49,7 @@ year,positionNumber,constructorId,points,championshipWon
 2023,8,art-grand-prix,71,False
 2023,9,charouz-racing-system,6,False
 2023,10,carlin,2,False
-2024,1,prema-racing,352,False
+2024,1,prema-racing,352,True
 2024,2,trident-motorsport,281,False
 2024,3,art-grand-prix,245,False
 2024,4,campos-racing,179,False
@@ -69,13 +69,13 @@ year,positionNumber,constructorId,points,championshipWon
 2025,8,hitech-racing,90,False
 2025,9,phm-racing,52,False
 2025,10,dams,30,False
-2026,1,van-amersfoort-racing,30,False
-2026,2,campos-racing,27,False
-2026,3,art-grand-prix,26,False
-2026,4,trident-motorsport,20,False
-2026,5,rodin-motorsport,7,False
-2026,6,phm-racing,6,False
-2026,7,hitech-racing,2,False
-2026,8,prema-racing,1,False
-2026,9,mp-motorsport,1,False
-2026,10,dams,0,False
+2026,1,campos-racing,269,False
+2026,2,trident-motorsport,196,False
+2026,3,van-amersfoort-racing,132,False
+2026,4,rodin-motorsport,121,False
+2026,5,art-grand-prix,119,False
+2026,6,mp-motorsport,102,False
+2026,7,prema-racing,50,False
+2026,8,hitech-racing,41,False
+2026,9,dams,26,False
+2026,10,phm-racing,23,False

@@ -15,7 +15,7 @@ function configuration(input = {}) {
     const raceIds = identifiers(input.raceIds, 100);
     if (!raceIds.length) throw new Error('Add at least one race.');
     return {
-        series: input.series === 'f2' ? 'f2' : 'f1',
+        series: ['f2', 'f3'].includes(input.series) ? input.series : 'f1',
         raceIds,
         driverIds: identifiers(input.driverIds, 1000),
         constructorIds: identifiers(input.constructorIds, 500),

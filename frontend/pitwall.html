@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Play Pitwall, the Racelytic motorsport strategy game.">
+  <link rel="icon" href="/assets/favicon-f1.svg" type="image/svg+xml">
+  <title>Pitwall · Racelytic</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/polish.css">
+</head>
+<body>
+  <script>
+    if (location.pathname.startsWith('/f2/')) document.body.classList.add('f2-mode');
+    if (location.pathname.startsWith('/f3/')) document.body.classList.add('f3-mode');
+  </script>
+  <div id="header"></div>
+
+  <main class="container page pitwall-page">
+    <a class="back-link pitwall-back-link" href="/games">← Back to games</a>
+
+    <section class="pitwall-hero">
+      <div class="eyebrow">RACELYTIC STRATEGY GAME</div>
+      <h1>Pit<span>wall</span></h1>
+      <p>Take your place on the pit wall, make the calls and put your motorsport strategy to the test.</p>
+    </section>
+
+    <section class="pitwall-game" aria-labelledby="pitwall-game-title">
+      <div class="section-heading">
+        <div>
+          <div class="eyebrow">PLAY NOW</div>
+          <h2 id="pitwall-game-title">Lead the race</h2>
+        </div>
+        <span class="pitwall-fullscreen-note">Fullscreen is available in-game</span>
+      </div>
+      <div class="pitwall-frame-shell">
+        <iframe class="pitwall-frame" src="/pitwall-build/" title="Play Pitwall" allow="autoplay; fullscreen; gamepad" allowfullscreen></iframe>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer"><div class="container">Racelytic</div></footer>
+  <script src="/js/header.js"></script>
+  <script>
+    const pitwallSeries = location.pathname.startsWith('/f3/') ? 'f3' : location.pathname.startsWith('/f2/') ? 'f2' : 'f1';
+    const pitwallBackLink = document.querySelector('.pitwall-back-link');
+    pitwallBackLink.href = pitwallSeries === 'f3' ? '/f3/games' : pitwallSeries === 'f2' ? '/f2/games' : '/games';
+  </script>
+</body>
+</html>
