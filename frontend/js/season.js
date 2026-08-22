@@ -486,14 +486,8 @@
 
         for (const driver of drivers) {
 
-            const leader =
-                Number(driver.position) === 1
-                    ? 'championship-leader'
-                    : '';
-
-
             rows += `
-                <tr class="${leader}">
+                <tr>
 
                     <td class="position-column">
                         ${escapeHtml(
@@ -653,14 +647,8 @@
 
         for (const constructor of constructors) {
 
-            const leader =
-                Number(constructor.position) === 1
-                    ? 'championship-leader'
-                    : '';
-
-
             rows += `
-                <tr class="${leader}">
+                <tr>
 
                     <td class="position-column">
                         ${escapeHtml(

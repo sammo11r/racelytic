@@ -121,6 +121,10 @@ test('public pages use extensionless URLs and preserve legacy query strings', as
         const { port } = server.address();
         const clean = await request(port, '/driver?id=max-verstappen');
         const legacy = await request(port, '/driver.html?id=max-verstappen');
+        const f2Legacy = await request(port, '/f2-driver.html?id=gabriele-mini');
+        const f2RawRoute = await request(port, '/f2-driver?id=gabriele-mini');
+        const f3Legacy = await request(port, '/f3-team.html?id=campos-racing');
+        const f3RawRoute = await request(port, '/f3-team?id=campos-racing');
         const privacy = await request(port, '/privacy');
         const terms = await request(port, '/terms');
         const pitwall = await request(port, '/pitwall');
@@ -136,6 +140,14 @@ test('public pages use extensionless URLs and preserve legacy query strings', as
         assert.equal(clean.statusCode, 200);
         assert.equal(legacy.statusCode, 308);
         assert.equal(legacy.headers.location, '/driver?id=max-verstappen');
+        assert.equal(f2Legacy.statusCode, 308);
+        assert.equal(f2Legacy.headers.location, '/f2/driver?id=gabriele-mini');
+        assert.equal(f2RawRoute.statusCode, 308);
+        assert.equal(f2RawRoute.headers.location, '/f2/driver?id=gabriele-mini');
+        assert.equal(f3Legacy.statusCode, 308);
+        assert.equal(f3Legacy.headers.location, '/f3/team?id=campos-racing');
+        assert.equal(f3RawRoute.statusCode, 308);
+        assert.equal(f3RawRoute.headers.location, '/f3/team?id=campos-racing');
         assert.equal(privacy.statusCode, 200);
         assert.equal(terms.statusCode, 200);
         assert.equal(pitwall.statusCode, 200);

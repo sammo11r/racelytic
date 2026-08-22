@@ -2155,17 +2155,6 @@ p {
 }
 
 
-/* Championship leader */
-
-.championship-table tr.championship-leader td {
-    background: #fffdf0;
-}
-
-.championship-table tr.championship-leader td.points-column {
-    color: var(--accent);
-}
-
-
 /* Hover */
 
 .championship-table tbody tr:hover td {

@@ -20,14 +20,20 @@ const SEARCH_PAGES = [
     ['Teammate battles', 'Intra-team head-to-heads', '/teammate-battles'],
     ['Circuit analysis', 'Performance by venue', '/circuit-analysis'],
     ['Records', 'Explore all-time rankings', '/records'],
-    ['Simulator', 'Recalculate a Formula 1 season', '/simulator-overview'],
+    ['Simulator', 'Explore Formula 1 simulation tools', '/simulator-overview'],
+    ['Simulate season', 'Recalculate a Formula 1 season', '/simulator'],
     ['Points systems', 'Create and manage scoring rules', '/points-systems'],
     ['Scenario calculator', 'Project a championship run-in', '/scenario-calculator'],
     ['Championship builder', 'Create a custom championship', '/championship-builder'],
     ['Games', 'Play with Formula 1 history', '/games'],
+    ['Pitwall', 'Play the motorsport strategy game', '/pitwall'],
     ['Quizzes', 'Test your Formula 1 knowledge', '/quizzes'],
+    ['World champions quiz', 'Name every Formula 1 world champion', '/world-champions-quiz'],
+    ['Race winners quiz', 'Name Formula 1 Grand Prix winners', '/race-winners-quiz'],
     ['About', 'About Racelytic and its data', '/about'],
-    ['Account', 'Your saved creations and community library', '/account']
+    ['Account', 'Your saved creations and community library', '/account'],
+    ['Privacy', 'Racelytic privacy information', '/privacy'],
+    ['Terms', 'Racelytic terms of use', '/terms']
 ];
 
 const F2_SEARCH_PAGES = [
@@ -40,8 +46,23 @@ const F2_SEARCH_PAGES = [
     ['Chassis', 'Formula 2 chassis and engine records', '/f2/chassis'],
     ['Analysis', 'Explore Formula 2 data and trends', '/f2/analysis'],
     ['Season analysis', 'Formula 2 championship progression', '/f2/season-analysis'],
-    ['Simulator', 'Formula 2 championship simulation', '/f2/simulator'],
+    ['Season comparison', 'Compare Formula 2 championships', '/f2/season-comparison'],
+    ['Race analysis', 'Explore a Formula 2 race in detail', '/f2/race-analysis'],
+    ['Driver comparison', 'Compare Formula 2 careers', '/f2/driver-comparison'],
+    ['Driver form', 'Recent Formula 2 performance', '/f2/driver-form'],
+    ['Teammate battles', 'Formula 2 intra-team head-to-heads', '/f2/teammate-battles'],
+    ['Circuit analysis', 'Formula 2 performance by venue', '/f2/circuit-analysis'],
+    ['Records', 'Formula 2 all-time rankings', '/f2/records'],
+    ['Simulator', 'Formula 2 simulator overview', '/f2/simulator'],
+    ['Simulate season', 'Formula 2 championship simulation', '/f2/simulate-season'],
+    ['Scenario calculator', 'Project a Formula 2 championship run-in', '/f2/scenario-calculator'],
+    ['Championship builder', 'Create a custom Formula 2 championship', '/f2/championship-builder'],
+    ['Points systems', 'Create and manage Formula 2 scoring rules', '/f2/points-systems'],
     ['Games', 'Games built from Formula 2 history', '/f2/games'],
+    ['Pitwall', 'Play the motorsport strategy game', '/f2/pitwall'],
+    ['Quizzes', 'Test your Formula 2 knowledge', '/f2/quizzes'],
+    ['Champions quiz', 'Name every Formula 2 champion', '/f2/champions-quiz'],
+    ['Race winners quiz', 'Name Formula 2 race winners', '/f2/race-winners-quiz'],
     ['About', 'About the Formula 2 archive', '/f2/about']
 ];
 
@@ -49,6 +70,10 @@ const F3_SEARCH_PAGES = [
     ['Formula 3', 'Explore the FIA Formula 3 archive', '/f3'],
     ['Database', 'Browse the Formula 3 dataset', '/f3/database'],
     ['Seasons', 'Formula 3 championship history', '/f3/seasons'],
+    ['Races', 'Formula 3 weekends and sessions', '/f3/races'],
+    ['Drivers', 'Formula 3 driver profiles', '/f3/drivers'],
+    ['Teams', 'Formula 3 teams and results', '/f3/teams'],
+    ['Circuits', 'Formula 3 tracks and venues', '/f3/circuits'],
     ['Chassis', 'Formula 3 chassis and engine records', '/f3/chassis'],
     ['Analysis', 'Explore Formula 3 data and trends', '/f3/analysis'],
     ['Season analysis', 'Formula 3 championship progression', '/f3/season-analysis'],
@@ -59,8 +84,13 @@ const F3_SEARCH_PAGES = [
     ['Teammate battles', 'Formula 3 intra-team head-to-heads', '/f3/teammate-battles'],
     ['Circuit analysis', 'Formula 3 performance by venue', '/f3/circuit-analysis'],
     ['Records', 'Formula 3 all-time rankings', '/f3/records'],
-    ['Simulator', 'Formula 3 championship simulation', '/f3/simulator'],
+    ['Simulator', 'Formula 3 simulator overview', '/f3/simulator'],
+    ['Simulate season', 'Formula 3 championship simulation', '/f3/simulate-season'],
+    ['Scenario calculator', 'Project a Formula 3 championship run-in', '/f3/scenario-calculator'],
+    ['Championship builder', 'Create a custom Formula 3 championship', '/f3/championship-builder'],
+    ['Points systems', 'Create and manage Formula 3 scoring rules', '/f3/points-systems'],
     ['Games', 'Games built from Formula 3 history', '/f3/games'],
+    ['Pitwall', 'Play the motorsport strategy game', '/f3/pitwall'],
     ['About', 'About the Formula 3 archive', '/f3/about']
 ];
 
@@ -92,7 +122,7 @@ const SERIES_PARENTS = {
     driver: { f1: '/drivers', f2: '/f2/drivers', f3: '/f3/drivers' },
     constructor: { f1: '/constructors', f2: '/f2/constructors', f3: '/f3/teams' },
     circuit: { f1: '/circuits', f2: '/f2/circuits', f3: '/f3/circuits' },
-    race: { f1: '/races', f2: '/f2/races' },
+    race: { f1: '/races', f2: '/f2/races', f3: '/f3/races' },
     season: { f1: '/seasons', f2: '/f2/seasons', f3: '/f3/seasons' }
 };
 
@@ -100,7 +130,7 @@ router.get('/api/series-equivalent', async (req, res) => {
     const target = String(req.query.target || '').toLowerCase();
     const type = String(req.query.type || '').toLowerCase();
     const id = String(req.query.id || '').trim().slice(0, 120);
-    const validTarget = ['f1', 'f2'].includes(target) || (target === 'f3' && ['season', 'driver', 'constructor', 'circuit'].includes(type));
+    const validTarget = ['f1', 'f2', 'f3'].includes(target);
     if (!validTarget || !SERIES_PARENTS[type] || !id) {
         return res.status(400).json({ error: 'Invalid series equivalent request.' });
     }
@@ -163,27 +193,27 @@ router.get('/api/series-equivalent', async (req, res) => {
                     WHERE sourceCircuit.id = ?
                     LIMIT 1
                 `, [id]);
-            } else if (target === 'f2') {
-                rows = await connection.query(`
-                    SELECT targetRace.id
-                    FROM races sourceRace
-                    JOIN circuits sourceCircuit ON sourceCircuit.id = sourceRace.circuitId
-                    JOIN f2_circuits targetCircuit
-                        ON LOWER(targetCircuit.name) IN (LOWER(sourceCircuit.name), LOWER(sourceCircuit.fullName))
-                    JOIN f2_races targetRace
-                        ON targetRace.circuitId = targetCircuit.id AND targetRace.year = sourceRace.year
-                    WHERE sourceRace.id = ?
-                    ORDER BY ABS(DATEDIFF(targetRace.date, sourceRace.date)), targetRace.round
-                    LIMIT 1
-                `, [id]);
             } else {
+                const source = ['f1', 'f2', 'f3'].includes(String(req.query.source || '').toLowerCase())
+                    ? String(req.query.source).toLowerCase()
+                    : target === 'f1' ? 'f2' : 'f1';
+                const raceTables = { f1: 'races', f2: 'f2_races', f3: 'f3_races' };
+                const circuitTables = { f1: 'circuits', f2: 'f2_circuits', f3: 'f3_circuits' };
+                const sourceRaceTable = raceTables[source];
+                const targetRaceTable = raceTables[target];
+                const sourceCircuitTable = circuitTables[source];
+                const targetCircuitTable = circuitTables[target];
+                const circuitNames = source === 'f1'
+                    ? 'LOWER(targetCircuit.name) IN (LOWER(sourceCircuit.name), LOWER(sourceCircuit.fullName))'
+                    : target === 'f1'
+                        ? 'LOWER(sourceCircuit.name) IN (LOWER(targetCircuit.name), LOWER(targetCircuit.fullName))'
+                        : 'LOWER(sourceCircuit.name) = LOWER(targetCircuit.name)';
                 rows = await connection.query(`
                     SELECT targetRace.id
-                    FROM f2_races sourceRace
-                    JOIN f2_circuits sourceCircuit ON sourceCircuit.id = sourceRace.circuitId
-                    JOIN circuits targetCircuit
-                        ON LOWER(sourceCircuit.name) IN (LOWER(targetCircuit.name), LOWER(targetCircuit.fullName))
-                    JOIN races targetRace
+                    FROM \`${sourceRaceTable}\` sourceRace
+                    JOIN \`${sourceCircuitTable}\` sourceCircuit ON sourceCircuit.id = sourceRace.circuitId
+                    JOIN \`${targetCircuitTable}\` targetCircuit ON ${circuitNames}
+                    JOIN \`${targetRaceTable}\` targetRace
                         ON targetRace.circuitId = targetCircuit.id AND targetRace.year = sourceRace.year
                     WHERE sourceRace.id = ?
                     ORDER BY ABS(DATEDIFF(targetRace.date, sourceRace.date)), targetRace.round
@@ -212,7 +242,8 @@ router.get('/api/search', async (req, res) => {
         const q = `%${search}%`;
         const databaseResults = await withConnection(async connection => {
             const [seasons, drivers, constructors, circuits, races, chassis,
-                f2Seasons, f2Drivers, f2Constructors, f2Circuits, f2Races, f3Drivers, f3Constructors, f3Circuits] = await Promise.all([
+                f2Seasons, f2Drivers, f2Constructors, f2Circuits, f2Races, f2Chassis,
+                f3Seasons, f3Drivers, f3Constructors, f3Circuits, f3Races, f3Chassis] = await Promise.all([
               connection.query(`
                 SELECT year FROM seasons
                 WHERE CAST(year AS CHAR) LIKE ?
@@ -250,11 +281,19 @@ router.get('/api/search', async (req, res) => {
               connection.query(`SELECT id, name, countryCode FROM f2_constructors WHERE name LIKE ? OR abbreviation LIKE ? ORDER BY name LIMIT 6`, [q, q]),
               connection.query(`SELECT id, name, placeName FROM f2_circuits WHERE name LIKE ? OR placeName LIKE ? ORDER BY name LIMIT 6`, [q, q]),
               connection.query(`SELECT id, year, name FROM f2_races WHERE name LIKE ? OR CAST(year AS CHAR) LIKE ? ORDER BY year DESC, round DESC LIMIT 6`, [q, q]),
+              connection.query(`SELECT id, name FROM f2_chassis WHERE name LIKE ? ORDER BY name LIMIT 6`, [q]),
+              connection.query(`SELECT year FROM f3_seasons WHERE CAST(year AS CHAR) LIKE ? ORDER BY year DESC LIMIT 6`, [q]),
               connection.query(`SELECT id, name, countryCode FROM f3_drivers WHERE name LIKE ? OR abbreviation LIKE ? ORDER BY name LIMIT 6`, [q, q]),
               connection.query(`SELECT id, name, countryCode FROM f3_constructors WHERE name LIKE ? OR abbreviation LIKE ? ORDER BY name LIMIT 6`, [q, q]),
-              connection.query(`SELECT id, name, placeName FROM f3_circuits WHERE name LIKE ? OR placeName LIKE ? ORDER BY name LIMIT 6`, [q, q])
+              connection.query(`SELECT id, name, placeName FROM f3_circuits WHERE name LIKE ? OR placeName LIKE ? ORDER BY name LIMIT 6`, [q, q]),
+              connection.query(`SELECT id, year, name FROM f3_races WHERE name LIKE ? OR CAST(year AS CHAR) LIKE ? ORDER BY year DESC, round DESC LIMIT 6`, [q, q]),
+              connection.query(`SELECT id, name FROM f3_chassis WHERE id NOT IN ('dallara-f3-2020', 'dallara-f3-2021') AND name LIKE ? ORDER BY name LIMIT 6`, [q])
             ]);
-            return { seasons, drivers, constructors, circuits, races, chassis, f2Seasons, f2Drivers, f2Constructors, f2Circuits, f2Races, f3Drivers, f3Constructors, f3Circuits };
+            return {
+                seasons, drivers, constructors, circuits, races, chassis,
+                f2Seasons, f2Drivers, f2Constructors, f2Circuits, f2Races, f2Chassis,
+                f3Seasons, f3Drivers, f3Constructors, f3Circuits, f3Races, f3Chassis
+            };
         });
 
         const lower = search.toLocaleLowerCase();
@@ -271,6 +310,7 @@ router.get('/api/search', async (req, res) => {
             ...pages,
             ...databaseResults.seasons.map(row => ({ type: 'F1 Season', label: String(row.year), meta: 'Formula 1 season', url: `/season?year=${row.year}` })),
             ...databaseResults.f2Seasons.map(row => ({ type: 'F2 Season', label: String(row.year), meta: 'Formula 2 season', url: `/f2/season?year=${row.year}` })),
+            ...databaseResults.f3Seasons.map(row => ({ type: 'F3 Season', label: String(row.year), meta: 'Formula 3 season', url: `/f3/season?year=${row.year}` })),
             ...databaseResults.drivers.map(row => ({ type: 'F1 Driver', label: row.name, meta: row.nationalityCountryId || 'Formula 1 driver', url: `/driver?id=${encodeURIComponent(row.id)}` })),
             ...databaseResults.f2Drivers.map(row => ({ type: 'F2 Driver', label: row.name, meta: row.countryCode || 'Formula 2 driver', url: `/f2/driver?id=${encodeURIComponent(row.id)}` })),
             ...databaseResults.f3Drivers.map(row => ({ type: 'F3 Driver', label: row.name, meta: row.countryCode || 'Formula 3 driver', url: `/f3/driver?id=${encodeURIComponent(row.id)}` })),
@@ -282,7 +322,10 @@ router.get('/api/search', async (req, res) => {
             ...databaseResults.f3Circuits.map(row => ({ type: 'F3 Circuit', label: row.name, meta: row.placeName || 'Formula 3 circuit', url: `/f3/circuit?id=${encodeURIComponent(row.id)}` })),
             ...databaseResults.races.map(row => ({ type: 'F1 Race', label: row.officialName, meta: String(row.year), url: `/race?id=${encodeURIComponent(row.id)}` })),
             ...databaseResults.f2Races.map(row => ({ type: 'F2 Race', label: row.name, meta: String(row.year), url: `/f2/race?id=${encodeURIComponent(row.id)}` })),
-            ...databaseResults.chassis.map(row => ({ type: 'F1 Chassis', label: row.fullName || row.name, meta: row.constructorName || 'Formula 1 chassis', url: `/chassis?search=${encodeURIComponent(row.fullName || row.name)}` }))
+            ...databaseResults.f3Races.map(row => ({ type: 'F3 Race', label: row.name, meta: String(row.year), url: `/f3/race?id=${encodeURIComponent(row.id)}` })),
+            ...databaseResults.chassis.map(row => ({ type: 'F1 Chassis', label: row.fullName || row.name, meta: row.constructorName || 'Formula 1 chassis', url: `/chassis?search=${encodeURIComponent(row.fullName || row.name)}` })),
+            ...databaseResults.f2Chassis.map(row => ({ type: 'F2 Chassis', label: row.name, meta: 'Formula 2 chassis', url: '/f2/chassis' })),
+            ...databaseResults.f3Chassis.map(row => ({ type: 'F3 Chassis', label: row.name, meta: 'Formula 3 chassis', url: '/f3/chassis' }))
         ].slice(0, 36));
     } catch (error) {
         sendError(res, error);

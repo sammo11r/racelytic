@@ -92,9 +92,9 @@ function renderF2ConstructorTable(constructors, raceSessions) {
     <th class="points-column">Points</th></tr>`;
 
   document.getElementById('f2-constructor-body').innerHTML = constructors.map(constructor => `
-    <tr class="${constructor.champion ? 'championship-leader' : ''}">
+    <tr>
       <td class="position-column">${esc(constructor.position)}</td>
-      <td class="name-column">${esc(constructor.name)}</td>
+      <td class="name-column"><a href="/f2/constructor?id=${encodeURIComponent(constructor.constructorId)}">${esc(constructor.name)}</a></td>
       ${raceSessions.map(session => {
         const points = Number(constructor.raceResults?.[session.id] || 0);
         return `<td class="race-point constructor-points ${points > 0 ? 'has-points' : ''}"><span>${points > 0 ? fmtNumber(points) : ''}</span></td>`;
@@ -126,9 +126,9 @@ function renderF2Season(data) {
     <th class="points-column">Points</th></tr>`;
 
   document.getElementById('f2-standings-body').innerHTML = data.championship.map(driver => `
-    <tr class="${driver.champion ? 'championship-leader' : ''}">
+    <tr>
       <td class="position-column">${esc(driver.position)}</td>
-      <td class="name-column"><span class="driver-name">${esc(driver.name)}<small>${esc(driver.constructor || 'Independent entry')}</small></span></td>
+      <td class="name-column"><a href="/f2/driver?id=${encodeURIComponent(driver.driverId)}"><span class="driver-name">${esc(driver.name)}<small>${esc(driver.constructor || 'Independent entry')}</small></span></a></td>
       ${raceSessions.map(session => {
         const result = driver.raceResults?.[session.id];
         if (result) {

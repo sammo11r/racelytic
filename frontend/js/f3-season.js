@@ -45,8 +45,8 @@ function setF3StandingsMode(mode) {
     button.classList.toggle('active', active);
     button.setAttribute('aria-pressed', String(active));
   });
-  document.getElementById('f3-driver-table').dataset.valueMode = f3StandingsMode;
-  document.querySelectorAll('#f3-driver-table .result-value').forEach(value => {
+  document.getElementById('driver-table').dataset.valueMode = f3StandingsMode;
+  document.querySelectorAll('#driver-table .result-value').forEach(value => {
     value.textContent = f3StandingsMode === 'position' ? value.dataset.position : value.dataset.points;
   });
 }
@@ -76,7 +76,7 @@ function f3SessionHeading(session) {
 function renderF3ConstructorTable(constructors, raceSessions) {
   document.getElementById('f3-constructor-head').innerHTML = `<tr><th class="position-column">Pos.</th><th class="name-column">Constructor</th>${raceSessions.map(session => `<th class="race-column${session.cancelled ? ' cancelled-session' : ''}" title="${esc(session.race.name)} · ${esc(session.name)}${session.cancelled ? ' · Cancelled' : ''}">${f3SessionHeading(session)}</th>`).join('')}<th class="points-column">Points</th></tr>`;
   document.getElementById('f3-constructor-body').innerHTML = constructors.map(constructor => `
-    <tr><td class="position-column">${esc(constructor.position)}</td><td class="name-column">${esc(constructor.name)}</td>${raceSessions.map(session => {
+    <tr><td class="position-column">${esc(constructor.position)}</td><td class="name-column"><a href="/f3/team?id=${encodeURIComponent(constructor.constructorId)}">${esc(constructor.name)}</a></td>${raceSessions.map(session => {
       const points = Number(constructor.raceResults?.[session.id] || 0);
       return `<td class="race-point constructor-points ${points > 0 ? 'has-points' : ''}"><span>${points > 0 ? fmtNumber(points) : ''}</span></td>`;
     }).join('')}<td class="points-column total-points">${fmtNumber(constructor.points)}</td></tr>`).join('');
@@ -100,7 +100,7 @@ function renderF3Season(data) {
   })));
   document.getElementById('f3-standings-head').innerHTML = `<tr><th class="position-column">Pos.</th><th class="name-column">Driver</th>${raceSessions.map(session => `<th class="race-column${session.cancelled ? ' cancelled-session' : ''}" title="${esc(session.race.name)} · ${esc(session.name)}${session.cancelled ? ' · Cancelled' : ''}">${f3SessionHeading(session)}</th>`).join('')}<th class="points-column">Points</th></tr>`;
   document.getElementById('f3-standings-body').innerHTML = data.championship.map(driver => `
-    <tr><td class="position-column">${esc(driver.position)}</td><td class="name-column"><span class="driver-name">${esc(driver.name)}<small>${esc(driver.constructor || 'Independent entry')}</small></span></td>${raceSessions.map(session => {
+    <tr><td class="position-column">${esc(driver.position)}</td><td class="name-column"><a href="/f3/driver?id=${encodeURIComponent(driver.driverId)}"><span class="driver-name">${esc(driver.name)}<small>${esc(driver.constructor || 'Independent entry')}</small></span></a></td>${raceSessions.map(session => {
       const result = driver.raceResults?.[session.id];
       if (result) {
         const position = Number(result.position || 0);
@@ -111,7 +111,7 @@ function renderF3Season(data) {
       return `<td class="race-point ${f3ResultClass(result)}" title="${esc(session.race.name)} · ${esc(session.name)}${result ? `: finished ${f3ResultLabel(result)}` : ''}"><span class="result-value">${esc(f3ResultLabel(result))}</span>${result?.fastestLap ? '<sup class="result-marker" title="Fastest lap">F</sup>' : ''}</td>`;
     }).join('')}<td class="points-column total-points">${fmtNumber(driver.points)}</td></tr>`).join('');
 
-  const values = [...document.querySelectorAll('#f3-driver-table .result-value')];
+  const values = [...document.querySelectorAll('#driver-table .result-value')];
   let valueIndex = 0;
   data.championship.forEach(driver => raceSessions.forEach(session => {
     const result = driver.raceResults?.[session.id];

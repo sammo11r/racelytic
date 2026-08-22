@@ -614,22 +614,22 @@ table tbody tr:last-child td { border-bottom: 0; }
   box-shadow: 0 1px 5px rgba(17,19,24,.12);
 }
 
-.championship-table-wrap { overflow-x: auto; }
+.championship-table-wrap { position: relative; isolation: isolate; overflow-x: auto; }
 .championship-table th, .championship-table td { height: 40px; padding: 7px 9px; border-color: var(--border); }
 .championship-table thead th { background: #17191f; color: #d9dce2; }
 .championship-table thead th:first-child, .championship-table thead th:nth-child(2) { color: #fff; }
 .championship-table .name-column a { color: var(--text); font-weight: 750; }
 .championship-table .has-points { background: #eef8f0; }
-.championship-leader td:first-child { box-shadow: inset 4px 0 var(--accent); }
 
 #driver-table { font-variant-numeric: tabular-nums; }
-#driver-table .position-column { position: sticky; left: 0; z-index: 3; width: 48px; min-width: 48px; }
+#driver-table .position-column { position: sticky; left: 0; z-index: 4; width: 48px; min-width: 48px; }
 #driver-table .name-column {
   position: sticky;
   left: 48px;
-  z-index: 3;
-  width: 1%;
-  min-width: max-content;
+  z-index: 4;
+  width: 190px;
+  min-width: 190px;
+  max-width: 190px;
   white-space: nowrap;
   box-shadow: 7px 0 12px -12px rgba(17,19,24,.6);
 }
@@ -637,20 +637,18 @@ table tbody tr:last-child td { border-bottom: 0; }
 #driver-table .name-column a:visited,
 #driver-table .name-column a:hover,
 #driver-table .name-column a:active { color: #111318; }
-#driver-table thead .position-column, #driver-table thead .name-column { z-index: 5; background: #17191f; }
+#driver-table thead .position-column, #driver-table thead .name-column { z-index: 7; background: #17191f; }
 #driver-table tbody .position-column { background: #f4f5f7; }
 #driver-table tbody .name-column { background: #fff; }
-#driver-table .championship-leader .position-column,
-#driver-table .championship-leader .name-column { background: #fff7f7; }
 #driver-table .race-column { min-width: 56px; color: #fff; font-size: 10px; letter-spacing: .06em; }
-#driver-table .race-point { position: relative; min-width: 56px; color: #24262c; font-size: 12px; font-weight: 750; white-space: nowrap; }
+#driver-table .race-point { position: relative; z-index: 1; min-width: 56px; color: #24262c; font-size: 12px; font-weight: 750; white-space: nowrap; }
 #driver-table .race-point > span { display: inline-block; min-width: 14px; }
 .championship-table .result-marker { position: relative; top: -.2em; margin-left: 1px; }
 .championship-table .pole-position::after { content: 'PP'; position: relative; bottom: -.25em; margin-left: 1px; color: var(--accent-dark); font-size: 9px; font-weight: 900; }
 #driver-table .sprint-points { position: relative; bottom: -.25em; margin-left: 1px; }
 #driver-table[data-value-mode="position"] .sprint-points { display: none; }
-#driver-table .points-column { position: sticky; right: 0; z-index: 3; min-width: 72px; background: #fff; box-shadow: -7px 0 12px -12px rgba(17,19,24,.65); }
-#driver-table thead .points-column { z-index: 5; background: #17191f; }
+#driver-table .points-column { position: sticky; right: 0; z-index: 4; width: 72px; min-width: 72px; background: #fff; box-shadow: -7px 0 12px -12px rgba(17,19,24,.65); }
+#driver-table thead .points-column { z-index: 7; background: #17191f; }
 .championship-table .result-win, .legend-swatch.result-win { background: #fff1ad; }
 .championship-table .result-podium, .legend-swatch.result-podium { background: #ffe0ad; }
 .championship-table .result-points, .legend-swatch.result-points { background: #dff4e2; }
@@ -664,13 +662,14 @@ table tbody tr:last-child td { border-bottom: 0; }
 #driver-table tbody tr:hover .points-column { filter: brightness(.975); }
 
 #constructor-table { font-variant-numeric: tabular-nums; }
-#constructor-table .position-column { position: sticky; left: 0; z-index: 3; width: 48px; min-width: 48px; }
+#constructor-table .position-column { position: sticky; left: 0; z-index: 4; width: 48px; min-width: 48px; }
 #constructor-table .name-column {
   position: sticky;
   left: 48px;
-  z-index: 3;
-  width: 1%;
-  min-width: max-content;
+  z-index: 4;
+  width: 190px;
+  min-width: 190px;
+  max-width: 190px;
   white-space: nowrap;
   box-shadow: 7px 0 12px -12px rgba(17,19,24,.6);
 }
@@ -679,18 +678,34 @@ table tbody tr:last-child td { border-bottom: 0; }
 #constructor-table .name-column a:hover,
 #constructor-table .name-column a:active { color: #111318; }
 #constructor-table thead .position-column,
-#constructor-table thead .name-column { z-index: 5; background: #17191f; }
+#constructor-table thead .name-column { z-index: 7; background: #17191f; }
 #constructor-table tbody .position-column { background: #f4f5f7; }
 #constructor-table tbody .name-column { background: #fff; }
-#constructor-table .championship-leader .position-column,
-#constructor-table .championship-leader .name-column { background: #fff7f7; }
 #constructor-table .race-column,
 #constructor-table .race-point { min-width: 56px; white-space: nowrap; }
 #constructor-table .constructor-points.has-points { background: #dff4e2; color: #24262c; font-weight: 750; }
 #constructor-table .constructor-points:not(.has-points) { background: #f6f7f8; }
 #constructor-table .sprint-points { position: relative; bottom: -.25em; margin-left: 1px; }
-#constructor-table .points-column { position: sticky; right: 0; z-index: 3; min-width: 72px; background: #fff; box-shadow: -7px 0 12px -12px rgba(17,19,24,.65); }
-#constructor-table thead .points-column { z-index: 5; background: #17191f; }
+#constructor-table .race-point { position: relative; z-index: 1; }
+#constructor-table .points-column { position: sticky; right: 0; z-index: 4; width: 72px; min-width: 72px; background: #fff; box-shadow: -7px 0 12px -12px rgba(17,19,24,.65); }
+#constructor-table thead .points-column { z-index: 7; background: #17191f; }
+
+#driver-table .name-column > a,
+#driver-table .driver-name,
+#constructor-table .name-column > a {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 620px) {
+  #driver-table .name-column,
+  #constructor-table .name-column {
+    width: 168px;
+    min-width: 168px;
+    max-width: 168px;
+  }
+}
 
 .season-map {
   position: relative;
@@ -2760,11 +2775,72 @@ body.f2-mode .home-path-simulator { background: #eef5ff; }
 .race-analysis-selectors select { min-width: 0; max-width: 100%; }
 .race-flow-chart { width: 100%; max-width: 100%; }
 
+/* One consistent native dropdown treatment across every tool and database page. */
+select:not([multiple]) {
+  min-height: 44px;
+  padding: 0 42px 0 14px;
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  appearance: none;
+  background-color: var(--surface);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 14 14' fill='none'%3E%3Cpath d='m3.25 5.25 3.75 3.5 3.75-3.5' stroke='%236f7682' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 14px 14px;
+  box-shadow: 0 1px 2px rgba(16,18,24,.04), inset 0 1px 0 rgba(255,255,255,.72);
+  color: var(--text);
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  transition: border-color .16s ease, box-shadow .16s ease, background-color .16s ease;
+}
+
+select:not([multiple]):hover:not(:disabled) {
+  border-color: rgba(var(--accent-rgb), .48);
+  background-color: #fff;
+}
+
+select:not([multiple]):focus:not(:disabled),
+select:not([multiple]):focus-visible:not(:disabled) {
+  border-color: rgba(var(--accent-rgb), .68);
+  outline: 0;
+  background-color: #fff;
+  box-shadow: 0 0 0 4px rgba(var(--accent-rgb), .1), 0 1px 2px rgba(16,18,24,.04);
+}
+
+select option,
+select optgroup {
+  background: #fff;
+  color: var(--text);
+  font: inherit;
+}
+
+select optgroup { font-weight: 800; }
+
+select[multiple] {
+  padding: 10px 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text);
+}
+
 button:disabled,
 input:disabled,
 select:disabled { cursor: not-allowed; opacity: .62; }
 .section-heading { gap: 20px; }
 h1, h2, h3, [id] { scroll-margin-top: calc(var(--header-height) + 20px); }
+
+@media (forced-colors: active) {
+  select:not([multiple]) {
+    padding-right: 12px;
+    appearance: auto;
+    background-image: none;
+  }
+}
 
 @media (max-width: 800px) {
   .site-header .nav { position: relative; }

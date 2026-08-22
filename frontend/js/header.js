@@ -111,6 +111,11 @@ async function loadHeader() {
             '/f3/driver': ['driver', '/drivers'], '/f3/team': ['constructor', '/constructors'],
             '/f3/circuit': ['circuit', '/circuits']
         };
+        const seriesDetailParents = {
+            f1: { season: '/seasons', race: '/races', driver: '/drivers', constructor: '/constructors', circuit: '/circuits' },
+            f2: { season: '/f2/seasons', race: '/f2/races', driver: '/f2/drivers', constructor: '/f2/constructors', circuit: '/f2/circuits' },
+            f3: { season: '/f3/seasons', race: '/f3/races', driver: '/f3/drivers', constructor: '/f3/teams', circuit: '/f3/circuits' }
+        };
         const resolveSeriesTarget = async targetSeries => {
             if (isSeriesNeutralPage) return `${window.location.pathname}?series=${targetSeries}`;
             const canonicalPage = isF3Mode
@@ -122,15 +127,16 @@ async function loadHeader() {
             if (topLevelTarget) return `${topLevelTarget}${window.location.search}${window.location.hash}`;
             if (targetSeries === 'f3') {
                 const detail = detailPages[window.location.pathname];
-                if (detail?.[0] === 'season') {
-                    const year = new URLSearchParams(window.location.search).get('year');
-                    if (year) {
+                if (detail) {
+                    const parameter = detail[0] === 'season' ? 'year' : 'id';
+                    const id = new URLSearchParams(window.location.search).get(parameter);
+                    if (id) {
                         try {
-                            const equivalent = await fetch(`/api/series-equivalent?target=f3&type=season&id=${encodeURIComponent(year)}&source=${activeSeries}`);
+                            const equivalent = await fetch(`/api/series-equivalent?target=f3&type=${detail[0]}&id=${encodeURIComponent(id)}&source=${activeSeries}`);
                             if (equivalent.ok) return (await equivalent.json()).url;
                         } catch {}
                     }
-                    return '/f3/seasons';
+                    return seriesDetailParents.f3[detail[0]];
                 }
                 const currentPath = canonicalPage || window.location.pathname;
                 if (/analysis|comparison|driver-form|teammate|records/.test(currentPath)) return '/f3/analysis';
@@ -146,12 +152,13 @@ async function loadHeader() {
             if (detail) {
                 const parameter = detail[0] === 'season' ? 'year' : 'id';
                 const id = new URLSearchParams(window.location.search).get(parameter);
-                if (!id) return detail[1];
+                const detailParent = seriesDetailParents[targetSeries]?.[detail[0]] || detail[1];
+                if (!id) return detailParent;
                 try {
                     const equivalent = await fetch(`/api/series-equivalent?target=${targetSeries}&type=${detail[0]}&id=${encodeURIComponent(id)}&source=${activeSeries}`);
                     if (equivalent.ok) return (await equivalent.json()).url;
                 } catch {}
-                return detail[1];
+                return detailParent;
             }
             if (canonicalPage === '/chassis' && targetF2) return '/f2/database';
             return targetF2 ? '/f2' : '/';
@@ -162,7 +169,8 @@ async function loadHeader() {
             if (active) {
                 link.href = `${window.location.pathname}${window.location.search}${window.location.hash}`;
             } else {
-                const fallback = detailPages[window.location.pathname]?.[1]
+                const detail = detailPages[window.location.pathname];
+                const fallback = (detail && seriesDetailParents[link.dataset.series]?.[detail[0]])
                     || (isSeriesNeutralPage ? `${window.location.pathname}?series=${link.dataset.series}` : link.href);
                 link.href = fallback;
                 resolveSeriesTarget(link.dataset.series).then(url => { link.href = url; });
@@ -350,7 +358,7 @@ async function loadHeader() {
             const rewriteF2Links = root => {
                 const links = root.matches?.('a[href]') ? [root] : [...(root.querySelectorAll?.('a[href]') || [])];
                 links.forEach(link => {
-                    if (link.closest('.series-switcher')) return;
+                    if (link.closest('.series-switcher, #global-search-results')) return;
                     const href = link.getAttribute('href') || '';
                     if (/^\/(season|race|driver|circuit|constructor)(?=[/?#])/.test(href)) {
                         link.setAttribute('href', `/f2${href}`);
@@ -384,7 +392,7 @@ async function loadHeader() {
             document.addEventListener('click', event => {
                 const link = event.target.closest('a[href]');
                 if (!link || event.defaultPrevented || event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
-                if (link.closest('.series-switcher')) return;
+                if (link.closest('.series-switcher, #global-search-results')) return;
                 const target = new URL(link.href, window.location.origin);
                 if (target.origin !== window.location.origin) return;
                 if (/^\/(driver|constructor|race|season|circuit)(?:$|\/)/.test(target.pathname)) {

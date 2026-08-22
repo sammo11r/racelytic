@@ -21,11 +21,22 @@ const publicPages = require('node:fs').readdirSync(frontendDirectory)
 
 for (const file of publicPages) {
     const route = `/${file.slice(0, -'.html'.length)}`;
-    app.get(route, (req, res) => res.sendFile(path.join(frontendDirectory, file)));
+    const juniorMatch = route.match(/^\/(f[23])-(.+)$/);
+    const canonicalRoute = juniorMatch ? `/${juniorMatch[1]}/${juniorMatch[2]}` : route;
+
+    if (canonicalRoute !== route) {
+        app.get(route, (req, res) => {
+            const queryIndex = req.originalUrl.indexOf('?');
+            const query = queryIndex === -1 ? '' : req.originalUrl.slice(queryIndex);
+            res.redirect(308, `${canonicalRoute}${query}`);
+        });
+    } else {
+        app.get(route, (req, res) => res.sendFile(path.join(frontendDirectory, file)));
+    }
     app.get(`/${file}`, (req, res) => {
         const queryIndex = req.originalUrl.indexOf('?');
         const query = queryIndex === -1 ? '' : req.originalUrl.slice(queryIndex);
-        res.redirect(308, `${route}${query}`);
+        res.redirect(308, `${canonicalRoute}${query}`);
     });
 }
 
