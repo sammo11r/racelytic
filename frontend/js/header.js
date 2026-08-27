@@ -165,7 +165,7 @@ async function loadHeader() {
                 }
                 const currentPath = canonicalPage || window.location.pathname;
                 if (/analysis|comparison|driver-form|teammate|records/.test(currentPath)) return `${targetBase}/analysis`;
-                if (/simulator|scenario|championship-builder|points-systems/.test(currentPath)) return `${targetBase}/simulator`;
+                if (/simulator|simulate-race|scenario|championship-builder|points-systems/.test(currentPath)) return `${targetBase}/simulator`;
                 if (/games|quiz/.test(currentPath)) return `${targetBase}/games`;
                 if (/database|season|race|driver|constructor|circuit|chassis/.test(currentPath)) return `${targetBase}/database`;
                 return targetBase;
@@ -186,6 +186,7 @@ async function loadHeader() {
                 return detailParent;
             }
             if (canonicalPage === '/chassis' && targetF2) return '/f2/database';
+            if (canonicalPage === '/simulate-race' && targetF2) return '/f2/simulator';
             return targetF2 ? '/f2' : '/';
         };
 

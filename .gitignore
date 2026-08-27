@@ -5,3 +5,5 @@ node_modules/
 Thumbs.db
 data/.f3-cache/
 data/.f2-cache/
+data/.replay-cache/
+.venv-replay/

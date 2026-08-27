@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Replay and simulate complete Formula 1 races with Racelytic.">
+  <link rel="icon" href="/assets/favicon-f1.svg" type="image/svg+xml">
+  <title>Simulate Race · Racelytic</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/polish.css">
+  <link rel="stylesheet" href="/css/simulate-race.css">
+</head>
+<body>
+  <div id="header"></div>
+  <main class="container page simulate-race-page">
+    <a class="back-link" href="/simulator-overview">← Simulator</a>
+    <section class="simulate-race-hero">
+      <div class="eyebrow">FORMULA 1 SIMULATOR</div>
+      <h1>Simulate race.</h1>
+      <p>Step inside the race. Follow every car around the circuit, watch the order develop lap by lap, and focus the replay on the drivers that matter to you.</p>
+      <ul class="simulate-race-highlights" aria-label="Replay features">
+        <li><strong>Full race</strong><span>From lights out to classification</span></li>
+        <li><strong>Live order</strong><span>Position changes as the race unfolds</span></li>
+        <li><strong>Your view</strong><span>Show one driver or the entire field</span></li>
+      </ul>
+    </section>
+
+    <section class="simulate-race-controls" aria-label="Race selection">
+      <label>
+        <span>Year</span>
+        <select id="replay-year"><option value="">Loading years…</option></select>
+      </label>
+      <label>
+        <span>Race</span>
+        <select id="replay-race" disabled><option value="">Select a year first</option></select>
+      </label>
+    </section>
+
+    <section class="replay-player" aria-labelledby="replay-title">
+      <header class="replay-race-banner">
+        <div class="replay-race-copy">
+          <span class="replay-mode-badge" id="replay-mode">Formula 1 race</span>
+          <h2 id="replay-title">Choose a race</h2>
+        </div>
+        <dl class="replay-race-meta">
+          <div><dt>Date</dt><dd id="replay-date">—</dd></div>
+          <div><dt>Location</dt><dd id="replay-location">—</dd></div>
+          <div><dt>Circuit</dt><dd id="replay-circuit">—</dd></div>
+        </dl>
+      </header>
+
+      <div class="replay-workspace">
+        <aside class="replay-timing-tower" aria-label="Race timing">
+          <div class="replay-lap-counter">
+            <span>Lap</span>
+            <div><strong id="replay-lap-current">1</strong><small>/ <b id="replay-lap-total">—</b></small></div>
+            <time id="replay-session-time">0:00</time>
+          </div>
+          <div class="replay-leaderboard" aria-label="Running order">
+            <div class="replay-leaderboard-head"><span>POS</span><strong>RUNNING ORDER</strong><span>STATUS</span></div>
+            <ol id="replay-order"></ol>
+          </div>
+        </aside>
+        <div class="replay-track-panel">
+          <canvas id="replay-canvas" aria-label="Animated race track showing driver positions"></canvas>
+          <details class="replay-driver-picker" id="replay-driver-picker" hidden>
+            <summary>Drivers <span id="replay-driver-count">0/0</span></summary>
+            <div class="replay-driver-menu">
+              <div class="replay-driver-menu-head">
+                <strong>Drivers shown</strong>
+                <div>
+                  <button id="replay-drivers-all" type="button">All</button>
+                  <button id="replay-drivers-none" type="button">None</button>
+                </div>
+              </div>
+              <div class="replay-driver-options" id="replay-driver-options" role="group" aria-label="Visible drivers"></div>
+            </div>
+          </details>
+          <button class="replay-stage-play paused" id="replay-stage-play" type="button" aria-label="Resume race simulation" disabled>▶</button>
+        </div>
+      </div>
+
+      <div class="replay-controls">
+        <div class="replay-transport" role="group" aria-label="Playback controls">
+          <button id="replay-restart" type="button" aria-label="Restart simulation" disabled>↺</button>
+          <button id="replay-pause" type="button" aria-label="Pause simulation" disabled>Ⅱ</button>
+          <button class="replay-play-button" id="replay-play" type="button" aria-label="Play simulation" disabled>▶</button>
+          <button id="replay-forward" type="button" aria-label="Fast forward ten seconds" disabled>+10</button>
+        </div>
+        <div class="replay-progress">
+          <label class="replay-timeline-label">
+            <input id="replay-timeline" type="range" min="0" max="100" value="0" step="0.1" aria-label="Race simulation progress" disabled>
+          </label>
+          <div class="replay-progress-copy"><span id="replay-elapsed">0:00</span><strong id="replay-progress-percent">0%</strong><span id="replay-duration">1:33:18</span></div>
+        </div>
+        <label class="replay-speed-label">Speed
+          <select id="replay-speed" disabled>
+            <option value="1">1×</option><option value="4">4×</option><option value="16">16×</option><option value="64">64×</option>
+          </select>
+        </label>
+      </div>
+
+    </section>
+
+    <section class="replay-guide" aria-labelledby="replay-guide-title">
+      <header class="replay-section-intro">
+        <div class="eyebrow">HOW TO USE THE REPLAY</div>
+        <h2 id="replay-guide-title">Follow the race, not just the result.</h2>
+        <p>The replay turns recorded race data into a moving overview of the whole field, so strategy shifts, recoveries and changing gaps are easier to understand.</p>
+      </header>
+      <div class="replay-guide-grid">
+        <article>
+          <span>01</span>
+          <h3>Choose an event</h3>
+          <p>Pick a season and Grand Prix. The circuit, starting order and complete race timeline load automatically.</p>
+        </article>
+        <article>
+          <span>02</span>
+          <h3>Shape the field</h3>
+          <p>Open the Drivers menu to isolate a battle, compare teammates or keep all cars visible for the full picture.</p>
+        </article>
+        <article>
+          <span>03</span>
+          <h3>Control the pace</h3>
+          <p>Pause at a key moment, jump ten seconds ahead or accelerate long stretches without losing the running order.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="replay-method" aria-labelledby="replay-method-title">
+      <div class="replay-method-copy">
+        <div class="eyebrow">BEHIND THE REPLAY</div>
+        <h2 id="replay-method-title">A clearer view of how the race developed.</h2>
+        <p>Driver markers are reconstructed from recorded position coordinates and synchronized with lap timing, status and classification data. The timing tower confirms short-lived position changes before displaying them, keeping close battles readable without hiding genuine overtakes.</p>
+        <a href="/simulator-overview">Explore more simulators <span aria-hidden="true">→</span></a>
+      </div>
+      <dl class="replay-method-facts">
+        <div><dt>Track view</dt><dd>Interpolated car movement around the recorded circuit trace</dd></div>
+        <div><dt>Running order</dt><dd>Continuously evaluated and stabilized between timing points</dd></div>
+        <div><dt>Race status</dt><dd>Retirements, non-starters and final classification remain visible</dd></div>
+        <div><dt>Driver focus</dt><dd>Any combination of cars can be shown or hidden during playback</dd></div>
+      </dl>
+    </section>
+  </main>
+  <footer class="footer"><div class="container">Racelytic</div></footer>
+  <script src="/js/header.js"></script>
+  <script src="/js/replay-engine.js"></script>
+  <script src="/js/simulate-race.js"></script>
+</body>
+</html>

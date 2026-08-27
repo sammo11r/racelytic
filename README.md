@@ -112,3 +112,19 @@ Restart the Node service and open `/monitor`. The browser will request those
 credentials using HTTP Basic authentication. The `app_analytics_visits` table
 is created automatically on the first tracked visit. Serve the site over HTTPS
 so dashboard credentials and traffic data are encrypted in transit.
+## Local race replay imports
+
+The race simulator at `/simulate-race` automatically lists replay files imported into
+`frontend/data/replays`. Imports are local static JSON files: they do not change
+the Racelytic database and can be deleted or regenerated independently.
+
+Only Formula 1 coordinate replays from the 2018 season onward are supported.
+Install FastF1 once and run:
+
+```sh
+python -m pip install -r requirements-replay.txt
+npm run import:replay:telemetry -- --year=2024 --round=1
+```
+
+The importer rejects earlier seasons. A successful import prints the exact
+preview URL.

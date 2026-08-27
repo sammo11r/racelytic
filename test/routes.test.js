@@ -129,6 +129,9 @@ test('public pages use extensionless URLs and preserve legacy query strings', as
         const f3RawRoute = await request(port, '/f3-team?id=campos-racing');
         const privacy = await request(port, '/privacy');
         const terms = await request(port, '/terms');
+        const simulateRace = await request(port, '/simulate-race');
+        const removedReplayPoc = await request(port, '/replay-poc');
+        const localReplayIndex = await request(port, '/data/replays/index.json');
         const pitwall = await request(port, '/pitwall');
         const f2Pitwall = await request(port, '/f2/pitwall');
         const f3Pitwall = await request(port, '/f3/pitwall');
@@ -160,6 +163,10 @@ test('public pages use extensionless URLs and preserve legacy query strings', as
         assert.equal(f3RawRoute.headers.location, '/f3/team?id=campos-racing');
         assert.equal(privacy.statusCode, 200);
         assert.equal(terms.statusCode, 200);
+        assert.equal(simulateRace.statusCode, 200);
+        assert.match(simulateRace.body, /Simulate race/);
+        assert.equal(removedReplayPoc.statusCode, 404);
+        assert.equal(localReplayIndex.statusCode, 200);
         assert.equal(pitwall.statusCode, 404);
         assert.equal(f2Pitwall.statusCode, 404);
         assert.equal(f3Pitwall.statusCode, 404);
