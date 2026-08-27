@@ -75,8 +75,14 @@ function readState() {
 }
 
 function extractCsvArchive(archivePath, outputDirectory) {
-  const listed = spawnSync('tar', ['-tf', archivePath], { encoding: 'utf8', maxBuffer: 10 * 1024 * 1024 });
-  if (listed.status !== 0) throw new Error(`Could not inspect F1DB archive: ${listed.stderr || listed.error?.message || 'tar failed'}`);
+  const processOptions = { encoding: 'utf8', maxBuffer: 10 * 1024 * 1024 };
+  let archiveTool = 'unzip';
+  let listed = spawnSync('unzip', ['-Z1', archivePath], processOptions);
+  if (listed.error?.code === 'ENOENT') {
+    archiveTool = 'tar';
+    listed = spawnSync('tar', ['-tf', archivePath], processOptions);
+  }
+  if (listed.status !== 0) throw new Error(`Could not inspect F1DB archive: ${listed.stderr || listed.error?.message || `${archiveTool} failed`}`);
   const entries = listed.stdout.split(/\r?\n/).filter(Boolean);
   const selected = new Map();
   for (const entry of entries) {
@@ -93,8 +99,10 @@ function extractCsvArchive(archivePath, outputDirectory) {
   if (missing.length) throw new Error(`F1DB archive is missing: ${missing.join(', ')}.`);
   const unpacked = path.join(outputDirectory, '_archive');
   fs.mkdirSync(unpacked);
-  const extracted = spawnSync('tar', ['-xf', archivePath, '-C', unpacked], { encoding: 'utf8', maxBuffer: 10 * 1024 * 1024 });
-  if (extracted.status !== 0) throw new Error(`Could not extract F1DB archive: ${extracted.stderr || extracted.error?.message || 'tar failed'}`);
+  const extracted = archiveTool === 'unzip'
+    ? spawnSync('unzip', ['-qq', archivePath, '-d', unpacked], processOptions)
+    : spawnSync('tar', ['-xf', archivePath, '-C', unpacked], processOptions);
+  if (extracted.status !== 0) throw new Error(`Could not extract F1DB archive: ${extracted.stderr || extracted.error?.message || `${archiveTool} failed`}`);
   for (const [basename, entry] of selected) {
     const source = path.join(unpacked, ...entry.split('/'));
     if (!fs.existsSync(source)) throw new Error(`Archive entry was not extracted: ${entry}`);
