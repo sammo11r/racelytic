@@ -5,11 +5,11 @@ Wants=network-online.target
 
 [Service]
 Type=oneshot
-User=racelytic
-Group=racelytic
-WorkingDirectory=/opt/racelytic
-EnvironmentFile=/opt/racelytic/.env
-ExecStart=/usr/bin/node scripts/sync-data.js
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/racelytics
+EnvironmentFile=/var/www/racelytics/.env
+ExecStart=/usr/local/bin/node scripts/sync-data.js
 Nice=10
 IOSchedulingClass=best-effort
 IOSchedulingPriority=7
@@ -20,4 +20,4 @@ NoNewPrivileges=true
 PrivateTmp=true
 ProtectSystem=strict
 ProtectHome=true
-ReadWritePaths=/opt/racelytic/data
+ReadWritePaths=/var/www/racelytics/data

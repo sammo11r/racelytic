@@ -141,8 +141,9 @@ row-loss guard in `.env`; see `.env.example`. `GITHUB_TOKEN` is optional and onl
 GitHub API rate limit. Database credentials should use a dedicated account that can create,
 rename, insert into and drop Racelytic data tables.
 
-For a Linux VPS, edit the user and `/opt/racelytic` paths in
-`deploy/systemd/racelytic-data-sync.service`, then install and enable the supplied timer:
+For the Racelytics Linux VPS, the supplied service uses the `www-data` account,
+`/var/www/racelytics` checkout and `/usr/local/bin/node`. If those deployment values change,
+update `deploy/systemd/racelytic-data-sync.service` before installing the timer:
 
 ```bash
 sudo cp deploy/systemd/racelytic-data-sync.* /etc/systemd/system/

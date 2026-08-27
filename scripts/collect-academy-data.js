@@ -1,8 +1,6 @@
 const fs = require('fs');
 const path = require('path');
 const csv = require('csv-parser');
-const { chromium } = require('playwright-core');
-const { findBrowserExecutable } = require('./import-f2-results');
 
 const ORIGIN = 'https://www.f1academy.com';
 const DATA_DIR = path.join(__dirname, '../data');
@@ -94,11 +92,27 @@ function upsert(map, id, value) {
   const current = map.get(id) || {};
   map.set(id, { ...current, ...Object.fromEntries(Object.entries(value).filter(([, item]) => item !== '' && item !== null && item !== undefined)) });
 }
-async function nextData(page, url) {
-  const response = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 });
-  if (response && !response.ok()) throw new Error(`${url}: HTTP ${response.status()}`);
-  await page.locator('#__NEXT_DATA__').waitFor({ state: 'attached', timeout: 30000 });
-  return JSON.parse(await page.locator('#__NEXT_DATA__').textContent()).props.pageProps;
+function pageProps(html, url) {
+  const match = html.match(/<script[^>]+id=["']__NEXT_DATA__["'][^>]*>([\s\S]*?)<\/script>/i);
+  if (!match) throw new Error(`${url}: embedded page data was not found.`);
+  return JSON.parse(match[1]).props.pageProps;
+}
+async function nextData(url) {
+  let lastError;
+  for (let attempt = 1; attempt <= 3; attempt += 1) {
+    try {
+      const response = await fetch(url, {
+        signal: AbortSignal.timeout(60000),
+        headers: { accept: 'text/html,application/xhtml+xml', 'user-agent': 'Racelytic data synchronizer/1.0' }
+      });
+      if (!response.ok) throw new Error(`${url}: HTTP ${response.status}`);
+      return pageProps(await response.text(), url);
+    } catch (error) {
+      lastError = error;
+      if (attempt < 3) await new Promise(resolve => setTimeout(resolve, attempt * 1000));
+    }
+  }
+  throw lastError;
 }
 async function circuitAliases() {
   const rows = (await Promise.all(['f1db-circuits.csv', 'f2db-circuits.csv', 'f3db-circuits.csv'].map(readCsv))).flat();
@@ -129,11 +143,7 @@ async function collect() {
   const maps = { drivers: new Map(), constructors: new Map(), circuits: new Map() };
   const rows = Object.fromEntries(['seasons', 'races', 'sessions', 'entries', 'results', 'driverStandings', 'constructorStandings'].map(key => [key, []]));
   const lookup = await circuitAliases();
-  const browser = await chromium.launch({ executablePath: findBrowserExecutable(), headless: true });
-  try {
-    const page = await browser.newPage();
-    await page.route('**/*', route => ['font', 'image', 'media'].includes(route.request().resourceType()) ? route.abort() : route.continue());
-    const first = await nextData(page, `${ORIGIN}/Racing-Series/Calendar?seasonid=1`);
+  const first = await nextData(`${ORIGIN}/Racing-Series/Calendar?seasonid=1`);
     const seasons = first.seasonData.filter(item => {
       const year = Number(String(item.SeasonName).match(/\d{4}/)?.[0]);
       return year >= FROM_YEAR && year <= TO_YEAR;
@@ -141,9 +151,9 @@ async function collect() {
     for (const season of [...seasons].sort((a, b) => a.SeasonId - b.SeasonId)) {
       const year = Number(String(season.SeasonName).match(/\d{4}/)?.[0]);
       process.stdout.write(`${year}: `);
-      const calendar = season.SeasonId === 1 ? first : await nextData(page, `${ORIGIN}/Racing-Series/Calendar?seasonid=${season.SeasonId}`);
-      const driverPage = await nextData(page, `${ORIGIN}/Racing-Series/Standings/Driver?seasonId=${season.SeasonId}`);
-      const teamPage = await nextData(page, `${ORIGIN}/Racing-Series/Standings/Team?seasonId=${season.SeasonId}`);
+      const calendar = season.SeasonId === 1 ? first : await nextData(`${ORIGIN}/Racing-Series/Calendar?seasonid=${season.SeasonId}`);
+      const driverPage = await nextData(`${ORIGIN}/Racing-Series/Standings/Driver?seasonId=${season.SeasonId}`);
+      const teamPage = await nextData(`${ORIGIN}/Racing-Series/Standings/Team?seasonId=${season.SeasonId}`);
       const drivers = driverPage.pageData.Standings || [];
       const teams = teamPage.pageData.Standings || [];
       rows.seasons.push({ year });
@@ -161,7 +171,7 @@ async function collect() {
       for (const [raceIndex, race] of (calendar.pageData.Races || []).entries()) {
         const raceId = `fa-${race.RaceId}`;
         const resultUrl = `${ORIGIN}/Racing-Series/Results?raceid=${race.RaceId}`;
-        const resultPage = await nextData(page, resultUrl);
+        const resultPage = await nextData(resultUrl);
         const circuit = canonicalCircuit({ ...race, ...resultPage.pageData.CircuitInformation }, lookup);
         upsert(maps.circuits, circuit.id, { id: circuit.id, name: resultPage.pageData.CircuitInformation?.CircuitName || race.CircuitName, type: circuit.type || '', direction: circuit.direction || '', placeName: `${race.CircuitShortName}, ${race.CountryName}`, lengthMeters: Number(resultPage.pageData.CircuitInformation?.CircuitLengthInKM || 0) * 1000 || circuit.lengthMeters || '', turns: circuit.turns || '', pictureUrl: circuit.pictureUrl || '', mapUrl: circuit.mapUrl || '' });
         rows.races.push({ id: raceId, year, round: race.RoundNumber, date: race.RaceStartDate, endDate: race.RaceEndDate, name: race.CircuitShortName, code: String(race.CountryCode || '').toUpperCase(), circuitId: circuit.id, sourceUrl: resultUrl });
@@ -219,7 +229,6 @@ async function collect() {
       for (const item of teams) rows.constructorStandings.push({ year, positionNumber: item.Position, constructorId: slug(item.FullName || item.DisplayName), points: item.TotalPoints, championshipWon: bool(complete && item.Position === 1) });
       console.log('done');
     }
-  } finally { await browser.close(); }
   const missingCountries = [...maps.drivers.values()].filter(item => !item.countryCode);
   const missingTeamCountries = [...maps.constructors.values()].filter(item => !item.countryCode);
   if (missingCountries.length) throw new Error(`Drivers without nationality: ${missingCountries.map(item => item.name).join(', ')}`);
@@ -234,4 +243,4 @@ async function collect() {
 
 if (require.main === module) collect().catch(error => { console.error(error); process.exitCode = 1; });
 
-module.exports = { basePoints, cleanName, isReverseRace, parseTimeMillis, slug };
+module.exports = { basePoints, cleanName, isReverseRace, pageProps, parseTimeMillis, slug };
