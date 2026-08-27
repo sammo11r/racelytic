@@ -1,0 +1,11 @@
+[Unit]
+Description=Run the Racelytic data refresh every morning
+
+[Timer]
+OnCalendar=*-*-* 04:15:00
+Persistent=true
+RandomizedDelaySec=10m
+Unit=racelytic-data-sync.service
+
+[Install]
+WantedBy=timers.target

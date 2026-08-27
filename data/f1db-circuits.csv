@@ -63,7 +63,7 @@
 "riverside","Riverside","Riverside International Raceway",,"RACE","CLOCKWISE","Riverside","united-states-of-america",33.937,-117.272556,5.271,9,1
 "rouen","Rouen-Les-Essarts","Rouen-Les-Essarts",,"ROAD","CLOCKWISE","Rouen","france",49.330639,1.004583,6.542,12,5
 "sebring","Sebring","Sebring International Raceway",,"ROAD","CLOCKWISE","Sebring","united-states-of-america",27.454741,-81.348267,8.360,17,1
-"sepang","Sepang","Sepang International Circuit",,"RACE","CLOCKWISE","Sepang","malaysia",2.760556,101.7375,5.543,15,20
+"sepang","Sepang","Sepang International Circuit",,"RACE","CLOCKWISE","Sepang","malaysia",2.760556,101.7375,5.543,15,19
 "shanghai","Shanghai","Shanghai International Circuit",,"RACE","CLOCKWISE","Shanghai","china",31.338889,121.219722,5.451,16,19
 "silverstone","Silverstone","Silverstone Circuit",,"RACE","CLOCKWISE","Silverstone","united-kingdom",52.078611,-1.016944,5.891,18,61
 "sochi","Sochi","Sochi Autodrom","Sochi International Street Circuit;Sochi Olympic Park Circuit","ROAD","CLOCKWISE","Sochi","russia",43.410278,39.968271,5.848,18,8
@@ -74,6 +74,6 @@
 "watkins-glen","Watkins Glen","Watkins Glen International",,"RACE","CLOCKWISE","Watkins Glen","united-states-of-america",42.336944,-76.927222,5.435,11,20
 "yas-marina","Yas Marina","Yas Marina Circuit",,"RACE","ANTI_CLOCKWISE","Abu Dhabi","united-arab-emirates",24.467222,54.603056,5.281,16,17
 "yeongam","Korea","Korea International Circuit",,"RACE","ANTI_CLOCKWISE","Yeongam","south-korea",34.733333,126.416667,5.615,18,4
-"zandvoort","Zandvoort","Circuit Park Zandvoort",,"RACE","CLOCKWISE","Zandvoort","netherlands",52.388819,4.540922,4.259,14,35
+"zandvoort","Zandvoort","Circuit Park Zandvoort",,"RACE","CLOCKWISE","Zandvoort","netherlands",52.388819,4.540922,4.259,14,36
 "zeltweg","Zeltweg","Zeltweg",,"ROAD","CLOCKWISE","Zeltweg","austria",47.202222,14.742222,3.186,4,1
 "zolder","Zolder","Circuit Zolder",,"RACE","CLOCKWISE","Heusden-Zolder","belgium",50.988889,5.255556,4.262,15,10

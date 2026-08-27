@@ -66,6 +66,7 @@ const toYear = Number(argumentValue('to')) || new Date().getFullYear();
 const delayMilliseconds = Number(argumentValue('delay') || 250);
 const headless = process.argv.includes('--headless');
 const metadataOnly = process.argv.includes('--metadata-only');
+const refreshCurrent = process.argv.includes('--refresh-current');
 
 function wait(milliseconds) { return new Promise(resolve => setTimeout(resolve, milliseconds)); }
 function bool(value) { return value ? 'True' : 'False'; }
@@ -470,7 +471,7 @@ async function main() {
   try {
     const page = await createPage(browser);
     for (const year of years) {
-      const cached = loadCheckpoint(year);
+      const cached = refreshCurrent && year === new Date().getFullYear() ? null : loadCheckpoint(year);
       if (cached) {
         console.log(`\n${year}: loaded checkpoint`);
         mergeDataset(dataset, cached);

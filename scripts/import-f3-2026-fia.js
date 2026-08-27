@@ -10,7 +10,8 @@ function databasePool() {
 }
 
 const YEAR = 2026;
-const APPLY = process.argv.includes('--apply');
+const CSV_ONLY = process.argv.includes('--csv-only');
+const APPLY = process.argv.includes('--apply') || CSV_ONLY;
 const DATA_DIR = path.join(__dirname, '../data');
 const CACHE_DIR = path.join(DATA_DIR, '.f3-cache');
 
@@ -43,14 +44,26 @@ const DRIVER_STANDING_COLUMNS = [
 const CONSTRUCTOR_STANDING_COLUMNS = [
   'year', 'positionNumber', 'constructorId', 'points', 'championshipWon'
 ];
+const RESULT_OVERRIDES = new Map([
+  ['fia-formula-3-championship_2026_melbourne_race:louis-sharp', { points: 0, fastestLap: 'False' }],
+  ['fia-formula-3-championship_2026_melbourne_race:james-wharton', { points: 1, fastestLap: 'True' }]
+]);
+
+function applyResultOverrides(rows) {
+  rows.forEach(row => Object.assign(row, RESULT_OVERRIDES.get(`${row.sessionId}:${row.driverId}`) || {}));
+  return rows;
+}
 
 const EVENTS = [
+  { round: 1, slug: 'melbourne', idSlug: 'melbourne' },
   { round: 2, slug: 'monaco', idSlug: 'monaco' },
   { round: 3, slug: 'barcelona-catalunya', idSlug: 'catalunya' },
   { round: 4, slug: 'spielberg', idSlug: 'spielberg' },
   { round: 5, slug: 'silverstone', idSlug: 'silverstone' },
   { round: 6, slug: 'spa-francorchamps', idSlug: 'spa-francorchamps' },
-  { round: 7, slug: 'budapest', idSlug: 'budapest' }
+  { round: 7, slug: 'budapest', idSlug: 'budapest' },
+  { round: 8, slug: 'monza', idSlug: 'monza' },
+  { round: 9, slug: 'madrid', idSlug: 'madrid' }
 ];
 
 const SESSION_DEFINITIONS = [
@@ -349,10 +362,12 @@ async function main() {
   const entriesByRaceAndNumber = new Map(entries.map(entry => [`${entry.raceId}:${entry.driverNumber}`, entry]));
   const importedSessions = [];
   const importedResults = [];
+  const today = new Date().toISOString().slice(0, 10);
 
   for (const event of EVENTS) {
     const race = racesByRound.get(event.round);
     if (!race) throw new Error(`2026 race round ${event.round} was not found.`);
+    if ((race.endDate || race.date) >= today) continue;
     for (const definition of SESSION_DEFINITIONS) {
       const id = `fia-formula-3-championship_${YEAR}_${event.idSlug}_${definition.suffix}`;
       const session = {
@@ -372,6 +387,7 @@ async function main() {
         return resultFromOfficial(row, index + 1, session, race, entry);
       });
       if (definition.isRace) markFastestLap(results);
+      applyResultOverrides(results);
       importedSessions.push(session);
       importedResults.push(...results);
       console.log(`${YEAR} round ${race.round} ${definition.name}${definition.suffix === 'race-2' ? ' 2' : ''}: ${results.length} results`);
@@ -442,8 +458,8 @@ async function main() {
     CONSTRUCTOR_STANDING_COLUMNS,
     existingConstructorStandings.filter(row => row.year !== String(YEAR)).concat(constructorStandings)
   );
-  await updateDatabase(importedSessions, importedResults, driverStandings, constructorStandings);
-  console.log(`Updated F3 CSV data and database. Backup: ${backupPath}`);
+  if (!CSV_ONLY) await updateDatabase(importedSessions, importedResults, driverStandings, constructorStandings);
+  console.log(`Updated F3 CSV data${CSV_ONLY ? '' : ' and database'}. Backup: ${backupPath}`);
 }
 
 if (require.main === module) {

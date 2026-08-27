@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Build a racing team, choose sponsors, upgrade your car and climb the motorsport ladder in Racelytic's idle racing manager game.">
+  <title>Idle Racing Manager · Racelytic</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/polish.css">
+  <link rel="stylesheet" href="/css/idle-racing-manager.css">
+</head>
+<body>
+  <div id="header"></div>
+  <main class="idle-manager-page">
+    <header class="irm-hero container">
+      <a class="back-link" id="irm-games-link" href="/games">← Games</a>
+      <div class="eyebrow">FICTIONAL MOTORSPORT · TEAM MANAGEMENT</div>
+      <h1>Build the team.<br><span>Earn the next race.</span></h1>
+      <p>Choose the right contract, develop the car and turn a small privateer into a championship-level operation.</p>
+    </header>
+
+    <section class="irm-game" aria-label="Idle Racing Manager">
+      <header class="irm-team-bar">
+        <div class="irm-team-identity"><span>PRIVATEER TEAM</span><strong id="irm-team-name">Apex Racing</strong></div>
+        <dl class="irm-resources">
+          <div><dt>Balance</dt><dd id="irm-money">€2,000</dd></div>
+          <div><dt>Reputation</dt><dd id="irm-reputation">0</dd></div>
+          <div><dt>Research</dt><dd id="irm-research">0 RP</dd></div>
+        </dl>
+        <button class="irm-reset" id="irm-reset" type="button">Reset save</button>
+      </header>
+
+      <div class="irm-dashboard">
+        <aside class="irm-development" aria-label="Team development">
+          <section class="irm-panel irm-car-panel">
+            <div class="irm-panel-heading"><div><span>DEVELOPMENT</span><h2>The car</h2></div><strong id="irm-car-rating">10.0</strong></div>
+            <div class="irm-condition"><span>Condition</span><div><i id="irm-condition-bar"></i></div><b id="irm-condition">100%</b></div>
+            <div class="irm-stat-list" id="irm-car-stats"></div>
+            <button class="irm-service-button" id="irm-service" type="button">Service car <span id="irm-service-cost">€0</span></button>
+          </section>
+          <section class="irm-panel irm-driver-panel">
+            <div class="irm-panel-heading"><div><span>DRIVER</span><h2 id="irm-driver-name">Alex Vale</h2></div><strong id="irm-driver-rating">30</strong></div>
+            <div class="irm-driver-stats" id="irm-driver-stats"></div>
+            <p>Race fee <strong id="irm-driver-cost">€350</strong></p>
+          </section>
+        </aside>
+
+        <section class="irm-contracts" aria-labelledby="irm-contracts-title">
+          <div class="irm-panel-heading"><div><span>NEXT OPPORTUNITY</span><h2 id="irm-contracts-title">Sponsor contracts</h2></div><small id="irm-contract-count">2 available</small></div>
+          <div class="irm-contract-list" id="irm-contract-list"></div>
+          <article class="irm-race-brief" id="irm-race-brief">
+            <div class="irm-circuit-mark" aria-hidden="true"><span></span><b>01</b></div>
+            <div><span id="irm-circuit-tier">AMATEUR CIRCUIT</span><h3 id="irm-circuit-name">Industrial Park</h3><p id="irm-circuit-description">Short straights and forgiving corners reward a dependable first car.</p></div>
+            <dl id="irm-circuit-facts"></dl>
+          </article>
+          <div class="irm-entry-summary">
+            <div><span>Total running cost</span><strong id="irm-entry-cost">€700</strong></div>
+            <div><span>Contract target</span><strong id="irm-target">Finish P10</strong></div>
+            <div><span>Maximum payout</span><strong class="positive" id="irm-max-reward">€7,000</strong></div>
+          </div>
+          <button class="irm-start-race" id="irm-start-race" type="button"><span>Enter race</span><small id="irm-start-detail">8 laps · Industrial Park</small></button>
+        </section>
+
+        <aside class="irm-race-console" aria-label="Race simulation">
+          <div class="irm-console-head"><div><span>RACE CONTROL</span><h2 id="irm-race-status">Ready</h2></div><div class="irm-live-light"><i></i><span id="irm-live-label">STANDBY</span></div></div>
+          <div class="irm-race-position"><span id="irm-lap-label">NEXT RACE</span><strong id="irm-position">P—</strong><small id="irm-performance">Select a contract to begin</small></div>
+          <div class="irm-race-progress"><i id="irm-race-progress"></i></div>
+          <ol class="irm-race-log" id="irm-race-log" aria-live="polite"><li><time>HQ</time><span>Your team is ready for its first contract.</span></li></ol>
+          <div class="irm-race-actions">
+            <label>Speed <select id="irm-race-speed"><option value="1">1×</option><option value="2">2×</option><option value="4">4×</option></select></label>
+            <button id="irm-finish-race" type="button" disabled>Finish instantly</button>
+          </div>
+        </aside>
+      </div>
+    </section>
+    <p class="irm-fiction-note">Idle Racing Manager takes place in an original fictional motorsport world. Every team, driver, sponsor and circuit appearing in the game is fictional.</p>
+  </main>
+
+  <dialog class="irm-dialog" id="irm-result-dialog"><div id="irm-result-content"></div></dialog>
+  <dialog class="irm-dialog" id="irm-offline-dialog"><div id="irm-offline-content"></div></dialog>
+  <footer class="footer"><div class="container">Racelytic</div></footer>
+  <script src="/js/header.js"></script>
+  <script src="/js/idle-racing-manager-engine.js"></script>
+  <script src="/js/idle-racing-manager.js"></script>
+</body>
+</html>

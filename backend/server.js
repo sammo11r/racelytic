@@ -69,6 +69,8 @@ for (const [route, file] of [
     ['/f3/championship-builder', 'f3-championship-builder.html'],
     ['/f3/points-systems', 'points-systems.html'],
     ['/f3/games', 'f3-games.html'],
+    ['/f3/idle-racing-manager', 'idle-racing-manager.html'],
+    ['/f3/lights-out', 'lights-out.html'],
     ['/f3/about', 'f3-about.html'],
     ['/f2/database', 'f2-database.html'],
     ['/f2/seasons', 'f2-seasons.html'],
@@ -98,6 +100,8 @@ for (const [route, file] of [
     ['/f2/championship-builder', 'championship-builder.html'],
     ['/f2/points-systems', 'points-systems.html'],
     ['/f2/games', 'f2-games.html'],
+    ['/f2/idle-racing-manager', 'idle-racing-manager.html'],
+    ['/f2/lights-out', 'lights-out.html'],
     ['/f2/quizzes', 'f2-quizzes.html'],
     ['/f2/champions-quiz', 'f2-champions-quiz.html'],
     ['/f2/race-winners-quiz', 'f2-race-winners-quiz.html']
@@ -116,7 +120,7 @@ const academyPages = {
     'circuit-analysis': 'circuit-analysis.html', records: 'records.html', simulator: 'f3-simulator.html',
     'simulate-season': 'f3-simulate-season.html', 'scenario-calculator': 'f3-scenario-calculator.html',
     'championship-builder': 'f3-championship-builder.html', 'points-systems': 'points-systems.html',
-    games: 'f3-games.html', about: 'f3-about.html'
+    games: 'f3-games.html', 'idle-racing-manager': 'idle-racing-manager.html', 'lights-out': 'lights-out.html', about: 'f3-about.html'
 };
 
 function academyCopy(content) {

@@ -6,4 +6,8 @@ Thumbs.db
 data/.f3-cache/
 data/.f2-cache/
 data/.replay-cache/
+data/.sync-backups/
+data/.data-sync.lock
+data/.f1db-release.json
+data/.f1db-sync-*/
 .venv-replay/

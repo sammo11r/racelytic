@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Test your reaction time with Racelytic's Lights Out game.">
+  <title>Lights Out! · Racelytic</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/polish.css">
+  <link rel="stylesheet" href="/css/lights-out.css">
+</head>
+<body>
+  <div id="header"></div>
+  <main class="container page lights-page">
+    <a class="back-link" id="lights-games-link" href="/games">← Games</a>
+    <section class="lights-hero">
+      <div class="eyebrow">REACTION CHALLENGE</div>
+      <h1>Lights out.<br><span>How fast are you?</span></h1>
+      <p>Wait for all five lights to go dark, then react as quickly as you can. The delay changes every time—anticipate it and you’ll false start.</p>
+    </section>
+
+    <section class="lights-game" aria-labelledby="lights-game-title">
+      <div class="lights-stage" id="lights-stage">
+        <header>
+          <div><span>REACTION TEST</span><h2 id="lights-game-title">Watch the lights</h2></div>
+          <span class="lights-round" id="lights-round">Attempt 1</span>
+        </header>
+
+        <button class="lights-reaction-zone" id="lights-reaction-zone" type="button" aria-describedby="lights-instruction">
+          <span class="lights-rig" aria-hidden="true">
+            <i></i><i></i><i></i><i></i><i></i>
+          </span>
+          <strong id="lights-result">—</strong>
+          <span id="lights-instruction">Press start when you are ready</span>
+        </button>
+
+        <div class="lights-actions">
+          <button class="button primary" id="lights-start" type="button">Start test</button>
+          <small>Click, tap, or press the space bar when the lights go out.</small>
+        </div>
+      </div>
+
+      <aside class="lights-stats" aria-label="Reaction statistics">
+        <div class="eyebrow">YOUR TIMING</div>
+        <dl class="lights-summary">
+          <div><dt>Best</dt><dd id="lights-best">—</dd></div>
+          <div><dt>Average</dt><dd id="lights-average">—</dd></div>
+          <div><dt>Valid starts</dt><dd id="lights-valid">0</dd></div>
+          <div><dt>False starts</dt><dd id="lights-false">0</dd></div>
+        </dl>
+        <div class="lights-history-head"><h3>Recent attempts</h3><button id="lights-clear" type="button">Clear</button></div>
+        <ol class="lights-history" id="lights-history"><li class="empty">No attempts yet</li></ol>
+        <div class="lights-scale" aria-label="Reaction time guide">
+          <span><i class="elite"></i><b>Under 200 ms</b><small>Exceptional</small></span>
+          <span><i class="quick"></i><b>200–249 ms</b><small>Quick</small></span>
+          <span><i class="steady"></i><b>250–349 ms</b><small>Steady</small></span>
+          <span><i class="slow"></i><b>350+ ms</b><small>Room to improve</small></span>
+        </div>
+      </aside>
+    </section>
+
+    <section class="lights-explainer">
+      <div><span>01</span><h2>Get ready</h2><p>Start the sequence and keep your pointer, finger, or space bar ready.</p></div>
+      <div><span>02</span><h2>Do not guess</h2><p>The hold after the fifth light is randomized. Reacting before darkness is a false start.</p></div>
+      <div><span>03</span><h2>Find consistency</h2><p>Your last ten valid attempts are saved on this device so you can chase a better average.</p></div>
+    </section>
+  </main>
+  <footer class="footer"><div class="container">Racelytic</div></footer>
+  <script src="/js/header.js"></script>
+  <script src="/js/lights-out-engine.js"></script>
+  <script src="/js/lights-out.js"></script>
+</body>
+</html>

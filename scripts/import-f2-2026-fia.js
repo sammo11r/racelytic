@@ -8,7 +8,8 @@ const {
 } = require('./import-f3-2026-fia');
 
 const YEAR = 2026;
-const APPLY = process.argv.includes('--apply');
+const CSV_ONLY = process.argv.includes('--csv-only');
+const APPLY = process.argv.includes('--apply') || CSV_ONLY;
 const DATA_DIR = path.join(__dirname, '../data');
 const CACHE_DIR = path.join(DATA_DIR, '.f2-cache');
 const file = suffix => path.join(DATA_DIR, `f2db-${suffix}.csv`);
@@ -18,15 +19,29 @@ const RESULT_COLUMNS = ['sessionId','raceId','year','round','positionDisplayOrde
 const ENTRY_COLUMNS = ['raceId','year','round','driverNumber','driverId','constructorId','chassisId','engineId'];
 const DRIVER_STANDING_COLUMNS = ['year','positionNumber','driverId','constructorId','points','championshipWon','starts','wins','podiums','poles','fastestLaps','retirements'];
 const CONSTRUCTOR_STANDING_COLUMNS = ['year','positionNumber','constructorId','points','championshipWon'];
+const RESULT_OVERRIDES = new Map([
+  ['fia-formula-2-championship_2026_montreal_race-2:nikola-tsolov', {
+    positionDisplayOrder: 12, positionNumber: 12, points: 0, gapMillis: 11859
+  }],
+  ['fia-formula-2-championship_2026_montreal_race-2:sebastian-montoya', { points: 12 }],
+  ['fia-formula-2-championship_2026_montreal_race-2:ritomo-miyata', { time: '55:47.074' }]
+]);
 
 const EVENTS = [
+  { round:1, sourceSlug:'melbourne', idSlug:'melbourne' },
+  { round:2, sourceSlug:'miami', idSlug:'miami' },
   { round:3, sourceSlug:'montreal', idSlug:'montreal' },
   { round:4, sourceSlug:'monaco', idSlug:'monte-carlo' },
   { round:5, sourceSlug:'barcelona-catalunya', idSlug:'barcelona' },
   { round:6, sourceSlug:'spielberg', idSlug:'spielburg' },
   { round:7, sourceSlug:'silverstone', idSlug:'silverstone' },
   { round:8, sourceSlug:'spa-francorchamps', idSlug:'spa-francorchamps' },
-  { round:9, sourceSlug:'budapest', idSlug:'budapest' }
+  { round:9, sourceSlug:'budapest', idSlug:'budapest' },
+  { round:10, sourceSlug:'monza', idSlug:'monza' },
+  { round:11, sourceSlug:'madrid', idSlug:'madrid' },
+  { round:12, sourceSlug:'baku', idSlug:'baku' },
+  { round:13, sourceSlug:'lusail', idSlug:'lusail' },
+  { round:14, sourceSlug:'yas-marina', idSlug:'yas-marina' }
 ];
 const SESSION_DEFINITIONS = [
   { path:'session-classifications', suffix:'free-practice', number:1, name:'Free Practice', race:false },
@@ -62,6 +77,10 @@ function resultRow(row, order, session, race, entry) {
   };
 }
 
+function applyResultOverride(result) {
+  return Object.assign(result, RESULT_OVERRIDES.get(`${result.sessionId}:${result.driverId}`) || {});
+}
+
 function driverForStanding(label, drivers, activeDriverIds) {
   const match = label.match(/^(\d+)\s*(.+)$/);
   if (!match) throw new Error(`Invalid driver standing: ${label}`);
@@ -69,12 +88,13 @@ function driverForStanding(label, drivers, activeDriverIds) {
   const parts = display.split(/\s+/);
   const initial = normalized(parts[0]).charAt(0);
   const surname = normalized(parts.slice(1).join(' '));
-  let candidates = drivers.filter(driver => {
+  const initialMatches = drivers.filter(driver => {
     const name = normalized(driver.name);
     const first = name.charAt(0);
-    return first === initial && name.endsWith(surname);
+    return first === initial;
   });
-  const active = candidates.filter(driver => activeDriverIds.has(driver.id));
+  const active = initialMatches.filter(driver => activeDriverIds.has(driver.id) && normalized(driver.name).includes(surname));
+  let candidates = initialMatches.filter(driver => normalized(driver.name).endsWith(surname));
   if (active.length === 1) candidates = active;
   if (candidates.length !== 1) throw new Error(`Could not uniquely map official F2 driver: ${display}`);
   return { position:Number(match[1]), driver:candidates[0] };
@@ -169,10 +189,12 @@ async function main() {
     }
   });
   const importedSessions = [], importedResults = [], newEntries = [];
+  const today = new Date().toISOString().slice(0, 10);
 
   for (const event of EVENTS) {
     const race = racesByRound.get(event.round);
     if (!race) throw new Error(`F2 round ${event.round} not found.`);
+    if ((race.endDate || race.date) >= today) continue;
     for (const definition of SESSION_DEFINITIONS) {
       const session = {
         id:`fia-formula-2-championship_${YEAR}_${event.idSlug}_${definition.suffix}`,
@@ -194,7 +216,7 @@ async function main() {
           entriesByRaceNumber.set(`${race.id}:${number}`, entry);
           newEntries.push(entry);
         }
-        return resultRow(row,index+1,session,race,entry);
+        return applyResultOverride(resultRow(row,index+1,session,race,entry));
       });
       if (definition.race) markFastestLap(rows);
       importedSessions.push(session); importedResults.push(...rows);
@@ -241,8 +263,8 @@ async function main() {
   writeCsv(file('session-results'),RESULT_COLUMNS,mergedResults);
   writeCsv(file('season-driver-standings'),DRIVER_STANDING_COLUMNS,oldDriverStandings.filter(row=>row.year!==String(YEAR)).concat(driverStandings));
   writeCsv(file('season-constructor-standings'),CONSTRUCTOR_STANDING_COLUMNS,oldConstructorStandings.filter(row=>row.year!==String(YEAR)).concat(constructorStandings));
-  await updateDatabase(importedSessions,importedResults,newEntries,driverStandings,constructorStandings);
-  console.log(`Updated F2 CSV and database data. Backup: ${backup}`);
+  if (!CSV_ONLY) await updateDatabase(importedSessions,importedResults,newEntries,driverStandings,constructorStandings);
+  console.log(`Updated F2 CSV${CSV_ONLY ? '' : ' and database'} data. Backup: ${backup}`);
 }
 
 main().catch(error=>{console.error(error);process.exitCode=1;}).finally(async()=>pool.end());

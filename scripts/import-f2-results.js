@@ -315,15 +315,22 @@ async function main() {
   ]);
   const racesById = new Map(races.map(race => [race.id, race]));
   const entriesByRaceAndNumber = new Map(entries.map(entry => [`${entry.raceId}:${entry.driverNumber}`, entry]));
+  const today = new Date().toISOString().slice(0, 10);
+  const completedWeekend = session => {
+    const race = racesById.get(session.raceId);
+    const completedOn = race?.endDate || race?.date;
+    return completedOn && completedOn < today;
+  };
   const matchingSessions = sessions.filter(session =>
     requestedSessionKinds.has(sessionKind(session)) &&
-    (!selectedYear || session.year === selectedYear)
+    (!selectedYear || session.year === selectedYear) &&
+    completedWeekend(session)
   );
   const classificationSessions = selectClassificationSessions(
     sessions,
     selectedYear,
     requestedSessionKinds
-  );
+  ).filter(completedWeekend);
   if (!matchingSessions.length) throw new Error('No matching F2 classification sessions found.');
 
   if (manifestOnly) {

@@ -94,6 +94,67 @@ last completed round and ignores future scheduled rounds.
 
 If your F1DB export uses a different release/version, the SQL may need small column adjustments.
 
+## Automatic database updates
+
+Racelytic has one guarded synchronization command:
+
+```bash
+npm run sync:data
+```
+
+The command checks the official F1DB GitHub release, refreshes the configured junior-series
+collectors, backs up the current CSV files, runs the full test suite and CSV integrity audits,
+loads every CSV into staging tables, and publishes all staging tables with one atomic MariaDB
+`RENAME TABLE` operation. The live site therefore continues to use the old tables until the
+entire replacement is ready. An import is rejected if a table unexpectedly loses more than 10%
+of its rows. Set `DATA_SYNC_MIN_ROW_RATIO` to adjust that guard.
+
+Only one synchronization can run at once. Every attempt is recorded in
+`app_data_sync_runs`; inspect recent attempts with:
+
+```bash
+npm run sync:data:status
+```
+
+Validate the current CSV files without downloading or publishing anything with:
+
+```bash
+npm run sync:data:dry
+```
+
+Useful options are:
+
+```bash
+# Refresh selected championships only
+npm run sync:data -- --series=f1,f2
+
+# Publish already-downloaded CSV files
+npm run sync:data -- --skip-fetch
+
+# Re-download an F1DB release even if its version is unchanged
+npm run sync:data -- --series=f1 --force
+```
+
+The updater keeps five CSV snapshots in `data/.sync-backups` by default and restores the latest
+snapshot if source collection or validation fails. Configure the series, backup retention and
+row-loss guard in `.env`; see `.env.example`. `GITHUB_TOKEN` is optional and only raises the
+GitHub API rate limit. Database credentials should use a dedicated account that can create,
+rename, insert into and drop Racelytic data tables.
+
+For a Linux VPS, edit the user and `/opt/racelytic` paths in
+`deploy/systemd/racelytic-data-sync.service`, then install and enable the supplied timer:
+
+```bash
+sudo cp deploy/systemd/racelytic-data-sync.* /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable --now racelytic-data-sync.timer
+systemctl list-timers racelytic-data-sync.timer
+```
+
+The timer runs daily at approximately 04:15 server time and catches missed runs after a reboot.
+Run `systemctl start racelytic-data-sync.service` for an immediate manual refresh and inspect
+failures with `journalctl -u racelytic-data-sync.service`.
+
 ## Private traffic monitor
 
 Racelytic includes anonymous first-party monitoring for visits, unique visitors,

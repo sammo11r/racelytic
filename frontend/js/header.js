@@ -95,6 +95,8 @@ async function loadHeader() {
             '/records': '/f2/records', '/simulator-overview': '/f2/simulator', '/simulator': '/f2/simulate-season',
             '/scenario-calculator': '/f2/scenario-calculator', '/championship-builder': '/f2/championship-builder',
             '/points-systems': '/f2/points-systems', '/games': '/f2/games', '/quizzes': '/f2/quizzes',
+            '/idle-racing-manager': '/f2/idle-racing-manager',
+            '/lights-out': '/f2/lights-out',
             '/world-champions-quiz': '/f2/champions-quiz', '/race-winners-quiz': '/f2/race-winners-quiz',
             '/about': '/f2/about'
         };
@@ -111,7 +113,7 @@ async function loadHeader() {
             '/simulator-overview': '/f3/simulator', '/simulator': '/f3/simulate-season',
             '/scenario-calculator': '/f3/scenario-calculator', '/championship-builder': '/f3/championship-builder',
             '/points-systems': '/f3/points-systems',
-            '/games': '/f3/games', '/about': '/f3/about'
+            '/games': '/f3/games', '/idle-racing-manager': '/f3/idle-racing-manager', '/lights-out': '/f3/lights-out', '/about': '/f3/about'
         };
         const reverseF3PagePairs = Object.fromEntries(Object.entries(f3PagePairs).map(([f1, f3]) => [f3, f1]));
         const academyPagePairs = Object.fromEntries(Object.entries(f3PagePairs).map(([f1, f3]) => [f1, f3.replace('/f3', '/academy')]));
@@ -247,7 +249,9 @@ async function loadHeader() {
                     ['/f3/points-systems', 'Points systems', 'Create and manage scoring rules']
                 ]],
                 ['FORMULA 3 GAMES', [
-                    ['/f3/games', 'Overview', 'Choose a Formula 3 game']
+                    ['/f3/games', 'Overview', 'Choose a Formula 3 game'],
+                    ['/idle-racing-manager', 'Idle Racing Manager', 'Build a fictional racing team'],
+                    ['/f3/lights-out', 'Lights Out!', 'Test your reaction time']
                 ]]
             ];
             const seriesMenus = isAcademyMode
@@ -369,7 +373,9 @@ async function loadHeader() {
             const gamesLinks = [...(gamesDropdown?.querySelectorAll('.dropdown-menu a') || [])];
             const f2GamesRoutes = [
                 ['/f2/games', 'Overview', 'Choose a Formula 2 game'],
-                ['/f2/quizzes', 'Quizzes', 'Test your Formula 2 knowledge']
+                ['/f2/quizzes', 'Quizzes', 'Test your Formula 2 knowledge'],
+                ['/idle-racing-manager', 'Idle Racing Manager', 'Build a fictional racing team'],
+                ['/f2/lights-out', 'Lights Out!', 'Test your reaction time']
             ];
             gamesLinks.forEach((link, index) => {
                 const item = f2GamesRoutes[index];

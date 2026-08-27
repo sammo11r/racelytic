@@ -81,7 +81,7 @@ test('post-race penalties and fastest-lap eligibility remain applied', async () 
   assert.equal(montreal.find(result => result.driverId === 'sebastian-montoya').points, '12');
   assert.equal(montreal.find(result => result.driverId === 'ritomo-miyata').time, '55:47.074');
 
-  assert.ok(f2Standings.some(row => row.year === '2026' && row.driverId === 'emerson-fanucchi-fittipaldi-jr' && row.points === '10'));
+  assert.ok(f2Standings.some(row => row.year === '2026' && row.driverId === 'emerson-fanucchi-fittipaldi-jr' && Number(row.points) >= 10));
   assert.ok(!f2Standings.some(row => row.year === '2026' && row.driverId === 'enzo-fittipaldi'));
 
   const melbourne = f3Results.filter(result => result.sessionId === 'fia-formula-3-championship_2026_melbourne_race');

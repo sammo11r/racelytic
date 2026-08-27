@@ -1,0 +1,23 @@
+[Unit]
+Description=Refresh and atomically publish Racelytic race data
+After=network-online.target mariadb.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=racelytic
+Group=racelytic
+WorkingDirectory=/opt/racelytic
+EnvironmentFile=/opt/racelytic/.env
+ExecStart=/usr/bin/node scripts/sync-data.js
+Nice=10
+IOSchedulingClass=best-effort
+IOSchedulingPriority=7
+TimeoutStartSec=3h
+
+# Restrict the updater while allowing its working data and database connection.
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/racelytic/data
