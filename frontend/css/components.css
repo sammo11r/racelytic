@@ -1,0 +1,79 @@
+/* Shared state, filter, table, and chart primitives. Page-specific layout stays in polish.css. */
+
+.ui-state,
+.loading-state,
+.empty-state,
+.error {
+  display: grid;
+  min-height: 96px;
+  place-items: center;
+  padding: 24px;
+  border-radius: 13px;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.loading-state { border: 1px solid var(--border); background: var(--surface); }
+.empty-state { border: 1px dashed var(--border-strong); }
+.error { border: 1px solid rgba(190, 40, 40, .22); background: #fff4f4; color: #9e2525; }
+.error:empty { display: none; }
+
+.filter-bar,
+.race-filters,
+.simulator-controls,
+.scenario-controls {
+  display: flex;
+  align-items: end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.filter-bar label,
+.race-filters label,
+.simulator-controls label,
+.scenario-controls label {
+  display: grid;
+  gap: 6px;
+}
+
+.table-wrap {
+  overflow-x: auto;
+  border: 1px solid rgba(17, 19, 24, .09);
+  border-radius: 15px;
+  background: var(--surface);
+  box-shadow: var(--shadow-small);
+}
+
+.table-wrap table { width: 100%; border-collapse: collapse; }
+.table-wrap th { background: #f2f3f5; color: var(--text-muted); font-size: 10px; letter-spacing: .11em; text-transform: uppercase; }
+.table-wrap th,
+.table-wrap td { padding: 13px 16px; border-bottom: 1px solid var(--border); text-align: left; }
+.table-wrap tbody tr { transition: background .14s ease; }
+.table-wrap tbody tr:nth-child(even) { background: rgba(244, 245, 247, .55); }
+.table-wrap tbody tr:hover { background: #eceff3; }
+.table-wrap tbody tr:last-child td { border-bottom: 0; }
+
+.chart-frame,
+.interactive-chart {
+  overflow: hidden;
+  min-height: 330px;
+  padding: 18px 15px 5px;
+  border: 1px solid var(--border);
+  border-radius: 15px;
+  background: var(--surface);
+  box-shadow: var(--shadow-small);
+}
+
+.chart-frame svg,
+.interactive-chart svg { display: block; width: 100%; height: auto; }
+
+@media (max-width: 760px) {
+  .filter-bar,
+  .race-filters,
+  .simulator-controls,
+  .scenario-controls { align-items: stretch; flex-direction: column; }
+  .chart-frame,
+  .interactive-chart { overflow-x: auto; padding-right: 5px; padding-left: 5px; }
+  .chart-frame svg,
+  .interactive-chart svg { width: 760px; max-width: none; }
+}

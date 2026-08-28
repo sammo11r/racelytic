@@ -4,6 +4,7 @@
   else root.RacelyticReplay = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this, function createReplayEngine() {
   const startMetadataCache = new WeakMap();
+  const traceProjectionCache = new WeakMap();
 
   function segmentIndex(values, time) {
     if (!values?.length) return -1;
@@ -211,9 +212,46 @@
 
   function projectedTrackProgress(trace, coordinates) {
     if (!trace?.length || trace.length < 2 || !coordinates) return null;
+    let lookup = traceProjectionCache.get(trace);
+    if (!lookup) {
+      const divisions = 24;
+      const xs = trace.map(point => Number(point[0]));
+      const ys = trace.map(point => Number(point[1]));
+      const minX = Math.min(...xs), maxX = Math.max(...xs);
+      const minY = Math.min(...ys), maxY = Math.max(...ys);
+      const width = Math.max(.0001, maxX - minX);
+      const height = Math.max(.0001, maxY - minY);
+      const cells = new Map();
+      const cellX = value => Math.max(0, Math.min(divisions - 1, Math.floor((value - minX) / width * divisions)));
+      const cellY = value => Math.max(0, Math.min(divisions - 1, Math.floor((value - minY) / height * divisions)));
+      for (let index = 0; index < trace.length; index += 1) {
+        const point = trace[index];
+        const next = trace[(index + 1) % trace.length];
+        const fromX = cellX(Math.min(Number(point[0]), Number(next[0])));
+        const toX = cellX(Math.max(Number(point[0]), Number(next[0])));
+        const fromY = cellY(Math.min(Number(point[1]), Number(next[1])));
+        const toY = cellY(Math.max(Number(point[1]), Number(next[1])));
+        for (let x = fromX; x <= toX; x += 1) for (let y = fromY; y <= toY; y += 1) {
+          const key = `${x}:${y}`;
+          if (!cells.has(key)) cells.set(key, []);
+          cells.get(key).push(index);
+        }
+      }
+      lookup = { divisions, minX, minY, width, height, cells, cellX, cellY };
+      traceProjectionCache.set(trace, lookup);
+    }
+    const centreX = lookup.cellX(coordinates.x);
+    const centreY = lookup.cellY(coordinates.y);
+    const nearby = new Set();
+    for (let x = Math.max(0, centreX - 1); x <= Math.min(lookup.divisions - 1, centreX + 1); x += 1) {
+      for (let y = Math.max(0, centreY - 1); y <= Math.min(lookup.divisions - 1, centreY + 1); y += 1) {
+        for (const index of lookup.cells.get(`${x}:${y}`) || []) nearby.add(index);
+      }
+    }
+    const candidates = nearby.size ? nearby : trace.keys();
     let nearestProgress = null;
     let nearestDistance = Infinity;
-    for (let index = 0; index < trace.length; index += 1) {
+    for (const index of candidates) {
       const point = trace[index];
       const next = trace[(index + 1) % trace.length];
       const segmentX = Number(next[0]) - Number(point[0]);

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title description">
+  <title id="title">Racelytic</title>
+  <desc id="description">Racing history, statistics and analysis</desc>
+  <rect width="1200" height="630" fill="#0b0d12"/>
+  <path d="M0 490 1200 170v460H0Z" fill="#151923"/>
+  <path d="M770 0h430v112L360 338 0 435v-84Z" fill="#e32636" opacity=".95"/>
+  <path d="M940 0h260v48L438 253 0 370v-34Z" fill="#f5f7fa" opacity=".92"/>
+  <g fill="#f5f7fa" font-family="Arial, Helvetica, sans-serif">
+    <text x="90" y="290" font-size="104" font-weight="800" letter-spacing="-5">Racelytic<tspan fill="#e32636">.</tspan></text>
+    <text x="96" y="365" font-size="30" font-weight="700" letter-spacing="7">RACING HISTORY · STATISTICS · ANALYSIS</text>
+  </g>
+  <rect x="94" y="420" width="180" height="8" rx="4" fill="#e32636"/>
+</svg>

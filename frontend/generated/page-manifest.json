@@ -1,0 +1,613 @@
+{
+  "version": 1,
+  "series": {
+    "f1": {
+      "name": "Formula 1",
+      "shortName": "F1",
+      "path": "",
+      "modeClass": "",
+      "favicon": "/assets/favicon-f1.svg",
+      "entity": "constructor"
+    },
+    "f2": {
+      "name": "Formula 2",
+      "shortName": "F2",
+      "path": "/f2",
+      "modeClass": "f2-mode",
+      "favicon": "/assets/favicon-f2.svg",
+      "entity": "constructor"
+    },
+    "f3": {
+      "name": "Formula 3",
+      "shortName": "F3",
+      "path": "/f3",
+      "modeClass": "f3-mode",
+      "favicon": "/assets/favicon-f3.svg",
+      "entity": "team"
+    },
+    "academy": {
+      "name": "F1 Academy",
+      "shortName": "F1 Academy",
+      "path": "/academy",
+      "modeClass": "academy-mode",
+      "favicon": "/assets/favicon-academy.svg",
+      "entity": "team"
+    }
+  },
+  "sharedTemplates": {
+    "season-comparison": "season-comparison.html",
+    "race-analysis": "race-analysis.html",
+    "driver-comparison": "driver-comparison.html",
+    "driver-form": "driver-form.html",
+    "teammate-battles": "teammate-battles.html",
+    "circuit-analysis": "circuit-analysis.html",
+    "records": "records.html",
+    "points-systems": "points-systems.html"
+  },
+  "routes": [
+    {
+      "series": "f2",
+      "slug": "database",
+      "route": "/f2/database",
+      "template": "f2-database.html"
+    },
+    {
+      "series": "f2",
+      "slug": "seasons",
+      "route": "/f2/seasons",
+      "template": "f2-seasons.html"
+    },
+    {
+      "series": "f2",
+      "slug": "season",
+      "route": "/f2/season",
+      "template": "f2-season.html"
+    },
+    {
+      "series": "f2",
+      "slug": "races",
+      "route": "/f2/races",
+      "template": "f2-races.html"
+    },
+    {
+      "series": "f2",
+      "slug": "race",
+      "route": "/f2/race",
+      "template": "f2-race.html"
+    },
+    {
+      "series": "f2",
+      "slug": "drivers",
+      "route": "/f2/drivers",
+      "template": "f2-drivers.html"
+    },
+    {
+      "series": "f2",
+      "slug": "driver",
+      "route": "/f2/driver",
+      "template": "f2-driver.html"
+    },
+    {
+      "series": "f2",
+      "slug": "circuits",
+      "route": "/f2/circuits",
+      "template": "f2-circuits.html"
+    },
+    {
+      "series": "f2",
+      "slug": "circuit",
+      "route": "/f2/circuit",
+      "template": "f2-circuit.html"
+    },
+    {
+      "series": "f2",
+      "slug": "constructors",
+      "route": "/f2/constructors",
+      "template": "f2-constructors.html"
+    },
+    {
+      "series": "f2",
+      "slug": "constructor",
+      "route": "/f2/constructor",
+      "template": "f2-constructor.html"
+    },
+    {
+      "series": "f2",
+      "slug": "chassis",
+      "route": "/f2/chassis",
+      "template": "f2-chassis.html"
+    },
+    {
+      "series": "f2",
+      "slug": "about",
+      "route": "/f2/about",
+      "template": "f2-about.html"
+    },
+    {
+      "series": "f2",
+      "slug": "analysis",
+      "route": "/f2/analysis",
+      "template": "f2-analysis.html"
+    },
+    {
+      "series": "f2",
+      "slug": "season-analysis",
+      "route": "/f2/season-analysis",
+      "template": "f2-season-analysis.html"
+    },
+    {
+      "series": "f2",
+      "slug": "season-comparison",
+      "route": "/f2/season-comparison",
+      "template": "season-comparison.html"
+    },
+    {
+      "series": "f2",
+      "slug": "race-analysis",
+      "route": "/f2/race-analysis",
+      "template": "race-analysis.html"
+    },
+    {
+      "series": "f2",
+      "slug": "driver-comparison",
+      "route": "/f2/driver-comparison",
+      "template": "driver-comparison.html"
+    },
+    {
+      "series": "f2",
+      "slug": "driver-form",
+      "route": "/f2/driver-form",
+      "template": "driver-form.html"
+    },
+    {
+      "series": "f2",
+      "slug": "teammate-battles",
+      "route": "/f2/teammate-battles",
+      "template": "teammate-battles.html"
+    },
+    {
+      "series": "f2",
+      "slug": "circuit-analysis",
+      "route": "/f2/circuit-analysis",
+      "template": "circuit-analysis.html"
+    },
+    {
+      "series": "f2",
+      "slug": "records",
+      "route": "/f2/records",
+      "template": "records.html"
+    },
+    {
+      "series": "f2",
+      "slug": "points-systems",
+      "route": "/f2/points-systems",
+      "template": "points-systems.html"
+    },
+    {
+      "series": "f2",
+      "slug": "simulator",
+      "route": "/f2/simulator",
+      "template": "f2-simulator.html"
+    },
+    {
+      "series": "f2",
+      "slug": "simulate-season",
+      "route": "/f2/simulate-season",
+      "template": "simulator.html"
+    },
+    {
+      "series": "f2",
+      "slug": "scenario-calculator",
+      "route": "/f2/scenario-calculator",
+      "template": "scenario-calculator.html"
+    },
+    {
+      "series": "f2",
+      "slug": "championship-builder",
+      "route": "/f2/championship-builder",
+      "template": "championship-builder.html"
+    },
+    {
+      "series": "f2",
+      "slug": "games",
+      "route": "/f2/games",
+      "template": "f2-games.html"
+    },
+    {
+      "series": "f2",
+      "slug": "idle-racing-manager",
+      "route": "/f2/idle-racing-manager",
+      "template": "idle-racing-manager.html"
+    },
+    {
+      "series": "f2",
+      "slug": "lights-out",
+      "route": "/f2/lights-out",
+      "template": "lights-out.html"
+    },
+    {
+      "series": "f2",
+      "slug": "quizzes",
+      "route": "/f2/quizzes",
+      "template": "f2-quizzes.html"
+    },
+    {
+      "series": "f2",
+      "slug": "champions-quiz",
+      "route": "/f2/champions-quiz",
+      "template": "f2-champions-quiz.html"
+    },
+    {
+      "series": "f2",
+      "slug": "race-winners-quiz",
+      "route": "/f2/race-winners-quiz",
+      "template": "f2-race-winners-quiz.html"
+    },
+    {
+      "series": "f3",
+      "slug": "database",
+      "route": "/f3/database",
+      "template": "f3-database.html"
+    },
+    {
+      "series": "f3",
+      "slug": "seasons",
+      "route": "/f3/seasons",
+      "template": "f3-seasons.html"
+    },
+    {
+      "series": "f3",
+      "slug": "season",
+      "route": "/f3/season",
+      "template": "f3-season.html"
+    },
+    {
+      "series": "f3",
+      "slug": "races",
+      "route": "/f3/races",
+      "template": "f3-races.html"
+    },
+    {
+      "series": "f3",
+      "slug": "race",
+      "route": "/f3/race",
+      "template": "f3-race.html"
+    },
+    {
+      "series": "f3",
+      "slug": "drivers",
+      "route": "/f3/drivers",
+      "template": "f3-drivers.html"
+    },
+    {
+      "series": "f3",
+      "slug": "driver",
+      "route": "/f3/driver",
+      "template": "f3-driver.html"
+    },
+    {
+      "series": "f3",
+      "slug": "teams",
+      "route": "/f3/teams",
+      "template": "f3-teams.html"
+    },
+    {
+      "series": "f3",
+      "slug": "team",
+      "route": "/f3/team",
+      "template": "f3-team.html"
+    },
+    {
+      "series": "f3",
+      "slug": "circuits",
+      "route": "/f3/circuits",
+      "template": "f3-circuits.html"
+    },
+    {
+      "series": "f3",
+      "slug": "circuit",
+      "route": "/f3/circuit",
+      "template": "f3-circuit.html"
+    },
+    {
+      "series": "f3",
+      "slug": "chassis",
+      "route": "/f3/chassis",
+      "template": "f3-chassis.html"
+    },
+    {
+      "series": "f3",
+      "slug": "analysis",
+      "route": "/f3/analysis",
+      "template": "f3-analysis.html"
+    },
+    {
+      "series": "f3",
+      "slug": "season-analysis",
+      "route": "/f3/season-analysis",
+      "template": "f2-season-analysis.html"
+    },
+    {
+      "series": "f3",
+      "slug": "season-comparison",
+      "route": "/f3/season-comparison",
+      "template": "season-comparison.html"
+    },
+    {
+      "series": "f3",
+      "slug": "race-analysis",
+      "route": "/f3/race-analysis",
+      "template": "race-analysis.html"
+    },
+    {
+      "series": "f3",
+      "slug": "driver-comparison",
+      "route": "/f3/driver-comparison",
+      "template": "driver-comparison.html"
+    },
+    {
+      "series": "f3",
+      "slug": "driver-form",
+      "route": "/f3/driver-form",
+      "template": "driver-form.html"
+    },
+    {
+      "series": "f3",
+      "slug": "teammate-battles",
+      "route": "/f3/teammate-battles",
+      "template": "teammate-battles.html"
+    },
+    {
+      "series": "f3",
+      "slug": "circuit-analysis",
+      "route": "/f3/circuit-analysis",
+      "template": "circuit-analysis.html"
+    },
+    {
+      "series": "f3",
+      "slug": "records",
+      "route": "/f3/records",
+      "template": "records.html"
+    },
+    {
+      "series": "f3",
+      "slug": "points-systems",
+      "route": "/f3/points-systems",
+      "template": "points-systems.html"
+    },
+    {
+      "series": "f3",
+      "slug": "simulator",
+      "route": "/f3/simulator",
+      "template": "f3-simulator.html"
+    },
+    {
+      "series": "f3",
+      "slug": "simulate-season",
+      "route": "/f3/simulate-season",
+      "template": "f3-simulate-season.html"
+    },
+    {
+      "series": "f3",
+      "slug": "scenario-calculator",
+      "route": "/f3/scenario-calculator",
+      "template": "f3-scenario-calculator.html"
+    },
+    {
+      "series": "f3",
+      "slug": "championship-builder",
+      "route": "/f3/championship-builder",
+      "template": "f3-championship-builder.html"
+    },
+    {
+      "series": "f3",
+      "slug": "games",
+      "route": "/f3/games",
+      "template": "f3-games.html"
+    },
+    {
+      "series": "f3",
+      "slug": "idle-racing-manager",
+      "route": "/f3/idle-racing-manager",
+      "template": "idle-racing-manager.html"
+    },
+    {
+      "series": "f3",
+      "slug": "lights-out",
+      "route": "/f3/lights-out",
+      "template": "lights-out.html"
+    },
+    {
+      "series": "f3",
+      "slug": "about",
+      "route": "/f3/about",
+      "template": "f3-about.html"
+    },
+    {
+      "series": "academy",
+      "slug": "",
+      "route": "/academy",
+      "template": "f3.html"
+    },
+    {
+      "series": "academy",
+      "slug": "database",
+      "route": "/academy/database",
+      "template": "f3-database.html"
+    },
+    {
+      "series": "academy",
+      "slug": "seasons",
+      "route": "/academy/seasons",
+      "template": "f3-seasons.html"
+    },
+    {
+      "series": "academy",
+      "slug": "season",
+      "route": "/academy/season",
+      "template": "f3-season.html"
+    },
+    {
+      "series": "academy",
+      "slug": "races",
+      "route": "/academy/races",
+      "template": "f3-races.html"
+    },
+    {
+      "series": "academy",
+      "slug": "race",
+      "route": "/academy/race",
+      "template": "f3-race.html"
+    },
+    {
+      "series": "academy",
+      "slug": "drivers",
+      "route": "/academy/drivers",
+      "template": "f3-drivers.html"
+    },
+    {
+      "series": "academy",
+      "slug": "driver",
+      "route": "/academy/driver",
+      "template": "f3-driver.html"
+    },
+    {
+      "series": "academy",
+      "slug": "teams",
+      "route": "/academy/teams",
+      "template": "f3-teams.html"
+    },
+    {
+      "series": "academy",
+      "slug": "team",
+      "route": "/academy/team",
+      "template": "f3-team.html"
+    },
+    {
+      "series": "academy",
+      "slug": "circuits",
+      "route": "/academy/circuits",
+      "template": "f3-circuits.html"
+    },
+    {
+      "series": "academy",
+      "slug": "circuit",
+      "route": "/academy/circuit",
+      "template": "f3-circuit.html"
+    },
+    {
+      "series": "academy",
+      "slug": "chassis",
+      "route": "/academy/chassis",
+      "template": "f3-chassis.html"
+    },
+    {
+      "series": "academy",
+      "slug": "analysis",
+      "route": "/academy/analysis",
+      "template": "f3-analysis.html"
+    },
+    {
+      "series": "academy",
+      "slug": "season-analysis",
+      "route": "/academy/season-analysis",
+      "template": "f2-season-analysis.html"
+    },
+    {
+      "series": "academy",
+      "slug": "season-comparison",
+      "route": "/academy/season-comparison",
+      "template": "season-comparison.html"
+    },
+    {
+      "series": "academy",
+      "slug": "race-analysis",
+      "route": "/academy/race-analysis",
+      "template": "race-analysis.html"
+    },
+    {
+      "series": "academy",
+      "slug": "driver-comparison",
+      "route": "/academy/driver-comparison",
+      "template": "driver-comparison.html"
+    },
+    {
+      "series": "academy",
+      "slug": "driver-form",
+      "route": "/academy/driver-form",
+      "template": "driver-form.html"
+    },
+    {
+      "series": "academy",
+      "slug": "teammate-battles",
+      "route": "/academy/teammate-battles",
+      "template": "teammate-battles.html"
+    },
+    {
+      "series": "academy",
+      "slug": "circuit-analysis",
+      "route": "/academy/circuit-analysis",
+      "template": "circuit-analysis.html"
+    },
+    {
+      "series": "academy",
+      "slug": "records",
+      "route": "/academy/records",
+      "template": "records.html"
+    },
+    {
+      "series": "academy",
+      "slug": "points-systems",
+      "route": "/academy/points-systems",
+      "template": "points-systems.html"
+    },
+    {
+      "series": "academy",
+      "slug": "simulator",
+      "route": "/academy/simulator",
+      "template": "f3-simulator.html"
+    },
+    {
+      "series": "academy",
+      "slug": "simulate-season",
+      "route": "/academy/simulate-season",
+      "template": "f3-simulate-season.html"
+    },
+    {
+      "series": "academy",
+      "slug": "scenario-calculator",
+      "route": "/academy/scenario-calculator",
+      "template": "f3-scenario-calculator.html"
+    },
+    {
+      "series": "academy",
+      "slug": "championship-builder",
+      "route": "/academy/championship-builder",
+      "template": "f3-championship-builder.html"
+    },
+    {
+      "series": "academy",
+      "slug": "games",
+      "route": "/academy/games",
+      "template": "f3-games.html"
+    },
+    {
+      "series": "academy",
+      "slug": "idle-racing-manager",
+      "route": "/academy/idle-racing-manager",
+      "template": "idle-racing-manager.html"
+    },
+    {
+      "series": "academy",
+      "slug": "lights-out",
+      "route": "/academy/lights-out",
+      "template": "lights-out.html"
+    },
+    {
+      "series": "academy",
+      "slug": "about",
+      "route": "/academy/about",
+      "template": "f3-about.html"
+    }
+  ]
+}

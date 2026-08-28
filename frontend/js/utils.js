@@ -6,6 +6,7 @@ function params() {
   return new URLSearchParams(window.location.search);
 }
 function activeSeriesKey() {
+  if (window.RacelyticSeries) return window.RacelyticSeries.fromPath().key;
   if (window.location.pathname === '/academy' || window.location.pathname.startsWith('/academy/')) return 'academy';
   if (window.location.pathname === '/f3' || window.location.pathname.startsWith('/f3/')) return 'f3';
   if (window.location.pathname === '/f2' || window.location.pathname.startsWith('/f2/')) return 'f2';
@@ -16,7 +17,8 @@ function activeSeriesBase() {
   return series === 'f1' ? '' : `/${series}`;
 }
 function activeSeriesName() {
-  return { f1: 'Formula 1', f2: 'Formula 2', f3: 'Formula 3', academy: 'F1 Academy' }[activeSeriesKey()];
+  return window.RacelyticSeries?.all[activeSeriesKey()]?.name
+    || { f1: 'Formula 1', f2: 'Formula 2', f3: 'Formula 3', academy: 'F1 Academy' }[activeSeriesKey()];
 }
 function seriesPageUrl(page, parameter, value) {
   const query = parameter ? `?${parameter}=${encodeURIComponent(value)}` : '';
@@ -84,6 +86,7 @@ function displayRaceName(race, compact = false) {
     : race.name || race.officialName || race.shortName || 'Race weekend';
 }
 function setError(id, message='Unable to load data.') {
+  if (window.RacelyticUI) return window.RacelyticUI.setState(id, 'error', message);
   const el = document.getElementById(id);
   if (el) el.innerHTML = `<div class="error">${esc(message)}</div>`;
 }

@@ -1,5 +1,6 @@
 (() => {
   const engine = window.RacelyticReplay;
+  const chunks = window.RacelyticReplayChunks;
   const canvas = document.getElementById('replay-canvas');
   const trackPanel = canvas.parentElement;
   const context = canvas.getContext('2d');
@@ -23,7 +24,11 @@
   let stabilizeLeaderboard = engine.createOrderStabilizer(1);
   let visibleDriverIds = new Set();
   let transformCache;
+  let trackDrawingCache;
+  let lastHudSignature = '';
   let loadSequence = 0;
+  let loadedChunkIndexes = new Set();
+  let chunkRequests = new Map();
   const replayControls = [playButton, pauseButton, stagePlay, speedSelect, timeline,
     document.getElementById('replay-forward'), document.getElementById('replay-restart')];
 
@@ -74,6 +79,25 @@
     const response = await fetch(url);
     if (!response.ok) throw new Error(`Unable to load replay data (${response.status})`);
     return response.json();
+  }
+
+  async function loadChunk(index, requestSequence = loadSequence) {
+    if (!replay?.chunks?.[index] || loadedChunkIndexes.has(index)) return;
+    if (chunkRequests.has(index)) return chunkRequests.get(index);
+    const request = fetchJson(replay.chunks[index].url).then(chunk => {
+      if (requestSequence !== loadSequence || !replay) return;
+      chunks.mergeChunk(replay, chunk);
+      loadedChunkIndexes.add(index);
+    }).finally(() => chunkRequests.delete(index));
+    chunkRequests.set(index, request);
+    return request;
+  }
+
+  async function ensureChunksForTime(time, requestSequence = loadSequence) {
+    if (!replay?.chunks?.length) return;
+    const index = chunks.requiredChunkIndex(replay, time);
+    await loadChunk(index, requestSequence);
+    if (index + 1 < replay.chunks.length) loadChunk(index + 1, requestSequence).catch(() => {});
   }
 
   function sizeCanvas() {
@@ -200,21 +224,24 @@
     const compact = width < 560;
     const transform = coordinateTransform(width, height, replay.track.trace);
     const occupiedLabels = [];
-    const points = replay.track.trace.map(([x, y]) => transform(x, y));
-    const path = new Path2D();
-    if (points.length > 1) {
-      const first = points[0];
-      const last = points.at(-1);
-      path.moveTo((last.x + first.x) / 2, (last.y + first.y) / 2);
+    if (trackDrawingCache?.width !== width || trackDrawingCache?.height !== height
+      || trackDrawingCache?.trace !== replay.track.trace) {
+      const points = replay.track.trace.map(([x, y]) => transform(x, y));
+      const path = new Path2D();
+      if (points.length > 1) {
+        const first = points[0];
+        const last = points.at(-1);
+        path.moveTo((last.x + first.x) / 2, (last.y + first.y) / 2);
+      }
+      for (let index = 0; index < points.length; index += 1) {
+        const point = points[index];
+        const next = points[(index + 1) % points.length];
+        path.quadraticCurveTo(point.x, point.y, (point.x + next.x) / 2, (point.y + next.y) / 2);
+      }
+      path.closePath();
+      trackDrawingCache = { width, height, trace: replay.track.trace, path, startLine: gridStartLine(points) };
     }
-    for (let index = 0; index < points.length; index += 1) {
-      const point = points[index];
-      const next = points[(index + 1) % points.length];
-      path.quadraticCurveTo(point.x, point.y, (point.x + next.x) / 2, (point.y + next.y) / 2);
-    }
-    path.closePath();
-    const startLine = gridStartLine(points);
-    strokeTrack(path, startLine);
+    strokeTrack(trackDrawingCache.path, trackDrawingCache.startLine);
     state.drivers.filter(driver => !['OUT', 'DNS'].includes(driver.statusText)).forEach(driver => {
       const position = transform(driver.x, driver.y);
       drawDriver(driver, position.x, position.y, compact, occupiedLabels);
@@ -256,6 +283,9 @@
   }
 
   function updateHud(state) {
+    const signature = `${Math.floor(state.time * 10)}:${state.lap}:${Math.round(state.time / replay.duration * 1000)}`;
+    if (signature === lastHudSignature) return;
+    lastHudSignature = signature;
     document.getElementById('replay-session-time').textContent = engine.formatTime(state.time);
     document.getElementById('replay-lap-current').textContent = Math.min(state.lap, replay.totalLaps || state.lap);
     document.getElementById('replay-lap-total').textContent = replay.totalLaps || '—';
@@ -294,10 +324,18 @@
 
   function frame(timestamp) {
     if (playing && replay) {
-      const elapsed = Math.min(0.1, (timestamp - lastFrameTime) / 1000);
-      currentTime = Math.min(replay.duration, currentTime + elapsed * Number(speedSelect.value));
+      const elapsed = Math.min(0.25, (timestamp - lastFrameTime) / 1000);
+      const nextTime = Math.min(replay.duration, currentTime + elapsed * Number(speedSelect.value));
+      const nextChunk = replay.chunks?.length ? chunks.requiredChunkIndex(replay, nextTime) : -1;
+      if (nextChunk < 0 || loadedChunkIndexes.has(nextChunk)) currentTime = nextTime;
+      else loadChunk(nextChunk).catch(() => setPlaying(false));
       if (currentTime >= replay.duration) setPlaying(false);
       render();
+      if (replay.chunks?.length) {
+        const chunkIndex = chunks.requiredChunkIndex(replay, currentTime);
+        const chunkEnd = Number(replay.chunks[chunkIndex]?.end) || replay.duration;
+        if (chunkEnd - currentTime < 30) loadChunk(chunkIndex + 1).catch(() => {});
+      }
     }
     lastFrameTime = timestamp;
     requestAnimationFrame(frame);
@@ -320,12 +358,19 @@
     document.getElementById('replay-title').textContent = 'Loading race…';
     raceSelect.disabled = true;
     try {
-      const data = await fetchJson(sample.url || `/data/replays/${sample.file}`);
+      const manifest = await fetchJson(sample.url || `/data/replays/${sample.file}`);
       if (requestSequence !== loadSequence) return;
-      if (data.mode !== 'telemetry' || data.series !== 'f1' || data.track?.type !== 'coordinates') {
+      if (manifest.mode !== 'telemetry' || manifest.series !== 'f1' || manifest.track?.type !== 'coordinates') {
         throw new Error('Only Formula 1 coordinate telemetry replays are supported');
       }
-      replay = data;
+      replay = chunks.prepareManifest(manifest);
+      transformCache = undefined;
+      trackDrawingCache = undefined;
+      lastHudSignature = '';
+      loadedChunkIndexes = new Set();
+      chunkRequests = new Map();
+      if (replay.chunks?.length) await ensureChunksForTime(0, requestSequence);
+      if (requestSequence !== loadSequence) return;
       currentTime = 0;
       lastLeaderboardSignature = '';
       stabilizeLeaderboard = engine.createOrderStabilizer(1);
@@ -403,8 +448,9 @@
     setPlaying(false);
     render(true);
   });
-  timeline.addEventListener('input', () => {
+  timeline.addEventListener('input', async () => {
     currentTime = Number(timeline.value);
+    await ensureChunksForTime(currentTime);
     render(true);
   });
   window.addEventListener('keydown', event => {

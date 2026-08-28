@@ -1,189 +1,4 @@
-/* =========================================================
-   RACELYTIC
-   Global Stylesheet
-   Light / Sharp / Editorial
-   ========================================================= */
 
-
-/* =========================================================
-   DESIGN TOKENS
-   ========================================================= */
-
-:root {
-    --background: #f5f5f3;
-    --surface: #ffffff;
-    --surface-alt: #eeeeec;
-
-    --border: #deded9;
-    --border-strong: #c9c9c3;
-
-    --text: #111214;
-    --text-secondary: #4f5257;
-    --text-muted: #777a80;
-    --text-light: #a1a3a7;
-
-    --accent: #e10600;
-    --accent-dark: #b80500;
-    --accent-light: #fcebea;
-
-    --success: #16834b;
-    --warning: #a86d00;
-
-    --max-width: 1200px;
-
-    --header-height: 72px;
-
-    --radius-sm: 4px;
-    --radius-md: 6px;
-    --radius-lg: 8px;
-
-    --shadow-small: 0 2px 8px rgba(0, 0, 0, 0.04);
-    --shadow-medium: 0 8px 24px rgba(0, 0, 0, 0.08);
-}
-
-
-/* =========================================================
-   RESET
-   ========================================================= */
-
-* {
-    box-sizing: border-box;
-}
-
-html {
-    scroll-behavior: smooth;
-}
-
-body {
-    margin: 0;
-
-    background: var(--background);
-    color: var(--text);
-
-    font-family:
-        Inter,
-        ui-sans-serif,
-        system-ui,
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        sans-serif;
-
-    font-size: 15px;
-    line-height: 1.55;
-
-    -webkit-font-smoothing: antialiased;
-    text-rendering: optimizeLegibility;
-}
-
-img {
-    display: block;
-    max-width: 100%;
-}
-
-button,
-input,
-select,
-textarea {
-    font: inherit;
-}
-
-button {
-    cursor: pointer;
-}
-
-a {
-    color: inherit;
-    text-decoration: none;
-}
-
-h1,
-h2,
-h3,
-h4,
-p {
-    margin-top: 0;
-}
-
-
-/* =========================================================
-   GLOBAL CONTAINER
-   ========================================================= */
-
-.container {
-    width: min(
-        var(--max-width),
-        calc(100% - 48px)
-    );
-
-    margin: 0 auto;
-}
-
-
-/* =========================================================
-   HEADER
-   ========================================================= */
-
-.site-header {
-    position: sticky;
-    top: 0;
-
-    z-index: 1000;
-
-    height: var(--header-height);
-
-    background: rgba(255, 255, 255, 0.94);
-
-    border-bottom: 1px solid var(--border);
-
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-}
-
-.nav {
-    min-height: var(--header-height);
-
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-
-    gap: 32px;
-}
-
-
-/* =========================================================
-   BRAND
-   ========================================================= */
-
-.brand {
-    display: inline-flex;
-    align-items: center;
-
-    color: var(--text);
-
-    font-size: 23px;
-    font-weight: 850;
-
-    letter-spacing: -0.055em;
-
-    white-space: nowrap;
-}
-
-.brand span {
-    color: var(--accent);
-}
-
-
-/* =========================================================
-   MAIN NAVIGATION
-   ========================================================= */
-
-.main-nav {
-    display: flex;
-    align-items: center;
-
-    gap: 2px;
-}
 
 .nav-link {
     position: relative;
@@ -214,24 +29,6 @@ p {
         background 0.15s ease;
 }
 
-.nav-link:hover {
-    background: var(--surface-alt);
-    color: var(--text);
-}
-
-.nav-link.active {
-    color: var(--text);
-}
-
-
-/* =========================================================
-   NAVIGATION DROPDOWN
-   ========================================================= */
-
-.nav-dropdown {
-    position: relative;
-}
-
 .chevron {
     display: inline-block;
 
@@ -243,57 +40,6 @@ p {
 
     transition:
         transform 0.18s ease;
-}
-
-.nav-dropdown:hover .chevron {
-    transform: rotate(180deg);
-}
-
-.dropdown-menu {
-    position: absolute;
-
-    top: calc(100% + 10px);
-    right: 0;
-
-    width: 270px;
-
-    padding: 7px;
-
-    background: var(--surface);
-
-    border: 1px solid var(--border);
-
-    border-radius: var(--radius-md);
-
-    box-shadow: var(--shadow-medium);
-
-    opacity: 0;
-    visibility: hidden;
-
-    transform: translateY(-5px);
-
-    transition:
-        opacity 0.15s ease,
-        transform 0.15s ease,
-        visibility 0.15s ease;
-}
-
-.nav-dropdown:hover .dropdown-menu {
-    opacity: 1;
-    visibility: visible;
-
-    transform: translateY(0);
-}
-
-.dropdown-title {
-    padding: 9px 11px 7px;
-
-    color: var(--accent);
-
-    font-size: 10px;
-    font-weight: 800;
-
-    letter-spacing: 0.15em;
 }
 
 .dropdown-menu a {
@@ -310,15 +56,6 @@ p {
         background 0.12s ease;
 }
 
-.dropdown-menu a:hover {
-    background: var(--surface-alt);
-}
-
-.dropdown-menu a span {
-    font-size: 13px;
-    font-weight: 700;
-}
-
 .dropdown-menu a small {
     margin-top: 2px;
 
@@ -326,28 +63,6 @@ p {
 
     font-size: 11px;
     line-height: 1.4;
-}
-
-
-/* =========================================================
-   HERO
-   ========================================================= */
-
-.hero {
-    padding: 120px 0 105px;
-}
-
-.eyebrow {
-    margin-bottom: 14px;
-
-    color: var(--accent);
-
-    font-size: 11px;
-    font-weight: 800;
-
-    letter-spacing: 0.17em;
-
-    text-transform: uppercase;
 }
 
 .hero h1 {
@@ -366,31 +81,6 @@ p {
     line-height: 0.91;
 
     letter-spacing: -0.075em;
-}
-
-.hero h1 span {
-    color: var(--text-muted);
-}
-
-.hero-copy {
-    max-width: 650px;
-
-    margin-bottom: 0;
-
-    color: var(--text-secondary);
-
-    font-size: 18px;
-    line-height: 1.65;
-}
-
-.hero-actions {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-
-    gap: 10px;
-
-    margin-top: 34px;
 }
 
 
@@ -424,14 +114,6 @@ p {
         transform 0.15s ease;
 }
 
-.button:hover {
-    border-color: #a9aaa5;
-
-    background: var(--surface-alt);
-
-    transform: translateY(-1px);
-}
-
 .button.primary {
     border-color: var(--accent);
 
@@ -440,58 +122,8 @@ p {
     color: #ffffff;
 }
 
-.button.primary:hover {
-    border-color: var(--accent-dark);
-
-    background: var(--accent-dark);
-}
-
 .button.secondary {
     background: var(--surface);
-}
-
-
-/* =========================================================
-   STATISTICS
-   ========================================================= */
-
-.stats-grid {
-    display: grid;
-
-    grid-template-columns:
-        repeat(4, 1fr);
-
-    border-top: 1px solid var(--border);
-    border-bottom: 1px solid var(--border);
-}
-
-.metric {
-    min-height: 130px;
-
-    padding: 25px 24px;
-
-    border-right: 1px solid var(--border);
-
-    background: var(--surface);
-}
-
-.metric:last-child {
-    border-right: 0;
-}
-
-.metric span {
-    display: block;
-
-    margin-bottom: 8px;
-
-    color: var(--text-muted);
-
-    font-size: 11px;
-    font-weight: 700;
-
-    letter-spacing: 0.08em;
-
-    text-transform: uppercase;
 }
 
 .metric strong {
@@ -507,28 +139,6 @@ p {
     letter-spacing: -0.05em;
 }
 
-
-/* =========================================================
-   FEATURE GRID
-   ========================================================= */
-
-.feature-grid {
-    display: grid;
-
-    grid-template-columns:
-        repeat(4, 1fr);
-
-    gap: 1px;
-
-    margin-top: 48px;
-
-    padding-bottom: 100px;
-
-    background: var(--border);
-
-    border: 1px solid var(--border);
-}
-
 .feature {
     position: relative;
 
@@ -540,10 +150,6 @@ p {
 
     transition:
         background 0.15s ease;
-}
-
-.feature:hover {
-    background: #fafaf9;
 }
 
 .feature-kicker {
@@ -593,34 +199,6 @@ p {
     transform: translateX(4px);
 }
 
-
-/* =========================================================
-   PAGE
-   ========================================================= */
-
-.page {
-    padding: 64px 0 100px;
-}
-
-
-/* =========================================================
-   PAGE HEADER
-   ========================================================= */
-
-.page-head {
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-
-    gap: 32px;
-
-    padding-bottom: 28px;
-
-    margin-bottom: 32px;
-
-    border-bottom: 1px solid var(--border);
-}
-
 .page-head h1 {
     margin: 5px 0 8px;
 
@@ -632,14 +210,6 @@ p {
     line-height: 0.95;
 
     letter-spacing: -0.065em;
-}
-
-.page-head p {
-    margin: 0;
-
-    color: var(--text-muted);
-
-    font-size: 14px;
 }
 
 
@@ -682,64 +252,6 @@ p {
 }
 
 
-/* =========================================================
-   SEASON GRID
-   ========================================================= */
-
-.season-grid {
-    display: grid;
-
-    grid-template-columns:
-        repeat(4, 1fr);
-
-    gap: 10px;
-}
-
-
-/* Season card */
-
-.season-card {
-    position: relative;
-
-    display: block;
-
-    padding: 23px;
-
-    background: var(--surface);
-
-    border: 1px solid var(--border);
-
-    transition:
-        border-color 0.15s ease,
-        background 0.15s ease,
-        transform 0.15s ease;
-}
-
-.season-card:hover {
-    border-color: var(--border-strong);
-
-    background: #fafaf9;
-
-    transform: translateY(-2px);
-}
-
-
-/* Season year */
-
-.season-year {
-    margin-bottom: 28px;
-
-    color: var(--text);
-
-    font-size: 38px;
-    font-weight: 800;
-
-    line-height: 1;
-
-    letter-spacing: -0.055em;
-}
-
-
 /* Season statistics */
 
 .season-details {
@@ -753,43 +265,6 @@ p {
     padding-top: 16px;
 
     border-top: 1px solid var(--border);
-}
-
-
-/* Individual season statistic */
-
-.season-stat {
-    padding-right: 12px;
-
-    border-right: 1px solid var(--border);
-}
-
-.season-stat:not(:first-child) {
-    padding-left: 12px;
-}
-
-.season-stat:last-child {
-    padding-right: 0;
-
-    border-right: 0;
-}
-
-
-/* Statistic label */
-
-.season-stat span {
-    display: block;
-
-    margin-bottom: 4px;
-
-    color: var(--text-muted);
-
-    font-size: 9px;
-    font-weight: 800;
-
-    letter-spacing: 0.1em;
-
-    text-transform: uppercase;
 }
 
 
@@ -808,20 +283,6 @@ p {
     letter-spacing: -0.035em;
 
     font-variant-numeric: tabular-nums;
-}
-
-
-/* =========================================================
-   ENTITY GRID
-   ========================================================= */
-
-.entity-grid {
-    display: grid;
-
-    grid-template-columns:
-        repeat(3, 1fr);
-
-    gap: 10px;
 }
 
 .entity-card {
@@ -856,14 +317,6 @@ p {
     letter-spacing: -0.025em;
 }
 
-.entity-card p {
-    margin: 0;
-
-    color: var(--text-muted);
-
-    font-size: 12px;
-}
-
 .entity-card .number {
     display: block;
 
@@ -873,17 +326,6 @@ p {
 
     font-size: 12px;
     font-weight: 750;
-}
-
-
-/* =========================================================
-   DETAIL HERO
-   ========================================================= */
-
-.detail-hero {
-    padding: 10px 0 36px;
-
-    border-bottom: 1px solid var(--border);
 }
 
 .detail-hero h1 {
@@ -902,37 +344,6 @@ p {
     line-height: 0.92;
 
     letter-spacing: -0.07em;
-}
-
-.detail-sub {
-    color: var(--text-muted);
-
-    font-size: 14px;
-}
-
-
-/* =========================================================
-   TWO COLUMN
-   ========================================================= */
-
-.two-col {
-    display: grid;
-
-    grid-template-columns:
-        1fr 1fr;
-
-    gap: 40px;
-
-    margin-top: 42px;
-}
-
-
-/* =========================================================
-   SECTIONS
-   ========================================================= */
-
-.section {
-    margin-top: 56px;
 }
 
 .section-title {
@@ -955,19 +366,6 @@ p {
     text-transform: uppercase;
 }
 
-
-/* =========================================================
-   STANDINGS
-   ========================================================= */
-
-.standings {
-    overflow: hidden;
-
-    background: var(--surface);
-
-    border: 1px solid var(--border);
-}
-
 .standing {
     display: grid;
 
@@ -988,10 +386,6 @@ p {
         background 0.12s ease;
 }
 
-.standing:last-child {
-    border-bottom: 0;
-}
-
 .standing:hover {
     background: var(--surface-alt);
 }
@@ -1009,21 +403,6 @@ p {
     font-weight: 800;
 
     font-variant-numeric: tabular-nums;
-}
-
-.winner {
-    color: var(--accent);
-}
-
-
-/* =========================================================
-   RACE LIST
-   ========================================================= */
-
-.race-list {
-    display: grid;
-
-    gap: 7px;
 }
 
 .race {
@@ -1077,31 +456,12 @@ p {
    TABLES
    ========================================================= */
 
-.table-wrap {
-    overflow-x: auto;
-
-    background: var(--surface);
-
-    border: 1px solid var(--border);
-}
-
 table {
     width: 100%;
 
     min-width: 720px;
 
     border-collapse: collapse;
-}
-
-th,
-td {
-    padding: 12px 15px;
-
-    border-bottom: 1px solid var(--border);
-
-    text-align: left;
-
-    font-size: 12px;
 }
 
 th {
@@ -1134,40 +494,8 @@ tr:last-child td {
     border-bottom: 0;
 }
 
-
-/* =========================================================
-   UTILITY
-   ========================================================= */
-
-.muted {
-    color: var(--text-muted);
-}
-
-.error {
-    padding: 20px 0;
-
-    color: var(--accent);
-
-    font-size: 13px;
-}
-
 .compact {
     margin-bottom: 0;
-}
-
-
-/* =========================================================
-   FOOTER
-   ========================================================= */
-
-.footer {
-    padding: 28px 0 55px;
-
-    border-top: 1px solid var(--border);
-
-    color: var(--text-muted);
-
-    font-size: 12px;
 }
 
 
@@ -2688,14 +2016,6 @@ p {
    TABLES
    ========================================================= */
 
-.table-wrap {
-    overflow-x: auto;
-
-    background: var(--surface);
-
-    border: 1px solid var(--border);
-}
-
 table {
     width: 100%;
 
@@ -2746,14 +2066,6 @@ th {
 
 .muted {
     color: var(--text-muted);
-}
-
-.error {
-    padding: 20px 0;
-
-    color: var(--accent);
-
-    font-size: 13px;
 }
 
 

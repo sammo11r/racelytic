@@ -1,26 +1,10 @@
-const ACADEMY_SERIES = Object.freeze({
-    key: 'academy',
-    name: 'F1 Academy',
-    path: '/academy',
-    modeClass: 'academy-mode',
-    favicon: '/assets/favicon-academy.svg',
-    firstSeason: 2023
-});
+const { all: SERIES } = require('../frontend/js/series-config');
+const { SERIES_PAGE_TEMPLATES } = require('./series-pages');
 
-const ACADEMY_PAGES = Object.freeze({
-    '': 'f3.html', database: 'f3-database.html', seasons: 'f3-seasons.html', season: 'f3-season.html',
-    races: 'f3-races.html', race: 'f3-race.html', drivers: 'f3-drivers.html', driver: 'f3-driver.html',
-    teams: 'f3-teams.html', team: 'f3-team.html', circuits: 'f3-circuits.html', circuit: 'f3-circuit.html',
-    chassis: 'f3-chassis.html', analysis: 'f3-analysis.html',
-    'season-analysis': 'f2-season-analysis.html', 'season-comparison': 'season-comparison.html',
-    'race-analysis': 'race-analysis.html', 'driver-comparison': 'driver-comparison.html',
-    'driver-form': 'driver-form.html', 'teammate-battles': 'teammate-battles.html',
-    'circuit-analysis': 'circuit-analysis.html', records: 'records.html', simulator: 'f3-simulator.html',
-    'simulate-season': 'f3-simulate-season.html', 'scenario-calculator': 'f3-scenario-calculator.html',
-    'championship-builder': 'f3-championship-builder.html', 'points-systems': 'points-systems.html',
-    games: 'f3-games.html', 'idle-racing-manager': 'idle-racing-manager.html', 'lights-out': 'lights-out.html',
-    about: 'f3-about.html'
-});
+const { key, name, path: seriesPath, modeClass, favicon } = SERIES.academy;
+const ACADEMY_SERIES = Object.freeze({ key, name, path: seriesPath, modeClass, favicon, firstSeason: 2023 });
+
+const ACADEMY_PAGES = SERIES_PAGE_TEMPLATES.academy;
 
 const PAGE_COPY = Object.freeze({
     'f3.html': [

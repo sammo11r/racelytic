@@ -65,6 +65,20 @@ The API is intentionally read-only: the website does not modify the F1DB data.
 
 - `/race?id=2025-01` — race classification
 
+## Frontend structure
+
+The frontend stays framework-free, but common behavior is generated from a small shared layer:
+
+- `frontend/templates/page-shell.html` owns the common document shell.
+- `frontend/js/series-config.js` is the single source for F1, F2, F3, and Academy identity and paths.
+- `backend/series-pages.js` maps reusable junior-series templates to public routes.
+- `frontend/js/ui-components.js` and `frontend/css/components.css` provide shared loading, error, empty, filter, table, and chart primitives.
+- `frontend/js/header.js` is only a compatibility loader; navigation, search, analytics, and privacy live in separate modules.
+
+Run `npm run build:frontend` after changing the shell, series configuration, or series-page mappings. It validates every generated route and refreshes `frontend/generated/page-manifest.json`; do not edit that manifest by hand.
+
+Use `npm run consolidate:css` to remove exact duplicate top-level CSS rules safely. The normal `npm run check` command verifies that both generated output and CSS remain current.
+
 ## Quality checks
 
 Run JavaScript syntax and local-link checks with `npm run check`.
@@ -177,8 +191,14 @@ so dashboard credentials and traffic data are encrypted in transit.
 ## Local race replay imports
 
 The race simulator at `/simulate-race` automatically lists replay files imported into
-`frontend/data/replays`. Imports are local static JSON files: they do not change
-the Racelytic database and can be deleted or regenerated independently.
+`frontend/data/replays`. Imports are local files: they do not change the Racelytic
+database and can be deleted or regenerated independently.
+
+Replay manifests use schema version 2. Coordinates and timestamps are quantized, and
+each race is split into a small metadata manifest plus two-minute Brotli timeline chunks.
+The browser loads the first chunk before enabling playback and prefetches the next chunk
+near the end of the current window. Express serves chunks with immutable one-year caching
+and transparently decompresses them for clients that do not advertise Brotli support.
 
 Only Formula 1 coordinate replays from the 2018 season onward are supported.
 Install FastF1 once and run:
@@ -187,6 +207,16 @@ Install FastF1 once and run:
 python -m pip install -r requirements-replay.txt
 npm run import:replay:telemetry -- --year=2024 --round=1
 ```
+
+New imports are compacted automatically. To migrate or verify an existing replay library:
+
+```sh
+npm run compact:replays
+npm run check:replays
+```
+
+The manifest and chunk URLs are deliberately independent, so chunk files can later move
+to object storage or a CDN without changing the replay engine.
 
 The importer rejects earlier seasons. A successful import prints the exact
 preview URL.

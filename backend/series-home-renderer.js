@@ -1,6 +1,8 @@
+const { all: SERIES } = require('../frontend/js/series-config');
+
 const SERIES_HOME_CONFIG = Object.freeze({
     f1: {
-        key: 'f1', name: 'Formula 1', shortName: 'F1', path: '', modeClass: '',
+        ...SERIES.f1,
         favicon: '/assets/favicon.svg', description: 'Explore, analyse, simulate and play with more than seventy years of Formula 1 history.',
         eyebrow: 'FORMULA 1 · EXPLORED', headline: 'More than results.', subheadline: 'A different way to experience F1.',
         introduction: 'Explore the history, uncover patterns, rewrite championships and test what you know in one connected Formula 1 platform.',
@@ -22,8 +24,8 @@ const SERIES_HOME_CONFIG = Object.freeze({
         ]
     },
     f2: {
-        key: 'f2', name: 'Formula 2', shortName: 'F2', path: '/f2', modeClass: 'f2-mode',
-        favicon: '/assets/favicon-f2.svg', description: 'Explore, analyse, simulate and play with the complete Formula 2 archive in Racelytic.',
+        ...SERIES.f2,
+        description: 'Explore, analyse, simulate and play with the complete Formula 2 archive in Racelytic.',
         eyebrow: 'FORMULA 2 · EXPLORED', headline: 'The proving ground.', subheadline: 'Every story behind the step up.',
         introduction: 'Follow the drivers, teams and race weekends that shape the next generation—then analyse, simulate and play with their history.',
         platformEyebrow: 'ONE CHAMPIONSHIP · EVERY ANGLE', platformTitle: 'Go beyond the finishing order.',
@@ -44,8 +46,8 @@ const SERIES_HOME_CONFIG = Object.freeze({
         ]
     },
     f3: {
-        key: 'f3', name: 'Formula 3', shortName: 'F3', path: '/f3', modeClass: 'f3-mode',
-        favicon: '/assets/favicon-f3.svg', description: 'Explore, analyse, simulate and play with FIA Formula 3 history in Racelytic.',
+        ...SERIES.f3,
+        description: 'Explore, analyse, simulate and play with FIA Formula 3 history in Racelytic.',
         eyebrow: 'FORMULA 3 · EXPLORED', headline: 'The first global stage.', subheadline: 'Where the next generation breaks through.',
         introduction: 'Explore the drivers, teams and race weekends that have shaped the championship since 2019—then take the data further.',
         platformEyebrow: 'THE FULL RACELYTIC TOOLKIT', platformTitle: 'A short history, explored deeply.',
@@ -66,8 +68,8 @@ const SERIES_HOME_CONFIG = Object.freeze({
         ]
     },
     academy: {
-        key: 'academy', name: 'F1 Academy', shortName: 'F1 Academy', path: '/academy', modeClass: 'academy-mode',
-        favicon: '/assets/favicon-academy.svg', description: 'Explore, analyse, simulate and play with the complete F1 Academy archive in Racelytic.',
+        ...SERIES.academy,
+        description: 'Explore, analyse, simulate and play with the complete F1 Academy archive in Racelytic.',
         eyebrow: 'F1 ACADEMY · EXPLORED', headline: 'A new generation.', subheadline: 'Every race, career and title story.',
         introduction: 'Follow the drivers, teams and race weekends shaping the championship, with a complete toolkit built around its own format.',
         platformEyebrow: 'ONE SERIES · EVERY ANGLE', platformTitle: 'The complete championship experience.',

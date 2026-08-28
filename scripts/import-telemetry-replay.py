@@ -6,6 +6,7 @@ import csv
 import json
 import math
 import re
+import subprocess
 import sys
 from pathlib import Path
 
@@ -227,6 +228,12 @@ def main():
     catalogue_session = "Race" if str(args.session).upper() == "R" else str(args.session)
     replay_file = catalogue_write(replay, args.year, args.round, catalogue_session, Path(args.output).resolve())
     count = sum(len(rows) for rows in replay["samples"].values())
+    if Path(args.output).resolve() == DEFAULT_OUTPUT.resolve():
+        subprocess.run(
+            ["node", str(ROOT / "scripts" / "compact-replays.js"), "--id", replay["id"]],
+            cwd=ROOT,
+            check=True,
+        )
     print(f"Imported {replay['title']}: {len(replay['drivers'])} drivers, {count} coordinate samples.")
     print(f"Saved {replay_file}")
     print(f"Preview at /simulate-race?year={args.year}&race={replay['id']}")
