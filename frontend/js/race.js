@@ -75,12 +75,15 @@ async function loadRace() {
     const data = await getJSON(`/api/races/${encodeURIComponent(id)}`);
     raceData = data;
     const race = data.race;
-    document.title = `${race.officialName || race.name || `${race.year} Race`} · Formula 1 · Racelytic`;
+    const name = displayRaceName(race);
+    const showOfficialName = race.officialName && race.officialName !== name;
+    document.title = `${race.year} ${name} · Formula 1 · Racelytic`;
     document.getElementById('race-head').innerHTML = `
       <div class="detail-hero">
         <div class="eyebrow">ROUND ${esc(race.round)} · ${esc(race.year)}</div>
-        <h1>${esc(race.officialName)}</h1>
+        <h1>${esc(name)}</h1>
         <div class="detail-sub">${esc(race.circuitName || '')}${race.countryName ? ` · ${esc(race.countryName)}` : ''} · ${esc(fmtDate(race.date))}</div>
+        ${showOfficialName ? `<div class="detail-official-name">Official title: ${esc(race.officialName)}</div>` : ''}
         <div class="race-hero-facts"><span>${fmtNumber(race.laps)} laps</span><span>${fmtNumber(race.distance)} km</span><span>${esc(race.qualifyingFormat ? race.qualifyingFormat.replaceAll('_', ' ').toLowerCase() : 'Grand Prix')}</span></div>
       </div>`;
     renderSessionTabs();

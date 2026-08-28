@@ -10,6 +10,7 @@ function f3SessionKind(session) {
 }
 
 function f3SessionName(session) {
+  if (session.displayName) return String(session.displayName);
   const originalName = String(session.name || 'Session');
   if (originalName.toLowerCase() !== 'race') return originalName;
   const raceSessions = f3RaceData.sessions.filter(item => item.isRace);

@@ -7,6 +7,13 @@ function renderF3PodiumPlace(id, driver) {
 
 function f3SessionType(session, sessionIndex, sessionCount, year) {
   const name = String(session.name || '').toLowerCase();
+  if (document.body.classList.contains('academy-mode')) {
+    if (name.includes('reverse')) return 'S';
+    if (name.includes('feature') || name.includes('opening')) return 'F';
+    if (Number(year) === 2023 && sessionCount === 3 && sessionIndex === 1) return 'S';
+    if (Number(year) === 2025 && ((sessionCount === 2 && sessionIndex === 0) || (sessionCount === 3 && sessionIndex === 1))) return 'S';
+    return 'F';
+  }
   if (name.includes('feature')) return 'F';
   if (name.includes('sprint')) return 'S';
   const sessionNumber = Number(session.sessionNumber || 0);
@@ -20,6 +27,9 @@ function f3SessionType(session, sessionIndex, sessionCount, year) {
 
 function f3SessionLabel(race, session, sessionIndex, sessionCount, year) {
   const code = race.code || `R${race.round}`;
+  if (document.body.classList.contains('academy-mode')) {
+    return sessionCount === 1 ? code : `${code} R${sessionIndex + 1}`;
+  }
   const type = f3SessionType(session, sessionIndex, sessionCount, year);
   if (sessionCount === 1) return code;
   if (Number(year) === 2021 && type === 'S') return `${code} S${sessionIndex + 1}`;

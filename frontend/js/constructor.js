@@ -105,7 +105,7 @@ async function loadConstructor() {
       ? `<table><thead><tr><th>Season</th><th>Race</th><th>Driver</th><th>Grid</th><th>Finish</th><th>Points</th></tr></thead>
         <tbody>${paged.items.map(r => `<tr>
           <td><a href="/season?year=${encodeURIComponent(r.year)}">${esc(r.year)}</a></td>
-          <td><a href="/race?id=${encodeURIComponent(r.raceId)}">${esc(r.officialName)}</a><small>${esc(fmtDate(r.date))}</small></td>
+          <td><a href="/race?id=${encodeURIComponent(r.raceId)}">${esc(displayRaceName(r))}</a><small>${esc(fmtDate(r.date))}</small></td>
           <td><a href="/driver?id=${encodeURIComponent(r.driverId)}">${esc(r.driverName)}</a></td>
           <td>${esc(r.gridPositionNumber ?? '—')}</td>
           <td><span class="finish-position${Number(r.positionNumber) <= 3 ? ' podium' : ''}">${esc(r.positionText || r.positionNumber || '—')}</span></td>

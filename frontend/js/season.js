@@ -454,7 +454,7 @@
                 <th
                     class="race-column"
                     title="${escapeHtml(
-                        race.officialName
+                        displayRaceName(race)
                     )}"
                 >
                     ${escapeHtml(
@@ -518,7 +518,7 @@
                 rows += `
                     <td
                         class="race-point ${resultClass(result)}"
-                        title="${escapeHtml(race.officialName)}: finished ${escapeHtml(resultLabel(result))}, ${escapeHtml(resultPoints(result) || '0')} race points${Number(result?.sprintPoints || 0) > 0 ? `, ${formatNumber(result.sprintPoints)} sprint points` : ''}"
+                        title="${escapeHtml(displayRaceName(race))}: finished ${escapeHtml(resultLabel(result))}, ${escapeHtml(resultPoints(result) || '0')} race points${Number(result?.sprintPoints || 0) > 0 ? `, ${formatNumber(result.sprintPoints)} sprint points` : ''}"
                     >
                         <span
                             class="result-value"
@@ -614,7 +614,7 @@
                 <th
                     class="race-column"
                     title="${escapeHtml(
-                        race.officialName
+                        displayRaceName(race)
                     )}"
                 >
                     ${escapeHtml(
@@ -768,8 +768,7 @@
 
                         <strong>
                             ${escapeHtml(
-                                race.officialName ||
-                                'Grand Prix'
+                                displayRaceName(race)
                             )}
                         </strong>
 
@@ -864,7 +863,7 @@
                     .attr('class', 'calendar-stop')
                     .attr('role', 'button')
                     .attr('tabindex', 0)
-                    .attr('aria-label', race => `Round ${race.round}: ${race.officialName}`)
+                    .attr('aria-label', race => `Round ${race.round}: ${displayRaceName(race)}`)
                     .attr('transform', race => `translate(${projection([Number(race.longitude), Number(race.latitude)])})`);
 
                 stops.append('circle').attr('r', 8);
@@ -874,7 +873,7 @@
                 const activate = (event, race) => {
                     const bounds = container.getBoundingClientRect();
                     const point = window.d3.pointer(event, container);
-                    tooltip.innerHTML = `<strong>Round ${escapeHtml(race.round)}</strong><span>${escapeHtml(race.officialName)}</span><small>${escapeHtml(race.circuitName || '')} · ${escapeHtml(formatDate(race.date))}</small>`;
+                    tooltip.innerHTML = `<strong>Round ${escapeHtml(race.round)}</strong><span>${escapeHtml(displayRaceName(race))}</span><small>${escapeHtml(race.circuitName || '')} · ${escapeHtml(formatDate(race.date))}</small>`;
                     tooltip.style.left = `${Math.min(point[0] + 14, bounds.width - 235)}px`;
                     tooltip.style.top = `${Math.max(point[1] - 35, 10)}px`;
                     tooltip.classList.add('visible');

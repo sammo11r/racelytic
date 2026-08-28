@@ -766,6 +766,8 @@ router.get('/api/seasons/:year', async (req, res) => {
                         r.year,
                         r.round,
                         r.date,
+                        COALESCE(NULLIF(gp.fullName, ''), r.officialName) AS name,
+                        gp.shortName,
                         r.officialName,
                         r.grandPrixId,
                         r.circuitId,
@@ -775,6 +777,8 @@ router.get('/api/seasons/:year', async (req, res) => {
                         c.latitude AS circuitLatitude,
                         c.longitude AS circuitLongitude
                     FROM races r
+                    LEFT JOIN grands_prix gp
+                        ON gp.id = r.grandPrixId
                     LEFT JOIN circuits c
                         ON c.id = r.circuitId
                     WHERE r.year = ?
@@ -1173,6 +1177,8 @@ router.get('/api/seasons/:year', async (req, res) => {
                     id: race.id,
                     round: Number(race.round),
                     date: race.date,
+                    name: race.name,
+                    shortName: race.shortName,
                     officialName: race.officialName,
                     grandPrixId: race.grandPrixId,
                     circuitId: race.circuitId,

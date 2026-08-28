@@ -52,7 +52,7 @@ function driverSeries(data) {
       values: data.calendar.map(race => {
         const result = driver.raceResults?.[String(race.round)];
         cumulative += Number(result?.points || 0) + Number(result?.sprintPoints || 0);
-        return { round: Number(race.round), points: cumulative, race: race.officialName };
+        return { round: Number(race.round), points: cumulative, race: displayRaceName(race) };
       })
     };
   });
@@ -129,11 +129,11 @@ function renderHeatmap() {
   const drivers = seasonData.driverChampionship.slice(0, 15);
   const rounds = seasonData.calendar;
   const container = document.getElementById('results-heatmap');
-  container.innerHTML = `<div class="results-heatmap" style="--rounds:${rounds.length}"><div class="heatmap-corner">Driver</div>${rounds.map(race => `<div class="heatmap-round" data-chart-tooltip="<strong>Round ${race.round}</strong><span>${esc(race.officialName)}</span><b>${esc(fmtDate(race.date))}</b>">R${race.round}</div>`).join('')}${drivers.map(driver => `<a class="heatmap-driver" href="/driver?id=${encodeURIComponent(driver.driverId)}">${esc(driver.name)}</a>${rounds.map(race => {
+  container.innerHTML = `<div class="results-heatmap" style="--rounds:${rounds.length}"><div class="heatmap-corner">Driver</div>${rounds.map(race => `<div class="heatmap-round" data-chart-tooltip="<strong>Round ${race.round}</strong><span>${esc(displayRaceName(race))}</span><b>${esc(fmtDate(race.date))}</b>">R${race.round}</div>`).join('')}${drivers.map(driver => `<a class="heatmap-driver" href="/driver?id=${encodeURIComponent(driver.driverId)}">${esc(driver.name)}</a>${rounds.map(race => {
     const result = driver.raceResults?.[String(race.round)];
     const display = result?.positionText || result?.position || '';
     const sprint = Number(result?.sprintPoints || 0);
-    return `<div tabindex="0" class="heatmap-cell ${resultHeatClass(result)}" data-chart-tooltip="<strong>${esc(driver.name)}</strong><span>R${race.round} · ${esc(race.officialName)}</span><b>${display ? `Finished ${esc(display)}` : 'Did not participate'}${sprint ? ` · ${fmtNumber(sprint)} sprint pts` : ''}</b>">${esc(display)}</div>`;
+    return `<div tabindex="0" class="heatmap-cell ${resultHeatClass(result)}" data-chart-tooltip="<strong>${esc(driver.name)}</strong><span>R${race.round} · ${esc(displayRaceName(race))}</span><b>${display ? `Finished ${esc(display)}` : 'Did not participate'}${sprint ? ` · ${fmtNumber(sprint)} sprint pts` : ''}</b>">${esc(display)}</div>`;
   }).join('')}`).join('')}</div><div class="heatmap-key"><span class="winner">Win</span><span class="podium">Podium</span><span class="points">Points</span><span class="finish">Finish</span><span class="retired">Retired / unclassified</span></div>`;
   bindChartTooltips(container);
 }

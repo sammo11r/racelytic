@@ -198,11 +198,13 @@ router.get('/api/circuits/:id/analysis', async (req, res) => {
                 connection.query(`SELECT c.id, c.name, c.fullName, c.countryId, co.name AS countryName, cl.id AS layoutId
                     FROM circuits c LEFT JOIN countries co ON co.id = c.countryId
                     LEFT JOIN circuits_layouts cl ON cl.circuitId = c.id AND cl.effective = 1 WHERE c.id = ?`, [req.params.id]),
-                connection.query(`SELECT r.id AS raceId, r.year, r.round, r.date, r.officialName, r.laps AS raceLaps,
+                connection.query(`SELECT r.id AS raceId, r.year, r.round, r.date,
+                    COALESCE(NULLIF(gp.fullName, ''), r.officialName) AS name, gp.shortName, r.officialName, r.laps AS raceLaps,
                     rr.driverId, d.name AS driverName, rr.constructorId, k.name AS constructorName,
                     rr.positionNumber, rr.positionText, rr.gridPositionNumber, rr.qualificationPositionNumber,
                     rr.laps, rr.gap, rr.reasonRetired, rr.polePosition, rr.fastestLap, rr.points
                     FROM races r JOIN races_race_results rr ON rr.raceId = r.id
+                    LEFT JOIN grands_prix gp ON gp.id = r.grandPrixId
                     JOIN drivers d ON d.id = rr.driverId LEFT JOIN constructors k ON k.id = rr.constructorId
                     WHERE r.circuitId = ? ORDER BY r.year, r.round, rr.positionDisplayOrder, rr.positionNumber`, [req.params.id])
             ]);
@@ -211,7 +213,7 @@ router.get('/api/circuits/:id/analysis', async (req, res) => {
             rows.forEach(row => {
                 if (!races.has(String(row.raceId))) races.set(String(row.raceId), {
                     id: row.raceId, year: Number(row.year), round: Number(row.round), date: row.date,
-                    officialName: row.officialName, laps: Number(row.raceLaps || 0), results: []
+                    name: row.name, shortName: row.shortName, officialName: row.officialName, laps: Number(row.raceLaps || 0), results: []
                 });
                 races.get(String(row.raceId)).results.push({
                     driverId: row.driverId, driverName: row.driverName, constructorId: row.constructorId,
@@ -327,6 +329,8 @@ router.get('/api/circuits/:id', async (req, res) => {
                         r.year,
                         r.round,
                         r.date,
+                        COALESCE(NULLIF(gp.fullName, ''), r.officialName) AS name,
+                        gp.shortName,
                         r.officialName,
                         r.laps,
                         r.distance,
@@ -336,6 +340,9 @@ router.get('/api/circuits/:id', async (req, res) => {
                         k.name AS winnerConstructorName
 
                     FROM races r
+
+                    LEFT JOIN grands_prix gp
+                        ON gp.id = r.grandPrixId
 
                     LEFT JOIN races_race_results winner
                         ON winner.raceId = r.id

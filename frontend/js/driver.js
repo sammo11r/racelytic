@@ -62,7 +62,7 @@ async function loadDriver() {
       ? `<table><thead><tr><th>Season</th><th>Race</th><th>Constructor</th><th>Grid</th><th>Finish</th><th>Points</th></tr></thead>
         <tbody>${paged.items.map(r => `<tr>
           <td><a href="/season?year=${encodeURIComponent(r.year)}">${esc(r.year)}</a></td>
-          <td><a href="/race?id=${encodeURIComponent(r.raceId)}">${esc(r.officialName)}</a><small>${esc(fmtDate(r.date))}</small></td>
+          <td><a href="/race?id=${encodeURIComponent(r.raceId)}">${esc(displayRaceName(r))}</a><small>${esc(fmtDate(r.date))}</small></td>
           <td>${r.constructorName ? `<a href="/constructor?id=${encodeURIComponent(r.constructorId)}">${esc(r.constructorName)}</a>` : '—'}</td>
           <td>${esc(r.gridPositionNumber ?? '—')}</td>
           <td><span class="finish-position${Number(r.positionNumber) <= 3 ? ' podium' : ''}">${esc(r.positionText || r.positionNumber || '—')}</span></td>

@@ -1,5 +1,5 @@
-const JUNIOR_ANALYSIS_SERIES = window.location.pathname.startsWith('/f3/') ? 'f3' : 'f2';
-const JUNIOR_ANALYSIS_LABEL = JUNIOR_ANALYSIS_SERIES === 'f3' ? 'Formula 3' : 'Formula 2';
+const JUNIOR_ANALYSIS_SERIES = activeSeriesKey();
+const JUNIOR_ANALYSIS_LABEL = activeSeriesName();
 const JUNIOR_ANALYSIS_BASE = `/${JUNIOR_ANALYSIS_SERIES}`;
 const F2_ANALYSIS_COLORS = [activeSeriesAccent(),'#f2a900','#16a36a','#8b5cf6','#e56b22','#0f9fa8','#d94c9d','#68707d','#7d9b35','#4f46b8','#ad6b47','#0091d5','#c13d63','#536d3b','#9367a8','#a77b00','#3b8391','#cf5944','#6573c3'];
 let f2AnalysisData;
@@ -8,15 +8,17 @@ let f2SelectedDrivers = new Set();
 let f2DriverStyles = new Map();
 let f2Tooltip;
 
-if (JUNIOR_ANALYSIS_SERIES === 'f3') {
+if (JUNIOR_ANALYSIS_SERIES !== 'f2') {
   const backLink = document.querySelector('.back-link');
-  if (backLink) backLink.href = '/f3/analysis';
+  if (backLink) backLink.href = `${JUNIOR_ANALYSIS_BASE}/analysis`;
   const eyebrow = document.querySelector('.analysis-detail-head .eyebrow');
-  if (eyebrow) eyebrow.textContent = 'FORMULA 3 SEASON ANALYSIS';
+  if (eyebrow) eyebrow.textContent = `${JUNIOR_ANALYSIS_LABEL.toUpperCase()} SEASON ANALYSIS`;
   const description = document.querySelector('.analysis-detail-head p');
-  if (description) description.textContent = 'Follow how the standings changed through every sprint and feature race using Formula 3 results and scoring.';
+  if (description) description.textContent = JUNIOR_ANALYSIS_SERIES === 'academy'
+    ? 'Follow how the standings changed through every F1 Academy race using the championship’s recorded results and scoring.'
+    : 'Follow how the standings changed through every sprint and feature race using Formula 3 results and scoring.';
   const tablist = document.querySelector('.analysis-visualization-tabs');
-  if (tablist) tablist.setAttribute('aria-label', 'Formula 3 season analysis visualization');
+  if (tablist) tablist.setAttribute('aria-label', `${JUNIOR_ANALYSIS_LABEL} season analysis visualization`);
 }
 
 function selectF2AnalysisView(view) {
@@ -56,6 +58,13 @@ function bindF2Tooltips(container = document) {
 
 function f2AnalysisSessionType(session, index, count) {
   const name = String(session.name || '').toLowerCase();
+  if (JUNIOR_ANALYSIS_SERIES === 'academy') {
+    if (name.includes('reverse')) return 'S';
+    if (name.includes('feature') || name.includes('opening')) return 'F';
+    if (Number(f2AnalysisData?.year) === 2023 && count === 3 && index === 1) return 'S';
+    if (Number(f2AnalysisData?.year) === 2025 && ((count === 2 && index === 0) || (count === 3 && index === 1))) return 'S';
+    return 'F';
+  }
   if (name.includes('sprint') || /race\s*1/.test(name)) return 'S';
   if (name.includes('feature') || /race\s*2/.test(name)) return 'F';
   return count > 1 && index === 0 ? 'S' : 'F';
@@ -66,7 +75,9 @@ function flattenF2AnalysisSessions(data) {
     ...session,
     race,
     type: f2AnalysisSessionType(session, index, race.sessions.length),
-    label: `${race.code || `R${race.round}`} ${f2AnalysisSessionType(session, index, race.sessions.length)}`
+    label: JUNIOR_ANALYSIS_SERIES === 'academy'
+      ? `${race.code || `R${race.round}`} R${index + 1}`
+      : `${race.code || `R${race.round}`} ${f2AnalysisSessionType(session, index, race.sessions.length)}`
   })));
 }
 
@@ -107,7 +118,7 @@ function f2LineChart(series, { height = 430, suffix = '' } = {}) {
     }).join('');
     return `<g class="chart-series" style="--series-color:${item.color}"><path d="${path}"${item.dash ? ` stroke-dasharray="${item.dash}"` : ''}/>${dots}</g>`;
   }).join('');
-  return `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Championship points by Formula 2 race session"><g class="chart-grid">${grid}${labels}</g>${lines}</svg>`;
+  return `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Championship points by ${esc(JUNIOR_ANALYSIS_LABEL)} race session"><g class="chart-grid">${grid}${labels}</g>${lines}</svg>`;
 }
 
 function renderF2Progression() {
@@ -171,6 +182,8 @@ function f2Average(values) {
 }
 
 function renderF2Averages() {
+  const firstRaceLabel = JUNIOR_ANALYSIS_SERIES === 'academy' ? 'Avg. reverse-grid' : 'Avg. sprint';
+  const secondRaceLabel = JUNIOR_ANALYSIS_SERIES === 'academy' ? 'Avg. standard race' : 'Avg. feature';
   const rows = f2AnalysisData.championship.map(driver => {
     const sprint = [], feature = [];
     f2AnalysisSessions.forEach(session => {
@@ -179,7 +192,7 @@ function renderF2Averages() {
     });
     return { ...driver, sprintAverage: f2Average(sprint), featureAverage: f2Average(feature), starts: sprint.length + feature.length };
   }).sort((first, second) => (f2Average([first.sprintAverage, first.featureAverage].filter(Number.isFinite)) ?? 99) - (f2Average([second.sprintAverage, second.featureAverage].filter(Number.isFinite)) ?? 99));
-  document.getElementById('f2-average-table').innerHTML = `<table class="average-position-table"><thead><tr><th>Driver</th><th>Avg. sprint</th><th>Avg. feature</th><th>Classified results</th><th>Final standing</th></tr></thead><tbody>${rows.map(driver => `<tr><td><a href="${JUNIOR_ANALYSIS_BASE}/driver?id=${encodeURIComponent(driver.driverId)}">${esc(driver.name)}</a></td><td>${driver.sprintAverage?.toFixed(2) ?? '—'}</td><td>${driver.featureAverage?.toFixed(2) ?? '—'}</td><td>${fmtNumber(driver.starts)}</td><td>P${esc(driver.position)}</td></tr>`).join('')}</tbody></table>`;
+  document.getElementById('f2-average-table').innerHTML = `<table class="average-position-table"><thead><tr><th>Driver</th><th>${firstRaceLabel}</th><th>${secondRaceLabel}</th><th>Classified results</th><th>Final standing</th></tr></thead><tbody>${rows.map(driver => `<tr><td><a href="${JUNIOR_ANALYSIS_BASE}/driver?id=${encodeURIComponent(driver.driverId)}">${esc(driver.name)}</a></td><td>${driver.sprintAverage?.toFixed(2) ?? '—'}</td><td>${driver.featureAverage?.toFixed(2) ?? '—'}</td><td>${fmtNumber(driver.starts)}</td><td>P${esc(driver.position)}</td></tr>`).join('')}</tbody></table>`;
 }
 
 async function renderF2SeasonAnalysis() {

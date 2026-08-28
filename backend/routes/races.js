@@ -195,8 +195,10 @@ router.get('/api/races/:id', async (req, res) => {
                 sprintQualifying, preQualifying, practice1, practice2, practice3,
                 practice4, warmingUp] = await Promise.all([
                 connection.query(`
-                    SELECT r.*, COALESCE(NULLIF(c.fullName, ''), c.name) AS circuitName, co.name AS countryName
+                    SELECT r.*, COALESCE(NULLIF(gp.fullName, ''), r.officialName) AS name,
+                        gp.shortName, COALESCE(NULLIF(c.fullName, ''), c.name) AS circuitName, co.name AS countryName
                     FROM races r
+                    LEFT JOIN grands_prix gp ON gp.id = r.grandPrixId
                     LEFT JOIN circuits c ON c.id = r.circuitId
                     LEFT JOIN countries co ON co.id = c.countryId
                     WHERE r.id = ?
@@ -314,9 +316,9 @@ router.get('/api/races', async (req, res) => {
             if (year) { conditions.push('r.year = ?'); values.push(year); }
             if (req.query.circuit) { conditions.push('r.circuitId = ?'); values.push(String(req.query.circuit)); }
             if (req.query.search) {
-                conditions.push('(r.officialName LIKE ? OR c.name LIKE ? OR co.name LIKE ?)');
+                conditions.push('(r.officialName LIKE ? OR gp.fullName LIKE ? OR gp.shortName LIKE ? OR c.name LIKE ? OR co.name LIKE ?)');
                 const search = `%${String(req.query.search).trim()}%`;
-                values.push(search, search, search);
+                values.push(search, search, search, search, search);
             }
             return connection.query(`
                 SELECT
@@ -324,6 +326,8 @@ router.get('/api/races', async (req, res) => {
                     r.year,
                     r.round,
                     r.date,
+                    COALESCE(NULLIF(gp.fullName, ''), r.officialName) AS name,
+                    gp.shortName,
                     r.officialName,
                     r.circuitId,
                     r.laps,
@@ -333,6 +337,9 @@ router.get('/api/races', async (req, res) => {
                     co.name AS countryName
 
                 FROM races r
+
+                LEFT JOIN grands_prix gp
+                    ON gp.id = r.grandPrixId
 
                 LEFT JOIN circuits c
                     ON c.id = r.circuitId

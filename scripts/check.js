@@ -29,4 +29,40 @@ if (legacyLinks.length) {
     process.exit(1);
 }
 
-console.log(`Checked ${files.length} JavaScript files and local page links.`);
+const sharedFrontendDependencies = [
+    { symbol: 'displayRaceName', provider: '/js/utils.js' },
+];
+const frontendRoot = path.join(root, 'frontend');
+const htmlFiles = fs.readdirSync(frontendRoot, { recursive: true })
+    .filter(file => file.endsWith('.html'))
+    .map(file => path.join(frontendRoot, file));
+const missingDependencies = [];
+
+for (const htmlFile of htmlFiles) {
+    const html = fs.readFileSync(htmlFile, 'utf8');
+    const scriptSources = [...html.matchAll(/<script[^>]+src=["']([^"']+)["'][^>]*>/gi)]
+        .map(match => match[1]);
+
+    for (const dependency of sharedFrontendDependencies) {
+        const providerIndex = scriptSources.indexOf(dependency.provider);
+        for (const [consumerIndex, source] of scriptSources.entries()) {
+            if (!source.startsWith('/js/') || source === dependency.provider) continue;
+            const scriptFile = path.join(frontendRoot, source.slice(1).replaceAll('/', path.sep));
+            if (!fs.existsSync(scriptFile)) continue;
+            const script = fs.readFileSync(scriptFile, 'utf8');
+            if (!new RegExp(`\\b${dependency.symbol}\\b`).test(script)) continue;
+            if (providerIndex < 0 || providerIndex > consumerIndex) {
+                missingDependencies.push(
+                    `${path.relative(root, htmlFile)} loads ${source} without loading ${dependency.provider} first (${dependency.symbol})`,
+                );
+            }
+        }
+    }
+}
+
+if (missingDependencies.length) {
+    console.error(`Missing frontend script dependencies:\n${missingDependencies.join('\n')}`);
+    process.exit(1);
+}
+
+console.log(`Checked ${files.length} JavaScript files, local page links, and shared frontend dependencies.`);

@@ -58,7 +58,7 @@ async function loadCircuit() {
         <article class="circuit-race-card">
           <div class="circuit-race-year">${esc(r.year)}</div>
           <div class="circuit-race-copy">
-            <a href="/race?id=${encodeURIComponent(r.id)}"><strong>${esc(r.officialName)}</strong></a>
+            <a href="/race?id=${encodeURIComponent(r.id)}"><strong>${esc(displayRaceName(r))}</strong></a>
             <span>Round ${esc(r.round)} · ${esc(fmtDate(r.date))}${r.laps ? ` · ${fmtNumber(r.laps)} laps` : ''}</span>
             ${r.winnerName ? `<small>Won by <a href="/driver?id=${encodeURIComponent(r.winnerDriverId)}">${esc(r.winnerName)}</a>${r.winnerConstructorName ? ` for <a href="/constructor?id=${encodeURIComponent(r.winnerConstructorId)}">${esc(r.winnerConstructorName)}</a>` : ''}</small>` : ''}
           </div>

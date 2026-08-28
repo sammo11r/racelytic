@@ -309,6 +309,8 @@ router.get('/api/constructors/:id', async (req, res) => {
 
                         d.name AS driverName,
 
+                        COALESCE(NULLIF(gp.fullName, ''), r.officialName) AS name,
+                        gp.shortName,
                         r.officialName,
                         r.date,
 
@@ -321,6 +323,9 @@ router.get('/api/constructors/:id', async (req, res) => {
 
                     JOIN races r
                         ON r.id = rr.raceId
+
+                    LEFT JOIN grands_prix gp
+                        ON gp.id = r.grandPrixId
 
                     LEFT JOIN circuits c
                         ON c.id = r.circuitId

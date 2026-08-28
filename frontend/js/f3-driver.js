@@ -13,6 +13,7 @@ function f3ProfileCountry(code) {
 
 function f3RaceLabel(result) {
   const name = String(result.sessionName || '').trim();
+  if (document.body.classList.contains('academy-mode')) return name || 'Race';
   if (/feature/i.test(name)) return 'Feature race';
   if (/sprint/i.test(name)) return name;
   if (name.toLowerCase() !== 'race') return name || 'Race';

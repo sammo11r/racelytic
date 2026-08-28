@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Search every Racelytic series, race, circuit, driver, team and season.">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <title>Search · Racelytic</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/polish.css">
+</head>
+<body>
+  <div id="header"></div>
+  <main class="container search-page">
+    <section class="search-page-hero">
+      <div class="eyebrow">GLOBAL SEARCH</div>
+      <h1>Find anything in Racelytic.</h1>
+      <p>Search across every championship, then narrow the complete result set by series.</p>
+      <form class="search-page-form" id="search-page-form" role="search">
+        <label><span>Search</span><input id="search-page-input" type="search" autocomplete="off" maxlength="80" placeholder="Driver, circuit, race, team or season…"></label>
+        <label><span>Series</span><select id="search-page-series">
+          <option value="all">All series</option>
+          <option value="f1">Formula 1</option>
+          <option value="f2">Formula 2</option>
+          <option value="f3">Formula 3</option>
+          <option value="academy">F1 Academy</option>
+        </select></label>
+        <button class="button primary" type="submit">Search</button>
+      </form>
+    </section>
+    <div class="search-page-status" id="search-page-status" aria-live="polite">Enter at least two characters to search.</div>
+    <div class="search-page-results" id="search-page-results"></div>
+  </main>
+  <footer class="footer"><div class="container">Racelytic</div></footer>
+  <script src="/js/utils.js"></script>
+  <script src="/js/header.js"></script>
+  <script src="/js/search.js"></script>
+</body>
+</html>

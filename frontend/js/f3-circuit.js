@@ -9,6 +9,7 @@ function f3CircuitSessionName(session, race) {
   if (name.toLowerCase() !== 'race') return name;
   const raceSessions = race.sessions.filter(item => item.isRace || (item.cancelled && /race/i.test(item.name)));
   const index = raceSessions.findIndex(item => item.id === session.id);
+  if (document.body.classList.contains('academy-mode')) return `Race ${index + 1}`;
   const year = Number(race.year);
   if (year === 2021 && index < raceSessions.length - 1) return `Sprint Race ${index + 1}`;
   if (year <= 2020) return index === 0 ? 'Feature Race' : 'Sprint Race';
