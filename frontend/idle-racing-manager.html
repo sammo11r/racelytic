@@ -12,23 +12,27 @@
 <body>
   <div id="header"></div>
   <main class="idle-manager-page">
-    <header class="irm-hero container">
-      <a class="back-link" id="irm-games-link" href="/games">← Games</a>
-      <div class="eyebrow">FICTIONAL MOTORSPORT · TEAM MANAGEMENT</div>
-      <h1>Build the team.<br><span>Earn the next race.</span></h1>
-      <p>Choose the right circuit, develop the car and turn a small privateer into a championship-level operation.</p>
+    <header class="irm-page-intro container">
+      <div class="irm-page-intro-top">
+        <a class="back-link" id="irm-games-link" href="/games">← Games</a>
+        <div class="eyebrow">FICTIONAL MOTORSPORT · TEAM MANAGEMENT</div>
+      </div>
+      <div class="irm-page-intro-copy">
+        <h1>Idle Racing Manager</h1>
+        <p>Turn a privateer team into a championship operation, one race at a time.</p>
+      </div>
     </header>
 
     <section class="irm-game" aria-label="Idle Racing Manager">
       <header class="irm-team-bar">
-        <div class="irm-team-identity"><span>PRIVATEER TEAM</span><strong id="irm-team-name">Apex Racing</strong></div>
+        <div class="irm-team-identity"><span>RACELYTIC GAME</span><strong>Idle Racing Manager</strong></div>
         <dl class="irm-resources">
           <div><dt>Balance</dt><dd id="irm-money">€2,000</dd></div>
           <div><dt>Reputation</dt><dd id="irm-reputation">0</dd></div>
           <div><dt>Research</dt><dd id="irm-research">0 RP</dd></div>
         </dl>
         <div class="irm-team-actions">
-          <button class="irm-fullscreen" id="irm-fullscreen" type="button" aria-pressed="false"><span id="irm-fullscreen-label">Fullscreen</span></button>
+          <button class="irm-fullscreen" id="irm-fullscreen" type="button" role="switch" aria-checked="false" aria-pressed="false"><span class="irm-toggle-track" aria-hidden="true"><i></i></span><span class="irm-fullscreen-label" id="irm-fullscreen-label">Fullscreen</span></button>
           <button class="irm-reset" id="irm-reset" type="button">Reset save</button>
         </div>
       </header>
@@ -45,15 +49,14 @@
         </nav>
 
         <div class="irm-workspace">
-          <section class="irm-view active" data-view-panel="race" aria-labelledby="irm-race-title">
-            <header class="irm-workspace-head"><div><span>RACE WEEKEND</span><h2 id="irm-race-title">Prepare the next race</h2><p>Choose a circuit, review the team and commit to the full race.</p></div><b id="irm-race-readiness">READY</b></header>
+          <section class="irm-view active" data-view-panel="race" aria-label="Race">
+            <div class="irm-team-snapshot">
+              <article><span>CAR</span><strong id="irm-race-car-rating">10.0</strong><p id="irm-race-car-detail">100% condition</p><div class="irm-race-card-actions"><button type="button" data-jump-view="development">Develop</button><button class="irm-service-button" id="irm-service" type="button">Service <span id="irm-service-cost">Ready</span></button></div></article>
+              <article><span>DRIVER</span><strong id="irm-race-driver-name">Mara Voss</strong><p id="irm-race-driver-detail">Rating 36 · €350 per race</p><button type="button" data-jump-view="driver">Manage</button></article>
+              <article><span>SPONSOR</span><strong id="irm-race-sponsor-name">Copper Kettle Café</strong><p id="irm-race-sponsor-detail">P10 · 1.20× · 5 races left</p><button type="button" data-jump-view="sponsor">Manage</button></article>
+            </div>
 
-            <div class="irm-race-prep" id="irm-race-prep">
-              <div class="irm-team-snapshot">
-                <article><span>CAR</span><strong id="irm-race-car-rating">10.0</strong><p id="irm-race-car-detail">100% condition</p><button type="button" data-jump-view="development">Open development</button></article>
-                <article><span>DRIVER</span><strong id="irm-race-driver-name">Mara Voss</strong><p id="irm-race-driver-detail">Rating 36 · €350 per race</p><button type="button" data-jump-view="driver">Open drivers</button></article>
-                <article><span>SPONSOR</span><strong id="irm-race-sponsor-name">Copper Kettle Café</strong><p id="irm-race-sponsor-detail">P10 · 1.20× · 5 races left</p><button type="button" data-jump-view="sponsor">Open sponsors</button></article>
-              </div>
+            <aside class="irm-race-prep" id="irm-race-prep" aria-label="Race entry">
 
               <section class="irm-circuit-picker" aria-labelledby="irm-circuit-picker-title">
                 <div class="irm-section-title"><div><span>VENUE</span><h3 id="irm-circuit-picker-title">Choose the circuit</h3></div><small id="irm-circuit-count">1 available</small></div>
@@ -73,56 +76,56 @@
                 <div><span>Sponsored win</span><strong class="positive" id="irm-sponsored-prize">€2,900</strong></div>
               </div>
               <button class="irm-start-race" id="irm-start-race" type="button"><span>Start race</span><small id="irm-start-detail">8 laps · full race playback</small></button>
-            </div>
+            </aside>
 
             <section class="irm-race-stage" id="irm-race-stage" aria-label="Race simulation">
-              <div class="irm-console-head"><div><span>RACE CONTROL</span><h3 id="irm-race-status">Ready</h3></div><div class="irm-live-light"><i></i><span id="irm-live-label">STANDBY</span></div></div>
+              <div class="irm-track-hud"><div class="irm-track-running"><span id="irm-lap-label">LAP — / —</span><strong id="irm-position">POS —</strong></div><div class="irm-live-light"><i></i><span id="irm-live-label">STANDBY</span></div></div>
               <div class="irm-race-stage-grid">
                 <div class="irm-race-visual"><canvas id="irm-race-canvas" role="img" aria-label="Race animation ready"></canvas></div>
-                <div class="irm-race-position"><span id="irm-lap-label">NEXT RACE</span><strong id="irm-position">P—</strong><small id="irm-performance">Choose a circuit to begin</small></div>
               </div>
               <div class="irm-race-progress"><i id="irm-race-progress"></i></div>
-              <ol class="irm-race-log" id="irm-race-log" aria-live="polite"><li><time>HQ</time><span>Your team is ready for its first race.</span></li></ol>
-              <p class="irm-fixed-speed-note">Race playback runs at live speed and cannot be skipped.</p>
+              <ol class="irm-race-log" id="irm-race-log" aria-live="polite" hidden><li><time>HQ</time><span>Your team is ready for its first race.</span></li></ol>
+              <p class="irm-fixed-speed-note">Fixed-speed playback · cannot be skipped</p>
             </section>
           </section>
 
-          <section class="irm-view" data-view-panel="development" aria-labelledby="irm-development-title" hidden>
-            <header class="irm-workspace-head"><div><span>TECHNICAL</span><h2 id="irm-development-title">Car development</h2><p>Develop four specialist departments through branching upgrade paths. Every purchase must connect to an installed node.</p></div><b id="irm-car-rating">10.0</b></header>
-            <div class="irm-development-overview">
-              <section class="irm-workspace-card irm-development-status">
-                <div class="irm-condition"><span>Condition</span><div><i id="irm-condition-bar"></i></div><b id="irm-condition">100%</b></div>
-                <div class="irm-department-summary" id="irm-department-summary"></div>
-                <button class="irm-service-button" id="irm-service" type="button">Service car <span id="irm-service-cost">Ready</span></button>
-              </section>
-              <aside class="irm-workspace-card irm-development-note"><span>ENGINEER CEILING</span><strong id="irm-development-limit">Level 24</strong><p id="irm-development-engineer">Nia Calder can develop every department to level 24.</p><button type="button" data-jump-view="engineer">Review engineers</button></aside>
-            </div>
+          <section class="irm-view" data-view-panel="development" aria-label="Development" hidden>
+            <header class="irm-development-head">
+              <div><span>PERFORMANCE LAB</span><h2>Car development</h2><p>Build each department from its foundation toward a defining final upgrade. Select a node to inspect its cost, effect and requirements.</p></div>
+              <dl class="irm-development-summary">
+                <div><dt>Car rating</dt><dd id="irm-development-rating">10.0</dd></div>
+                <div><dt>Condition</dt><dd id="irm-development-condition">100%</dd></div>
+                <div><dt>Engineer ceiling</dt><dd id="irm-development-ceiling">L24</dd></div>
+              </dl>
+            </header>
             <div class="irm-department-tabs" id="irm-department-tabs" role="tablist" aria-label="Development departments"></div>
-            <section class="irm-tree-panel">
-              <div class="irm-section-title"><div><span>UPGRADE TREE</span><h3 id="irm-tree-title">Aerodynamics</h3></div><small id="irm-tree-progress">1 / 7 installed</small></div>
-              <div class="irm-upgrade-tree" id="irm-upgrade-tree"></div>
-            </section>
+            <div class="irm-development-layout">
+              <section class="irm-tree-panel">
+                <div class="irm-section-title"><div><span>UPGRADE TREE</span><h3 id="irm-tree-title">Aerodynamics</h3></div><div class="irm-tree-status"><small id="irm-tree-progress">1 / 7 installed</small><span><i></i>Available</span><span><i></i>Installed</span></div></div>
+                <div class="irm-upgrade-tree" id="irm-upgrade-tree"></div>
+              </section>
+              <aside class="irm-upgrade-detail" id="irm-upgrade-detail" aria-label="Selected upgrade"></aside>
+            </div>
           </section>
 
           <section class="irm-view" data-view-panel="engineer" aria-labelledby="irm-engineer-title" hidden>
-            <header class="irm-workspace-head"><div><span>TECHNICAL TEAM</span><h2 id="irm-engineer-title">Engineers</h2><p>A stronger lead engineer raises the car's development ceiling and adds to every race budget.</p></div></header>
-            <article class="irm-current-hire"><div><span>CURRENT ENGINEER</span><h3 id="irm-engineer-name">Nia Calder</h3><p id="irm-engineer-role">Garage engineer</p></div><dl><div><dt>Upgrade ceiling</dt><dd id="irm-engineer-limit">Level 24</dd></div><div><dt>Race fee</dt><dd id="irm-engineer-cost">€125</dd></div></dl></article>
-            <div class="irm-section-title"><div><span>MARKET</span><h3>Available engineers</h3></div><small>Reputation + research required</small></div>
+            <header class="irm-workspace-head irm-engineer-head"><div><span>TECHNICAL TEAM</span><h2 id="irm-engineer-title">Engineers</h2></div></header>
+            <article class="irm-current-hire"><div><span>CURRENT ENGINEER</span><h3 id="irm-engineer-name">Nia Calder</h3><p id="irm-engineer-role">Garage engineer</p></div><dl><div><dt>Upgrade ceiling</dt><dd id="irm-engineer-limit">Level 16</dd></div><div><dt>Race bonus</dt><dd id="irm-engineer-bonus">+0.0</dd></div><div><dt>Race fee</dt><dd id="irm-engineer-cost">€75</dd></div></dl></article>
+            <div class="irm-section-title irm-engineer-market-head"><div><span>MARKET</span><h3>Available engineers</h3></div></div>
             <div class="irm-market-list" id="irm-engineer-market-list"></div>
           </section>
 
           <section class="irm-view" data-view-panel="driver" aria-labelledby="irm-driver-title" hidden>
-            <header class="irm-workspace-head"><div><span>RACE TEAM</span><h2 id="irm-driver-title">Drivers</h2><p>Hire faster, more consistent drivers as the team's reputation grows.</p></div></header>
-            <article class="irm-current-hire"><div><span>CURRENT DRIVER</span><h3 id="irm-driver-name">Mara Voss</h3><p>Lead race driver</p></div><dl><div><dt>Rating</dt><dd id="irm-driver-rating">36</dd></div><div><dt>Race fee</dt><dd id="irm-driver-cost">€350</dd></div></dl></article>
-            <div class="irm-current-driver-stats" id="irm-driver-stats"></div>
-            <div class="irm-section-title"><div><span>MARKET</span><h3>Available drivers</h3></div><small>Signing fee + race fee</small></div>
+            <header class="irm-workspace-head irm-driver-head"><div><span>RACE TEAM</span><h2 id="irm-driver-title">Drivers</h2></div></header>
+            <article class="irm-current-hire"><div><span>CURRENT DRIVER</span><h3 id="irm-driver-name">Mara Voss</h3><p>Lead race driver</p></div><dl><div><dt>Rating</dt><dd id="irm-driver-rating">36</dd></div><div><dt>Race fee</dt><dd id="irm-driver-cost">€350</dd></div></dl><div class="irm-current-driver-stats" id="irm-driver-stats"></div></article>
+            <div class="irm-section-title irm-driver-market-head"><div><span>MARKET</span><h3>Available drivers</h3></div></div>
             <div class="irm-market-list" id="irm-driver-market-list"></div>
           </section>
 
           <section class="irm-view" data-view-panel="sponsor" aria-labelledby="irm-sponsor-title" hidden>
-            <header class="irm-workspace-head"><div><span>COMMERCIAL</span><h2 id="irm-sponsor-title">Sponsors</h2><p>Sponsors work at every circuit. Meet their finish target to multiply the circuit winnings.</p></div></header>
+            <header class="irm-workspace-head irm-sponsor-head"><div><span>COMMERCIAL</span><h2 id="irm-sponsor-title">Sponsors</h2></div></header>
             <article class="irm-current-sponsor" id="irm-current-sponsor"></article>
-            <div class="irm-section-title"><div><span>OFFERS</span><h3>Sponsor contracts</h3></div><small>One active contract at a time</small></div>
+            <div class="irm-section-title irm-sponsor-market-head"><div><span>OFFERS</span><h3>Sponsor contracts</h3></div></div>
             <div class="irm-sponsor-list" id="irm-sponsor-list"></div>
           </section>
         </div>
@@ -130,8 +133,39 @@
       <dialog class="irm-dialog" id="irm-result-dialog"><div id="irm-result-content"></div></dialog>
       <dialog class="irm-dialog" id="irm-offline-dialog"><div id="irm-offline-content"></div></dialog>
     </section>
+    <section class="irm-guide" id="idle-manager-guide" aria-labelledby="irm-guide-title">
+      <header class="irm-guide-head">
+        <div><span>TEAM HANDBOOK</span><h2 id="irm-guide-title">How to build a winning operation</h2></div>
+        <p>Every decision feeds the next. Race for resources, invest where the team is weakest and take on tougher opposition when the operation is ready.</p>
+      </header>
+
+      <div class="irm-guide-loop" aria-label="Core progression loop">
+        <strong>Core loop</strong>
+        <ol><li>Race</li><li>Earn</li><li>Develop</li><li>Attract sponsors</li><li>Hire staff</li><li>Unlock circuits</li></ol>
+      </div>
+
+      <div class="irm-guide-grid">
+        <article><b>01</b><div><h3>Choose the next race</h3><p>Compare entry costs, lap count and circuit demands. New venues require both reputation and a sufficiently strong driver.</p></div></article>
+        <article><b>02</b><div><h3>Race from the back</h3><p>Your car starts every event in P20. Its development, condition, driver and engineer determine how far it can climb.</p></div></article>
+        <article><b>03</b><div><h3>Develop and maintain</h3><p>Spend earnings on connected upgrade paths. Service the car before its condition becomes too low to enter.</p></div></article>
+        <article><b>04</b><div><h3>Find the right sponsor</h3><p>Sponsors multiply race winnings when you meet their finishing target. Better results and reputation attract stronger contracts.</p></div></article>
+        <article><b>05</b><div><h3>Build the team</h3><p>Drivers improve race performance. Reputation and research unlock engineers who raise the development ceiling and add a race bonus.</p></div></article>
+        <article><b>06</b><div><h3>Climb the ladder</h3><p>Reputation opens markets and circuits. Balance immediate race costs against upgrades that make future events more profitable.</p></div></article>
+      </div>
+
+      <aside class="irm-guide-tip"><span>RACE-DAY CHECK</span><p>Confirm the entry cost, car condition, sponsor target and circuit strengths before pressing start. The race playback cannot be skipped.</p></aside>
+    </section>
     <p class="irm-fiction-note">Idle Racing Manager takes place in an original fictional motorsport world. Every team, driver, sponsor and circuit appearing in the game is fictional.</p>
   </main>
+
+  <svg width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute;overflow:hidden">
+    <path id="irm-industrial-park-path" d="M49,395.1333312988281 C33.5,379.7999979654948 36.333333333333336,328.6333312988281 72,311.1333312988281 C107.66666666666666,293.6333312988281 222.83333333333334,313.6333312988281 263,290.1333312988281 C303.1666666666667,266.6333312988281 309.8333333333333,207.96666463216147 313,170.13333129882812 C316.1666666666667,132.29999796549478 243,77.46666463216145 282,63.133331298828125 C321,48.79999796549479 482.3333333333333,57.466664632161454 547,84.13333129882812 C611.6666666666666,110.7999979654948 609.1666666666666,192.29999796549478 670,223.13333129882812 C730.8333333333334,253.96666463216147 852.1666666666666,277.46666463216144 912,269.1333312988281 C971.8333333333334,260.7999979654948 999.6666666666666,179.63333129882812 1029,173.13333129882812 C1058.3333333333333,166.63333129882812 1094.5,208.13333129882812 1088,230.13333129882812 C1081.5,252.13333129882812 1075,273.1333312988281 990,305.1333312988281 C905,337.1333312988281 649,432.1333312988281 578,422.1333312988281 C507,412.1333312988281 575,291.2999979654948 564,245.13333129882812 C553,198.96666463216147 530,163.63333129882812 512,145.13333129882812 C494,126.63333129882812 475.5,129.46666463216147 456,134.13333129882812 C436.5,138.79999796549478 410,131.46666463216147 395,173.13333129882812 C380,214.79999796549478 404.3333333333333,345.7999979654948 366,384.1333312988281 C327.6666666666667,422.46666463216144 217.83333333333334,401.2999979654948 165,403.1333312988281 C112.16666666666666,404.96666463216144 64.5,410.46666463216144 49,395.1333312988281" />
+    <path id="irm-ridgeway-path" d="M96,261.1333312988281 C118.16666666666667,225.96666463216147 189.33333333333334,140.29999796549478 221,117.13333129882812 C252.66666666666666,93.96666463216145 287.5,105.7999979654948 286,122.13333129882812 C284.5,138.46666463216147 229.16666666666666,185.96666463216147 212,215.13333129882812 C194.83333333333334,244.29999796549478 175.66666666666666,277.1333312988281 183,297.1333312988281 C190.33333333333334,317.1333312988281 231.33333333333334,339.6333312988281 256,335.1333312988281 C280.6666666666667,330.6333312988281 316.3333333333333,302.7999979654948 331,270.1333312988281 C345.6666666666667,237.46666463216147 286,166.46666463216147 344,139.13333129882812 C402,111.7999979654948 623.3333333333334,99.96666463216145 679,106.13333129882812 C734.6666666666666,112.2999979654948 666.3333333333334,167.79999796549478 678,176.13333129882812 C689.6666666666666,184.46666463216147 737.6666666666666,141.96666463216147 749,156.13333129882812 C760.3333333333334,170.29999796549478 720.8333333333334,243.29999796549478 746,261.1333312988281 C771.1666666666666,278.96666463216144 836.1666666666666,257.7999979654948 900,263.1333312988281 C963.8333333333334,268.46666463216144 1099,260.96666463216144 1129,293.1333312988281 C1159,325.2999979654948 1155.3333333333333,421.7999979654948 1080,456.1333312988281 C1004.6666666666666,490.46666463216144 752.3333333333334,503.1333312988281 677,499.1333312988281 C601.6666666666666,495.1333312988281 702.5,445.1333312988281 628,432.1333312988281 C553.5,419.1333312988281 320,438.46666463216144 230,421.1333312988281 C140,403.7999979654948 110.33333333333333,354.7999979654948 88,328.1333312988281 C65.66666666666667,301.46666463216144 73.83333333333333,296.2999979654948 96,261.1333312988281" />
+    <path id="irm-aurora-ring-path" d="M36,536.1333312988281 C29.666666666666668,525.7999979654948 53.33333333333333,498.7999979654948 75,491.1333312988281 C96.66666666666667,483.46666463216144 143.5,496.6333312988281 166,490.1333312988281 C188.5,483.6333312988281 207.66666666666666,464.7999979654948 210,452.1333312988281 C212.33333333333334,439.46666463216144 179.33333333333334,427.1333312988281 180,414.1333312988281 C180.66666666666666,401.1333312988281 201.66666666666666,380.46666463216144 214,374.1333312988281 C226.33333333333334,367.7999979654948 240,381.7999979654948 254,376.1333312988281 C268,370.46666463216144 297.1666666666667,356.96666463216144 298,340.1333312988281 C298.8333333333333,323.2999979654948 251.66666666666666,299.7999979654948 259,275.1333312988281 C266.3333333333333,250.46666463216147 275.5,224.79999796549478 342,192.13333129882812 C408.5,159.46666463216147 584.5,98.96666463216145 658,79.13333129882812 C731.5,59.299997965494796 780.1666666666666,60.46666463216146 783,73.13333129882812 C785.8333333333334,85.7999979654948 741.6666666666666,128.29999796549478 675,155.13333129882812 C608.3333333333334,181.96666463216147 420.5,202.79999796549478 383,234.13333129882812 C345.5,265.46666463216144 409.6666666666667,330.7999979654948 450,343.1333312988281 C490.3333333333333,355.46666463216144 572.5,300.1333312988281 625,308.1333312988281 C677.5,316.1333312988281 753.5,365.96666463216144 765,391.1333312988281 C776.5,416.2999979654948 720.3333333333334,466.2999979654948 694,459.1333312988281 C667.6666666666666,451.96666463216144 666.3333333333334,333.6333312988281 607,348.1333312988281 C547.6666666666666,362.6333312988281 420.3333333333333,511.96666463216144 338,546.1333312988281 C255.66666666666669,580.2999979654948 163.33333333333334,554.7999979654948 113,553.1333312988281 C62.666666666666664,551.4666646321615 42.333333333333336,546.4666646321615 36,536.1333312988281" />
+    <path id="irm-ember-coast-path" d="M68,548.1333312988281 C150.66666666666669,559.6333312988281 418.8333333333333,550.6333312988281 505,546.1333312988281 C591.1666666666666,541.6333312988281 558.1666666666666,522.9666646321615 585,521.1333312988281 C611.8333333333334,519.2999979654948 593.3333333333334,533.2999979654948 666,535.1333312988281 C738.6666666666666,536.9666646321615 942,543.7999979654948 1021,532.1333312988281 C1100,520.4666646321615 1119.3333333333333,499.46666463216144 1140,465.1333312988281 C1160.6666666666667,430.7999979654948 1165.8333333333333,358.7999979654948 1145,326.1333312988281 C1124.1666666666667,293.46666463216144 1067.3333333333333,279.46666463216144 1015,269.1333312988281 C962.6666666666666,258.7999979654948 865.8333333333334,284.1333312988281 831,264.1333312988281 C796.1666666666666,244.13333129882812 844.6666666666666,169.96666463216147 806,149.13333129882812 C767.3333333333334,128.29999796549478 637.1666666666666,125.13333129882812 599,139.13333129882812 C560.8333333333334,153.13333129882812 605.1666666666666,216.63333129882812 577,233.13333129882812 C548.8333333333334,249.63333129882812 479.8333333333333,227.13333129882812 430,238.13333129882812 C380.1666666666667,249.13333129882812 328,315.1333312988281 278,299.1333312988281 C228,283.1333312988281 172.5,157.96666463216147 130,142.13333129882812 C87.5,126.2999979654948 7.5,173.46666463216147 23,204.13333129882812 C38.5,234.79999796549478 159.16666666666666,305.1333312988281 223,326.1333312988281 C286.8333333333333,347.1333312988281 358.1666666666667,320.2999979654948 406,330.1333312988281 C453.8333333333333,339.96666463216144 497,373.7999979654948 510,385.1333312988281 C523,396.46666463216144 540,396.46666463216144 484,398.1333312988281 C428,399.7999979654948 237.33333333333334,401.7999979654948 174,395.1333312988281 C110.66666666666666,388.46666463216144 131.5,344.46666463216144 104,358.1333312988281 C76.5,371.7999979654948 15,445.46666463216144 9,477.1333312988281 C3,508.7999979654948 -14.666666666666671,536.6333312988281 68,548.1333312988281" />
+    <path id="irm-blackstone-pass-path" d="M178,73.13333129882812 C285,61.96666463216146 638.6666666666666,55.633331298828125 743,66.13333129882812 C847.3333333333334,76.63333129882812 781.6666666666666,124.2999979654948 804,136.13333129882812 C826.3333333333334,147.96666463216147 853.8333333333334,144.46666463216147 877,137.13333129882812 C900.1666666666666,129.79999796549478 909.5,103.13333129882812 943,92.13333129882812 C976.5,81.13333129882812 1045.6666666666667,63.46666463216146 1078,71.13333129882812 C1110.3333333333333,78.7999979654948 1135.5,113.96666463216145 1137,138.13333129882812 C1138.5,162.29999796549478 1129.8333333333333,189.96666463216147 1087,216.13333129882812 C1044.1666666666667,242.29999796549478 917.8333333333334,293.6333312988281 880,295.1333312988281 C842.1666666666666,296.6333312988281 897,242.29999796549478 860,225.13333129882812 C823,207.96666463216147 711.5,190.46666463216147 658,192.13333129882812 C604.5,193.79999796549478 567,215.46666463216147 539,235.13333129882812 C511,254.79999796549478 494.8333333333333,282.6333312988281 490,310.1333312988281 C485.1666666666667,337.6333312988281 484.1666666666667,379.7999979654948 510,400.1333312988281 C535.8333333333334,420.46666463216144 565.6666666666666,431.96666463216144 645,432.1333312988281 C724.3333333333334,432.2999979654948 906.6666666666666,398.2999979654948 986,401.1333312988281 C1065.3333333333333,403.96666463216144 1171.1666666666667,426.1333312988281 1121,449.1333312988281 C1070.8333333333333,472.1333312988281 761.8333333333334,514.4666646321615 685,539.1333312988281 C608.1666666666666,563.7999979654948 697.6666666666666,590.4666646321615 660,597.1333312988281 C622.3333333333334,603.7999979654948 526.6666666666666,605.9666646321615 459,579.1333312988281 C391.3333333333333,552.2999979654948 322.5,462.1333312988281 254,436.1333312988281 C185.5,410.1333312988281 85.66666666666666,445.6333312988281 48,423.1333312988281 C10.333333333333336,400.6333312988281 -3.333333333333332,334.1333312988281 28,301.1333312988281 C59.33333333333333,268.1333312988281 223.83333333333334,253.13333129882812 236,225.13333129882812 C248.16666666666666,197.13333129882812 110.66666666666667,158.46666463216147 101,133.13333129882812 C91.33333333333333,107.7999979654948 71,84.2999979654948 178,73.13333129882812" />
+    <path id="irm-halcyon-circuit-path" d="M186,126.13333129882812 C273.1666666666667,111.63333129882812 495.8333333333333,105.7999979654948 600,98.13333129882812 C704.1666666666666,90.46666463216145 743.1666666666666,85.2999979654948 811,80.13333129882812 C878.8333333333334,74.96666463216145 953.5,57.633331298828125 1007,67.13333129882812 C1060.5,76.63333129882812 1110.6666666666667,105.63333129882812 1132,137.13333129882812 C1153.3333333333333,168.63333129882812 1141.6666666666667,195.79999796549478 1135,256.1333312988281 C1128.3333333333333,316.46666463216144 1139.5,453.6333312988281 1092,499.1333312988281 C1044.5,544.6333312988281 911.3333333333334,537.4666646321615 850,529.1333312988281 C788.6666666666666,520.7999979654948 823.1666666666666,449.2999979654948 724,449.1333312988281 C624.8333333333334,448.96666463216144 314,531.2999979654948 255,528.1333312988281 C196,524.9666646321615 299.3333333333333,453.7999979654948 370,430.1333312988281 C440.6666666666667,406.46666463216144 633.6666666666666,426.96666463216144 679,386.1333312988281 C724.3333333333334,345.2999979654948 679.1666666666666,215.79999796549478 642,185.13333129882812 C604.8333333333334,154.46666463216147 551.3333333333334,158.96666463216147 456,202.13333129882812 C360.6666666666667,245.29999796549478 128.33333333333334,419.96666463216144 70,444.1333312988281 C11.666666666666664,468.2999979654948 104.83333333333333,390.2999979654948 106,347.1333312988281 C107.16666666666667,303.96666463216144 63.666666666666664,221.96666463216147 77,185.13333129882812 C90.33333333333333,148.29999796549478 98.83333333333333,140.63333129882812 186,126.13333129882812" />
+  </svg>
 
   <footer class="footer"><div class="container">Racelytic</div></footer>
   <script src="/js/header.js"></script>

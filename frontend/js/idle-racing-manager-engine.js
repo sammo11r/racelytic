@@ -3,33 +3,63 @@
   if (typeof module === 'object' && module.exports) module.exports = api;
   else root.IdleRacingManagerEngine = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this, function createIdleRacingManagerEngine() {
-  const GRID_SIZE = 14;
+  const GRID_SIZE = 20;
   const SAVE_KEY = 'racelytic-idle-racing-manager-v1';
   const OFFLINE_CAP_MS = 8 * 60 * 60 * 1000;
   const STAT_LABELS = { aero: 'Aerodynamics', chassis: 'Chassis', engine: 'Engine', durability: 'Durability' };
-  const POSITION_PAYOUTS = [1, .78, .65, .55, .48, .42, .36, .31, .27, .23, .19, .16, .14, .12];
+  const POSITION_PAYOUTS = [
+    1, .82, .70, .60, .52, .46, .41, .37, .33, .30,
+    .27, .24, .22, .20, .18, .16, .14, .13, .115, .10
+  ];
 
   const circuits = [
     {
       id: 'industrial-park', name: 'Industrial Park', tier: 'Amateur circuit', difficulty: 1,
       length: 2.4, laps: 8, corners: 'Low', straights: 'High', tyreWear: 'Low',
-      unlockReputation: 0, prizeFund: 2400, entryCost: 160, fuelPerLap: 22,
+      unlockReputation: 0, driverRatingRequired: 0, fieldStrength: 16.5,
+      prizeFund: 4000, minimumPayout: 800, entryCost: 150, fuelPerLap: 16,
       description: 'Wide exits and long acceleration zones make this a forgiving place to begin.',
       weights: { engine: .4, aero: .16, chassis: .14 }
     },
     {
       id: 'ridgeway', name: 'Ridgeway', tier: 'Regional circuit', difficulty: 3,
       length: 4.7, laps: 14, corners: 'Very high', straights: 'Low', tyreWear: 'Medium',
-      unlockReputation: 25, prizeFund: 7500, entryCost: 650, fuelPerLap: 31,
+      unlockReputation: 35, driverRatingRequired: 48, fieldStrength: 25,
+      prizeFund: 10000, minimumPayout: 2200, entryCost: 700, fuelPerLap: 25,
       description: 'A technical climb where balance, grip and a composed driver matter more than power.',
       weights: { engine: .14, aero: .39, chassis: .17 }
     },
     {
       id: 'aurora-ring', name: 'Aurora Ring', tier: 'Premier circuit', difficulty: 5,
       length: 6.1, laps: 24, corners: 'High', straights: 'High', tyreWear: 'High',
-      unlockReputation: 80, prizeFund: 22000, entryCost: 2300, fuelPerLap: 43,
+      unlockReputation: 100, driverRatingRequired: 58, fieldStrength: 35,
+      prizeFund: 25000, minimumPayout: 5200, entryCost: 2500, fuelPerLap: 36,
       description: 'A complete test of speed, tyre life and reliability over a demanding lap.',
       weights: { engine: .27, aero: .25, chassis: .18 }
+    },
+    {
+      id: 'ember-coast', name: 'Ember Coast', tier: 'International circuit', difficulty: 4,
+      length: 5.2, laps: 18, corners: 'Medium', straights: 'High', tyreWear: 'Medium',
+      unlockReputation: 190, driverRatingRequired: 68, fieldStrength: 44,
+      prizeFund: 55000, minimumPayout: 9000, entryCost: 5500, fuelPerLap: 42,
+      description: 'Fast coastal sweepers reward a low-drag car without forgiving poor balance in the final sector.',
+      weights: { engine: .28, aero: .24, chassis: .18 }
+    },
+    {
+      id: 'blackstone-pass', name: 'Blackstone Pass', tier: 'Endurance circuit', difficulty: 5,
+      length: 6.8, laps: 22, corners: 'Very high', straights: 'Medium', tyreWear: 'Very high',
+      unlockReputation: 310, driverRatingRequired: 77, fieldStrength: 54,
+      prizeFund: 110000, minimumPayout: 16500, entryCost: 11000, fuelPerLap: 47,
+      description: 'Relentless elevation changes punish weak chassis balance and any lapse in mechanical preparation.',
+      weights: { engine: .15, aero: .25, chassis: .30 }
+    },
+    {
+      id: 'halcyon-circuit', name: 'Halcyon Circuit', tier: 'Championship circuit', difficulty: 5,
+      length: 7.1, laps: 28, corners: 'High', straights: 'Very high', tyreWear: 'High',
+      unlockReputation: 460, driverRatingRequired: 87, fieldStrength: 66,
+      prizeFund: 220000, minimumPayout: 31000, entryCost: 22000, fuelPerLap: 55,
+      description: 'The privateer championship finale demands speed, downforce and durability in equal measure.',
+      weights: { engine: .24, aero: .24, chassis: .22 }
     }
   ];
 
@@ -37,84 +67,115 @@
     {
       id: 'aerodynamics', label: 'Aerodynamics', stat: 'aero', centralId: 'aero-platform',
       nodes: [
-        { id: 'aero-platform', name: 'Aero platform', description: 'The baseline airflow concept for the car.', x: 50, y: 8, cost: 0, effects: {} },
-        { id: 'front-wing-mainplane', name: 'Front wing mainplane', description: 'Reshape the mainplane for a stronger, cleaner front load.', x: 30, y: 34, cost: 650, requires: ['aero-platform'], effects: { aero: 4 } },
-        { id: 'engine-cover-fin', name: 'Engine cover fin', description: 'Stabilise the rear airflow through high-speed direction changes.', x: 70, y: 34, cost: 700, requires: ['aero-platform'], effects: { aero: 4 } },
-        { id: 'front-wing-endplates', name: 'Endplates', description: 'Control front-tyre wake and retain usable downforce.', x: 15, y: 70, cost: 1800, requires: ['front-wing-mainplane'], effects: { aero: 7 } },
-        { id: 'front-wing-flaps', name: 'Adjustable flap profiles', description: 'Expand the setup window for every circuit type.', x: 40, y: 70, cost: 1950, requires: ['front-wing-mainplane'], effects: { aero: 7 } },
-        { id: 'floor-edge-vanes', name: 'Floor edge vanes', description: 'Seal the floor more consistently through yaw.', x: 60, y: 70, cost: 2100, requires: ['engine-cover-fin'], effects: { aero: 7 } },
-        { id: 'diffuser-strakes', name: 'Diffuser strakes', description: 'Improve rear load without adding excessive drag.', x: 85, y: 70, cost: 2250, requires: ['engine-cover-fin'], effects: { aero: 7 } }
+        { id: 'aero-platform', name: 'Aero platform', description: 'The baseline airflow concept for the car.', x: 8, y: 50, cost: 0, effects: {} },
+        { id: 'front-wing-minor', name: 'Front wing mainplane', description: 'A refined mainplane profile sharpens front-end response.', tier: 'Minor', branch: 'Front wing', x: 29, y: 20, cost: 600, requires: ['aero-platform'], effects: { aero: 2 } },
+        { id: 'rear-wing-minor', name: 'Rear wing mainplane', description: 'A reshaped rear wing mainplane improves high-speed stability.', tier: 'Minor', branch: 'Rear wing', x: 29, y: 50, cost: 650, requires: ['aero-platform'], effects: { aero: 2 } },
+        { id: 'drag-reduction-minor', name: 'Smoothed bodywork', description: 'Smoothed bodywork surfaces trim parasitic drag.', tier: 'Minor', branch: 'Drag reduction', x: 29, y: 80, cost: 620, requires: ['aero-platform'], effects: { aero: 2 } },
+        { id: 'front-wing-major', name: 'Endplates & flap stack', description: 'Wider endplates and a revised flap stack add usable front load.', tier: 'Major', branch: 'Front wing', x: 50, y: 20, cost: 1450, requires: ['front-wing-minor'], effects: { aero: 3 } },
+        { id: 'rear-wing-major', name: 'Swan-neck mounts', description: 'Swan-neck mounts and a slimmer beam wing cut interference drag.', tier: 'Major', branch: 'Rear wing', x: 50, y: 50, cost: 1550, requires: ['rear-wing-minor'], effects: { aero: 3 } },
+        { id: 'drag-reduction-major', name: 'Sidepod undercut', description: 'A reworked cooling exit and sidepod undercut clean up the wake.', tier: 'Major', branch: 'Drag reduction', x: 50, y: 80, cost: 1500, requires: ['drag-reduction-minor'], effects: { aero: 3 } },
+        { id: 'front-wing-ultimate', name: 'Full front wing reprofile', description: 'A fully reprofiled front wing extracts maximum downforce without stalling.', tier: 'Ultimate', branch: 'Front wing', x: 71, y: 20, cost: 2700, requires: ['front-wing-major'], effects: { aero: 4 } },
+        { id: 'rear-wing-ultimate', name: 'Full rear wing reprofile', description: 'A fully optimised rear wing assembly balances load against straight-line speed.', tier: 'Ultimate', branch: 'Rear wing', x: 71, y: 50, cost: 2850, requires: ['rear-wing-major'], effects: { aero: 4 } },
+        { id: 'drag-reduction-ultimate', name: 'Slimmed rear bodywork', description: 'An aggressively slimmed rear bodywork squeezes out the last of the drag.', tier: 'Ultimate', branch: 'Drag reduction', x: 71, y: 80, cost: 2800, requires: ['drag-reduction-major'], effects: { aero: 4 } },
+        { id: 'double-diffuser', name: 'Double diffuser', description: 'Combining the finished front wing, rear wing and drag reduction packages unlocks a double diffuser for a final leap in downforce.', x: 92, y: 50, cost: 5200, requires: ['front-wing-ultimate', 'rear-wing-ultimate', 'drag-reduction-ultimate'], effects: { aero: 9 } }
       ]
     },
     {
       id: 'chassis', label: 'Chassis', stat: 'chassis', centralId: 'chassis-platform',
       nodes: [
-        { id: 'chassis-platform', name: 'Chassis platform', description: 'The structural and mechanical baseline of the car.', x: 50, y: 8, cost: 0, effects: {} },
-        { id: 'weight-distribution', name: 'Weight distribution', description: 'Repackage systems to improve the car balance.', x: 30, y: 34, cost: 600, requires: ['chassis-platform'], effects: { chassis: 4 } },
-        { id: 'suspension-geometry', name: 'Suspension geometry', description: 'Rework the platform control through fast corners.', x: 70, y: 34, cost: 750, requires: ['chassis-platform'], effects: { chassis: 4 } },
-        { id: 'ballast-weights', name: 'Ballast weights', description: 'Use denser movable weights to tune balance by circuit.', x: 15, y: 70, cost: 1700, requires: ['weight-distribution'], effects: { chassis: 7 } },
-        { id: 'lightweight-fasteners', name: 'Lightweight fasteners', description: 'Remove mass while preserving structural stiffness.', x: 40, y: 70, cost: 1900, requires: ['weight-distribution'], effects: { chassis: 7 } },
-        { id: 'heave-spring', name: 'Heave spring package', description: 'Hold a stable platform under heavy aerodynamic load.', x: 60, y: 70, cost: 2050, requires: ['suspension-geometry'], effects: { chassis: 7 } },
-        { id: 'pushrod-pickup', name: 'Pushrod pickup points', description: 'Improve mechanical response and tyre contact.', x: 85, y: 70, cost: 2200, requires: ['suspension-geometry'], effects: { chassis: 7 } }
+        { id: 'chassis-platform', name: 'Chassis platform', description: 'The structural and mechanical baseline of the car.', x: 8, y: 50, cost: 0, effects: {} },
+        { id: 'weight-reduction-minor', name: 'Trimmed non-structural mass', description: "Trimmed non-structural components shed easy mass.", tier: 'Minor', branch: 'Weight reduction', x: 29, y: 20, cost: 600, requires: ['chassis-platform'], effects: { chassis: 2 } },
+        { id: 'weight-distribution-minor', name: 'Repackaged systems', description: "Repackaged systems nudge the car's balance towards neutral.", tier: 'Minor', branch: 'Weight distribution', x: 29, y: 50, cost: 650, requires: ['chassis-platform'], effects: { chassis: 2 } },
+        { id: 'tyre-wear-minor', name: 'Revised camber curves', description: 'Revised camber curves even out contact-patch wear.', tier: 'Minor', branch: 'Tyre wear', x: 29, y: 80, cost: 620, requires: ['chassis-platform'], effects: { chassis: 2 } },
+        { id: 'weight-reduction-major', name: 'Lightweight fasteners', description: 'Lightweight fasteners and thinner panels cut further weight.', tier: 'Major', branch: 'Weight reduction', x: 50, y: 20, cost: 1450, requires: ['weight-reduction-minor'], effects: { chassis: 3 } },
+        { id: 'weight-distribution-major', name: 'Movable ballast', description: "Movable ballast lets the car's balance be tuned circuit by circuit.", tier: 'Major', branch: 'Weight distribution', x: 50, y: 50, cost: 1550, requires: ['weight-distribution-minor'], effects: { chassis: 3 } },
+        { id: 'tyre-wear-major', name: 'Reworked suspension geometry', description: 'A reworked suspension geometry protects tyre life over a full stint.', tier: 'Major', branch: 'Tyre wear', x: 50, y: 80, cost: 1500, requires: ['tyre-wear-minor'], effects: { chassis: 3 } },
+        { id: 'weight-reduction-ultimate', name: 'Full lightweighting pass', description: "An extensive lightweighting pass strips out every gram that isn't earning its place.", tier: 'Ultimate', branch: 'Weight reduction', x: 71, y: 20, cost: 2700, requires: ['weight-reduction-major'], effects: { chassis: 4 } },
+        { id: 'weight-distribution-ultimate', name: 'Full weight rebalance', description: 'A fully reworked layout achieves the ideal front-to-rear weight split.', tier: 'Ultimate', branch: 'Weight distribution', x: 71, y: 50, cost: 2850, requires: ['weight-distribution-major'], effects: { chassis: 4 } },
+        { id: 'tyre-wear-ultimate', name: 'Active thermal management', description: 'Active thermal management keeps tyres in their working window for the whole race.', tier: 'Ultimate', branch: 'Tyre wear', x: 71, y: 80, cost: 2800, requires: ['tyre-wear-major'], effects: { chassis: 4 } },
+        { id: 'active-suspension', name: 'Active suspension', description: 'Combining the finished weight reduction, weight distribution and tyre wear packages unlocks a fully active suspension for a final leap in mechanical grip.', x: 92, y: 50, cost: 5200, requires: ['weight-reduction-ultimate', 'weight-distribution-ultimate', 'tyre-wear-ultimate'], effects: { chassis: 9 } }
       ]
     },
     {
       id: 'engine', label: 'Engine', stat: 'engine', centralId: 'engine-platform',
       nodes: [
-        { id: 'engine-platform', name: 'Power unit platform', description: 'The base combustion and forced-induction package.', x: 50, y: 8, cost: 0, effects: {} },
-        { id: 'cylinder-head-redesign', name: 'Cylinder head redesign', description: 'Improve gas flow and combustion efficiency.', x: 30, y: 34, cost: 700, requires: ['engine-platform'], effects: { engine: 4 } },
-        { id: 'turbo-compressor', name: 'Turbo compressor', description: 'Increase charge density while controlling response.', x: 70, y: 34, cost: 800, requires: ['engine-platform'], effects: { engine: 4 } },
-        { id: 'combustion-chamber', name: 'Combustion chamber', description: 'Extract more energy from every ignition event.', x: 15, y: 70, cost: 1950, requires: ['cylinder-head-redesign'], effects: { engine: 7 } },
-        { id: 'valvetrain-profile', name: 'Valvetrain profile', description: 'Extend the useful power band at high engine speed.', x: 40, y: 70, cost: 2100, requires: ['cylinder-head-redesign'], effects: { engine: 7 } },
-        { id: 'compressor-wheel', name: 'Compressor wheel', description: 'Deliver greater airflow with lower rotational inertia.', x: 60, y: 70, cost: 2250, requires: ['turbo-compressor'], effects: { engine: 7 } },
-        { id: 'intercooler-routing', name: 'Intercooler routing', description: 'Reduce pressure loss between turbo and intake.', x: 85, y: 70, cost: 2400, requires: ['turbo-compressor'], effects: { engine: 7 } }
+        { id: 'engine-platform', name: 'Power unit platform', description: 'The base combustion and forced-induction package.', x: 8, y: 50, cost: 0, effects: {} },
+        { id: 'battery-minor', name: 'Lithium Cell Optimization', description: 'Refined electrode chemistry extracts more usable energy per cell.', tier: 'Minor', branch: 'Battery', x: 25, y: 14, cost: 650, requires: ['engine-platform'], effects: { engine: 2 } },
+        { id: 'battery-major', name: 'High Density Batteries', description: 'Higher-density cell packs store significantly more deployable energy.', tier: 'Major', branch: 'Battery', x: 42, y: 14, cost: 1500, requires: ['battery-minor'], effects: { engine: 3 } },
+        { id: 'battery-ultimate', name: 'Graphene Core Integration', description: 'Graphene-cored cells push energy density and discharge rate to their practical limit.', tier: 'Ultimate', branch: 'Battery', x: 59, y: 14, cost: 2800, requires: ['battery-major'], effects: { engine: 4 } },
+        { id: 'fuel-minor', name: 'Fuel Injector Calibration', description: 'Recalibrated injectors sharpen fuel delivery through every engine cycle.', tier: 'Minor', branch: 'Fuel', x: 25, y: 50, cost: 680, requires: ['engine-platform'], effects: { engine: 2 } },
+        { id: 'fuel-major', name: 'Lean Combustion Mapping', description: 'A leaner combustion map extracts more power from the same fuel flow.', tier: 'Major', branch: 'Fuel', x: 42, y: 50, cost: 1550, requires: ['fuel-minor'], effects: { engine: 3 } },
+        { id: 'fuel-ultimate', name: 'Pre-Chamber Combustion', description: 'A pre-chamber ignition system burns a leaner mixture faster and more completely.', tier: 'Ultimate', branch: 'Fuel', x: 59, y: 50, cost: 2850, requires: ['fuel-major'], effects: { engine: 4 } },
+        { id: 'ice-spark-plug', name: 'Spark Plug Upgrade', description: 'Higher-performance spark plugs deliver a stronger, more consistent ignition event.', tier: 'Minor', branch: 'ICE', x: 25, y: 79, cost: 620, requires: ['engine-platform'], effects: { engine: 2 } },
+        { id: 'ice-turbo-lag', name: 'Reduce Turbo Lag', description: 'A reworked wastegate and smaller turbine cut the delay before boost arrives.', tier: 'Major', branch: 'ICE', x: 42, y: 79, cost: 1450, requires: ['ice-spark-plug'], effects: { engine: 3 } },
+        { id: 'ice-piston-travel', name: 'Piston Travel', description: 'Optimised piston travel improves cylinder filling through the rev range.', tier: 'Minor', branch: 'ICE', x: 59, y: 79, cost: 2200, requires: ['ice-turbo-lag'], effects: { engine: 2 } },
+        { id: 'ice-camshaft-timing', name: 'Camshaft Timing', description: 'Reprofiled camshaft timing reshapes the power delivery across the rev range.', tier: 'Major', branch: 'ICE', x: 76, y: 79, cost: 3200, requires: ['ice-piston-travel'], effects: { engine: 3 } },
+        { id: 'ice-variable-valve', name: 'Variable Valve Mastery', description: "Fully variable valve timing adapts the engine's breathing to every driving condition.", tier: 'Ultimate', branch: 'ICE', x: 93, y: 68, cost: 4400, requires: ['ice-camshaft-timing'], effects: { engine: 4 } },
+        { id: 'ice-hypercharged-combustion', name: 'Hypercharged Combustion', description: 'An aggressively boosted combustion cycle extracts maximum peak power at the cost of subtlety.', tier: 'Ultimate', branch: 'ICE', x: 93, y: 90, cost: 4400, requires: ['ice-camshaft-timing'], effects: { engine: 4 } }
       ]
     },
     {
       id: 'durability', label: 'Durability', stat: 'durability', centralId: 'durability-platform',
       nodes: [
-        { id: 'durability-platform', name: 'Reliability programme', description: 'The inspection and life-management baseline.', x: 50, y: 8, cost: 0, effects: {} },
-        { id: 'reinforced-crankshaft', name: 'Reinforced crankshaft', description: 'Increase fatigue resistance under peak cylinder load.', x: 30, y: 34, cost: 650, requires: ['durability-platform'], effects: { durability: 4 } },
-        { id: 'thermal-management', name: 'Thermal management', description: 'Control component temperatures over long races.', x: 70, y: 34, cost: 700, requires: ['durability-platform'], effects: { durability: 4 } },
-        { id: 'main-bearing-shells', name: 'Main bearing shells', description: 'Reduce wear around the crankshaft journals.', x: 15, y: 70, cost: 1750, requires: ['reinforced-crankshaft'], effects: { durability: 7 } },
-        { id: 'fatigue-monitoring', name: 'Fatigue monitoring', description: 'Detect structural life loss before a failure occurs.', x: 40, y: 70, cost: 1900, requires: ['reinforced-crankshaft'], effects: { durability: 7 } },
-        { id: 'cooling-pumps', name: 'High-flow cooling pumps', description: 'Maintain stable temperatures in traffic and hot races.', x: 60, y: 70, cost: 2050, requires: ['thermal-management'], effects: { durability: 7 } },
-        { id: 'heat-shielding', name: 'Composite heat shielding', description: 'Protect wiring, hydraulics and bodywork from heat soak.', x: 85, y: 70, cost: 2200, requires: ['thermal-management'], effects: { durability: 7 } }
+        { id: 'durability-platform', name: 'Reliability programme', description: 'The inspection and life-management baseline.', x: 8, y: 50, cost: 0, effects: {} },
+        { id: 'cooling-minor', name: 'Auxiliary Radiator', description: 'An auxiliary radiator sheds extra heat before it reaches critical components.', tier: 'Minor', branch: 'Cooling', x: 29, y: 20, cost: 620, requires: ['durability-platform'], effects: { durability: 2 } },
+        { id: 'structural-minor', name: 'Reinforced Crankshaft', description: 'A reinforced crankshaft resists fatigue under peak cylinder loads.', tier: 'Minor', branch: 'Structural', x: 29, y: 50, cost: 650, requires: ['durability-platform'], effects: { durability: 2 } },
+        { id: 'monitoring-minor', name: 'Fatigue Sensors', description: 'Embedded sensors flag structural fatigue before it becomes a failure.', tier: 'Minor', branch: 'Monitoring', x: 29, y: 80, cost: 600, requires: ['durability-platform'], effects: { durability: 2 } },
+        { id: 'cooling-major', name: 'High-Flow Cooling Pumps', description: 'Higher-flow pumps keep coolant moving fast enough to hold temperatures in traffic.', tier: 'Major', branch: 'Cooling', x: 50, y: 20, cost: 1500, requires: ['cooling-minor'], effects: { durability: 3 } },
+        { id: 'structural-major', name: 'Main Bearing Shells', description: 'Upgraded bearing shells cut wear around the crankshaft journals.', tier: 'Major', branch: 'Structural', x: 50, y: 50, cost: 1550, requires: ['structural-minor'], effects: { durability: 3 } },
+        { id: 'monitoring-major', name: 'Predictive Wear Analytics', description: 'Predictive analytics model component wear across a full race distance.', tier: 'Major', branch: 'Monitoring', x: 50, y: 80, cost: 1450, requires: ['monitoring-minor'], effects: { durability: 3 } },
+        { id: 'cooling-ultimate', name: 'Full Thermal Remodel', description: 'A complete thermal remodel keeps every component within its ideal operating window.', tier: 'Ultimate', branch: 'Cooling', x: 71, y: 20, cost: 2800, requires: ['cooling-major'], effects: { durability: 4 } },
+        { id: 'structural-ultimate', name: 'Forged Internals', description: 'Forged internals replace cast components for a step change in fatigue life.', tier: 'Ultimate', branch: 'Structural', x: 71, y: 50, cost: 2850, requires: ['structural-major'], effects: { durability: 4 } },
+        { id: 'monitoring-ultimate', name: 'Full Telemetry Life Management', description: 'A full telemetry suite tracks the life of every critical component in real time.', tier: 'Ultimate', branch: 'Monitoring', x: 71, y: 80, cost: 2700, requires: ['monitoring-major'], effects: { durability: 4 } },
+        { id: 'failsafe-powertrain', name: 'Failsafe Powertrain', description: 'Combining the finished cooling, structural and monitoring packages unlocks a fully failsafe powertrain for a final leap in reliability.', x: 92, y: 50, cost: 5200, requires: ['cooling-ultimate', 'structural-ultimate', 'monitoring-ultimate'], effects: { durability: 9 } }
       ]
     }
   ];
+  function balancedDevelopmentCost(baseCost) {
+    if (!baseCost) return 0;
+    const multiplier = baseCost <= 700 ? 1.25
+      : baseCost <= 1600 ? 1.5
+        : baseCost <= 2200 ? 1.8
+          : baseCost <= 3200 ? 2
+            : baseCost <= 4400 ? 2.2
+              : 2.5;
+    return Math.round(baseCost * multiplier / 50) * 50;
+  }
+  developmentDepartments.forEach(department => department.nodes.forEach(node => {
+    node.cost = balancedDevelopmentCost(node.cost);
+  }));
   const upgradeNodes = developmentDepartments.flatMap(department => department.nodes.map(node => ({ ...node, departmentId: department.id })));
   const startingUpgradeIds = developmentDepartments.map(department => department.centralId);
 
   const sponsors = [
-    { id: 'copper-kettle', name: 'Copper Kettle Café', target: 10, multiplier: 1.2, contractRaces: 5, reputationRequired: 0, tagline: 'A forgiving first deal for a new privateer.' },
-    { id: 'rivetworks', name: 'RivetWorks', target: 8, multiplier: 1.35, contractRaces: 6, reputationRequired: 10, tagline: 'Solid finishes turn into dependable backing.' },
-    { id: 'bluepeak', name: 'BluePeak Batteries', target: 7, multiplier: 1.45, contractRaces: 6, reputationRequired: 25, tagline: 'Consistent points-paying pace earns a stronger return.' },
-    { id: 'orbital-fibre', name: 'Orbital Fibre', target: 6, multiplier: 1.55, contractRaces: 7, reputationRequired: 45, tagline: 'A demanding technology partner chasing the front.' },
-    { id: 'northstar', name: 'Northstar Mutual', target: 5, multiplier: 1.7, contractRaces: 8, reputationRequired: 80, tagline: 'Top-five results unlock a major prize boost.' },
-    { id: 'vanta-mobility', name: 'Vanta Mobility', target: 4, multiplier: 1.85, contractRaces: 8, reputationRequired: 140, tagline: 'A high-profile deal with little room for error.' },
-    { id: 'helix-foundry', name: 'Helix Foundry', target: 3, multiplier: 2, contractRaces: 10, reputationRequired: 240, tagline: 'Podiums double every circuit payout.' },
-    { id: 'axiom-industries', name: 'Axiom Industries', target: 1, multiplier: 2.5, contractRaces: 12, reputationRequired: 400, tagline: 'Victory is the only result that satisfies Axiom.' }
+    { id: 'copper-kettle', name: 'Copper Kettle Café', target: 14, multiplier: 1.15, contractRaces: 5, reputationRequired: 0, carRatingRequired: 10, tagline: 'A forgiving first deal for a new privateer.' },
+    { id: 'rivetworks', name: 'RivetWorks', target: 12, multiplier: 1.25, contractRaces: 6, reputationRequired: 8, carRatingRequired: 12, tagline: 'Solid finishes turn into dependable backing.' },
+    { id: 'bluepeak', name: 'BluePeak Batteries', target: 10, multiplier: 1.4, contractRaces: 6, reputationRequired: 25, carRatingRequired: 15, tagline: 'Consistent points-paying pace earns a stronger return.' },
+    { id: 'orbital-fibre', name: 'Orbital Fibre', target: 8, multiplier: 1.55, contractRaces: 7, reputationRequired: 55, carRatingRequired: 19, tagline: 'A demanding technology partner chasing the front.' },
+    { id: 'northstar', name: 'Northstar Mutual', target: 6, multiplier: 1.7, contractRaces: 8, reputationRequired: 100, carRatingRequired: 24, tagline: 'Top-six results unlock a major prize boost.' },
+    { id: 'vanta-mobility', name: 'Vanta Mobility', target: 5, multiplier: 1.9, contractRaces: 8, reputationRequired: 170, carRatingRequired: 30, tagline: 'A high-profile deal with little room for error.' },
+    { id: 'helix-foundry', name: 'Helix Foundry', target: 3, multiplier: 2.15, contractRaces: 10, reputationRequired: 270, carRatingRequired: 37, tagline: 'Podiums more than double every circuit payout.' },
+    { id: 'axiom-industries', name: 'Axiom Industries', target: 1, multiplier: 2.6, contractRaces: 12, reputationRequired: 420, carRatingRequired: 44, tagline: 'Victory is the only result that satisfies Axiom.' }
   ];
 
   const drivers = [
-    { id: 'mara-voss', name: 'Mara Voss', pace: 32, consistency: 36, overtaking: 40, raceCost: 350, signingBonus: 0, reputationRequired: 0 },
-    { id: 'theo-mercer', name: 'Theo Mercer', pace: 42, consistency: 34, overtaking: 47, raceCost: 525, signingBonus: 750, reputationRequired: 0 },
-    { id: 'imani-okafor', name: 'Imani Okafor', pace: 49, consistency: 54, overtaking: 46, raceCost: 775, signingBonus: 4500, reputationRequired: 20 },
-    { id: 'luca-ramires', name: 'Luca Ramires', pace: 62, consistency: 51, overtaking: 64, raceCost: 1200, signingBonus: 9000, reputationRequired: 50 },
-    { id: 'anika-sato', name: 'Anika Sato', pace: 69, consistency: 76, overtaking: 65, raceCost: 1850, signingBonus: 18000, reputationRequired: 90 },
-    { id: 'elias-novak', name: 'Elias Novak', pace: 80, consistency: 71, overtaking: 82, raceCost: 3100, signingBonus: 38000, reputationRequired: 160 },
-    { id: 'sofia-laurent', name: 'Sofia Laurent', pace: 89, consistency: 91, overtaking: 85, raceCost: 5250, signingBonus: 80000, reputationRequired: 280 },
-    { id: 'kian-varga', name: 'Kian Varga', pace: 96, consistency: 93, overtaking: 96, raceCost: 8500, signingBonus: 150000, reputationRequired: 450 }
+    { id: 'mara-voss', name: 'Mara Voss', pace: 32, consistency: 36, overtaking: 40, raceCost: 250, signingBonus: 0, reputationRequired: 0 },
+    { id: 'theo-mercer', name: 'Theo Mercer', pace: 42, consistency: 34, overtaking: 47, raceCost: 400, signingBonus: 1000, reputationRequired: 8 },
+    { id: 'imani-okafor', name: 'Imani Okafor', pace: 49, consistency: 54, overtaking: 46, raceCost: 650, signingBonus: 3500, reputationRequired: 30 },
+    { id: 'luca-ramires', name: 'Luca Ramires', pace: 62, consistency: 51, overtaking: 64, raceCost: 1000, signingBonus: 8000, reputationRequired: 85 },
+    { id: 'anika-sato', name: 'Anika Sato', pace: 69, consistency: 76, overtaking: 65, raceCost: 1600, signingBonus: 16000, reputationRequired: 170 },
+    { id: 'elias-novak', name: 'Elias Novak', pace: 80, consistency: 71, overtaking: 82, raceCost: 2600, signingBonus: 35000, reputationRequired: 280 },
+    { id: 'sofia-laurent', name: 'Sofia Laurent', pace: 89, consistency: 91, overtaking: 85, raceCost: 4300, signingBonus: 70000, reputationRequired: 390 },
+    { id: 'kian-varga', name: 'Kian Varga', pace: 96, consistency: 93, overtaking: 96, raceCost: 7000, signingBonus: 130000, reputationRequired: 520 }
   ];
 
   const engineers = [
-    { id: 'nia-calder', name: 'Nia Calder', title: 'Garage engineer', upgradeCap: 24, raceCost: 125, signingBonus: 0, reputationRequired: 0, researchRequired: 0 },
-    { id: 'jon-bellamy', name: 'Jon Bellamy', title: 'Development engineer', upgradeCap: 38, raceCost: 300, signingBonus: 2500, reputationRequired: 15, researchRequired: 8 },
-    { id: 'asha-vermeer', name: 'Asha Vermeer', title: 'Vehicle dynamics lead', upgradeCap: 52, raceCost: 650, signingBonus: 8500, reputationRequired: 40, researchRequired: 20 },
-    { id: 'mateo-kovac', name: 'Mateo Kovac', title: 'Technical director', upgradeCap: 68, raceCost: 1200, signingBonus: 22000, reputationRequired: 85, researchRequired: 45 },
-    { id: 'elena-park', name: 'Elena Park', title: 'Chief designer', upgradeCap: 84, raceCost: 2200, signingBonus: 55000, reputationRequired: 160, researchRequired: 85 },
-    { id: 'idris-laurent', name: 'Idris Laurent', title: 'Championship engineer', upgradeCap: 100, raceCost: 4000, signingBonus: 125000, reputationRequired: 280, researchRequired: 150 }
+    { id: 'nia-calder', name: 'Nia Calder', title: 'Garage engineer', upgradeCap: 16, performanceBonus: 0, raceCost: 75, signingBonus: 0, reputationRequired: 0, researchRequired: 0 },
+    { id: 'jon-bellamy', name: 'Jon Bellamy', title: 'Development engineer', upgradeCap: 24, performanceBonus: 1, raceCost: 200, signingBonus: 2500, reputationRequired: 18, researchRequired: 8 },
+    { id: 'asha-vermeer', name: 'Asha Vermeer', title: 'Vehicle dynamics lead', upgradeCap: 32, performanceBonus: 2, raceCost: 450, signingBonus: 8000, reputationRequired: 60, researchRequired: 24 },
+    { id: 'mateo-kovac', name: 'Mateo Kovac', title: 'Technical director', upgradeCap: 40, performanceBonus: 3.5, raceCost: 850, signingBonus: 20000, reputationRequired: 120, researchRequired: 50 },
+    { id: 'elena-park', name: 'Elena Park', title: 'Chief designer', upgradeCap: 48, performanceBonus: 5, raceCost: 1500, signingBonus: 50000, reputationRequired: 220, researchRequired: 90 },
+    { id: 'idris-laurent', name: 'Idris Laurent', title: 'Championship engineer', upgradeCap: 60, performanceBonus: 7, raceCost: 2600, signingBonus: 110000, reputationRequired: 360, researchRequired: 140 }
   ];
 
   const copy = value => value ? { ...value } : null;
@@ -125,6 +186,7 @@
   const getDevelopmentDepartment = id => developmentDepartments.find(department => department.id === id);
   const getUpgradeNode = id => upgradeNodes.find(node => node.id === id);
   const driverRating = driver => Math.round((driver.pace + driver.consistency + driver.overtaking) / 3);
+  const carRating = state => Object.values(state.car).reduce((sum, value) => sum + Number(value || 0), 0) / 4;
   const roundCurrency = value => Math.max(0, Math.round(value / 50) * 50);
 
   function createSponsorContract(sponsorOrId) {
@@ -152,11 +214,13 @@
   }
 
   function getAvailableCircuits(state) {
-    return circuits.filter(circuit => state.reputation >= circuit.unlockReputation);
+    const rating = driverRating(state.driver);
+    return circuits.filter(circuit => state.reputation >= circuit.unlockReputation && rating >= circuit.driverRatingRequired);
   }
 
   function getAvailableSponsors(state) {
-    return sponsors.filter(sponsor => state.reputation >= sponsor.reputationRequired);
+    const rating = carRating(state);
+    return sponsors.filter(sponsor => state.reputation >= sponsor.reputationRequired && rating >= sponsor.carRatingRequired);
   }
 
   function purchaseUpgrade(state, nodeOrId) {
@@ -171,11 +235,12 @@
     if (exceedsLimit) {
       return { ok: false, reason: 'ENGINEER_LIMIT', node, engineer, limit: engineer.upgradeCap, state };
     }
-    if (state.money < node.cost) return { ok: false, reason: 'INSUFFICIENT_FUNDS', node, cost: node.cost, state };
     const next = structuredClone(state);
-    next.money -= node.cost;
     next.development.purchased.push(node.id);
     for (const [stat, gain] of Object.entries(node.effects || {})) next.car[stat] = Math.min(100, next.car[stat] + gain);
+    const required = node.cost + calculateOperatingReserve(next);
+    if (state.money < required) return { ok: false, reason: 'INSUFFICIENT_FUNDS', node, cost: node.cost, required, state };
+    next.money -= node.cost;
     return { ok: true, cost: node.cost, node, state: next };
   }
 
@@ -210,6 +275,11 @@
     };
   }
 
+  function calculateOperatingReserve(state) {
+    const available = getAvailableCircuits(state);
+    return Math.min(...available.map(circuit => calculateRaceCosts(state, circuit).total));
+  }
+
   function getAvailableDrivers(state) {
     return drivers.filter(driver => state.reputation >= driver.reputationRequired);
   }
@@ -219,10 +289,11 @@
     if (!driver) return { ok: false, reason: 'UNKNOWN_DRIVER', state };
     if (state.driver.id === driver.id) return { ok: false, reason: 'CURRENT_DRIVER', driver, state };
     if (state.reputation < driver.reputationRequired) return { ok: false, reason: 'REPUTATION_REQUIRED', driver, required: driver.reputationRequired, state };
-    if (state.money < driver.signingBonus) return { ok: false, reason: 'INSUFFICIENT_FUNDS', driver, cost: driver.signingBonus, state };
     const next = structuredClone(state);
-    next.money -= driver.signingBonus;
     next.driver = copy(driver);
+    const required = driver.signingBonus + calculateOperatingReserve(next);
+    if (state.money < required) return { ok: false, reason: 'INSUFFICIENT_FUNDS', driver, cost: driver.signingBonus, required, state };
+    next.money -= driver.signingBonus;
     return { ok: true, driver, cost: driver.signingBonus, state: next };
   }
 
@@ -236,10 +307,11 @@
     if (state.engineer?.id === engineer.id) return { ok: false, reason: 'CURRENT_ENGINEER', engineer, state };
     if (state.reputation < engineer.reputationRequired) return { ok: false, reason: 'REPUTATION_REQUIRED', engineer, required: engineer.reputationRequired, state };
     if (state.researchPoints < engineer.researchRequired) return { ok: false, reason: 'RESEARCH_REQUIRED', engineer, required: engineer.researchRequired, state };
-    if (state.money < engineer.signingBonus) return { ok: false, reason: 'INSUFFICIENT_FUNDS', engineer, cost: engineer.signingBonus, state };
     const next = structuredClone(state);
-    next.money -= engineer.signingBonus;
     next.engineer = copy(engineer);
+    const required = engineer.signingBonus + calculateOperatingReserve(next);
+    if (state.money < required) return { ok: false, reason: 'INSUFFICIENT_FUNDS', engineer, cost: engineer.signingBonus, required, state };
+    next.money -= engineer.signingBonus;
     return { ok: true, engineer, cost: engineer.signingBonus, state: next };
   }
 
@@ -248,6 +320,7 @@
     if (!sponsor) return { ok: false, reason: 'UNKNOWN_SPONSOR', state };
     if (state.sponsor?.racesRemaining > 0) return { ok: false, reason: 'ACTIVE_SPONSOR', sponsor: state.sponsor, state };
     if (state.reputation < sponsor.reputationRequired) return { ok: false, reason: 'REPUTATION_REQUIRED', sponsor, required: sponsor.reputationRequired, state };
+    if (carRating(state) < sponsor.carRatingRequired) return { ok: false, reason: 'CAR_RATING_REQUIRED', sponsor, required: sponsor.carRatingRequired, state };
     const next = structuredClone(state);
     next.sponsor = createSponsorContract(sponsor);
     return { ok: true, sponsor: next.sponsor, state: next };
@@ -260,11 +333,12 @@
     const driverScore = state.driver.pace * .52 + state.driver.consistency * .28 + state.driver.overtaking * .2;
     const carScore = car.engine * circuit.weights.engine + car.aero * circuit.weights.aero
       + car.chassis * circuit.weights.chassis + car.durability * .05;
+    const engineer = getEngineer(state.engineer?.id) || engineers[0];
     const conditionFactor = .82 + Math.max(0, Math.min(100, state.carCondition)) * .0018;
-    const researchBonus = Math.min(5, state.researchPoints * .02);
+    const researchBonus = Math.min(4, state.researchPoints * .015);
     const varianceRange = Math.max(1.1, 3.5 - state.driver.consistency * .022);
     const variance = (rng() * 2 - 1) * varianceRange;
-    return (carScore + driverScore * .25) * conditionFactor + researchBonus + variance;
+    return (carScore + driverScore * .25) * conditionFactor + engineer.performanceBonus + researchBonus + variance;
   }
 
   function reliabilityIssue(state, rng = Math.random) {
@@ -280,7 +354,9 @@
     const circuit = typeof circuitOrId === 'string' ? getCircuit(circuitOrId) : circuitOrId;
     if (!circuit) throw new Error('Unknown circuit');
     const safePosition = Math.max(1, Math.min(GRID_SIZE, Number(position) || GRID_SIZE));
-    const base = failed ? 0 : roundCurrency(circuit.prizeFund * POSITION_PAYOUTS[safePosition - 1]);
+    const base = failed
+      ? circuit.minimumPayout
+      : Math.max(circuit.minimumPayout, roundCurrency(circuit.prizeFund * POSITION_PAYOUTS[safePosition - 1]));
     const targetMet = Boolean(sponsor && !failed && safePosition <= sponsor.target);
     const multiplier = targetMet ? sponsor.multiplier : 1;
     const total = roundCurrency(base * multiplier);
@@ -288,14 +364,15 @@
   }
 
   function reputationForResult(circuit, position, failed) {
-    if (failed) return -Math.max(1, circuit.difficulty - 1);
-    if (position === 1) return 10 + circuit.difficulty;
-    if (position === 2) return 8 + circuit.difficulty;
-    if (position === 3) return 6 + circuit.difficulty;
-    if (position <= 5) return 5;
-    if (position <= 7) return 3;
-    if (position <= 10) return 1;
-    return 0;
+    if (failed) return 0;
+    if (position === 1) return 12 + circuit.difficulty * 2;
+    if (position === 2) return 10 + circuit.difficulty * 2;
+    if (position === 3) return 8 + circuit.difficulty * 2;
+    if (position <= 5) return 7 + circuit.difficulty;
+    if (position <= 8) return 5 + Math.floor(circuit.difficulty / 2);
+    if (position <= 12) return 3 + Math.floor(circuit.difficulty / 2);
+    if (position <= 16) return 2 + Math.floor(circuit.difficulty / 2);
+    return 1;
   }
 
   function simulateRace(state, circuitOrId, rng = Math.random) {
@@ -304,15 +381,13 @@
     let playerPerformance = calculateRacePerformance(state, circuit, rng);
     const issue = reliabilityIssue(state, rng);
     if (issue) playerPerformance -= issue.penalty;
-    const fieldBase = 11.5 + circuit.difficulty * 4.7 + circuit.unlockReputation * .018;
+    const fieldBase = circuit.fieldStrength;
     const opponents = Array.from({ length: GRID_SIZE - 1 }, (_, index) => {
       const fieldSpread = (index / (GRID_SIZE - 2) - .5) * 13;
       return fieldBase + fieldSpread + (rng() * 2 - 1) * 2.2;
     });
     const finalPosition = issue?.type === 'failure' ? GRID_SIZE : 1 + opponents.filter(score => score > playerPerformance).length;
-    const startPosition = Math.max(1, Math.min(GRID_SIZE,
-      Math.round(GRID_SIZE / 2 + (rng() * 2 - 1) * (4.5 - state.driver.consistency * .025))
-    ));
+    const startPosition = GRID_SIZE;
     const laps = [];
     let previousPosition = startPosition;
     for (let lap = 1; lap <= circuit.laps; lap += 1) {
@@ -482,9 +557,9 @@
 
   return {
     GRID_SIZE, OFFLINE_CAP_MS, POSITION_PAYOUTS, SAVE_KEY, STAT_LABELS,
-    applyRaceResult, calculateOfflineProgress, calculateRaceCosts, calculateRacePerformance,
+    applyRaceResult, calculateOfflineProgress, calculateOperatingReserve, calculateRaceCosts, calculateRacePerformance,
     calculateRaceWinnings, calculateServiceCost, checkUnlocks, circuits, developmentDepartments,
-    createInitialState, createSeededRandom, createSponsorContract, driverRating, drivers, engineers,
+    carRating, createInitialState, createSeededRandom, createSponsorContract, driverRating, drivers, engineers,
     getAvailableCircuits, getAvailableDrivers, getAvailableEngineers, getAvailableSponsors, getCircuit,
     getDevelopmentDepartment, getDriver, getEngineer, getSponsor, getUpgradeNode, hireSponsor, loadGame,
     normalizeState, purchaseUpgrade, saveGame, serviceCar, signDriver, signEngineer, simulateRace,

@@ -12,24 +12,34 @@ test('idle manager starts with a circuit, driver, engineer and five-race sponsor
   assert.ok(game.calculateRaceCosts(state, circuit).total < state.money);
 });
 
+test('circuit catalogue contains six fully configured venues', () => {
+  assert.equal(game.circuits.length, 6);
+  for (const circuit of game.circuits) {
+    assert.ok(circuit.id && circuit.name && circuit.tier && circuit.description);
+    assert.ok(circuit.length > 0 && circuit.laps > 0 && circuit.prizeFund > 0);
+    assert.ok(circuit.entryCost >= 0 && circuit.fuelPerLap > 0);
+    assert.ok(circuit.weights.engine > 0 && circuit.weights.aero > 0 && circuit.weights.chassis > 0);
+  }
+});
+
 test('development starts at one central node in each of four departments', () => {
   const state = game.createInitialState();
   assert.deepEqual(game.developmentDepartments.map(department => department.id), [
     'aerodynamics', 'chassis', 'engine', 'durability'
   ]);
   assert.deepEqual(state.development.purchased, game.developmentDepartments.map(department => department.centralId));
-  assert.equal(game.getUpgradeNode('front-wing-mainplane').departmentId, 'aerodynamics');
-  assert.equal(game.getUpgradeNode('turbo-compressor').departmentId, 'engine');
-  assert.equal(game.getUpgradeNode('reinforced-crankshaft').departmentId, 'durability');
+  assert.equal(game.getUpgradeNode('front-wing-minor').departmentId, 'aerodynamics');
+  assert.equal(game.getUpgradeNode('ice-turbo-lag').departmentId, 'engine');
+  assert.equal(game.getUpgradeNode('structural-minor').departmentId, 'durability');
 });
 
 test('tree upgrades require their path, spend money and leave the original state unchanged', () => {
   const state = game.createInitialState();
-  const locked = game.purchaseUpgrade(state, 'front-wing-endplates');
+  const locked = game.purchaseUpgrade(state, 'front-wing-major');
   assert.equal(locked.reason, 'PREREQUISITE');
-  assert.deepEqual(locked.missing, ['front-wing-mainplane']);
+  assert.deepEqual(locked.missing, ['front-wing-minor']);
 
-  const node = game.getUpgradeNode('front-wing-mainplane');
+  const node = game.getUpgradeNode('front-wing-minor');
   const upgraded = game.purchaseUpgrade(state, node.id);
   assert.equal(upgraded.ok, true);
   assert.equal(upgraded.state.car.aero, state.car.aero + node.effects.aero);
@@ -42,29 +52,30 @@ test('tree upgrades require their path, spend money and leave the original state
 test('the starting engineer limits development until a stronger engineer is hired', () => {
   let state = game.createInitialState();
   state.money = 100000;
-  state = game.purchaseUpgrade(state, 'cylinder-head-redesign').state;
-  state = game.purchaseUpgrade(state, 'turbo-compressor').state;
-  assert.equal(state.car.engine, 18);
-  const limited = game.purchaseUpgrade(state, 'combustion-chamber');
+  state = game.purchaseUpgrade(state, 'battery-minor').state;
+  state = game.purchaseUpgrade(state, 'fuel-minor').state;
+  state = game.purchaseUpgrade(state, 'ice-spark-plug').state;
+  assert.equal(state.car.engine, 16);
+  const limited = game.purchaseUpgrade(state, 'battery-major');
   assert.equal(limited.reason, 'ENGINEER_LIMIT');
-  assert.equal(limited.limit, 24);
+  assert.equal(limited.limit, 16);
 
   state.engineer = { ...game.getEngineer('jon-bellamy') };
-  const upgraded = game.purchaseUpgrade(state, 'combustion-chamber');
+  const upgraded = game.purchaseUpgrade(state, 'battery-major');
   assert.equal(upgraded.ok, true);
-  assert.equal(upgraded.state.car.engine, 25);
+  assert.equal(upgraded.state.car.engine, 19);
 });
 
 test('engineers require reputation, research and a signing fee', () => {
   const state = game.createInitialState();
   assert.deepEqual(game.getAvailableEngineers(state).map(engineer => engineer.id), ['nia-calder']);
   assert.equal(game.signEngineer(state, 'jon-bellamy').reason, 'REPUTATION_REQUIRED');
-  assert.equal(game.signEngineer({ ...state, reputation: 15 }, 'jon-bellamy').reason, 'RESEARCH_REQUIRED');
-  assert.equal(game.signEngineer({ ...state, reputation: 15, researchPoints: 8, money: 2000 }, 'jon-bellamy').reason, 'INSUFFICIENT_FUNDS');
+  assert.equal(game.signEngineer({ ...state, reputation: 18 }, 'jon-bellamy').reason, 'RESEARCH_REQUIRED');
+  assert.equal(game.signEngineer({ ...state, reputation: 18, researchPoints: 8, money: 3000 }, 'jon-bellamy').reason, 'INSUFFICIENT_FUNDS');
 
-  const signed = game.signEngineer({ ...state, reputation: 15, researchPoints: 8, money: 3000 }, 'jon-bellamy');
+  const signed = game.signEngineer({ ...state, reputation: 18, researchPoints: 8, money: 4000 }, 'jon-bellamy');
   assert.equal(signed.ok, true);
-  assert.equal(signed.state.money, 500);
+  assert.equal(signed.state.money, 1500);
   assert.equal(signed.state.engineer.id, 'jon-bellamy');
   assert.equal(signed.state.researchPoints, 8);
 });
@@ -83,12 +94,12 @@ test('driver and engineer fees are included in every circuit race budget', () =>
 
 test('driver market gates stronger drivers by reputation and signing budget', () => {
   const state = game.createInitialState();
-  assert.deepEqual(game.getAvailableDrivers(state).map(driver => driver.id), ['mara-voss', 'theo-mercer']);
+  assert.deepEqual(game.getAvailableDrivers(state).map(driver => driver.id), ['mara-voss']);
   assert.equal(game.signDriver(state, 'imani-okafor').reason, 'REPUTATION_REQUIRED');
-  assert.equal(game.signDriver({ ...state, reputation: 20, money: 1000 }, 'imani-okafor').reason, 'INSUFFICIENT_FUNDS');
-  const signed = game.signDriver({ ...state, reputation: 20, money: 5000 }, 'imani-okafor');
+  assert.equal(game.signDriver({ ...state, reputation: 30, money: 4000 }, 'imani-okafor').reason, 'INSUFFICIENT_FUNDS');
+  const signed = game.signDriver({ ...state, reputation: 30, money: 5000 }, 'imani-okafor');
   assert.equal(signed.ok, true);
-  assert.equal(signed.state.money, 500);
+  assert.equal(signed.state.money, 1500);
   assert.equal(signed.state.driver.id, 'imani-okafor');
 });
 
@@ -107,9 +118,9 @@ test('circuit winnings vary by venue and sponsors multiply them only when the ta
   const sponsor = game.createSponsorContract('rivetworks');
   const industrial = game.getCircuit('industrial-park');
   const ridgeway = game.getCircuit('ridgeway');
-  const met = game.calculateRaceWinnings(industrial, 8, sponsor);
-  const missed = game.calculateRaceWinnings(industrial, 9, sponsor);
-  const harderCircuit = game.calculateRaceWinnings(ridgeway, 8, sponsor);
+  const met = game.calculateRaceWinnings(industrial, 12, sponsor);
+  const missed = game.calculateRaceWinnings(industrial, 13, sponsor);
+  const harderCircuit = game.calculateRaceWinnings(ridgeway, 12, sponsor);
 
   assert.equal(met.targetMet, true);
   assert.equal(met.multiplier, sponsor.multiplier);
@@ -140,7 +151,8 @@ test('a new sponsor can only be hired after the current deal ends and reputation
   assert.equal(game.hireSponsor(state, 'rivetworks').reason, 'ACTIVE_SPONSOR');
   const free = { ...state, sponsor: null };
   assert.equal(game.hireSponsor(free, 'rivetworks').reason, 'REPUTATION_REQUIRED');
-  const hired = game.hireSponsor({ ...free, reputation: 10 }, 'rivetworks');
+  assert.equal(game.hireSponsor({ ...free, reputation: 8 }, 'rivetworks').reason, 'CAR_RATING_REQUIRED');
+  const hired = game.hireSponsor({ ...free, reputation: 8, car: { aero: 12, chassis: 12, engine: 12, durability: 12 } }, 'rivetworks');
   assert.equal(hired.ok, true);
   assert.equal(hired.state.sponsor.racesRemaining, game.getSponsor('rivetworks').contractRaces);
 });
@@ -193,6 +205,7 @@ test('race simulation is deterministic and applies all economy values only with 
   const first = game.simulateRace(state, circuit, game.createSeededRandom(42));
   const second = game.simulateRace(state, circuit, game.createSeededRandom(42));
   assert.deepEqual(first, second);
+  assert.equal(first.startPosition, game.GRID_SIZE);
   assert.equal(first.laps.length, circuit.laps);
   assert.equal(first.laps.at(-1).position, first.finalPosition);
   assert.equal(state.statistics.races, 0);
@@ -204,14 +217,65 @@ test('race simulation is deterministic and applies all economy values only with 
   assert.ok(next.carCondition < state.carCondition);
 });
 
-test('reputation unlocks harder circuits, sponsors and staff', () => {
+test('reputation plus car and driver quality unlock the next commercial and racing tiers', () => {
   const state = game.createInitialState();
-  const progressed = { ...state, reputation: 80, researchPoints: 45 };
+  const progressed = {
+    ...state,
+    reputation: 100,
+    researchPoints: 45,
+    car: { aero: 25, chassis: 25, engine: 25, durability: 25 },
+    driver: { ...game.getDriver('luca-ramires') }
+  };
+  const championshipReady = {
+    ...state,
+    reputation: 520,
+    researchPoints: 160,
+    car: { aero: 46, chassis: 46, engine: 46, durability: 46 },
+    driver: { ...game.getDriver('kian-varga') }
+  };
   assert.deepEqual(game.getAvailableCircuits(state).map(circuit => circuit.id), ['industrial-park']);
   assert.deepEqual(game.getAvailableCircuits(progressed).map(circuit => circuit.id), ['industrial-park', 'ridgeway', 'aurora-ring']);
+  assert.deepEqual(game.getAvailableCircuits(championshipReady).map(circuit => circuit.id), [
+    'industrial-park', 'ridgeway', 'aurora-ring', 'ember-coast', 'blackstone-pass', 'halcyon-circuit'
+  ]);
   assert.ok(game.getAvailableSponsors(progressed).length > game.getAvailableSponsors(state).length);
   assert.deepEqual(game.checkUnlocks(state, progressed).circuits.map(circuit => circuit.id), ['ridgeway', 'aurora-ring']);
   assert.ok(game.checkUnlocks(state, progressed).sponsors.some(sponsor => sponsor.id === 'northstar'));
+});
+
+test('engineer ceilings and race bonuses rise at every market tier', () => {
+  for (let index = 1; index < game.engineers.length; index += 1) {
+    assert.ok(game.engineers[index].upgradeCap > game.engineers[index - 1].upgradeCap);
+    assert.ok(game.engineers[index].performanceBonus > game.engineers[index - 1].performanceBonus);
+    assert.ok(game.engineers[index].raceCost > game.engineers[index - 1].raceCost);
+  }
+});
+
+test('spending preserves enough cash to enter another race', () => {
+  const state = game.createInitialState();
+  const first = game.purchaseUpgrade(state, 'front-wing-minor');
+  assert.equal(first.ok, true);
+  const second = game.purchaseUpgrade(first.state, 'rear-wing-minor');
+  assert.equal(second.reason, 'INSUFFICIENT_FUNDS');
+  assert.ok(second.required > second.node.cost);
+  assert.ok(first.state.money >= game.calculateOperatingReserve(first.state));
+});
+
+test('starter races earn money and reputation on average', () => {
+  const state = game.createInitialState();
+  const circuit = game.getCircuit('industrial-park');
+  const costs = game.calculateRaceCosts(state, circuit);
+  const rng = game.createSeededRandom(24680);
+  let rewards = 0;
+  let reputation = 0;
+  for (let race = 0; race < 500; race += 1) {
+    const result = game.simulateRace(state, circuit, rng);
+    rewards += result.reward;
+    reputation += result.reputationDelta;
+  }
+  assert.ok(rewards / 500 > costs.total);
+  assert.ok(reputation / 500 >= 2);
+  assert.ok(game.calculateRaceWinnings(circuit, 20, null, true).total >= costs.total);
 });
 
 test('offline progression is capped at eight hours and auto-races only while affordable', () => {
