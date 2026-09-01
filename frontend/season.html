@@ -21,6 +21,7 @@
     href="/css/championship.css"
 >
     <link rel="stylesheet" href="/css/polish.css">
+    <link rel="stylesheet" href="/css/season-detail-overview.css">
 
 </head>
 
@@ -38,7 +39,7 @@
          MAIN
          ===================================================== -->
 
-    <main class="container page">
+    <main class="container page season-detail-page">
 
         <a class="back-link" href="/seasons" aria-label="Back to all seasons">
             <span aria-hidden="true">←</span>
@@ -47,58 +48,50 @@
 
 
         <!-- =================================================
-             SEASON HEADER
-             ================================================= -->
-
-        <section class="detail-hero">
-
-            <div class="eyebrow">
-                FORMULA 1 SEASON
-            </div>
-
-            <h1 id="season-year">
-                —
-            </h1>
-
-            <div
-                id="season-subtitle"
-                class="detail-sub"
-            >
-                Formula 1 World Championship
-            </div>
-
-        </section>
-
-
-        <!-- =================================================
              SEASON SUMMARY
              ================================================= -->
 
         <section class="season-overview" aria-label="Season summary">
-            <div class="season-champion">
-                <span class="summary-label">World champion</span>
-                <strong id="season-first">—</strong>
-                <small id="season-first-points">—</small>
-            </div>
+            <header class="season-summary-heading">
+                <div>
+                    <div class="eyebrow">CHAMPIONSHIP SUMMARY</div>
+                    <h1><span id="season-year">—</span> Formula 1 season</h1>
+                </div>
+                <p id="season-subtitle">Formula 1 World Championship</p>
+            </header>
 
-            <div class="season-facts">
-                <div class="season-fact">
-                    <span>Races</span>
-                    <strong id="season-races">—</strong>
+            <div class="season-summary-grid">
+                <div class="season-summary-entry season-summary-winner">
+                    <span id="season-first-label">World champion</span>
+                    <strong id="season-first">—</strong>
+                    <small id="season-first-points">—</small>
                 </div>
-                <div class="season-fact">
-                    <span>Laps</span>
-                    <strong id="season-laps">—</strong>
-                </div>
-                <div class="season-fact podium-fact">
-                    <span>Runner-up</span>
+
+                <div class="season-summary-entry">
+                    <span id="season-second-label">Runner-up</span>
                     <strong id="season-second">—</strong>
                     <small id="season-second-points">—</small>
                 </div>
-                <div class="season-fact podium-fact">
-                    <span>Third</span>
+
+                <div class="season-summary-entry">
+                    <span id="season-third-label">Third place</span>
                     <strong id="season-third">—</strong>
                     <small id="season-third-points">—</small>
+                </div>
+
+                <div class="season-summary-entry season-summary-constructor">
+                    <span id="season-constructor-label">Constructors’ champion</span>
+                    <strong id="season-constructor">—</strong>
+                </div>
+
+                <div class="season-summary-entry season-summary-number">
+                    <span>Races</span>
+                    <strong id="season-races">—</strong>
+                </div>
+
+                <div class="season-summary-entry season-summary-number">
+                    <span>Laps</span>
+                    <strong id="season-laps">—</strong>
                 </div>
             </div>
         </section>
@@ -116,7 +109,7 @@
                 <div>
 
                     <div class="eyebrow">
-                        CHAMPIONSHIP
+                        STANDINGS
                     </div>
 
                     <h2>
@@ -142,11 +135,11 @@
                 <div><span class="legend-swatch result-points"></span>Points finish</div>
                 <div><span class="legend-swatch result-finish"></span>Classified</div>
                 <div><span class="legend-swatch result-retired"></span>Retired / DNS</div>
+                <div><span class="legend-swatch result-disqualified"></span>Disqualified</div>
                 <div class="legend-markers"><sub>8</sub> Sprint points</div>
                 <div class="legend-markers"><sup>F</sup> Fastest lap</div>
                 <div class="legend-markers"><sup>P</sup> Pole position</div>
             </div>
-
 
             <div class="championship-table-wrap">
 
@@ -182,10 +175,6 @@
 
                 <div>
 
-                    <div class="eyebrow">
-                        CHAMPIONSHIP
-                    </div>
-
                     <h2>
                         Constructors
                     </h2>
@@ -196,6 +185,13 @@
                     Points by race
                 </div>
 
+            </div>
+
+            <div class="standings-legend" aria-label="Constructor standings legend">
+                <div><span class="legend-swatch result-win"></span>Winner</div>
+                <div><span class="legend-swatch result-podium"></span>Podium</div>
+                <div><span class="legend-swatch result-points"></span>Points finish</div>
+                <div><span class="legend-swatch result-finish"></span>Classified</div>
             </div>
 
 

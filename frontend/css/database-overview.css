@@ -1,0 +1,41 @@
+/* Shared championship database directory. */
+/* Leave the footer's brand and copyright in view when the content fits the screen. */
+.database-directory.page { min-height: calc(100svh - var(--header-height) - 128px); padding-top: 30px; padding-bottom: clamp(48px, 6vh, 80px); }
+.database-directory-heading .eyebrow { margin-bottom: 10px; color: var(--accent); }
+.database-directory-heading h1 { margin: 0; color: var(--text); font-size: clamp(30px, 3.5vw, 44px); line-height: 1.15; letter-spacing: -.04em; text-wrap: balance; }
+.database-directory-heading p { margin: 10px 0 0; color: var(--text-secondary); }
+.database-summary { margin-top: 24px; padding: 18px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+.database-summary dl { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); margin: 0; }
+.database-summary dl > div { min-width: 0; padding: 0 20px; border-left: 1px solid var(--border); }
+.database-summary dl > div:first-child { padding-left: 0; border-left: 0; }
+.database-summary dt { color: var(--text-secondary); font-size: 13px; }
+.database-summary dd { margin: 4px 0 0; color: var(--text); font-size: 28px; font-weight: 800; line-height: 1.2; letter-spacing: -.035em; font-variant-numeric: tabular-nums; }
+.database-directory .database-navigation-title { margin: 32px 0 14px; color: var(--accent); font-size: 12px; font-weight: 800; line-height: 1.4; letter-spacing: .13em; }
+.database-category-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.database-category { display: flex; flex-direction: column; min-width: 0; padding: 22px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); color: var(--text); text-decoration: none; transition: border-color .15s ease, background .15s ease; }
+.database-category:hover { border-color: var(--accent); background: var(--accent-light); }
+.database-category:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.database-category-heading { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.database-category h3 { margin: 0; font-size: 24px; line-height: 1.2; letter-spacing: -.025em; }
+.database-category:hover h3 { color: var(--accent); }
+.database-category-action { margin-top: auto; padding-top: 18px; font-size: 13px; font-weight: 800; }
+.database-category:hover .database-category-action { color: var(--accent); }
+.database-directory .database-category p { margin: 10px 0 0; font-size: 15px; line-height: 1.55; color: var(--text-secondary); }
+@media (max-width: 1000px) {
+  .database-category-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .database-summary dl { grid-template-columns: repeat(3, minmax(0, 1fr)); row-gap: 16px; }
+  .database-summary dl > div:nth-child(4) { padding-left: 0; border-left: 0; }
+  .database-summary dl > div:nth-child(n+4) { padding-top: 16px; border-top: 1px solid var(--border); }
+}
+@media (max-width: 600px) {
+  .database-directory.page { padding-top: 24px; padding-bottom: 48px; }
+  .database-category-grid { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  .database-category { padding: 18px; }
+  .database-category h3 { font-size: 22px; }
+  .database-summary dl > div { padding-left: 12px; padding-right: 8px; }
+  .database-summary dt { font-size: 12px; }
+  .database-summary dd { font-size: 25px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .database-category { transition: none; }
+}

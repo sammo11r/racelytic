@@ -12,8 +12,10 @@ async function loadSeriesHome() {
     const seasonUrl = `${base}/season?year=${encodeURIComponent(data.latestSeason)}`;
     const latestSeasonLink = document.getElementById('latest-season-link');
     const snapshotSeasonLink = document.getElementById('snapshot-season-link');
-    latestSeasonLink.href = seasonUrl;
-    latestSeasonLink.textContent = `Latest season · ${data.latestSeason}`;
+    if (latestSeasonLink) {
+      latestSeasonLink.href = seasonUrl;
+      latestSeasonLink.textContent = `Latest season · ${data.latestSeason}`;
+    }
     snapshotSeasonLink.href = seasonUrl;
     document.getElementById('snapshot-season').textContent = data.latestSeason;
     document.getElementById('snapshot-rounds').textContent = fmtNumber(data.currentSeason?.rounds || 0);

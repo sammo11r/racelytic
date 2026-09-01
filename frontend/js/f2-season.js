@@ -85,6 +85,16 @@ function f2ResultLabel(result) {
   return result?.positionText || result?.position || 'â€”';
 }
 
+function f2ConstructorResultClass(result) {
+  if (!result) return 'result-empty';
+  const bestPosition = Number(result.bestPosition || 0);
+  if (bestPosition === 1) return 'result-win';
+  if (bestPosition > 1 && bestPosition <= 3) return 'result-podium';
+  if (Number(result.points || 0) > 0) return 'result-points';
+  if (Number(result.classified || 0) > 0) return 'result-finish';
+  return 'result-empty';
+}
+
 function renderF2ConstructorTable(constructors, raceSessions) {
   document.getElementById('f2-constructor-head').innerHTML = `<tr>
     <th class="position-column">Pos.</th><th class="name-column">Constructor</th>
@@ -96,8 +106,9 @@ function renderF2ConstructorTable(constructors, raceSessions) {
       <td class="position-column">${esc(constructor.position)}</td>
       <td class="name-column"><a href="/f2/constructor?id=${encodeURIComponent(constructor.constructorId)}">${esc(constructor.name)}</a></td>
       ${raceSessions.map(session => {
-        const points = Number(constructor.raceResults?.[session.id] || 0);
-        return `<td class="race-point constructor-points ${points > 0 ? 'has-points' : ''}"><span>${points > 0 ? fmtNumber(points) : ''}</span></td>`;
+        const result = constructor.raceResults?.[session.id];
+        const points = Number(result?.points ?? result ?? 0);
+        return `<td class="race-point constructor-points ${f2ConstructorResultClass(result)}"><span>${points > 0 ? fmtNumber(points) : ''}</span></td>`;
       }).join('')}
       <td class="points-column total-points">${fmtNumber(constructor.points)}</td>
     </tr>`).join('');
@@ -106,8 +117,14 @@ function renderF2ConstructorTable(constructors, raceSessions) {
 function renderF2Season(data) {
   document.title = `${data.year} Formula 2 Season · Racelytic`;
   document.getElementById('f2-season-year').textContent = data.year;
-  document.getElementById('f2-season-rounds').textContent = fmtNumber(data.summary.rounds);
-  document.getElementById('f2-season-drivers').textContent = fmtNumber(data.summary.drivers);
+  const completed = Boolean(data.summary.completed);
+  document.getElementById('f2-season-first-label').textContent = completed ? 'Formula 2 champion' : 'Championship leader';
+  document.getElementById('f2-season-second-label').textContent = completed ? 'Runner-up' : 'Second place';
+  document.getElementById('f2-season-third-label').textContent = 'Third place';
+  document.getElementById('f2-season-constructor-label').textContent = completed ? 'Teams’ champion' : 'Leading team';
+  document.getElementById('f2-season-constructor').textContent = data.summary.constructorLeader?.name || '—';
+  document.getElementById('f2-season-races').textContent = fmtNumber(data.summary.races);
+  document.getElementById('f2-season-laps').textContent = fmtNumber(data.summary.laps);
   document.getElementById('f2-team-count').textContent = `${fmtNumber(data.summary.teams)} teams`;
   renderPodiumPlace('first', data.summary.first);
   renderPodiumPlace('second', data.summary.second);
@@ -155,12 +172,13 @@ function renderF2Season(data) {
   renderF2ConstructorTable(data.constructorChampionship || [], raceSessions);
 
   document.getElementById('f2-race-calendar').innerHTML = data.calendar.map(race => `
-    <article class="calendar-race f2-calendar-race">
+    <article class="calendar-race f2-calendar-race" data-round="${esc(race.round)}">
       <div class="calendar-round">${esc(race.round)}</div>
       <div class="calendar-date">${fmtDate(race.date)}</div>
       <div class="calendar-name"><strong>${esc(race.name)}</strong><small>${esc(race.circuitName || race.placeName || '')}</small></div>
       <div class="f2-calendar-sessions">${race.sessions.map(session => `<span${session.cancelled ? ' class="cancelled-session"' : ''}>${esc(session.name)}: ${session.cancelled ? 'Cancelled' : esc(session.winner || 'No winner')}</span>`).join('')}</div>
     </article>`).join('');
+  window.renderJuniorSeasonMap?.('f2-season-map', data.calendar, { year: data.year, seriesName: 'Formula 2' });
 }
 
 async function loadF2Season() {

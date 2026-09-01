@@ -663,6 +663,9 @@ table tbody tr:last-child td { border-bottom: 0; }
 .championship-table .result-finish, .legend-swatch.result-finish { background: #e8ecfb; }
 .championship-table .result-retired, .legend-swatch.result-retired { background: #f6dcea; }
 .championship-table .result-disqualified, .legend-swatch.result-disqualified { background: #17191f; color: #fff; }
+#driver-table .race-point.result-disqualified,
+#driver-table .race-point.result-disqualified .result-value,
+#driver-table .race-point.result-disqualified .sprint-points { color: #fff; }
 .championship-table .result-disqualified.pole-position::after { color: #fff; }
 .championship-table .result-empty { background: #f6f7f8; color: #a7abb2; }
 #driver-table tbody tr:hover .name-column,
@@ -691,8 +694,12 @@ table tbody tr:last-child td { border-bottom: 0; }
 #constructor-table tbody .name-column { background: #fff; }
 #constructor-table .race-column,
 #constructor-table .race-point { min-width: 56px; white-space: nowrap; }
-#constructor-table .constructor-points.has-points { background: #dff4e2; color: #24262c; font-weight: 750; }
-#constructor-table .constructor-points:not(.has-points) { background: #f6f7f8; }
+#constructor-table .constructor-points { color: #24262c; font-weight: 750; }
+#constructor-table .constructor-points.result-win { background: #fff1ad; }
+#constructor-table .constructor-points.result-podium { background: #ffe0ad; }
+#constructor-table .constructor-points.result-points { background: #dff4e2; }
+#constructor-table .constructor-points.result-finish { background: #e8ecfb; }
+#constructor-table .constructor-points.result-empty { background: #f6f7f8; }
 #constructor-table .sprint-points { position: relative; bottom: -.25em; margin-left: 1px; }
 #constructor-table .race-point { position: relative; z-index: 1; }
 #constructor-table .points-column { position: sticky; right: 0; z-index: 4; width: 72px; min-width: 72px; background: #fff; box-shadow: -7px 0 12px -12px rgba(17,19,24,.65); }
@@ -732,9 +739,10 @@ table tbody tr:last-child td { border-bottom: 0; }
 .map-country { fill: #dfe3e8; stroke: #fff; stroke-width: .6; }
 .calendar-route { fill: none; stroke: var(--accent); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; opacity: .72; }
 .calendar-stop { cursor: pointer; outline: none; }
-.calendar-stop circle { fill: #17191f; stroke: #fff; stroke-width: 2; transition: r .15s ease, fill .15s ease; }
+.calendar-stop .calendar-stop-hit { fill: transparent; stroke: none; pointer-events: all; }
+.calendar-stop .calendar-stop-marker { fill: #17191f; stroke: #fff; stroke-width: 2; transition: r .15s ease, fill .15s ease; }
 .calendar-stop text { fill: #fff; font-size: 7px; font-weight: 850; pointer-events: none; }
-.calendar-stop:hover circle, .calendar-stop:focus circle { r: 11px; fill: var(--accent); }
+.calendar-stop:hover .calendar-stop-marker, .calendar-stop:focus .calendar-stop-marker { r: 11px; fill: var(--accent); }
 
 .season-map-tooltip {
   position: absolute;
@@ -2519,7 +2527,8 @@ table td { padding: 14px 16px; }
 .series-home-hero { min-height: 455px; display: flex; align-items: center; overflow: hidden; }
 .series-home-hero-copy { position: relative; z-index: 1; width: min(820px, 76%); }
 .series-home-hero::after {
-  top: 50%;
+  /* Share the original F1 anchor; headline wrapping must not move the artwork. */
+  top: calc(146.55px + clamp(80.64px, 9.36vw, 112.32px));
   right: clamp(-90px, 2vw, 30px);
   width: min(39vw, 480px);
   aspect-ratio: 1.25;
@@ -2533,6 +2542,11 @@ table td { padding: 14px 16px; }
   transform: translateY(-50%) skewX(-10deg) rotate(-3deg);
 }
 
+/* Let desktop copy overlap the artwork; retain clipping on smaller screens. */
+@media (min-width: 981px) {
+  .series-home-hero { overflow: visible; }
+}
+
 .series-snapshot {
   display: grid;
   grid-template-columns: minmax(220px, .55fr) minmax(0, 1.45fr);
@@ -2543,6 +2557,19 @@ table td { padding: 14px 16px; }
   border-bottom: 1px solid var(--border);
 }
 .series-snapshot-intro h2 { max-width: 390px; margin: 8px 0 0; font-size: clamp(29px, 3.5vw, 43px); line-height: 1.02; letter-spacing: -.045em; }
+body[data-series-home] .series-snapshot {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 20px;
+  padding-bottom: 32px;
+}
+body[data-series-home] .series-snapshot-intro h2 {
+  max-width: none;
+  margin: 0;
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1.4;
+  letter-spacing: .2em;
+}
 .series-snapshot-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border: 1px solid var(--border); border-radius: 16px; background: rgba(255,255,255,.76); box-shadow: var(--shadow-small); }
 .series-snapshot-item { display: flex; min-width: 0; min-height: 126px; flex-direction: column; justify-content: flex-end; padding: 20px; color: var(--text); }
 .series-snapshot-item + .series-snapshot-item { border-left: 1px solid var(--border); }
@@ -2685,6 +2712,13 @@ body.f2-mode .home-path-simulator { background: #eef5ff; }
 .home-community h2 { color: #fff; }
 .home-community p { max-width: 660px; margin: 17px 0 0; color: #aeb3bd; font-size: 15px; line-height: 1.65; }
 .home-community .button { flex: 0 0 auto; }
+.home-community.home-community-compact { gap: 28px; padding: 28px 32px; margin-bottom: 60px; border-radius: 18px; }
+.home-community-compact h2 { margin: 0; font-size: clamp(28px, 3vw, 38px); line-height: 1.1; letter-spacing: -.035em; }
+.home-community-compact p { max-width: 600px; margin: 10px 0 0; font-size: 14px; }
+.home-account-actions { display: flex; flex: 0 0 auto; flex-wrap: wrap; align-items: center; gap: 18px; }
+.home-account-signin { color: #d6d8de; font-size: 13px; font-weight: 700; text-decoration: underline; text-underline-offset: 4px; }
+.home-account-signin:hover { color: #fff; }
+.home-account-signin:focus-visible { outline: 2px solid #fff; outline-offset: 5px; }
 
 @media (max-width: 800px) {
   .home-hero { padding-top: 46px; padding-bottom: 42px; }
@@ -2705,6 +2739,7 @@ body.f2-mode .home-path-simulator { background: #eef5ff; }
   .series-tool-card { min-height: 245px; padding: 26px; }
   .home-archive { gap: 35px; padding-top: 60px; padding-bottom: 60px; }
   .home-community { align-items: flex-start; flex-direction: column; margin-bottom: 70px; padding: 34px 28px; }
+  .home-community.home-community-compact { padding: 26px 24px; gap: 22px; }
 }
 
 @media (max-width: 520px) {

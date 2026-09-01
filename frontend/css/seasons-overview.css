@@ -1,0 +1,73 @@
+/* Shared championship seasons: archive grid, filters and two-tone champion names. */
+.seasons-directory .season-filters {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  flex: 0 0 390px;
+  width: 390px;
+}
+.seasons-directory .season-filter-field { min-width: 0; }
+.seasons-directory .season-filter-field > label {
+  display: block;
+  margin-bottom: 10px;
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.seasons-directory .season-filter-field input,
+.seasons-directory .season-filter-field select {
+  width: 100%;
+  min-width: 0;
+  min-height: 52px;
+  padding: 10px 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 16px;
+  box-shadow: none;
+}
+.seasons-directory .season-filter-field select { cursor: pointer; }
+.seasons-directory .season-filter-field input:focus-visible,
+.seasons-directory .season-filter-field select:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+.seasons-directory .season-card { min-width: 0; container-type: inline-size; }
+.seasons-directory .season-card:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.seasons-directory .season-card-heading { gap: 12px; min-height: 78px; }
+.seasons-directory .season-year { flex-shrink: 0; }
+.seasons-directory .season-card-champion { flex: 1; min-width: 0; max-width: none; gap: 6px; }
+.seasons-directory .season-card-champion > span { font-size: 9px; }
+.seasons-directory .season-card-champion strong {
+  color: var(--text);
+  font-size: 18px;
+  line-height: 1.15;
+  letter-spacing: -.035em;
+  overflow-wrap: anywhere;
+}
+.seasons-directory .season-card-champion.has-champion strong { font-size: 22px; }
+.seasons-directory .season-card-champion strong span {
+  display: block;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: none;
+}
+.seasons-directory .champion-last-name { color: var(--accent); }
+@container (max-width: 215px) {
+  .seasons-directory .season-card-champion.has-champion strong { font-size: 18px; }
+  .seasons-directory .season-year { font-size: 34px; }
+}
+@media (min-width: 1001px) and (max-width: 1200px) {
+  .seasons-directory .season-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 800px) {
+  .seasons-directory .page-head { align-items: stretch; flex-direction: column; gap: 24px; }
+  .seasons-directory .season-filters { flex: none; width: 100%; }
+}
+@media (max-width: 380px) {
+  .seasons-directory .season-filters { grid-template-columns: minmax(0, 1fr); }
+}

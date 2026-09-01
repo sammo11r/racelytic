@@ -17,6 +17,7 @@
         href="/css/style.css"
     >
     <link rel="stylesheet" href="/css/polish.css">
+    <link rel="stylesheet" href="/css/seasons-overview.css">
 
 </head>
 
@@ -26,7 +27,7 @@
     <div id="header"></div>
 
 
-    <main class="container page">
+    <main class="container page seasons-directory">
 
         <div class="page-head">
 
@@ -40,15 +41,11 @@
                     Seasons
                 </h1>
 
-                <p>
-                    Every championship season in the F1DB dataset.
-                </p>
-
             </div>
 
-            <form id="season-jump" class="season-jump" role="search">
-                <label for="season-search">Find a season</label>
-                <div class="season-jump-controls">
+            <div class="season-filters" role="search" aria-label="Filter and sort seasons">
+                <div class="season-filter-field">
+                    <label for="season-search">Filter by year</label>
                     <input
                         id="season-search"
                         type="search"
@@ -56,12 +53,18 @@
                         list="season-years"
                         placeholder="Enter a year"
                         autocomplete="off"
+                        aria-controls="seasons"
                     >
-                    <button type="submit">Open</button>
+                </div>
+                <div class="season-filter-field">
+                    <label for="season-sort">order by</label>
+                    <select id="season-sort" aria-controls="seasons">
+                        <option value="desc" selected>Descending</option>
+                        <option value="asc">Ascending</option>
+                    </select>
                 </div>
                 <datalist id="season-years"></datalist>
-                <small id="season-search-message" aria-live="polite"></small>
-            </form>
+            </div>
 
         </div>
 

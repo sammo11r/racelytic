@@ -30,5 +30,19 @@ function selectComparisonView(value) { document.querySelectorAll('[data-comparis
 function renderComparison() { const [first,second]=comparisonData.drivers; document.getElementById('comparison-content').innerHTML=`<section class="comparison-driver-heads"><a href="${comparisonUrl('driver',first.id)}"><span>${esc(first.nationalityCountryId||'')}</span><h2>${esc(first.name)}</h2></a><div>HEAD TO HEAD</div><a href="${comparisonUrl('driver',second.id)}"><span>${esc(second.nationalityCountryId||'')}</span><h2>${esc(second.name)}</h2></a></section><section class="analysis-visualization-menu comparison-view-menu"><div class="analysis-visualization-heading"><div class="eyebrow">COMPARISON</div><strong>Choose a view</strong></div><div class="analysis-visualization-tabs comparison-tabs" role="tablist"><button type="button" class="active" role="tab" aria-selected="true" data-comparison-view="overview"><span>Career overview</span><small>All-time totals</small></button><button type="button" role="tab" aria-selected="false" data-comparison-view="teammates"><span>Teammate battle</span><small>Season by season</small></button><button type="button" role="tab" aria-selected="false" data-comparison-view="races"><span>Shared races</span><small>Race by race</small></button></div></section><div class="comparison-workspace"><section data-comparison-panel="overview">${renderOverview()}</section><section data-comparison-panel="teammates" hidden>${renderTeammates()}</section><section data-comparison-panel="races" hidden>${renderSharedRaces()}</section></div>`; document.querySelectorAll('[data-comparison-view]').forEach(button=>button.addEventListener('click',()=>selectComparisonView(button.dataset.comparisonView))); }
 
 async function compareDrivers() { const first=document.getElementById('comparison-driver-one').value,second=document.getElementById('comparison-driver-two').value;if(first===second)return setError('comparison-content','Choose two different drivers.');document.getElementById('comparison-content').innerHTML='<div class="loading-state">Building comparison…</div>';try{comparisonData=await getJSON(`/api/drivers/compare?ids=${encodeURIComponent(first)},${encodeURIComponent(second)}`);renderComparison();}catch(error){setError('comparison-content',error.message);} }
-getJSON('/api/drivers?limit=1000').then(drivers=>{const ordered=[...drivers].sort((a,b)=>Number(b.totalRaceWins)-Number(a.totalRaceWins)||a.name.localeCompare(b.name)),options=ordered.map(driver=>`<option value="${esc(driver.id)}">${esc(driver.name)}</option>`).join('');document.getElementById('comparison-driver-one').innerHTML=options;document.getElementById('comparison-driver-two').innerHTML=options;document.getElementById('comparison-driver-two').selectedIndex=Math.min(1,ordered.length-1);compareDrivers();}).catch(error=>setError('comparison-content',error.message));
+getJSON('/api/drivers?limit=1000').then(drivers=>{
+  const ordered=[...drivers].sort((a,b)=>Number(b.totalRaceWins)-Number(a.totalRaceWins)||a.name.localeCompare(b.name));
+  const options=ordered.map(driver=>`<option value="${esc(driver.id)}">${esc(driver.name)}</option>`).join('');
+  const first=document.getElementById('comparison-driver-one'),second=document.getElementById('comparison-driver-two');
+  first.innerHTML=options;
+  second.innerHTML=options;
+  second.selectedIndex=Math.min(1,ordered.length-1);
+  const requested=new URLSearchParams(window.location.search);
+  const firstId=requested.get('first'),secondId=requested.get('second');
+  if(firstId!==secondId&&ordered.some(driver=>driver.id===firstId)&&ordered.some(driver=>driver.id===secondId)) {
+    first.value=firstId;
+    second.value=secondId;
+  }
+  compareDrivers();
+}).catch(error=>setError('comparison-content',error.message));
 document.getElementById('compare-drivers').addEventListener('click',compareDrivers);

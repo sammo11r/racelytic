@@ -305,6 +305,9 @@ async function initialiseSimulator() {
     const [seasons, systems] = await Promise.all([getJSON('/api/seasons'), getJSON('/api/points-systems')]);
     const select = document.getElementById('simulation-season');
     select.innerHTML = seasons.map(season => `<option value="${esc(season.year)}">${esc(season.year)}</option>`).join('');
+    const requestedPreview = new URLSearchParams(window.location.search);
+    const requestedYear = requestedPreview.get('year');
+    if (seasons.some(season => String(season.year) === requestedYear)) select.value = requestedYear;
     customSystems = systems;
     const pointsSelect = document.getElementById('simulation-points');
     const historicalGroup = document.createElement('optgroup');
@@ -349,6 +352,8 @@ async function initialiseSimulator() {
       });
       pointsSelect.append(group);
     }
+    const requestedPoints = requestedPreview.get('points');
+    if ([...pointsSelect.options].some(option => option.value === requestedPoints)) pointsSelect.value = requestedPoints;
     await loadSimulationSeason();
   } catch (error) {
     setError('simulation-results', error.message);

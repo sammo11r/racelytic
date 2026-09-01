@@ -245,6 +245,7 @@ async function submitAccount(form, action) {
 }
 
 document.querySelectorAll('[data-account-tab]').forEach(button => button.addEventListener('click', () => showTab(button.dataset.accountTab)));
+showTab(new URLSearchParams(window.location.search).get('tab') === 'register' ? 'register' : 'login');
 document.getElementById('login-form').addEventListener('submit', event => { event.preventDefault(); submitAccount(event.currentTarget, 'login'); });
 document.getElementById('register-form').addEventListener('submit', event => { event.preventDefault(); submitAccount(event.currentTarget, 'register'); });
 document.getElementById('logout-button').addEventListener('click', async () => {

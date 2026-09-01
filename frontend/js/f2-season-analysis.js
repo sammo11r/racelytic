@@ -213,6 +213,8 @@ async function renderF2SeasonAnalysis() {
 getJSON(`/api/seasons?series=${JUNIOR_ANALYSIS_SERIES}`).then(seasons => {
   const select = document.getElementById('f2-analysis-season');
   select.innerHTML = seasons.map(season => `<option value="${esc(season.year)}">${esc(season.year)}</option>`).join('');
+  const requestedYear = new URLSearchParams(window.location.search).get('year');
+  if (seasons.some(season => String(season.year) === requestedYear)) select.value = requestedYear;
   renderF2SeasonAnalysis();
 }).catch(error => setError('f2-progression-chart', error.message));
 document.getElementById('f2-analysis-season').addEventListener('change', renderF2SeasonAnalysis);

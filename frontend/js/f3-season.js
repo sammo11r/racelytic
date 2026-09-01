@@ -83,22 +83,40 @@ function f3SessionHeading(session) {
   return `${esc(session.label)}${session.cancelled ? '<small class="cancelled-label">Cancelled</small>' : ''}`;
 }
 
+function f3ConstructorResultClass(result) {
+  if (!result) return 'result-empty';
+  const bestPosition = Number(result.bestPosition || 0);
+  if (bestPosition === 1) return 'result-win';
+  if (bestPosition > 1 && bestPosition <= 3) return 'result-podium';
+  if (Number(result.points || 0) > 0) return 'result-points';
+  if (Number(result.classified || 0) > 0) return 'result-finish';
+  return 'result-empty';
+}
+
 function renderF3ConstructorTable(constructors, raceSessions) {
   document.getElementById('f3-constructor-head').innerHTML = `<tr><th class="position-column">Pos.</th><th class="name-column">Constructor</th>${raceSessions.map(session => `<th class="race-column${session.cancelled ? ' cancelled-session' : ''}" title="${esc(session.race.name)} · ${esc(session.name)}${session.cancelled ? ' · Cancelled' : ''}">${f3SessionHeading(session)}</th>`).join('')}<th class="points-column">Points</th></tr>`;
   document.getElementById('f3-constructor-body').innerHTML = constructors.map(constructor => `
     <tr><td class="position-column">${esc(constructor.position)}</td><td class="name-column"><a href="/f3/team?id=${encodeURIComponent(constructor.constructorId)}">${esc(constructor.name)}</a></td>${raceSessions.map(session => {
-      const points = Number(constructor.raceResults?.[session.id] || 0);
-      return `<td class="race-point constructor-points ${points > 0 ? 'has-points' : ''}"><span>${points > 0 ? fmtNumber(points) : ''}</span></td>`;
+      const result = constructor.raceResults?.[session.id];
+      const points = Number(result?.points ?? result ?? 0);
+      return `<td class="race-point constructor-points ${f3ConstructorResultClass(result)}"><span>${points > 0 ? fmtNumber(points) : ''}</span></td>`;
     }).join('')}<td class="points-column total-points">${fmtNumber(constructor.points)}</td></tr>`).join('');
 }
 
 function renderF3Season(data) {
   document.title = `${data.year} Formula 3 Season · Racelytic`;
   document.getElementById('f3-season-year').textContent = data.year;
-  document.getElementById('f3-season-rounds').textContent = fmtNumber(data.summary.rounds);
-  document.getElementById('f3-season-drivers').textContent = fmtNumber(data.summary.drivers);
+  const academy = document.body.classList.contains('academy-mode');
+  const completed = Boolean(data.summary.completed);
+  const seriesName = academy ? 'F1 Academy' : 'Formula 3';
   document.getElementById('f3-team-count').textContent = `${fmtNumber(data.summary.teams)} teams`;
-  document.getElementById('f3-season-first-label').textContent = data.summary.first?.champion ? 'Champion' : 'Championship leader';
+  document.getElementById('f3-season-first-label').textContent = completed ? `${seriesName} champion` : 'Championship leader';
+  document.getElementById('f3-season-second-label').textContent = completed ? 'Runner-up' : 'Second place';
+  document.getElementById('f3-season-third-label').textContent = 'Third place';
+  document.getElementById('f3-season-constructor-label').textContent = completed ? 'Teams’ champion' : 'Leading team';
+  document.getElementById('f3-season-constructor').textContent = data.summary.constructorLeader?.name || '—';
+  document.getElementById('f3-season-races').textContent = fmtNumber(data.summary.races);
+  document.getElementById('f3-season-laps').textContent = fmtNumber(data.summary.laps);
   renderF3PodiumPlace('first', data.summary.first);
   renderF3PodiumPlace('second', data.summary.second);
   renderF3PodiumPlace('third', data.summary.third);
@@ -132,7 +150,8 @@ function renderF3Season(data) {
   setF3StandingsMode(f3StandingsMode);
   renderF3ConstructorTable(data.constructorChampionship || [], raceSessions);
   document.getElementById('f3-race-calendar').innerHTML = data.calendar.map(race => `
-    <article class="calendar-race f2-calendar-race"><div class="calendar-round">${esc(race.round)}</div><div class="calendar-date">${fmtDate(race.date)}</div><div class="calendar-name"><strong>${esc(race.name)}</strong><small>${esc(race.circuitName || race.placeName || '')}</small></div><div class="f2-calendar-sessions">${race.sessions.map(session => `<span${session.cancelled ? ' class="cancelled-session"' : ''}>${esc(session.name)}: ${session.cancelled ? 'Cancelled' : esc(session.winner || 'No winner')}</span>`).join('')}</div></article>`).join('');
+    <article class="calendar-race f2-calendar-race" data-round="${esc(race.round)}"><div class="calendar-round">${esc(race.round)}</div><div class="calendar-date">${fmtDate(race.date)}</div><div class="calendar-name"><strong>${esc(race.name)}</strong><small>${esc(race.circuitName || race.placeName || '')}</small></div><div class="f2-calendar-sessions">${race.sessions.map(session => `<span${session.cancelled ? ' class="cancelled-session"' : ''}>${esc(session.name)}: ${session.cancelled ? 'Cancelled' : esc(session.winner || 'No winner')}</span>`).join('')}</div></article>`).join('');
+  window.renderJuniorSeasonMap?.('f3-season-map', data.calendar, { year: data.year, seriesName });
 }
 
 async function loadF3Season() {

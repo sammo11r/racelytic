@@ -1,0 +1,206 @@
+/* F1 season detail opening: one concise championship summary. */
+.season-detail-page #driver-table .driver-name { color: var(--text); }
+.season-detail-page { padding-top: 36px; }
+.season-detail-page .back-link { margin-bottom: 18px; }
+.season-detail-page .calendar-list {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  border: 0;
+  background: transparent;
+}
+.season-detail-page .calendar-race {
+  grid-template-columns: 28px 76px minmax(0, 1fr) auto;
+  gap: 8px;
+  min-height: 58px;
+  padding: 8px 10px;
+  border-radius: 9px;
+}
+.season-detail-page .calendar-race:hover { transform: translateX(2px); }
+.season-detail-page .calendar-round { padding-left: 0; font-size: 11px; }
+.season-detail-page .calendar-date { font-size: 10px; white-space: nowrap; }
+.season-detail-page .calendar-name { min-width: 0; padding: 0; }
+.season-detail-page .calendar-name strong,
+.season-detail-page .calendar-name span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.season-detail-page .calendar-name strong { font-size: 12px; }
+.season-detail-page .calendar-name span { font-size: 9px; }
+.season-detail-page .calendar-laps { gap: 3px; padding-right: 0; }
+.season-detail-page .calendar-laps span { font-size: 14px; }
+.season-detail-page .calendar-laps small { font-size: 8px; }
+.season-detail-page .season-map-svg { cursor: grab; touch-action: none; }
+.season-detail-page .season-map-svg:active { cursor: grabbing; }
+.season-detail-page .season-map-controls {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 3;
+  display: flex;
+  gap: 5px;
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: rgba(255,255,255,.92);
+  box-shadow: var(--shadow-small);
+}
+.season-detail-page .season-map-controls button {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  place-items: center;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  font: inherit;
+  font-size: 19px;
+  font-weight: 800;
+}
+.season-detail-page .season-map-controls button:hover { background: var(--surface-alt); }
+.season-detail-page .season-map-controls button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.season-detail-page .season-map-controls .season-map-reset { width: auto; padding: 0 10px; font-size: 11px; }
+.season-detail-page .season-map-help {
+  position: absolute;
+  left: 14px;
+  bottom: 12px;
+  z-index: 2;
+  padding: 6px 9px;
+  border-radius: 7px;
+  background: rgba(255,255,255,.86);
+  color: var(--text-muted);
+  font-size: 9px;
+  font-weight: 700;
+  pointer-events: none;
+}
+.season-detail-page .season-overview {
+  display: block;
+  overflow: hidden;
+  margin-top: 0;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface);
+  box-shadow: var(--shadow-small);
+}
+.season-summary-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 28px 30px 26px;
+  border-bottom: 1px solid var(--border);
+}
+.season-summary-heading .eyebrow { margin-bottom: 8px; }
+.season-summary-heading h1 {
+  margin: 0 !important;
+  color: var(--text);
+  font-size: clamp(32px, 4vw, 48px);
+  line-height: 1;
+  letter-spacing: -.05em;
+}
+.season-summary-heading h1 #season-year,
+.season-summary-heading h1 .season-summary-year { color: var(--accent) !important; }
+.season-summary-heading p {
+  margin: 0 0 3px;
+  color: var(--text-secondary);
+  font-size: 14px;
+  white-space: nowrap;
+}
+.season-summary-grid {
+  display: grid;
+  grid-template-columns: 2fr 1.25fr 1.25fr 1.5fr .85fr .85fr;
+}
+.season-summary-entry {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+  min-height: 142px;
+  padding: 24px;
+  border-right: 1px solid var(--border);
+}
+.season-summary-entry:last-child { border-right: 0; }
+.season-summary-entry > span {
+  display: block;
+  margin-bottom: 10px;
+  color: var(--text-muted);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .11em;
+  text-transform: uppercase;
+}
+.season-summary-entry strong {
+  overflow-wrap: anywhere;
+  color: var(--text);
+  font-size: clamp(18px, 1.8vw, 27px);
+  line-height: 1.08;
+  letter-spacing: -.035em;
+}
+.season-summary-entry small { margin-top: 7px; color: var(--text-muted); font-size: 12px; }
+.season-summary-winner { position: relative; overflow: hidden; background: var(--accent); }
+.season-summary-winner::after {
+  position: absolute;
+  right: -48px;
+  bottom: -92px;
+  width: 180px;
+  height: 180px;
+  border: 22px solid rgba(255,255,255,.12);
+  border-radius: 50%;
+  content: '';
+}
+.season-summary-winner > * { position: relative; z-index: 1; }
+.season-summary-winner > span,
+.season-summary-winner small { color: rgba(255,255,255,.75); }
+.season-summary-winner strong { color: #fff; font-size: clamp(24px, 2.4vw, 36px); }
+.season-summary-number { text-align: center; }
+.season-summary-number strong { font-size: clamp(28px, 2.7vw, 38px); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.junior-season-detail-page .f2-calendar-race {
+  grid-template-columns: 28px 70px minmax(0, 1fr);
+  align-content: center;
+  min-height: 92px;
+}
+.junior-season-detail-page .f2-calendar-sessions {
+  grid-column: 1 / -1;
+  justify-content: flex-start;
+  gap: 4px;
+}
+.junior-season-detail-page .f2-calendar-sessions span { padding: 4px 6px; }
+@media (max-width: 1100px) {
+  .season-detail-page .calendar-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .season-summary-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .season-summary-winner { grid-column: span 2; }
+  .season-summary-constructor { grid-column: span 2; border-right: 0; }
+  .season-summary-entry { border-bottom: 1px solid var(--border); }
+  .season-summary-entry:nth-child(3) { border-right: 0; }
+  .season-summary-entry:nth-last-child(-n+2) { border-bottom: 0; }
+}
+@media (max-width: 700px) {
+  .season-detail-page .season-map-controls { top: 10px; right: 10px; }
+  .season-detail-page .season-map-help { left: 10px; bottom: 9px; }
+  .season-detail-page .calendar-list { grid-template-columns: minmax(0, 1fr); }
+  .season-detail-page .calendar-race { grid-template-columns: 28px 76px minmax(0, 1fr) auto; }
+  .season-detail-page .calendar-date { display: block; }
+  .season-detail-page .calendar-laps { display: flex; }
+  .season-detail-page { padding-top: 28px; }
+  .season-summary-heading { align-items: start; flex-direction: column; gap: 10px; padding: 24px 22px; }
+  .season-summary-heading p { white-space: normal; }
+  .season-summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .season-summary-winner,
+  .season-summary-constructor { grid-column: 1 / -1; }
+  .season-summary-entry { min-height: 112px; padding: 20px; }
+  .season-summary-entry:nth-child(2),
+  .season-summary-constructor { border-right: 0; }
+  .season-summary-entry:nth-child(3) { border-right: 1px solid var(--border); }
+  .season-summary-entry:nth-last-child(-n+2) { border-bottom: 0; }
+}
+@media (max-width: 380px) {
+  .season-detail-page .calendar-race { grid-template-columns: 26px minmax(0, 1fr) auto; }
+  .season-detail-page .calendar-date { display: none; }
+  .season-summary-grid { grid-template-columns: minmax(0, 1fr); }
+  .season-summary-entry { border-right: 0 !important; border-bottom: 1px solid var(--border) !important; }
+  .season-summary-entry:last-child { border-bottom: 0 !important; }
+  .season-summary-number { text-align: left; }
+}

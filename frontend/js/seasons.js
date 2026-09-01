@@ -1,6 +1,9 @@
 let allSeasons = [];
 let seasonPage = 1;
 const SEASON_PAGE_SIZE = 16;
+const seasonSeries = activeSeriesKey();
+const seasonBase = seasonSeries === 'f1' ? '' : `/${seasonSeries}`;
+const seasonChampionLabel = { f1: 'World champion', f2: 'F2 champion', f3: 'F3 champion', academy: 'F1 Academy champion' }[seasonSeries];
 
 
 async function loadSeasons() {
@@ -13,11 +16,11 @@ async function loadSeasons() {
 
     try {
 
-        allSeasons = await getJSON('/api/seasons');
+        allSeasons = await getJSON(`/api/seasons${seasonBase ? `?series=${seasonSeries}` : ''}`);
 
         populateSeasonSearch();
 
-        renderSeasons(allSeasons);
+        renderSeasons(matchingSeasons());
 
     } catch (error) {
 
@@ -47,9 +50,26 @@ function matchingSeasons() {
 
     const query = document.getElementById('season-search')?.value.trim() || '';
 
-    return query
+    const filtered = query
         ? allSeasons.filter(season => String(season.year).includes(query))
         : allSeasons;
+
+    const direction = document.getElementById('season-sort')?.value === 'asc' ? 1 : -1;
+    return [...filtered].sort((a, b) => direction * (Number(a.year) - Number(b.year)));
+}
+
+
+function championNameMarkup(champion) {
+    if (!champion?.name) return 'To be decided';
+
+    // Prefer recorded name parts, including compound given names. Some junior
+    // records only contain a display name; keep all words after the first together.
+    const fallback = champion.name.trim().match(/^(\S+)\s+(.+)$/);
+    const firstName = champion.firstName && champion.lastName ? champion.firstName : fallback?.[1];
+    const lastName = champion.firstName && champion.lastName ? champion.lastName : fallback?.[2];
+    if (!firstName || !lastName) return esc(champion.name);
+
+    return `<span class="champion-first-name">${esc(firstName)}</span> <span class="champion-last-name">${esc(lastName)}</span>`;
 }
 
 
@@ -88,7 +108,7 @@ function renderSeasons(seasons) {
         return `
             <a
                 class="season-card"
-                href="/season?year=${encodeURIComponent(season.year)}"
+                href="${seasonBase}/season?year=${encodeURIComponent(season.year)}"
             >
 
                 <div class="season-card-heading">
@@ -97,15 +117,15 @@ function renderSeasons(seasons) {
                     </div>
 
                     <div class="season-card-champion${season.champion?.name ? ' has-champion' : ''}">
-                        <span>World champion</span>
-                        <strong>${esc(season.champion?.name || 'To be decided')}</strong>
+                        <span>${seasonChampionLabel}</span>
+                        <strong>${championNameMarkup(season.champion)}</strong>
                     </div>
                 </div>
 
                 <div class="season-details">
 
                     <div class="season-stat">
-                        <span>Races</span>
+                        <span>${seasonSeries === 'f1' ? 'Races' : 'Rounds'}</span>
                         <strong>${fmtNumber(races)}</strong>
                     </div>
 
@@ -115,7 +135,7 @@ function renderSeasons(seasons) {
                     </div>
 
                     <div class="season-stat">
-                        <span>Constructors</span>
+                        <span>${seasonSeries === 'f1' ? 'Constructors' : 'Teams'}</span>
                         <strong>${fmtNumber(constructors)}</strong>
                     </div>
 
@@ -129,30 +149,13 @@ function renderSeasons(seasons) {
 }
 
 
-document.getElementById('season-search')?.addEventListener('input', () => {
+function refreshSeasons() {
     seasonPage = 1;
-    document.getElementById('season-search-message').textContent = '';
     renderSeasons(matchingSeasons());
-});
+}
 
-
-document.getElementById('season-jump')?.addEventListener('submit', event => {
-    event.preventDefault();
-
-    const input = document.getElementById('season-search');
-    const message = document.getElementById('season-search-message');
-    const year = input.value.trim();
-    const season = allSeasons.find(item => String(item.year) === year);
-
-    if (season) {
-        window.location.href = `/season?year=${encodeURIComponent(season.year)}`;
-        return;
-    }
-
-    message.textContent = year
-        ? 'Enter a complete year from the archive.'
-        : 'Enter a season year to open it.';
-});
+document.getElementById('season-search')?.addEventListener('input', refreshSeasons);
+document.getElementById('season-sort')?.addEventListener('change', refreshSeasons);
 
 
 loadSeasons();

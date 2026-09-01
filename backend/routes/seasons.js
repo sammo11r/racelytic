@@ -8,6 +8,10 @@ function isDisqualified(result) {
     return /\b(?:DSQ|DQ|DISQ|DISQUALIFIED|EXC)\b/i.test(String(result.status || result.positionText || ''));
 }
 
+function normalizedCircuitKey(value) {
+    return String(value || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+}
+
 function f2SessionType(session, sessionIndex, sessionCount, year) {
     const name = String(session.name || '').toLowerCase();
     if (name.includes('feature')) return 'F';
@@ -133,7 +137,8 @@ router.get('/api/seasons', async (req, res) => {
                     connection.query(`SELECT year, COUNT(DISTINCT driverId) AS driverCount FROM ${prefix}entries WHERE driverId IS NOT NULL GROUP BY year`),
                     connection.query(`SELECT year, COUNT(DISTINCT constructorId) AS constructorCount FROM ${prefix}entries WHERE constructorId IS NOT NULL GROUP BY year`),
                     connection.query(`
-                        SELECT standings.year, standings.driverId AS championDriverId, drivers.name AS championName
+                        SELECT standings.year, standings.driverId AS championDriverId, drivers.name AS championName,
+                            drivers.firstName AS championFirstName, drivers.lastName AS championLastName
                         FROM ${prefix}season_driver_standings standings
                         JOIN ${prefix}drivers drivers ON drivers.id = standings.driverId
                         LEFT JOIN (
@@ -152,7 +157,10 @@ router.get('/api/seasons', async (req, res) => {
                 const raceMap = countMap(raceCounts, 'raceCount');
                 const driverMap = countMap(driverCounts, 'driverCount');
                 const constructorMap = countMap(constructorCounts, 'constructorCount');
-                const championMap = new Map(champions.map(row => [Number(row.year), { id: row.championDriverId, name: row.championName }]));
+                const championMap = new Map(champions.map(row => [Number(row.year), {
+                    id: row.championDriverId, name: row.championName,
+                    firstName: row.championFirstName, lastName: row.championLastName
+                }]));
 
                 return seasons.map(season => {
                     const year = Number(season.year);
@@ -214,7 +222,9 @@ router.get('/api/seasons', async (req, res) => {
                     SELECT
                         standings.year,
                         standings.driverId AS championDriverId,
-                        drivers.name AS championName
+                        drivers.name AS championName,
+                        drivers.firstName AS championFirstName,
+                        drivers.lastName AS championLastName
                     FROM seasons_driver_standings standings
                     JOIN drivers
                         ON drivers.id = standings.driverId
@@ -253,7 +263,9 @@ router.get('/api/seasons', async (req, res) => {
                     Number(row.year),
                     {
                         id: row.championDriverId,
-                        name: row.championName
+                        name: row.championName,
+                        firstName: row.championFirstName,
+                        lastName: row.championLastName
                     }
                 ])
             );
@@ -309,7 +321,7 @@ router.get('/api/seasons/:year', async (req, res) => {
                 const seasonRows = await connection.query(`SELECT year FROM ${prefix}seasons WHERE year = ?`, [year]);
                 if (!seasonRows.length) return null;
 
-                const [races, raceSessions, raceResults, featureGridResults, qualifyingResults, qualifyingWinners, officialStandings] = await Promise.all([
+                const [races, raceSessions, raceResults, featureGridResults, qualifyingResults, qualifyingWinners, officialStandings, circuitCoordinates] = await Promise.all([
                     connection.query(`
                         SELECT r.id, r.round, r.date, r.endDate, r.name, r.code, r.circuitId,
                                c.name AS circuitName, c.placeName
@@ -321,6 +333,7 @@ router.get('/api/seasons/:year', async (req, res) => {
                     connection.query(`
                         SELECT sessions.id AS sessionId, sessions.raceId, sessions.sessionNumber,
                                sessions.name AS sessionName, sessions.cancelled, results.driverId,
+                               results.laps AS winnerLaps,
                                drivers.name AS winnerName, constructors.name AS constructorName
                         FROM ${prefix}sessions sessions
                         LEFT JOIN ${prefix}session_results results ON results.sessionId = sessions.id AND results.positionNumber = 1
@@ -396,8 +409,29 @@ router.get('/api/seasons/:year', async (req, res) => {
                         FROM ${prefix}season_driver_standings
                         WHERE year = ?
                         GROUP BY driverId
-                    `, [year])
+                    `, [year]),
+                    connection.query(`
+                        SELECT name, fullName, placeName, latitude, longitude
+                        FROM circuits
+                        WHERE latitude IS NOT NULL AND longitude IS NOT NULL
+                    `)
                 ]);
+
+                const coordinatesByName = new Map();
+                for (const circuit of circuitCoordinates) {
+                    for (const name of [circuit.name, circuit.fullName]) {
+                        const key = normalizedCircuitKey(name);
+                        if (key && !coordinatesByName.has(key)) coordinatesByName.set(key, circuit);
+                    }
+                }
+                const coordinatesForRace = race => {
+                    const exact = coordinatesByName.get(normalizedCircuitKey(race.circuitName));
+                    if (exact) return exact;
+                    const juniorPlace = normalizedCircuitKey(String(race.placeName || '').split(',')[0]);
+                    return circuitCoordinates.find(circuit =>
+                        juniorPlace && normalizedCircuitKey(circuit.placeName).includes(juniorPlace)
+                    ) || null;
+                };
 
                 const sessionsByRace = new Map();
                 for (const session of raceSessions) {
@@ -408,6 +442,7 @@ router.get('/api/seasons/:year', async (req, res) => {
                         name: session.sessionName,
                         cancelled: ['1', 'true'].includes(String(session.cancelled).toLowerCase()),
                         winner: session.winnerName,
+                        laps: Number(session.winnerLaps || 0),
                         driverId: session.driverId,
                         constructor: session.constructorName
                     });
@@ -572,9 +607,20 @@ router.get('/api/seasons/:year', async (req, res) => {
                     const constructor = constructorsById.get(constructorId);
                     const constructorPoints = resultPoints(result, context.type, year, polePosition);
                     constructor.points += constructorPoints;
-                    constructor.raceResults[result.sessionId] =
-                        Number(constructor.raceResults[result.sessionId] || 0) + constructorPoints;
+                    if (!constructor.raceResults[result.sessionId]) {
+                        constructor.raceResults[result.sessionId] = {
+                            points: 0,
+                            bestPosition: null,
+                            classified: 0
+                        };
+                    }
+                    const constructorResult = constructor.raceResults[result.sessionId];
+                    constructorResult.points += constructorPoints;
                     if (position > 0) {
+                        constructorResult.bestPosition = constructorResult.bestPosition === null
+                            ? position
+                            : Math.min(constructorResult.bestPosition, position);
+                        constructorResult.classified += 1;
                         constructor.finishCounts[position] = Number(constructor.finishCounts[position] || 0) + 1;
                     }
                 }
@@ -691,33 +737,53 @@ router.get('/api/seasons/:year', async (req, res) => {
                     return { ...driver, raceResults };
                 });
 
+                const finalRace = races[races.length - 1];
+                const finalRaceDate = finalRace?.endDate || finalRace?.date;
+                const seasonCompleted = officialStandings.some(standing =>
+                    ['1', 'true'].includes(String(standing.championshipWon).toLowerCase())
+                ) || Boolean(finalRaceDate && new Date(finalRaceDate) < new Date());
+                const completedSessions = [...sessionsByRace.values()]
+                    .flat()
+                    .filter(session => !session.cancelled);
+
                 return {
                     year,
                     summary: {
+                        completed: seasonCompleted,
                         rounds: races.length,
+                        races: completedSessions.length,
+                        laps: completedSessions.reduce((sum, session) => sum + Number(session.laps || 0), 0),
                         drivers: championship.length,
                         teams: constructorChampionship.length,
                         first: championship[0] || null,
                         second: championship[1] || null,
-                        third: championship[2] || null
+                        third: championship[2] || null,
+                        constructorLeader: constructorChampionship.find(constructor => constructor.champion)
+                            || constructorChampionship.find(constructor => constructor.position === 1)
+                            || null
                     },
                     championship,
                     driverChampionship: comparisonChampionship,
                     constructorChampionship,
-                    calendar: races.map(race => ({
-                        id: race.id,
-                        round: Number(race.round),
-                        date: race.date,
-                        endDate: race.endDate,
-                        name: race.name,
-                        officialName: race.name,
-                        code: race.code,
-                        circuitId: race.circuitId,
-                        circuitName: race.circuitName,
-                        placeName: race.placeName,
-                        poleDriverId: poleDriverByRace.get(race.id) || null,
-                        sessions: sessionsByRace.get(race.id) || []
-                    }))
+                    calendar: races.map(race => {
+                        const coordinates = coordinatesForRace(race);
+                        return {
+                            id: race.id,
+                            round: Number(race.round),
+                            date: race.date,
+                            endDate: race.endDate,
+                            name: race.name,
+                            officialName: race.name,
+                            code: race.code,
+                            circuitId: race.circuitId,
+                            circuitName: race.circuitName,
+                            placeName: race.placeName,
+                            latitude: coordinates?.latitude === undefined ? null : Number(coordinates.latitude),
+                            longitude: coordinates?.longitude === undefined ? null : Number(coordinates.longitude),
+                            poleDriverId: poleDriverByRace.get(race.id) || null,
+                            sessions: sessionsByRace.get(race.id) || []
+                        };
+                    })
                 };
             });
 
@@ -900,7 +966,15 @@ router.get('/api/seasons/:year', async (req, res) => {
                         rr.round,
                         rr.constructorId,
                         k.name AS constructorName,
-                        SUM(rr.points) AS points
+                        SUM(rr.points) AS points,
+                        MIN(CASE
+                            WHEN rr.positionNumber > 0 THEN rr.positionNumber
+                            ELSE NULL
+                        END) AS bestPosition,
+                        SUM(CASE
+                            WHEN rr.positionNumber > 0 THEN 1
+                            ELSE 0
+                        END) AS classified
 
                     FROM races_race_results rr
 
@@ -949,6 +1023,10 @@ router.get('/api/seasons/:year', async (req, res) => {
                         name: driver.driverName,
                         points: Number(driver.points || 0)
                     }));
+
+            const seasonCompleted = driverStandings.some(driver =>
+                ['1', 'true'].includes(String(driver.championshipWon).toLowerCase())
+            );
 
 
             // ------------------------------------------------
@@ -1091,6 +1169,8 @@ router.get('/api/seasons/:year', async (req, res) => {
 
                 constructorRaceMap.get(constructorId)[Number(row.round)] = {
                     points: Number(row.points || 0),
+                    bestPosition: row.bestPosition === null ? null : Number(row.bestPosition),
+                    classified: Number(row.classified || 0),
                     sprintPoints: 0
                 };
             }
@@ -1163,10 +1243,14 @@ router.get('/api/seasons/:year', async (req, res) => {
                 summary: {
                     races: totalRaces,
                     laps: totalLaps,
+                    completed: seasonCompleted,
 
                     first: driverPodium[0] || null,
                     second: driverPodium[1] || null,
-                    third: driverPodium[2] || null
+                    third: driverPodium[2] || null,
+                    constructorLeader: constructorChampionship.find(constructor => constructor.championshipWon)
+                        || constructorChampionship.find(constructor => constructor.position === 1)
+                        || null
                 },
 
                 driverChampionship,

@@ -4,90 +4,38 @@ const SERIES_HOME_CONFIG = Object.freeze({
     f1: {
         ...SERIES.f1,
         favicon: '/assets/favicon.svg', description: 'Explore, analyse, simulate and play with more than seventy years of Formula 1 history.',
-        eyebrow: 'FORMULA 1 · EXPLORED', headline: 'More than results.', subheadline: 'A different way to experience F1.',
-        introduction: 'Explore the history, uncover patterns, rewrite championships and test what you know in one connected Formula 1 platform.',
-        platformEyebrow: 'ONE PLATFORM · FOUR WAYS IN', platformTitle: 'Choose how you want to explore.',
-        platformCopy: 'Start with a fact, a question, an alternative rulebook or a challenge.',
-        entityLabel: 'Constructors', accountHref: '/account',
+        headline: 'More than results.', subheadline: 'A different way to experience F1.',
+        introduction: 'Welcome to Racelytic. Discover the statistics and stories behind your favourite Formula 1 drivers, teams and countries. Recalculate championships with historical or custom points systems to compare eras using the same scoring rules. Explore distinctive visualisations, rewrite history in the F1 simulator and put your knowledge and instincts to the test with our games.',
+        entityLabel: 'Constructors',
         archiveTitle: 'Decades of Formula 1,|ready for your next question.',
-        archiveCopy: 'The database powers every part of Racelytic, from all-time comparisons and race replays to championship simulations and games.',
-        features: [
-            ['database', 'DATABASE', 'Explore the history', 'Move through every season, race, driver, constructor, circuit and chassis in one connected archive.', '/database', 'Open the database'],
-            ['analysis', 'ANALYSIS', 'Find the story in the data', 'Compare eras, follow championship progress, measure driver form and discover the records behind the headlines.', '/analysis', 'Start analysing'],
-            ['simulator', 'SIMULATOR', 'Reimagine the championship', 'Apply different points systems, calculate title scenarios and build a championship with your own calendar and field.', '/simulator-overview', 'Enter the simulator'],
-            ['games', 'GAMES', 'Put your knowledge on the line', 'Test your recall, manage a racing team and take on a growing collection of history-driven games.', '/games', 'Play now']
-        ],
-        tools: [
-            ['RACE REPLAY', 'Watch a race unfold', 'Follow the field around the circuit with timing, position changes and driver controls.', '/simulate-race', 'Open race replay'],
-            ['COMPARE ERAS', 'Season comparison', 'Place championships side by side and see how their stories differ.', '/season-comparison', 'Compare seasons'],
-            ['BUILD YOUR OWN', 'Championship builder', 'Choose the calendar, field and scoring rules for a championship of your own.', '/championship-builder', 'Start building']
-        ]
+        archiveCopy: 'The database powers every part of Racelytic, from all-time comparisons and race replays to championship simulations and games.'
     },
     f2: {
         ...SERIES.f2,
         description: 'Explore, analyse, simulate and play with the complete Formula 2 archive in Racelytic.',
-        eyebrow: 'FORMULA 2 · EXPLORED', headline: 'The proving ground.', subheadline: 'Every story behind the step up.',
-        introduction: 'Follow the drivers, teams and race weekends that shape the next generation—then analyse, simulate and play with their history.',
-        platformEyebrow: 'ONE CHAMPIONSHIP · EVERY ANGLE', platformTitle: 'Go beyond the finishing order.',
-        platformCopy: 'Move naturally from the archive into analysis, alternative championships and games.',
-        entityLabel: 'Teams', accountHref: '/account?series=f2',
+        headline: 'The proving ground.', subheadline: 'Every story behind the step up.',
+        introduction: 'Discover the stories behind Formula 2’s rising stars. Explore drivers, teams and circuits, follow title fights race by race and compare the careers that led to the next step. Recalculate seasons, build your own championship and put your knowledge and reactions to the test with our games.',
+        entityLabel: 'Teams',
         archiveTitle: 'A feeder series.|A history of its own.',
-        archiveCopy: 'Every season, driver, team, circuit and session result connects to the tools built on top of the Formula 2 archive.',
-        features: [
-            ['database', 'DATABASE', 'Explore the archive', 'Follow every season, race weekend, driver, team, circuit and chassis in the modern Formula 2 era.', '/f2/database', 'Open the database'],
-            ['analysis', 'ANALYSIS', 'See how campaigns unfolded', 'Track points progression, compare drivers, measure form and uncover the records behind each season.', '/f2/analysis', 'Start analysing'],
-            ['simulator', 'SIMULATOR', 'Rewrite the title fight', 'Change scoring rules, calculate championship scenarios and create a custom Formula 2 calendar.', '/f2/simulator', 'Enter the simulator'],
-            ['games', 'GAMES', 'Test what you remember', 'Name champions and winners, run a racing team or sharpen your reactions with quick challenges.', '/f2/games', 'Play now']
-        ],
-        tools: [
-            ['FOLLOW THE TITLE', 'Season analysis', 'Watch the standings change through every sprint and feature race.', '/f2/season-analysis', 'Analyse a season'],
-            ['HEAD TO HEAD', 'Driver comparison', 'Compare careers, results and performance across the Formula 2 archive.', '/f2/driver-comparison', 'Compare drivers'],
-            ['TEST YOUR RECALL', 'Champions quiz', 'See how many Formula 2 champions you can name from the complete archive.', '/f2/champions-quiz', 'Take the quiz']
-        ]
+        archiveCopy: 'Every season, driver, team, circuit and session result connects to the tools built on top of the Formula 2 archive.'
     },
     f3: {
         ...SERIES.f3,
         description: 'Explore, analyse, simulate and play with FIA Formula 3 history in Racelytic.',
-        eyebrow: 'FORMULA 3 · EXPLORED', headline: 'The first global stage.', subheadline: 'Where the next generation breaks through.',
-        introduction: 'Explore the drivers, teams and race weekends that have shaped the championship since 2019—then take the data further.',
-        platformEyebrow: 'THE FULL RACELYTIC TOOLKIT', platformTitle: 'A short history, explored deeply.',
-        platformCopy: 'Browse the record, interrogate the data, rewrite a championship or simply play.',
-        entityLabel: 'Teams', accountHref: '/account?series=f3',
+        headline: 'The first global stage.', subheadline: 'Where the next generation breaks through.',
+        introduction: 'Explore the drivers, teams and breakthrough performances that have shaped FIA Formula 3 since 2019. Trace championship battles, compare careers and uncover the details behind the results. Recalculate seasons, create your own championship or take a break with our racing games.',
+        entityLabel: 'Teams',
         archiveTitle: 'Every campaign.|Full race-by-race detail.',
-        archiveCopy: 'The championship calendar, entrants, classifications and standings come together in one connected Formula 3 archive.',
-        features: [
-            ['database', 'DATABASE', 'Explore every campaign', 'Browse seasons, race weekends, drivers, teams, circuits and machinery from 2019 onward.', '/f3/database', 'Open the database'],
-            ['analysis', 'ANALYSIS', 'Find the breakthrough moments', 'Follow title progress, compare drivers, examine teammate battles and discover all-time records.', '/f3/analysis', 'Start analysing'],
-            ['simulator', 'SIMULATOR', 'Change the championship', 'Recalculate seasons, explore title scenarios and assemble a custom calendar and field.', '/f3/simulator', 'Enter the simulator'],
-            ['games', 'GAMES', 'Play beyond the archive', 'Build a racing operation over time or test your reactions in a quick lights-out challenge.', '/f3/games', 'Play now']
-        ],
-        tools: [
-            ['FOLLOW THE TITLE', 'Season analysis', 'See how every sprint and feature race reshaped the championship.', '/f3/season-analysis', 'Analyse a season'],
-            ['INSIDE THE TEAM', 'Teammate battles', 'Measure head-to-head performance between drivers sharing the same machinery.', '/f3/teammate-battles', 'Compare teammates'],
-            ['BUILD YOUR OWN', 'Championship builder', 'Combine races, drivers and teams into a new championship.', '/f3/championship-builder', 'Start building']
-        ]
+        archiveCopy: 'The championship calendar, entrants, classifications and standings come together in one connected Formula 3 archive.'
     },
     academy: {
         ...SERIES.academy,
         description: 'Explore, analyse, simulate and play with the complete F1 Academy archive in Racelytic.',
-        eyebrow: 'F1 ACADEMY · EXPLORED', headline: 'A new generation.', subheadline: 'Every race, career and title story.',
-        introduction: 'Follow the drivers, teams and race weekends shaping the championship, with a complete toolkit built around its own format.',
-        platformEyebrow: 'ONE SERIES · EVERY ANGLE', platformTitle: 'The complete championship experience.',
-        platformCopy: 'Move from a season or driver into deeper analysis, simulation and games.',
-        entityLabel: 'Teams', accountHref: '/account?series=academy',
+        headline: 'A new generation.', subheadline: 'Every race, career and title story.',
+        introduction: 'Get to know the drivers, teams and title stories shaping F1 Academy. Explore every season, compare careers and follow how each race changes the championship. Take the results further with season simulations and custom championships, then test your reactions or build a racing team of your own.',
+        entityLabel: 'Teams',
         archiveTitle: 'A young championship.|A complete record.',
-        archiveCopy: 'Seasons, entrants, sessions and standings connect across a dedicated archive built for the championship’s own race formats.',
-        features: [
-            ['database', 'DATABASE', 'Explore the championship', 'Browse every season, race weekend, driver, team, circuit and chassis in the archive.', '/academy/database', 'Open the database'],
-            ['analysis', 'ANALYSIS', 'Follow every turning point', 'Track championship progress, compare drivers and teams, and explore performance by circuit.', '/academy/analysis', 'Start analysing'],
-            ['simulator', 'SIMULATOR', 'Rewrite the title fight', 'Change scoring rules, test championship scenarios and build your own calendar and field.', '/academy/simulator', 'Enter the simulator'],
-            ['games', 'GAMES', 'Play beyond the results', 'Manage a racing team over time or test your reactions in a quick lights-out challenge.', '/academy/games', 'Play now']
-        ],
-        tools: [
-            ['FOLLOW THE TITLE', 'Season analysis', 'Watch the standings change through every race in the championship.', '/academy/season-analysis', 'Analyse a season'],
-            ['RECENT FORM', 'Driver form', 'Follow finishing and qualifying trends across recent weekends.', '/academy/driver-form', 'Explore driver form'],
-            ['BUILD YOUR OWN', 'Championship builder', 'Choose races, drivers, teams and scoring rules for a custom season.', '/academy/championship-builder', 'Start building']
-        ]
+        archiveCopy: 'Seasons, entrants, sessions and standings connect across a dedicated archive built for the championship’s own race formats.'
     }
 });
 
@@ -95,20 +43,113 @@ function esc(value) {
     return String(value).replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[character]);
 }
 
-function featureCard(feature, index) {
-    const [kind, label, title, copy, href, action] = feature;
-    return `<a class="home-path-card home-path-${esc(kind)}" href="${esc(href)}">
-          <span>${String(index + 1).padStart(2, '0')} · ${esc(label)}</span>
-          <div><h3>${esc(title)}</h3><p>${esc(copy)}</p></div>
-          <strong>${esc(action)} <span aria-hidden="true">→</span></strong>
-        </a>`;
+// Completed historical examples; verified against the archive in landing-preview.test.js.
+const F1_HOME_PREVIEW = {
+    year: 2008,
+    alternateSystem: '1991-2002',
+    official: [{ name: 'Lewis Hamilton', id: 'lewis-hamilton', points: 98 }, { name: 'Felipe Massa', id: 'felipe-massa', points: 97 }],
+    alternate: [{ name: 'Felipe Massa', id: 'felipe-massa', points: 83 }, { name: 'Lewis Hamilton', id: 'lewis-hamilton', points: 80 }],
+    drivers: [{ id: 'ayrton-senna', name: 'Senna', wins: 41, poles: 65 }, { id: 'alain-prost', name: 'Prost', wins: 51, poles: 33 }],
+    champions: [{ year: 1950, name: 'Giuseppe Farina', id: 'nino-farina' }, { year: 1951, name: null }, { year: 1952, name: 'Alberto Ascari', id: 'alberto-ascari' }]
+};
+
+const SERIES_HOME_PREVIEWS = {
+    f1: {
+        ...F1_HOME_PREVIEW,
+        question: 'Would different points crown a different champion?',
+        copy: 'Keep the races. Change the rules. The 2008 title fight tells a different story.',
+        note: 'Same results, all 18 races. Only the points system changes.',
+        href: '/simulator?year=2008&points=1991-2002', action: 'Recalculate 2008',
+        quizHref: '/world-champions-quiz'
+    },
+    f2: {
+        year: 2020,
+        question: 'Can consistency beat more wins?',
+        copy: 'Schumacher won fewer races than Ilott. Over the full 2020 season, the title told a different story.',
+        contenders: [{ name: 'Mick Schumacher', id: 'mick-schumacher', points: 215, wins: 2 }, { name: 'Callum Ilott', id: 'callum-ilott', points: 201, wins: 3 }],
+        note: '2020 title contenders · Sprint and feature race wins combined.',
+        href: '/f2/season-analysis?year=2020', action: 'Explore the 2020 title fight',
+        drivers: [{ id: 'charles-leclerc', name: 'Leclerc', wins: 7, poles: 8 }, { id: 'george-russell', name: 'Russell', wins: 7, poles: 5 }],
+        champions: [{ year: 2017, name: 'Charles Leclerc', id: 'charles-leclerc' }, { year: 2018, name: null }, { year: 2019, name: 'Nyck de Vries', id: 'nyck-de-vries' }],
+        quizHref: '/f2/champions-quiz'
+    },
+    f3: {
+        year: 2024,
+        question: 'Can you take the title without a race win?',
+        copy: 'Fornaroli did just that in 2024. Follow the championship where every finish mattered.',
+        contenders: [{ name: 'Leonardo Fornaroli', id: 'leonardo-fornaroli', points: 153, wins: 0 }, { name: 'Gabriele Minì', id: 'gabriele-mini', points: 130, wins: 1 }],
+        note: '2024 title contenders · Final standings, including post-race penalties.',
+        href: '/f3/season-analysis?year=2024', action: 'Follow Fornaroli’s title season',
+        drivers: [{ id: 'oscar-piastri', name: 'Piastri', wins: 2, podiums: 6 }, { id: 'theo-pourchaire', name: 'Pourchaire', wins: 2, podiums: 8 }],
+        comparisonMetrics: [['wins', 'Race wins'], ['podiums', 'Podiums']]
+    },
+    academy: {
+        year: 2024,
+        question: 'What does a dominant season look like?',
+        copy: 'Nine victories. A commanding points lead. Discover how Pulling built her 2024 championship.',
+        contenders: [{ name: 'Abbi Pulling', id: 'abbi-pulling', points: 338, wins: 9 }, { name: 'Doriane Pin', id: 'doriane-pin', points: 217, wins: 4 }],
+        note: '2024 title contenders · Points and wins across the full season.',
+        href: '/academy/season-analysis?year=2024', action: 'Explore Pulling’s championship',
+        drivers: [{ id: 'marta-garcia', name: 'García', wins: 7, poles: 4 }, { id: 'abbi-pulling', name: 'Pulling', wins: 9, poles: 12 }]
+    }
+};
+
+function standingsPreview(rows, label, scoring, { alternate = false, metric = 'points', ranked = true } = {}) {
+    const list = ranked ? 'ol' : 'ul';
+    const maximum = Math.max(1, ...rows.map(driver => driver[metric]));
+    return `<div class="home-scoring-board${alternate ? ' home-scoring-alternate' : ''}">
+        <div class="home-scoring-heading"><strong>${esc(label)}</strong><span>${esc(scoring)}</span></div>
+        <${list}>${rows.map((driver, index) => `<li>
+            ${ranked ? `<span class="home-preview-rank">${index + 1}</span>` : ''}
+            <div><span>${esc(driver.name)}</span><i class="home-preview-bar" aria-hidden="true" style="--preview-fill:${driver[metric] / maximum * 100}%"></i></div>
+            <strong>${driver[metric]}<small>${metric === 'points' ? 'pts' : 'wins'}</small></strong>
+        </li>`).join('')}</${list}>
+    </div>`;
 }
 
-function toolCard(tool, index) {
-    const [label, title, copy, href, action] = tool;
-    return `<a class="series-tool-card${index === 0 ? ' series-tool-featured' : ''}" href="${esc(href)}">
-          <span>${esc(label)}</span><h3>${esc(title)}</h3><p>${esc(copy)}</p><strong>${esc(action)} <span aria-hidden="true">→</span></strong>
-        </a>`;
+function renderQuestions(config) {
+    const preview = SERIES_HOME_PREVIEWS[config.key];
+    const [first, second] = preview.drivers;
+    const metrics = preview.comparisonMetrics || [['wins', 'Race wins'], ['poles', 'Pole positions']];
+    const careerLabel = config.key === 'f1' ? 'CAREER TOTALS' : `${config.shortName.toUpperCase()} CAREERS`;
+    const missingChampion = preview.champions?.find(champion => !champion.name);
+    return `<section class="container home-questions" id="series-explore" aria-labelledby="home-questions-title">
+      <div class="home-section-head">
+        <div><div class="eyebrow">TAKE THE WHEEL</div><h2 id="home-questions-title">Start with a question.</h2></div>
+        <p>Real history. Different perspectives.<br>See where your curiosity takes you.</p>
+      </div>
+      <div class="home-question-grid">
+        <article class="home-question-card home-question-scoring">
+          <h3>${esc(preview.question)}</h3>
+          <p>${esc(preview.copy)}</p>
+          <div class="home-scoring-preview" aria-label="${preview.year} championship top two ${preview.alternate ? 'under two scoring systems' : 'compared by points and race wins'}">
+            ${preview.alternate ? standingsPreview(preview.official, 'As it happened', '2003–2009 rules · 10–8–6–5–4–3–2–1') + standingsPreview(preview.alternate, 'Recalculated', '1991–2002 rules · 10–6–4–3–2–1', { alternate: true }) : standingsPreview(preview.contenders, 'Final championship', `${preview.year} · Official points`, { alternate: true }) + standingsPreview(preview.contenders, 'Race wins', 'The same two title contenders', { metric: 'wins', ranked: false })}
+          </div>
+          <p class="home-question-note">${esc(preview.note)}</p>
+          <a class="home-question-link" href="${esc(preview.href)}">${esc(preview.action)}</a>
+        </article>
+        <article class="home-question-card home-question-comparison">
+          <h3>How do your favourites compare?</h3>
+          <div class="home-duel-preview" aria-label="${esc(first.name)} and ${esc(second.name)} ${esc(config.shortName)} career comparison">
+            <div class="home-duel-names"><strong>${esc(first.name)}</strong><span>${esc(careerLabel)}</span><strong>${esc(second.name)}</strong></div>
+            ${metrics.map(([key, label]) => `<div class="home-duel-row"><strong${first[key] > second[key] ? ' class="home-duel-leading"' : ''}>${first[key]}</strong><span>${esc(label)}</span><strong${second[key] > first[key] ? ' class="home-duel-leading"' : ''}>${second[key]}</strong></div>`).join('')}
+          </div>
+          <a class="home-question-link" href="${esc(config.path)}/driver-comparison?first=${esc(first.id)}&amp;second=${esc(second.id)}">Compare ${esc(first.name)} &amp; ${esc(second.name)}</a>
+        </article>
+        <article class="home-question-card home-question-quiz">
+          ${preview.champions ? `<h3>How much ${esc(config.shortName)} history can you remember?</h3>
+          <div class="home-quiz-preview" aria-label="Champions quiz preview: can you name the ${missingChampion.year} champion?">
+            ${preview.champions.map(champion => `<div${champion.name ? '' : ' class="home-quiz-missing"'}><span>${champion.year}</span><strong>${champion.name ? esc(champion.name) : 'Who took the title?'}</strong><span aria-hidden="true">${champion.name ? '✓' : '?'}</span></div>`).join('')}
+          </div>
+          <a class="home-question-link" href="${esc(preview.quizHref)}">Name the champions</a>` : `<h3>How quick are your reactions?</h3>
+          <div class="home-lights-preview">
+            <div class="home-start-lights" role="img" aria-label="Lights Out preview: five red starting lights"><i></i><i></i><i></i><i></i><i></i></div>
+            <p>Wait for the lights. Then react.<br>Find out how fast you are off the line.</p>
+          </div>
+          <a class="home-question-link" href="${esc(config.path)}/lights-out">Try Lights Out</a>`}
+        </article>
+      </div>
+    </section>`;
 }
 
 function renderSeriesHome(seriesKey) {
@@ -125,26 +166,21 @@ function renderSeriesHome(seriesKey) {
   <title>${esc(title)}</title>
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/polish.css">
+  <link rel="stylesheet" href="/css/home-questions.css">
 </head>
 <body${config.modeClass ? ` class="${esc(config.modeClass)}"` : ''} data-series-home="${esc(config.key)}">
   <div id="header"></div>
   <main>
     <section class="hero home-hero series-home-hero container">
       <div class="series-home-hero-copy">
-        <div class="eyebrow">${esc(config.eyebrow)}</div>
         <h1>${esc(config.headline)}<br><span>${esc(config.subheadline)}</span></h1>
         <p class="hero-copy">${esc(config.introduction)}</p>
-        <div class="hero-actions">
-          <a class="button primary" href="#series-explore">Explore ${esc(config.shortName)}</a>
-          <a class="button secondary" id="latest-season-link" href="${esc(config.path)}/seasons">Latest season</a>
-        </div>
       </div>
     </section>
 
     <section class="container series-snapshot" aria-labelledby="season-snapshot-title">
       <div class="series-snapshot-intro">
-        <div class="eyebrow">CURRENT SEASON</div>
-        <h2 id="season-snapshot-title">The championship at a glance.</h2>
+        <h2 class="eyebrow" id="season-snapshot-title">CURRENT SEASON</h2>
       </div>
       <div class="series-snapshot-grid" aria-live="polite">
         <a class="series-snapshot-item" id="snapshot-season-link" href="${esc(config.path)}/seasons"><span>Season</span><strong id="snapshot-season">—</strong><small>Open championship</small></a>
@@ -154,21 +190,7 @@ function renderSeriesHome(seriesKey) {
       </div>
     </section>
 
-    <section class="container home-platform" id="series-explore">
-      <div class="home-section-head">
-        <div><div class="eyebrow">${esc(config.platformEyebrow)}</div><h2>${esc(config.platformTitle)}</h2></div>
-        <p>${esc(config.platformCopy)}</p>
-      </div>
-      <div class="home-path-grid">${config.features.map(featureCard).join('')}</div>
-    </section>
-
-    <section class="container series-tools" aria-labelledby="series-tools-title">
-      <div class="home-section-head">
-        <div><div class="eyebrow">FEATURED TOOLS</div><h2 id="series-tools-title">Start somewhere interesting.</h2></div>
-        <p>A few of the best ways to turn the ${esc(config.name)} archive into something you can explore.</p>
-      </div>
-      <div class="series-tools-grid">${config.tools.map(toolCard).join('')}</div>
-    </section>
+    ${renderQuestions(config)}
 
     <section class="container home-archive" id="series-archive">
       <div class="home-archive-copy">
@@ -185,9 +207,9 @@ function renderSeriesHome(seriesKey) {
       </div>
     </section>
 
-    <section class="container home-community">
-      <div><div class="eyebrow">YOUR RACELYTIC</div><h2>One account. Every series.</h2><p>Save custom points systems and championships, keep your creations private or share them with the community.</p></div>
-      <a class="button primary" href="${esc(config.accountHref)}">Open your account</a>
+    <section class="container home-community home-community-compact">
+      <div><h2>Keep what you create.</h2><p>Save your custom points systems and championships. Keep them private or share them with the community.</p></div>
+      <div class="home-account-actions"><a class="button primary" href="/account?series=${esc(config.key)}&amp;tab=register">Create an account</a><a class="home-account-signin" href="/account?series=${esc(config.key)}">Sign in</a></div>
     </section>
   </main>
   <footer class="footer"><div class="container">Racelytic</div></footer>
@@ -198,4 +220,4 @@ function renderSeriesHome(seriesKey) {
 </html>`;
 }
 
-module.exports = { SERIES_HOME_CONFIG, renderSeriesHome };
+module.exports = { SERIES_HOME_CONFIG, F1_HOME_PREVIEW, SERIES_HOME_PREVIEWS, renderSeriesHome };

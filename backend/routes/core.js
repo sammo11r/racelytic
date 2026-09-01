@@ -409,10 +409,10 @@ router.get('/api/dashboard', async (req, res) => {
 
         const series = String(req.query.series || '').toLowerCase();
         const tables = {
-            f1: { drivers: 'drivers', constructors: 'constructors', circuits: 'circuits', seasons: 'seasons', races: 'races', standings: 'seasons_driver_standings', eventName: "COALESCE(NULLIF(grandPrix.fullName, ''), race.officialName)", eventFields: ', grandPrix.shortName, race.officialName', eventJoin: 'LEFT JOIN grands_prix grandPrix ON grandPrix.id = race.grandPrixId' },
-            f2: { drivers: 'f2_drivers', constructors: 'f2_constructors', circuits: 'f2_circuits', seasons: 'f2_seasons', races: 'f2_races', standings: 'f2_season_driver_standings', eventName: 'race.name', eventFields: '', eventJoin: '' },
-            f3: { drivers: 'f3_drivers', constructors: 'f3_constructors', circuits: 'f3_circuits', seasons: 'f3_seasons', races: 'f3_races', standings: 'f3_season_driver_standings', eventName: 'race.name', eventFields: '', eventJoin: '' },
-            academy: { drivers: 'fa_drivers', constructors: 'fa_constructors', circuits: 'fa_circuits', seasons: 'fa_seasons', races: 'fa_races', standings: 'fa_season_driver_standings', eventName: 'race.name', eventFields: '', eventJoin: '' }
+            f1: { drivers: 'drivers', constructors: 'constructors', circuits: 'circuits', seasons: 'seasons', races: 'races', chassis: 'chassis', standings: 'seasons_driver_standings', eventName: "COALESCE(NULLIF(grandPrix.fullName, ''), race.officialName)", eventFields: ', grandPrix.shortName, race.officialName', eventJoin: 'LEFT JOIN grands_prix grandPrix ON grandPrix.id = race.grandPrixId' },
+            f2: { drivers: 'f2_drivers', constructors: 'f2_constructors', circuits: 'f2_circuits', seasons: 'f2_seasons', races: 'f2_races', chassis: 'f2_chassis', standings: 'f2_season_driver_standings', eventName: 'race.name', eventFields: '', eventJoin: '' },
+            f3: { drivers: 'f3_drivers', constructors: 'f3_constructors', circuits: 'f3_circuits', seasons: 'f3_seasons', races: 'f3_races', chassis: 'f3_chassis', standings: 'f3_season_driver_standings', eventName: 'race.name', eventFields: '', eventJoin: '' },
+            academy: { drivers: 'fa_drivers', constructors: 'fa_constructors', circuits: 'fa_circuits', seasons: 'fa_seasons', races: 'fa_races', chassis: 'fa_chassis', standings: 'fa_season_driver_standings', eventName: 'race.name', eventFields: '', eventJoin: '' }
         }[['f2', 'f3', 'academy'].includes(series) ? series : 'f1'];
 
         const data = await withConnection(async connection => {
@@ -423,7 +423,7 @@ router.get('/api/dashboard', async (req, res) => {
             `);
             const latestSeason = Number(latest[0].year);
 
-            const [drivers, constructors, circuits, seasons, rounds, leader, latestEvent, nextEvent] = await Promise.all([
+            const [drivers, constructors, circuits, seasons, rounds, leader, latestEvent, nextEvent, archive] = await Promise.all([
 
                 connection.query(`
                     SELECT COUNT(*) AS count
@@ -472,7 +472,13 @@ router.get('/api/dashboard', async (req, res) => {
                     WHERE race.year = ? AND race.date > CURRENT_DATE()
                     ORDER BY race.date, race.round
                     LIMIT 1
-                `, [latestSeason])
+                `, [latestSeason]),
+
+                // Keep archive totals aligned with the race and chassis directories.
+                req.query.archive === '1'
+                    ? connection.query(`SELECT (SELECT COUNT(*) FROM \`${tables.races}\`) AS races,
+                        (SELECT COUNT(*) FROM \`${tables.chassis}\`${series === 'f3' ? " WHERE id NOT IN ('dallara-f3-2020', 'dallara-f3-2021')" : ''}) AS chassis`)
+                    : Promise.resolve([])
 
             ]);
 
@@ -482,6 +488,7 @@ router.get('/api/dashboard', async (req, res) => {
                 constructors: Number(constructors[0].count),
                 circuits: Number(circuits[0].count),
                 seasons: Number(seasons[0].count),
+                ...(archive[0] ? { races: Number(archive[0].races), chassis: Number(archive[0].chassis) } : {}),
                 latestSeason,
                 currentSeason: {
                     rounds: Number(rounds[0].count),

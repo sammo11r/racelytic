@@ -1,16 +1,72 @@
 <!doctype html>
 <html lang="en">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Browse Racelytic's Formula 3 database."><link rel="icon" href="/assets/favicon-f3.svg" type="image/svg+xml"><title>Formula 3 Database · Racelytic</title><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/polish.css"></head>
-<body class="f3-mode"><div id="header"></div><main class="container page database-overview-page">
-  <section class="analysis-hero database-overview-hero"><div class="eyebrow">FORMULA 3 DATABASE</div><h1>The first global stage, documented.</h1><p>Explore the dataset behind every FIA Formula 3 championship, race weekend, driver, team and circuit since 2019.</p></section>
-  <section class="stats-grid database-overview-stats" id="f3-stats"><div class="metric"><span>Seasons</span><strong>—</strong></div><div class="metric"><span>Drivers</span><strong>—</strong></div><div class="metric"><span>Teams</span><strong>—</strong></div><div class="metric"><span>Circuits</span><strong>—</strong></div></section>
-  <section class="analysis-tool-grid">
-    <a class="analysis-tool-card" href="/f3/seasons"><span>01 · CHAMPIONSHIPS</span><h2>Seasons</h2><p>Championship standings, calendars and race-by-race breakdowns from every Formula 3 season.</p><strong>Browse seasons →</strong></a>
-    <a class="analysis-tool-card" href="/f3/races"><span>02 · EVENTS</span><h2>Races &amp; sessions</h2><p>Practice, qualifying, sprint and feature classifications connected by race weekend.</p><strong>Browse races →</strong></a>
-    <a class="analysis-tool-card" href="/f3/drivers"><span>03 · PEOPLE</span><h2>Drivers</h2><p>Career records, teams, results, wins, podiums, poles and fastest laps.</p><strong>Browse drivers →</strong></a>
-    <a class="analysis-tool-card" href="/f3/teams"><span>04 · TEAMS</span><h2>Teams</h2><p>Championship records, line-ups and results for every Formula 3 team.</p><strong>Browse teams →</strong></a>
-    <a class="analysis-tool-card" href="/f3/circuits"><span>05 · VENUES</span><h2>Circuits</h2><p>Every Formula 3 venue and the sessions held at each circuit.</p><strong>Browse circuits →</strong></a>
-    <a class="analysis-tool-card" href="/f3/chassis"><span>06 · MACHINERY</span><h2>Chassis &amp; engine</h2><p>The two Dallara generations, their technical specifications and championship usage.</p><strong>Explore chassis →</strong></a>
-  </section>
-</main><footer class="footer"><div class="container">Racelytic</div></footer><script src="/js/utils.js"></script><script src="/js/header.js"></script><script src="/js/f3.js"></script></body>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Browse the Formula 3 archive: seasons, races, drivers, teams, circuits and chassis.">
+  <link rel="icon" href="/assets/favicon-f3.svg" type="image/svg+xml">
+  <title>Formula 3 database · Racelytic</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/polish.css">
+  <link rel="stylesheet" href="/css/database-overview.css">
+</head>
+<body class="f3-mode">
+  <div id="header"></div>
+  <main class="container page database-directory">
+    <header class="database-directory-heading">
+      <div class="eyebrow">FORMULA 3 DATABASE</div>
+      <h1>The facts behind Formula 3</h1>
+      <p>Browse every season, race, driver, team, circuit and chassis.</p>
+    </header>
+
+    <section class="database-summary" aria-label="Formula 3 archive totals">
+      <dl>
+        <div><dt>Seasons</dt><dd data-archive-count="seasons">—</dd></div>
+        <div><dt>Races</dt><dd data-archive-count="races">—</dd></div>
+        <div><dt>Drivers</dt><dd data-archive-count="drivers">—</dd></div>
+        <div><dt>Teams</dt><dd data-archive-count="constructors">—</dd></div>
+        <div><dt>Circuits</dt><dd data-archive-count="circuits">—</dd></div>
+        <div><dt>Chassis</dt><dd data-archive-count="chassis">—</dd></div>
+      </dl>
+    </section>
+
+    <h2 class="eyebrow database-navigation-title" id="database-navigation-title">BROWSE THE TABLES</h2>
+    <nav class="database-category-grid" aria-labelledby="database-navigation-title">
+      <a class="database-category" href="/f3/seasons">
+        <div class="database-category-heading"><h3>Seasons</h3></div>
+        <p>Championship standings, calendars and race-by-race results.</p>
+        <strong class="database-category-action">Browse seasons <span aria-hidden="true">→</span></strong>
+      </a>
+      <a class="database-category" href="/f3/races">
+        <div class="database-category-heading"><h3>Races</h3></div>
+        <p>Practice, qualifying, sprint and feature classifications connected by race weekend.</p>
+        <strong class="database-category-action">Browse races <span aria-hidden="true">→</span></strong>
+      </a>
+      <a class="database-category" href="/f3/drivers">
+        <div class="database-category-heading"><h3>Drivers</h3></div>
+        <p>Career statistics, championship histories and individual results.</p>
+        <strong class="database-category-action">Browse drivers <span aria-hidden="true">→</span></strong>
+      </a>
+      <a class="database-category" href="/f3/teams">
+        <div class="database-category-heading"><h3>Teams</h3></div>
+        <p>Team records, drivers and championship campaigns.</p>
+        <strong class="database-category-action">Browse teams <span aria-hidden="true">→</span></strong>
+      </a>
+      <a class="database-category" href="/f3/circuits">
+        <div class="database-category-heading"><h3>Circuits</h3></div>
+        <p>Track layouts, locations and every race held at each venue.</p>
+        <strong class="database-category-action">Browse circuits <span aria-hidden="true">→</span></strong>
+      </a>
+      <a class="database-category" href="/f3/chassis">
+        <div class="database-category-heading"><h3>Chassis</h3></div>
+        <p>The two Dallara generations, their technical specifications and championship usage.</p>
+        <strong class="database-category-action">Browse chassis <span aria-hidden="true">→</span></strong>
+      </a>
+    </nav>
+  </main>
+  <footer class="footer"><div class="container">Racelytic</div></footer>
+  <script src="/js/utils.js"></script>
+  <script src="/js/header.js"></script>
+  <script src="/js/database-overview.js"></script>
+</body>
 </html>

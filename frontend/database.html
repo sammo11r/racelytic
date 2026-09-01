@@ -1,13 +1,72 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" href="/assets/favicon.svg" type="image/svg+xml"><title>Racelytic</title><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/polish.css"></head>
-<body><div id="header"></div><main class="container page database-overview-page">
-  <section class="analysis-hero database-overview-hero"><div class="eyebrow">FORMULA 1 DATABASE</div><h1>The history behind every result.</h1><p>Explore championships, races, drivers, teams, circuits and machinery through one connected archive.</p></section>
-  <section class="stats-grid database-overview-stats" id="stats"><div class="metric"><span>Seasons</span><strong>—</strong></div><div class="metric"><span>Drivers</span><strong>—</strong></div><div class="metric"><span>Constructors</span><strong>—</strong></div><div class="metric"><span>Circuits</span><strong>—</strong></div></section>
-  <section class="analysis-tool-grid">
-    <a class="analysis-tool-card" href="/seasons"><span>01 · CHAMPIONSHIPS</span><h2>Seasons</h2><p>Follow each championship through standings, calendars, points and race-by-race results.</p><strong>Browse seasons →</strong></a>
-    <a class="analysis-tool-card" href="/races"><span>02 · EVENTS</span><h2>Races</h2><p>Search every Grand Prix and inspect race, sprint, qualifying and practice classifications.</p><strong>Browse races →</strong></a>
-    <a class="analysis-tool-card" href="/drivers"><span>03 · PEOPLE</span><h2>Drivers</h2><p>Explore career records, championship histories, timelines and individual race results.</p><strong>Browse drivers →</strong></a>
-    <a class="analysis-tool-card" href="/constructors"><span>04 · TEAMS</span><h2>Constructors</h2><p>Trace teams through their drivers, chassis, engines and championship campaigns.</p><strong>Browse constructors →</strong></a>
-    <a class="analysis-tool-card" href="/circuits"><span>05 · VENUES</span><h2>Circuits</h2><p>Discover track layouts, locations, specifications and every race staged at each venue.</p><strong>Browse circuits →</strong></a>
-    <a class="analysis-tool-card" href="/chassis"><span>06 · MACHINERY</span><h2>Chassis</h2><p>Browse the cars, engine combinations and manufacturers that contested Formula 1.</p><strong>Browse chassis →</strong></a>
-  </section>
-</main><footer class="footer"><div class="container">Racelytic</div></footer><script src="/js/utils.js"></script><script src="/js/header.js"></script><script src="/js/app.js"></script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Search the Formula 1 archive or browse seasons, races, drivers, constructors, circuits and chassis.">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <title>Formula 1 database · Racelytic</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/polish.css">
+  <link rel="stylesheet" href="/css/database-overview.css">
+</head>
+<body>
+  <div id="header"></div>
+  <main class="container page database-directory">
+    <header class="database-directory-heading">
+      <div class="eyebrow">FORMULA 1 DATABASE</div>
+      <h1>The facts behind Formula 1</h1>
+      <p>Browse every season, race, driver, constructor, circuit and chassis.</p>
+    </header>
+
+    <section class="database-summary" aria-label="Formula 1 archive totals">
+      <dl>
+        <div><dt>Seasons</dt><dd data-archive-count="seasons">—</dd></div>
+        <div><dt>Races</dt><dd data-archive-count="races">—</dd></div>
+        <div><dt>Drivers</dt><dd data-archive-count="drivers">—</dd></div>
+        <div><dt>Constructors</dt><dd data-archive-count="constructors">—</dd></div>
+        <div><dt>Circuits</dt><dd data-archive-count="circuits">—</dd></div>
+        <div><dt>Chassis</dt><dd data-archive-count="chassis">—</dd></div>
+      </dl>
+    </section>
+
+    <h2 class="eyebrow database-navigation-title" id="database-navigation-title">BROWSE THE TABLES</h2>
+    <nav class="database-category-grid" aria-labelledby="database-navigation-title">
+      <a class="database-category" href="/seasons">
+        <div class="database-category-heading"><h3>Seasons</h3></div>
+        <p>Championship standings, calendars and race-by-race results.</p>
+        <strong class="database-category-action">Browse seasons <span aria-hidden="true">→</span></strong>
+      </a>
+      <a class="database-category" href="/races">
+        <div class="database-category-heading"><h3>Races</h3></div>
+        <p>Grand Prix results, qualifying, sprints and practice sessions.</p>
+        <strong class="database-category-action">Browse races <span aria-hidden="true">→</span></strong>
+      </a>
+      <a class="database-category" href="/drivers">
+        <div class="database-category-heading"><h3>Drivers</h3></div>
+        <p>Career statistics, championship histories and individual results.</p>
+        <strong class="database-category-action">Browse drivers <span aria-hidden="true">→</span></strong>
+      </a>
+      <a class="database-category" href="/constructors">
+        <div class="database-category-heading"><h3>Constructors</h3></div>
+        <p>Team records, drivers and championship campaigns.</p>
+        <strong class="database-category-action">Browse constructors <span aria-hidden="true">→</span></strong>
+      </a>
+      <a class="database-category" href="/circuits">
+        <div class="database-category-heading"><h3>Circuits</h3></div>
+        <p>Track layouts, locations and every race held at each venue.</p>
+        <strong class="database-category-action">Browse circuits <span aria-hidden="true">→</span></strong>
+      </a>
+      <a class="database-category" href="/chassis">
+        <div class="database-category-heading"><h3>Chassis</h3></div>
+        <p>Formula 1 cars, manufacturers and engine combinations.</p>
+        <strong class="database-category-action">Browse chassis <span aria-hidden="true">→</span></strong>
+      </a>
+    </nav>
+  </main>
+  <footer class="footer"><div class="container">Racelytic</div></footer>
+  <script src="/js/utils.js"></script>
+  <script src="/js/header.js"></script>
+  <script src="/js/database-overview.js"></script>
+</body>
+</html>
