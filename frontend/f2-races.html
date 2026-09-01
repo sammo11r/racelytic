@@ -13,18 +13,31 @@
   <div id="header"></div>
   <main class="container page races-page">
     <div class="page-head"><div><div class="eyebrow">FORMULA 2 WEEKEND ARCHIVE</div><h1>Races</h1><p>Practice, qualifying, grids, sprint races and feature races from every Formula 2 round.</p></div></div>
-    <section class="race-filters" aria-label="Formula 2 race filters">
-      <label><span>Search</span><input id="f2-race-search" type="search" placeholder="Event, circuit or location"></label>
-      <label><span>Season</span><select id="f2-race-year"><option value="">All seasons</option></select></label>
-      <label><span>Circuit</span><select id="f2-race-circuit"><option value="">All circuits</option></select></label>
-      <button id="clear-f2-race-filters" class="button" type="button">Clear filters</button>
+    <section class="race-filters junior-race-filters" aria-label="Formula 2 race filters">
+      <div class="race-filter-primary">
+        <label class="race-search-filter"><span>Filter weekends</span><input id="junior-race-search" type="search" placeholder="Event, circuit or location"></label>
+        <label><span>Season</span><select id="junior-race-year"><option value="">All seasons</option></select></label>
+        <label class="race-circuit-filter"><span>Circuit</span><input id="junior-race-circuit" type="search" list="junior-race-circuit-options" placeholder="All circuits" autocomplete="off"><datalist id="junior-race-circuit-options"></datalist></label>
+      </div>
+      <details class="race-more-filters" id="junior-race-more-filters" open>
+        <summary>More filters <span id="junior-race-more-filter-count"></span></summary>
+        <div class="race-filter-advanced">
+          <label><span>Status</span><select id="junior-race-status"><option value="">All statuses</option><option value="upcoming">Upcoming</option><option value="in-progress">In progress</option><option value="completed">Completed</option><option value="no-result">No result</option></select></label>
+          <label><span>Format</span><select id="junior-race-format"><option value="">All formats</option><option value="1">1 race</option><option value="2">2 races</option><option value="3">3 races</option></select></label>
+          <label><span>Order</span><select id="junior-race-sort"><option value="newest">Newest first</option><option value="oldest">Oldest first</option></select></label>
+        </div>
+      </details>
+      <button id="clear-junior-race-filters" class="button race-clear-filters" type="button" disabled>Clear filters</button>
     </section>
-    <div class="race-browser-heading"><strong id="f2-race-count">Loading weekends…</strong><span id="f2-race-filter-note"></span></div>
-    <div id="f2-races" class="race-archive"></div>
+    <div id="junior-race-active-filters" class="race-active-filters" aria-label="Active filters"></div>
+    <div id="junior-race-browser-heading" class="race-browser-heading" aria-live="polite"><strong id="junior-race-count">Loading weekends…</strong><span id="junior-race-filter-note"></span></div>
+    <div id="junior-races" class="race-archive" aria-busy="true"><div class="race-archive-loading">Loading the weekend archive…</div></div>
+    <nav id="junior-races-pagination" class="pagination race-season-pagination" aria-label="Weekend archive seasons"></nav>
   </main>
   <footer class="footer"><div class="container">Racelytic</div></footer>
   <script src="/js/utils.js"></script>
   <script src="/js/header.js"></script>
   <script src="/js/f2-races.js"></script>
+  <script src="/js/junior-races.js"></script>
 </body>
 </html>

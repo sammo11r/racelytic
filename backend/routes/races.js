@@ -4,6 +4,7 @@ const { optionalInteger } = require('../validation');
 const { f2SessionType, f3SessionType, academySessionType } = require('./seasons');
 const { isJuniorSeries, minimumSeasonYear, seriesPrefix } = require('../series-config');
 const { academyRaceAwardsPole, academyRaceDisplayName, academyRaceGridContext } = require('../academy-race-analysis');
+const { juniorRaceGridContext } = require('../junior-race-analysis');
 
 const router = express.Router();
 
@@ -120,6 +121,8 @@ router.get('/api/races/:id', async (req, res) => {
                         ...row,
                         positionNumber,
                         status: juniorClassificationStatus(row.status, row.positionNumber),
+                        time: row.time || (!isRace ? row.fastestLapTime : null),
+                        timeMillis: row.timeMillis || (!isRace ? row.fastestLapTimeMillis : null),
                         points: isDisqualified(row) ? 0 : row.points === null ? null : Number(row.points),
                         laps: row.laps === null ? null : Number(row.laps),
                         gapMillis: row.gapMillis === null ? null : Number(row.gapMillis),
@@ -132,46 +135,71 @@ router.get('/api/races/:id', async (req, res) => {
 
                 return {
                     race: raceRows[0],
-                    sessions: sessionRows.map(session => ({
-                        ...session,
-                        sessionNumber: Number(session.sessionNumber || 0),
-                        isRace: isTrue(session.isRace),
-                        cancelled: isTrue(session.cancelled),
-                        raceType: raceTypeBySession.get(String(session.id)) || null,
-                        displayName: series === 'academy'
-                            ? academyRaceDisplayName(session)
-                            : raceLabelBySession.get(String(session.id)) || session.name,
-                        gridNote: series === 'academy' && isTrue(session.isRace)
-                            ? academyRaceGridContext(
-                                { ...session, isRace: true },
-                                sessionRows.map(candidate => ({ ...candidate, isRace: isTrue(candidate.isRace) })),
-                                resultsBySession,
-                                raceRows[0].year
-                            ).gridNote
-                            : null,
-                        results: (() => {
-                            const results = resultsBySession.get(String(session.id)) || [];
-                            if (series !== 'academy' || !isTrue(session.isRace)) return results;
-                            const context = academyRaceGridContext(
-                                { ...session, isRace: true },
-                                sessionRows.map(candidate => ({ ...candidate, isRace: isTrue(candidate.isRace) })),
-                                resultsBySession,
-                                raceRows[0].year
-                            );
-                            return results.map(result => ({
+                    sessions: sessionRows.flatMap(session => {
+                        const normalizedSessions = sessionRows.map(candidate => ({ ...candidate, isRace: isTrue(candidate.isRace) }));
+                        const raceSession = isTrue(session.isRace);
+                        const raceType = raceTypeBySession.get(String(session.id)) || null;
+                        const context = raceSession
+                            ? series === 'academy'
+                                ? academyRaceGridContext({ ...session, isRace: true }, normalizedSessions, resultsBySession, raceRows[0].year)
+                                : juniorRaceGridContext(series, session, normalizedSessions, resultsBySession, raceType, raceRows[0].year)
+                            : null;
+                        const results = (resultsBySession.get(String(session.id)) || []).map(result => !context ? result : ({
+                            ...result,
+                            qualificationPositionNumber: context.qualificationByDriver.get(String(result.driverId)) ?? null,
+                            gridPositionNumber: context.gridByDriver.get(String(result.driverId)) ?? null,
+                            polePosition: series === 'academy' ? Boolean(
+                                academyRaceAwardsPole({ ...session, isRace: true }, normalizedSessions, raceRows[0].year)
+                                && context.gridByDriver.get(String(result.driverId)) === 1
+                            ) : result.polePosition
+                        }));
+                        const renderedSession = {
+                            ...session,
+                            sessionNumber: Number(session.sessionNumber || 0),
+                            isRace: raceSession,
+                            cancelled: isTrue(session.cancelled),
+                            raceType,
+                            displayName: series === 'academy'
+                                ? academyRaceDisplayName(session)
+                                : raceLabelBySession.get(String(session.id)) || session.name,
+                            gridNote: context?.gridNote || null,
+                            results
+                        };
+                        if (!raceSession || series === 'academy' || context?.source !== 'derived' || !context.gridByDriver.size) {
+                            return [renderedSession];
+                        }
+                        const gridResults = results
+                            .filter(result => context.gridByDriver.has(String(result.driverId)))
+                            .map(result => ({
                                 ...result,
-                                qualificationPositionNumber: context.qualificationByDriver.get(String(result.driverId)) ?? null,
-                                gridPositionNumber: context.gridByDriver.get(String(result.driverId)) ?? null,
-                                polePosition: Boolean(
-                                    academyRaceAwardsPole(
-                                        { ...session, isRace: true },
-                                        sessionRows.map(candidate => ({ ...candidate, isRace: isTrue(candidate.isRace) })),
-                                        raceRows[0].year
-                                    ) && context.gridByDriver.get(String(result.driverId)) === 1
-                                )
-                            }));
-                        })()
-                    }))
+                                positionNumber: context.gridByDriver.get(String(result.driverId)),
+                                positionDisplayOrder: context.gridByDriver.get(String(result.driverId)),
+                                points: null,
+                                polePosition: false,
+                                fastestLap: false,
+                                laps: null,
+                                time: null,
+                                timeMillis: null,
+                                gapMillis: null,
+                                gapLaps: null
+                            }))
+                            .sort((first, second) => Number(first.positionNumber) - Number(second.positionNumber));
+                        return [{
+                            id: `${session.id}__derived-grid`,
+                            sessionNumber: Number(session.sessionNumber || 0) - 0.1,
+                            code: null,
+                            name: 'Starting Grid',
+                            displayName: `${renderedSession.displayName} Grid`,
+                            startTimeUtc: null,
+                            endTimeUtc: null,
+                            isRace: false,
+                            cancelled: false,
+                            raceType: null,
+                            derived: true,
+                            gridNote: context.gridNote,
+                            results: gridResults
+                        }, renderedSession];
+                    })
                 };
             });
 
@@ -210,6 +238,7 @@ router.get('/api/races/:id', async (req, res) => {
                         rr.positionDisplayOrder,
                         rr.gridPositionNumber,
                         rr.qualificationPositionNumber,
+                        rr.driverNumber,
                         rr.driverId,
                         rr.constructorId,
                         rr.laps,
@@ -287,12 +316,26 @@ router.get('/api/races', async (req, res) => {
                     SELECT races.id, races.year, races.round, races.date, races.endDate,
                         races.name, races.code, races.circuitId,
                         circuits.name AS circuitName, circuits.placeName,
-                        COUNT(sessions.id) AS sessionCount,
-                        SUM(CASE WHEN LOWER(CAST(sessions.isRace AS CHAR)) IN ('1', 'true') THEN 1 ELSE 0 END) AS raceSessionCount,
-                        SUM(CASE WHEN LOWER(CAST(sessions.cancelled AS CHAR)) IN ('1', 'true') THEN 1 ELSE 0 END) AS cancelledSessionCount
+                        COUNT(DISTINCT sessions.id) AS sessionCount,
+                        COUNT(DISTINCT CASE WHEN LOWER(CAST(sessions.isRace AS CHAR)) IN ('1', 'true') THEN sessions.id END) AS raceSessionCount,
+                        COUNT(DISTINCT CASE WHEN LOWER(CAST(sessions.isRace AS CHAR)) IN ('1', 'true')
+                            AND LOWER(COALESCE(CAST(sessions.cancelled AS CHAR), 'false')) NOT IN ('1', 'true') THEN sessions.id END) AS activeRaceSessionCount,
+                        COUNT(DISTINCT CASE WHEN LOWER(CAST(sessions.isRace AS CHAR)) IN ('1', 'true')
+                            AND winnerResult.sessionId IS NOT NULL THEN sessions.id END) AS completedRaceSessionCount,
+                        COUNT(DISTINCT CASE WHEN LOWER(CAST(sessions.cancelled AS CHAR)) IN ('1', 'true') THEN sessions.id END) AS cancelledSessionCount,
+                        GROUP_CONCAT(DISTINCT winnerDriver.name ORDER BY sessions.sessionNumber, winnerDriver.name SEPARATOR ' / ') AS winnerName,
+                        GROUP_CONCAT(DISTINCT winnerConstructor.name ORDER BY sessions.sessionNumber, winnerConstructor.name SEPARATOR ' / ') AS winnerConstructorName
                     FROM ${prefix}races races
                     LEFT JOIN ${prefix}circuits circuits ON circuits.id = races.circuitId
                     LEFT JOIN ${prefix}sessions sessions ON sessions.raceId = races.id
+                    LEFT JOIN ${prefix}session_results winnerResult
+                        ON winnerResult.sessionId = sessions.id
+                        AND winnerResult.raceId = races.id
+                        AND LOWER(CAST(sessions.isRace AS CHAR)) IN ('1', 'true')
+                        AND winnerResult.positionNumber = 1
+                        AND UPPER(COALESCE(winnerResult.status, '')) NOT IN ('DSQ', 'DQ', 'DISQ', 'DISQUALIFIED', 'EXC')
+                    LEFT JOIN ${prefix}drivers winnerDriver ON winnerDriver.id = winnerResult.driverId
+                    LEFT JOIN ${prefix}constructors winnerConstructor ON winnerConstructor.id = winnerResult.constructorId
                     ${conditions.length ? `WHERE ${conditions.join(' AND ')}` : ''}
                     GROUP BY races.id, races.year, races.round, races.date, races.endDate,
                         races.name, races.code, races.circuitId, circuits.name, circuits.placeName
@@ -305,6 +348,8 @@ router.get('/api/races', async (req, res) => {
                 round: Number(row.round),
                 sessionCount: Number(row.sessionCount || 0),
                 raceSessionCount: Number(row.raceSessionCount || 0),
+                activeRaceSessionCount: Number(row.activeRaceSessionCount || 0),
+                completedRaceSessionCount: Number(row.completedRaceSessionCount || 0),
                 cancelledSessionCount: Number(row.cancelledSessionCount || 0)
             })));
         }
@@ -334,7 +379,11 @@ router.get('/api/races', async (req, res) => {
                     r.distance,
                     r.sprintRaceDate,
                     COALESCE(NULLIF(c.fullName, ''), c.name) AS circuitName,
-                    co.name AS countryName
+                    co.name AS countryName,
+                    winner.driverIds AS winnerDriverId,
+                    winner.driverNames AS winnerName,
+                    winner.constructorIds AS winnerConstructorId,
+                    winner.constructorNames AS winnerConstructorName
 
                 FROM races r
 
@@ -346,6 +395,20 @@ router.get('/api/races', async (req, res) => {
 
                 LEFT JOIN countries co
                     ON co.id = c.countryId
+
+                LEFT JOIN (
+                    SELECT winnerResult.raceId,
+                        GROUP_CONCAT(DISTINCT winnerResult.driverId ORDER BY winnerResult.positionDisplayOrder, winnerResult.driverId SEPARATOR ',') AS driverIds,
+                        GROUP_CONCAT(DISTINCT winnerDriver.name ORDER BY winnerResult.positionDisplayOrder, winnerDriver.name SEPARATOR ' / ') AS driverNames,
+                        GROUP_CONCAT(DISTINCT winnerResult.constructorId ORDER BY winnerResult.positionDisplayOrder, winnerResult.constructorId SEPARATOR ',') AS constructorIds,
+                        GROUP_CONCAT(DISTINCT winnerConstructor.name ORDER BY winnerResult.positionDisplayOrder, winnerConstructor.name SEPARATOR ' / ') AS constructorNames
+                    FROM races_race_results winnerResult
+                    JOIN drivers winnerDriver ON winnerDriver.id = winnerResult.driverId
+                    LEFT JOIN constructors winnerConstructor ON winnerConstructor.id = winnerResult.constructorId
+                    WHERE winnerResult.positionNumber = 1
+                        AND UPPER(COALESCE(winnerResult.positionText, '')) NOT IN ('DSQ', 'DQ', 'DISQ', 'DISQUALIFIED', 'EXC')
+                    GROUP BY winnerResult.raceId
+                ) winner ON winner.raceId = r.id
 
                 ${conditions.length ? `WHERE ${conditions.join(' AND ')}` : ''}
                 ORDER BY r.year DESC, r.round DESC

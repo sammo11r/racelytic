@@ -11,19 +11,26 @@
 </head>
 <body class="f2-mode">
   <div id="header"></div>
-  <main class="container page">
-    <a class="back-link" href="/f2/races"><span aria-hidden="true">←</span> All F2 races</a>
-    <section id="f2-race-head"></section>
-    <section class="race-session-header f2-session-header">
-      <div><div class="eyebrow">WEEKEND SESSIONS</div><h2 id="f2-session-title">Classification</h2></div>
-      <div id="f2-session-summary" class="section-note"></div>
+  <main class="container page race-detail-page junior-race-detail-page">
+    <div class="race-page-navigation">
+      <a class="back-link" href="/f2/races"><span aria-hidden="true">←</span>All F2 races</a>
+      <nav id="junior-race-round-navigation" class="race-round-navigation" aria-label="Previous and next race"></nav>
+    </div>
+    <section id="junior-race-head" aria-busy="true"><div class="loading-state race-detail-loading">Loading race weekend…</div></section>
+    <section id="junior-race-overview" class="race-overview" aria-live="polite"></section>
+    <section id="junior-race-session-results" class="race-session-results" hidden>
+      <header class="race-session-header">
+        <div><div class="eyebrow">WEEKEND RESULTS</div><h2 id="junior-session-title">Classification</h2></div>
+        <div id="junior-session-summary" class="section-note"></div>
+      </header>
+      <div id="junior-session-tabs" class="standings-mode race-session-tabs junior-detail-session-tabs" role="tablist" aria-label="Formula 2 weekend sessions"></div>
+      <section id="junior-race-results" class="race-results-panel" role="tabpanel" aria-live="polite"></section>
     </section>
-    <div id="f2-session-tabs" class="f2-session-tabs" role="tablist" aria-label="Formula 2 weekend sessions"></div>
-    <section id="f2-race-results" class="table-wrap f2-session-results"></section>
   </main>
   <footer class="footer"><div class="container">Racelytic</div></footer>
   <script src="/js/utils.js"></script>
   <script src="/js/header.js"></script>
   <script src="/js/f2-race.js"></script>
+  <script src="/js/junior-race-detail.js"></script>
 </body>
 </html>
