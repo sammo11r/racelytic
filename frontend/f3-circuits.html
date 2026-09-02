@@ -1,20 +1,39 @@
 <!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="description" content="Browse every Formula 3 circuit in Racelytic.">
-  <link rel="icon" href="/assets/favicon-f3.svg" type="image/svg+xml">
-  <title>Formula 3 Circuits · Racelytic</title>
-  <link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/polish.css">
-</head>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="Explore Formula 3 circuits, from the current calendar to historic venues. Filter by season, country and circuit type."><link rel="icon" href="/assets/favicon-f3.svg" type="image/svg+xml"><title>Formula 3 Circuits · Racelytic</title><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/polish.css"></head>
 <body class="f3-mode">
-  <div id="header"></div>
-  <main class="container page">
-    <div class="page-head"><div><div class="eyebrow">FORMULA 3 TRACKS &amp; VENUES</div><h1>Circuits</h1><p>Every circuit that has hosted an FIA Formula 3 championship weekend.</p></div><input class="search" id="f3-circuit-search" type="search" aria-label="Search Formula 3 circuits" placeholder="Search circuits or locations..."></div>
-    <div class="browser-toolbar"><span id="f3-circuit-count" class="browser-count">Loading circuits…</span><label class="sort-control">Sort <select id="f3-circuit-sort"><option value="name">Name</option><option value="recent">Most recent</option><option value="weekends">Most weekends</option></select></label></div>
-    <div id="f3-circuits" class="entity-grid"></div>
-  </main>
-  <footer class="footer"><div class="container">Racelytic</div></footer>
-  <script src="/js/utils.js"></script><script src="/js/header.js"></script><script src="/js/f2-circuit-images.js"></script><script src="/js/f3-circuits.js"></script>
-</body>
-</html>
+<div id="header"></div>
+<main class="container page circuits-page">
+  <header class="page-head drivers-page-head"><div><div class="eyebrow">TRACKS &amp; VENUES</div><h1>Circuits</h1><p>Explore the Formula 3 calendar and the circuits that shaped its history.</p></div></header>
+  <section class="driver-browser circuit-browser" aria-labelledby="circuit-browser-title">
+    <div class="driver-browser-primary"><h2 id="circuit-browser-title">Find a circuit</h2>
+      <div class="standings-mode" role="group" aria-label="Circuit archive view">
+        <button type="button" class="standings-mode-button active" data-circuit-view="current" aria-pressed="true">Current calendar</button>
+        <button type="button" class="standings-mode-button" data-circuit-view="all" aria-pressed="false">All circuits</button>
+      </div>
+    </div>
+    <div class="driver-filter-grid circuit-filter-grid" role="search" aria-label="Filter circuits">
+      <label class="driver-search-field"><span>Search</span><input class="search" id="search" type="search" placeholder="Circuit, former name or location…" autocomplete="off"></label>
+      <label><span>Season</span><select id="circuit-season"><option value="">Current season</option></select></label>
+      <label><span>Country</span><select id="circuit-country"><option value="">All countries</option></select></label>
+      <label><span>Type</span><select id="circuit-type"><option value="">All types</option></select></label>
+      <label><span>Order by</span><select id="circuit-sort"><option value="name">Name A–Z</option><option value="recent">Most recent</option><option value="races">Most races hosted</option></select></label>
+      <button type="button" id="circuit-clear" class="button secondary driver-clear">Clear filters</button>
+    </div>
+  </section>
+  <div class="driver-browser-toolbar"><span id="circuit-count" class="browser-count" aria-live="polite">Loading circuits…</span><span id="circuit-load-status" class="section-note" role="status"></span></div>
+  <div id="circuits" class="entity-grid circuit-archive-grid" aria-busy="true" aria-label="Formula 3 circuits">
+    <div class="circuit-archive-card circuit-card-skeleton" aria-hidden="true"><i></i><b></b><span></span><em></em></div>
+    <div class="circuit-archive-card circuit-card-skeleton" aria-hidden="true"><i></i><b></b><span></span><em></em></div>
+    <div class="circuit-archive-card circuit-card-skeleton" aria-hidden="true"><i></i><b></b><span></span><em></em></div>
+    <div class="circuit-archive-card circuit-card-skeleton" aria-hidden="true"><i></i><b></b><span></span><em></em></div>
+    <div class="circuit-archive-card circuit-card-skeleton" aria-hidden="true"><i></i><b></b><span></span><em></em></div>
+    <div class="circuit-archive-card circuit-card-skeleton" aria-hidden="true"><i></i><b></b><span></span><em></em></div>
+    <div class="circuit-archive-card circuit-card-skeleton" aria-hidden="true"><i></i><b></b><span></span><em></em></div>
+    <div class="circuit-archive-card circuit-card-skeleton" aria-hidden="true"><i></i><b></b><span></span><em></em></div>
+  </div>
+</main>
+<footer class="footer"><div class="container">Racelytic</div></footer>
+<script src="/js/utils.js"></script>
+<script src="/js/header.js"></script>
+<script src="/js/circuits.js"></script>
+</body></html>

@@ -4,6 +4,8 @@ const { integerOrDefault } = require('../validation');
 const { f2SessionType, f3SessionType, academySessionType } = require('./seasons');
 const { isJuniorSeries, seriesPrefix } = require('../series-config');
 const { academyComparisonLookups, comparisonRaceGroups } = require('../driver-comparison');
+const { driverRaceGridContexts } = require('../driver-race-grids');
+const { juniorClassificationPosition, juniorClassificationStatus, juniorClassificationTime } = require('../junior-classification');
 
 const router = express.Router();
 
@@ -17,6 +19,39 @@ const f2CountryCodeOverrides = new Map([
 function f2CountryCode(driver) {
     return f2CountryCodeOverrides.get(String(driver.id)) || String(driver.countryCode || '').toLowerCase() || null;
 }
+
+const F1_DRIVER_RESULTS_SQL = `
+    SELECT
+        rr.raceId,
+        rr.year,
+        rr.round,
+        rr.positionNumber,
+        rr.positionText,
+        rr.gridPositionNumber,
+        rr.gridPositionText,
+        rr.points,
+        rr.laps,
+        rr.pitStops,
+        rr.fastestLap,
+        rr.polePosition,
+        rr.driverOfTheDay,
+        rr.positionsGained,
+        rr.reasonRetired,
+        rr.constructorId,
+        COALESCE(NULLIF(gp.fullName, ''), r.officialName) AS name,
+        gp.shortName,
+        r.officialName,
+        r.date,
+        COALESCE(NULLIF(c.fullName, ''), c.name) AS circuitName,
+        k.name AS constructorName
+    FROM races_race_results rr
+    JOIN races r ON r.id = rr.raceId
+    LEFT JOIN grands_prix gp ON gp.id = r.grandPrixId
+    LEFT JOIN circuits c ON c.id = r.circuitId
+    LEFT JOIN constructors k ON k.id = rr.constructorId
+    WHERE rr.driverId = ?
+    ORDER BY rr.year DESC, rr.round DESC
+`;
 
 function juniorClassificationLookups(gridResults, qualifyingResults) {
     const gridsByRaceDriver = new Map();
@@ -68,7 +103,7 @@ function juniorClassificationLookups(gridResults, qualifyingResults) {
 function juniorRaceSessionLabel(series, row) {
     if (series === 'academy') return String(row.sessionName || 'Race');
     const sessionType = series === 'academy' ? academySessionType : series === 'f3' ? f3SessionType : f2SessionType;
-    const type = sessionType(row, 0, 0, row.year);
+    const type = sessionType({ ...row, name: row.sessionName || row.name }, 0, 0, row.year);
     if (type === 'F') return 'Feature';
     const explicitSprintNumber = String(row.sessionName || '').match(/sprint[^0-9]*([0-9]+)/i)?.[1];
     if (explicitSprintNumber) return `Sprint ${explicitSprintNumber}`;
@@ -121,17 +156,8 @@ router.get('/api/drivers', async (req, res) => {
                     COALESCE(stats.totalPolePositions, 0) AS totalPolePositions,
                     COALESCE(stats.totalFastestLaps, 0) AS totalFastestLaps,
                     COALESCE(stats.totalPoints, 0) AS totalPoints,
-                    (SELECT entry.constructorId
-                        FROM ${prefix}entries entry
-                        WHERE entry.driverId = d.id
-                        ORDER BY entry.year DESC, entry.round DESC
-                        LIMIT 1) AS latestConstructorId,
-                    (SELECT constructor.name
-                        FROM ${prefix}entries entry
-                        LEFT JOIN ${prefix}constructors constructor ON constructor.id = entry.constructorId
-                        WHERE entry.driverId = d.id
-                        ORDER BY entry.year DESC, entry.round DESC
-                        LIMIT 1) AS latestConstructorName
+                    latest.latestConstructorId,
+                    latest.latestConstructorName
                 FROM ${prefix}drivers d
                 LEFT JOIN (
                     SELECT
@@ -149,6 +175,19 @@ router.get('/api/drivers', async (req, res) => {
                     FROM ${prefix}season_driver_standings
                     GROUP BY driverId
                 ) stats ON stats.driverId = d.id
+                LEFT JOIN (
+                    SELECT driverId, constructorId AS latestConstructorId, constructorName AS latestConstructorName
+                    FROM (
+                        SELECT
+                            entry.driverId,
+                            entry.constructorId,
+                            constructor.name AS constructorName,
+                            ROW_NUMBER() OVER (PARTITION BY entry.driverId ORDER BY entry.year DESC, entry.round DESC) AS entryRank
+                        FROM ${prefix}entries entry
+                        LEFT JOIN ${prefix}constructors constructor ON constructor.id = entry.constructorId
+                    ) rankedEntries
+                    WHERE entryRank = 1
+                ) latest ON latest.driverId = d.id
                 ${where}
                 ORDER BY d.name
                 LIMIT ${limit}
@@ -202,10 +241,21 @@ router.get('/api/drivers', async (req, res) => {
                         totalFastestLaps,
                         totalPoints,
                         totalChampionshipWins,
-                        (SELECT MAX(year) FROM seasons_driver_standings standings WHERE standings.driverId = drivers.id) AS lastYear,
-                        (SELECT MIN(positionNumber) FROM seasons_driver_standings standings WHERE standings.driverId = drivers.id) AS bestChampionshipPosition
+                        totalRaceStarts,
+                        career.lastYear,
+                        career.firstYear,
+                        career.bestChampionshipPosition
 
                     FROM drivers
+                    LEFT JOIN (
+                        SELECT
+                            driverId,
+                            MIN(year) AS firstYear,
+                            MAX(year) AS lastYear,
+                            MIN(positionNumber) AS bestChampionshipPosition
+                        FROM seasons_driver_standings
+                        GROUP BY driverId
+                    ) career ON career.driverId = drivers.id
 
                     WHERE
                         name LIKE ?
@@ -238,10 +288,21 @@ router.get('/api/drivers', async (req, res) => {
                     totalFastestLaps,
                     totalPoints,
                     totalChampionshipWins,
-                    (SELECT MAX(year) FROM seasons_driver_standings standings WHERE standings.driverId = drivers.id) AS lastYear,
-                    (SELECT MIN(positionNumber) FROM seasons_driver_standings standings WHERE standings.driverId = drivers.id) AS bestChampionshipPosition
+                    totalRaceStarts,
+                    career.lastYear,
+                    career.firstYear,
+                    career.bestChampionshipPosition
 
                 FROM drivers
+                LEFT JOIN (
+                    SELECT
+                        driverId,
+                        MIN(year) AS firstYear,
+                        MAX(year) AS lastYear,
+                        MIN(positionNumber) AS bestChampionshipPosition
+                    FROM seasons_driver_standings
+                    GROUP BY driverId
+                ) career ON career.driverId = drivers.id
 
                 ORDER BY
                     lastName,
@@ -551,6 +612,112 @@ router.get('/api/drivers/:id/form', async (req, res) => {
     } catch (error) { sendError(res, error); }
 });
 
+async function juniorDriverResults(connection, series, driverId) {
+    const prefix = seriesPrefix(series);
+    const [rows, classifications] = await Promise.all([connection.query(`
+        SELECT results.sessionId, results.raceId, results.year, results.round,
+            results.positionNumber, results.positionDisplayOrder, results.points,
+            results.status, results.driverNumber, results.constructorId,
+            results.laps, results.time, results.gapMillis, results.gapLaps,
+            results.fastestLap, results.polePosition,
+            sessions.name AS sessionName, sessions.sessionNumber,
+            races.name AS raceName, races.code AS raceCode, races.date,
+            constructors.name AS constructorName
+        FROM ${prefix}session_results results
+        JOIN ${prefix}sessions sessions ON sessions.id = results.sessionId
+        JOIN ${prefix}races races ON races.id = results.raceId
+        LEFT JOIN ${prefix}constructors constructors ON constructors.id = results.constructorId
+        WHERE results.driverId = ?
+            AND LOWER(CAST(sessions.isRace AS CHAR)) IN ('1', 'true')
+            AND (sessions.cancelled IS NULL OR LOWER(CAST(sessions.cancelled AS CHAR)) NOT IN ('1', 'true'))
+        ORDER BY results.year DESC, results.round DESC, sessions.sessionNumber DESC
+    `, [driverId]), connection.query(`
+        SELECT sessions.raceId, races.year, sessions.id AS sessionId, sessions.name AS sessionName,
+            sessions.sessionNumber, sessions.isRace, sessions.cancelled, results.driverId, results.positionNumber
+        FROM ${prefix}sessions sessions
+        JOIN ${prefix}races races ON races.id = sessions.raceId
+        LEFT JOIN ${prefix}session_results results ON results.sessionId = sessions.id
+        WHERE sessions.raceId IN (SELECT DISTINCT raceId FROM ${prefix}session_results WHERE driverId = ?)
+            AND (LOWER(sessions.name) LIKE '%grid%' OR LOWER(sessions.name) LIKE '%qualif%'
+                OR LOWER(CAST(sessions.isRace AS CHAR)) IN ('1', 'true'))
+        ORDER BY sessions.raceId, sessions.sessionNumber
+    `, [driverId])]);
+    const contexts = driverRaceGridContexts(series, classifications, series === 'f3' ? f3SessionType : f2SessionType);
+    const isTrue = value => value === true || Number(value) === 1 || String(value).toLowerCase() === 'true';
+    return rows.map(row => {
+        const status = juniorClassificationStatus(row.status, row.positionNumber, true) || '';
+        const disqualified = /\b(?:DSQ|DQ|DISQ|DISQUALIFIED|EXC)\b/i.test(status);
+        const unclassified = disqualified || /\b(?:DNS|DNQ|DNPQ|WD|DNF|RET|RETIRED|NC)\b/i.test(status);
+        const positionNumber = disqualified ? null : juniorClassificationPosition(row.positionNumber);
+        const gridContext = contexts.get(String(row.sessionId));
+        const gridPositionNumber = juniorClassificationPosition(gridContext?.gridByDriver.get(String(driverId)));
+        return {
+            ...row, time: juniorClassificationTime(row.time), status: status || null, name: row.raceName, sessionLabel: juniorRaceSessionLabel(series, row),
+            year: Number(row.year), round: Number(row.round), positionNumber,
+            positionText: unclassified ? status : positionNumber || status || '—',
+            gridPositionNumber,
+            gridSource: gridPositionNumber === null ? null : gridContext.source,
+            gridNote: gridContext?.gridNote || null,
+            positionsGained: !unclassified && positionNumber > 0 && gridPositionNumber !== null ? gridPositionNumber - positionNumber : null,
+            reasonRetired: unclassified ? status : null,
+            points: disqualified ? 0 : Number(row.points || 0), laps: Number(row.laps || 0),
+            fastestLap: ['f2', 'academy'].includes(series) && isTrue(row.fastestLap),
+            polePosition: ['f2', 'academy'].includes(series) && isTrue(row.polePosition)
+        };
+    });
+}
+
+// Entries and race classifications preserve seasons even without a standings row.
+async function juniorDriverCareer(connection, prefix, driverId) {
+    return connection.query(`
+        SELECT career.year, NULL AS positionNumber, 0 AS championshipWon,
+            COALESCE(stats.points, 0) AS points, COALESCE(stats.starts, 0) AS starts,
+            COALESCE(stats.wins, 0) AS wins, COALESCE(stats.podiums, 0) AS podiums,
+            COALESCE(stats.poles, 0) AS poles, COALESCE(stats.fastestLaps, 0) AS fastestLaps,
+            teams.constructorName
+        FROM (
+            SELECT year FROM ${prefix}entries WHERE driverId = ?
+            UNION SELECT year FROM ${prefix}session_results WHERE driverId = ?
+        ) career
+        LEFT JOIN (
+            SELECT results.year,
+                SUM(CASE WHEN UPPER(COALESCE(results.status, '')) NOT IN ('DNS', 'DNQ', 'DNPQ', 'WD') THEN 1 ELSE 0 END) AS starts,
+                SUM(CASE WHEN results.positionNumber = 1 AND UPPER(COALESCE(results.status, '')) NOT IN ('DSQ', 'DQ', 'DISQ', 'DISQUALIFIED', 'EXC') THEN 1 ELSE 0 END) AS wins,
+                SUM(CASE WHEN results.positionNumber BETWEEN 1 AND 3 AND UPPER(COALESCE(results.status, '')) NOT IN ('DSQ', 'DQ', 'DISQ', 'DISQUALIFIED', 'EXC') THEN 1 ELSE 0 END) AS podiums,
+                SUM(CASE WHEN LOWER(CAST(results.polePosition AS CHAR)) IN ('1', 'true') THEN 1 ELSE 0 END) AS poles,
+                SUM(CASE WHEN LOWER(CAST(results.fastestLap AS CHAR)) IN ('1', 'true') THEN 1 ELSE 0 END) AS fastestLaps,
+                SUM(CASE WHEN UPPER(COALESCE(results.status, '')) IN ('DSQ', 'DQ', 'DISQ', 'DISQUALIFIED', 'EXC') THEN 0 ELSE COALESCE(results.points, 0) END) AS points
+            FROM ${prefix}session_results results
+            JOIN ${prefix}sessions sessions ON sessions.id = results.sessionId
+            WHERE results.driverId = ? AND LOWER(CAST(sessions.isRace AS CHAR)) IN ('1', 'true')
+                AND (sessions.cancelled IS NULL OR LOWER(CAST(sessions.cancelled AS CHAR)) NOT IN ('1', 'true'))
+            GROUP BY results.year
+        ) stats ON stats.year = career.year
+        LEFT JOIN (
+            SELECT participation.year, GROUP_CONCAT(DISTINCT constructors.name ORDER BY constructors.name SEPARATOR ' / ') AS constructorName
+            FROM (
+                SELECT year, constructorId FROM ${prefix}entries WHERE driverId = ?
+                UNION SELECT year, constructorId FROM ${prefix}session_results WHERE driverId = ?
+            ) participation
+            LEFT JOIN ${prefix}constructors constructors ON constructors.id = participation.constructorId
+            GROUP BY participation.year
+        ) teams ON teams.year = career.year
+        ORDER BY career.year DESC
+    `, [driverId, driverId, driverId, driverId, driverId]);
+}
+
+router.get('/api/drivers/:id/results', async (req, res) => {
+    try {
+        const series = String(req.query.series || '').toLowerCase();
+        const rows = await withConnection(connection => isJuniorSeries(series)
+            ? juniorDriverResults(connection, series, req.params.id)
+            : connection.query(F1_DRIVER_RESULTS_SQL, [req.params.id]));
+        res.json(rows);
+    } catch (error) {
+        sendError(res, error);
+    }
+});
+
 router.get('/api/drivers/:id', async (req, res) => {
 
     try {
@@ -558,10 +725,15 @@ router.get('/api/drivers/:id', async (req, res) => {
         const series = String(req.query.series || '').toLowerCase();
         if (isJuniorSeries(series)) {
             const prefix = seriesPrefix(series);
+            const summaryOnly = String(req.query.summary || '') === '1';
             const data = await withConnection(async connection => {
-                const [driverRows, standings, results] = await Promise.all([
+                const [driverRows, standings, results, career] = await Promise.all([
                     connection.query(`
                         SELECT d.id, d.name, d.firstName, d.lastName, d.abbreviation, d.countryCode,
+                            (SELECT MAX(year) FROM ${prefix}entries) AS currentSeason,
+                            (SELECT constructors.name FROM ${prefix}entries entry
+                                LEFT JOIN ${prefix}constructors constructors ON constructors.id = entry.constructorId
+                                WHERE entry.driverId = d.id ORDER BY entry.year DESC, entry.round DESC LIMIT 1) AS latestConstructorName,
                             (SELECT entry.driverNumber
                                 FROM ${prefix}entries entry
                                 WHERE entry.driverId = d.id
@@ -594,25 +766,8 @@ router.get('/api/drivers/:id', async (req, res) => {
                         GROUP BY standings.year, calendars.finalDate
                         ORDER BY standings.year DESC
                     `, [req.params.id]),
-                    connection.query(`
-                        SELECT results.sessionId, results.raceId, results.year, results.round,
-                            results.positionNumber, results.positionDisplayOrder, results.points,
-                            results.status, results.driverNumber, results.constructorId,
-                            results.laps, results.time, results.gapMillis, results.gapLaps,
-                            results.fastestLap, results.polePosition,
-                            sessions.name AS sessionName, sessions.sessionNumber,
-                            races.name AS raceName, races.code AS raceCode, races.date,
-                            constructors.name AS constructorName
-                        FROM ${prefix}session_results results
-                        JOIN ${prefix}sessions sessions ON sessions.id = results.sessionId
-                        JOIN ${prefix}races races ON races.id = results.raceId
-                        LEFT JOIN ${prefix}constructors constructors ON constructors.id = results.constructorId
-                        WHERE results.driverId = ?
-                            AND LOWER(CAST(sessions.isRace AS CHAR)) IN ('1', 'true')
-                            AND (sessions.cancelled IS NULL OR LOWER(CAST(sessions.cancelled AS CHAR)) NOT IN ('1', 'true'))
-                        ORDER BY results.year DESC, results.round DESC, sessions.sessionNumber DESC
-                        LIMIT 300
-                    `, [req.params.id])
+                    summaryOnly ? Promise.resolve([]) : juniorDriverResults(connection, series, req.params.id),
+                    juniorDriverCareer(connection, prefix, req.params.id)
                 ]);
 
                 if (!driverRows.length) return null;
@@ -622,7 +777,7 @@ router.get('/api/drivers/:id', async (req, res) => {
                         ...driverRows[0],
                         countryCode: f2CountryCode(driverRows[0])
                     },
-                    standings: standings.map(row => ({
+                    standings: [...standings, ...career.filter(season => !standings.some(row => Number(row.year) === Number(season.year)))].sort((a, b) => b.year - a.year).map(row => ({
                         ...row,
                         year: Number(row.year),
                         positionNumber: row.positionNumber === null ? null : Number(row.positionNumber),
@@ -638,16 +793,7 @@ router.get('/api/drivers/:id', async (req, res) => {
                         fastestLaps: Number(row.fastestLaps || 0),
                         retirements: Number(row.retirements || 0)
                     })),
-                    results: results.map(row => ({
-                        ...row,
-                        year: Number(row.year),
-                        round: Number(row.round),
-                        positionNumber: row.positionNumber === null ? null : Number(row.positionNumber),
-                        points: /\b(?:DSQ|DQ|DISQ|DISQUALIFIED|EXC)\b/i.test(String(row.status || '')) ? 0 : Number(row.points || 0),
-                        laps: Number(row.laps || 0),
-                        fastestLap: ['f2', 'academy'].includes(series) && isTrue(row.fastestLap),
-                        polePosition: ['f2', 'academy'].includes(series) && isTrue(row.polePosition)
-                    }))
+                    results
                 };
             });
 
@@ -655,6 +801,7 @@ router.get('/api/drivers/:id', async (req, res) => {
             return res.json(data);
         }
 
+        const summaryOnly = String(req.query.summary || '') === '1';
         const data = await withConnection(async connection => {
 
             const [
@@ -667,7 +814,8 @@ router.get('/api/drivers/:id', async (req, res) => {
                     SELECT
                         d.*,
                         cb.name AS birthCountryName,
-                        cn.name AS nationalityCountryName
+                        cn.name AS nationalityCountryName,
+                        (SELECT MAX(year) FROM seasons_driver_standings) AS currentSeason
 
                     FROM drivers d
 
@@ -683,68 +831,56 @@ router.get('/api/drivers/:id', async (req, res) => {
 
                 connection.query(`
                     SELECT
-                        s.year,
-                        s.positionNumber,
-                        s.points,
+                        career.year,
+                        COALESCE(s.positionNumber, seasonStats.positionNumber) AS positionNumber,
+                        COALESCE(s.points, seasonStats.totalPoints, raceStats.totalPoints, 0) AS points,
                         s.championshipWon,
-                        (SELECT GROUP_CONCAT(DISTINCT k.name ORDER BY k.name SEPARATOR '||')
-                            FROM races_race_results rr
-                            JOIN constructors k ON k.id = rr.constructorId
-                            WHERE rr.driverId = s.driverId AND rr.year = s.year) AS teams
+                        COALESCE(seasonStats.totalRaceStarts, raceStats.totalRaceStarts, 0) AS totalRaceStarts,
+                        COALESCE(seasonStats.totalRaceWins, raceStats.totalRaceWins, 0) AS totalRaceWins,
+                        COALESCE(seasonStats.totalPodiums, raceStats.totalPodiums, 0) AS totalPodiums,
+                        COALESCE(seasonStats.totalPolePositions, raceStats.totalPolePositions, 0) AS totalPolePositions,
+                        COALESCE(seasonStats.totalFastestLaps, raceStats.totalFastestLaps, 0) AS totalFastestLaps,
+                        seasonTeams.teams
 
-                    FROM seasons_driver_standings s
+                    FROM (
+                        SELECT year, driverId FROM seasons_drivers WHERE driverId = ?
+                        UNION
+                        SELECT year, driverId FROM races_race_results WHERE driverId = ?
+                    ) career
 
-                    WHERE s.driverId = ?
+                    LEFT JOIN seasons_drivers seasonStats
+                        ON seasonStats.driverId = career.driverId AND seasonStats.year = career.year
 
-                    ORDER BY s.year DESC
-                `, [req.params.id]),
+                    LEFT JOIN seasons_driver_standings s
+                        ON s.driverId = career.driverId AND s.year = career.year
+
+                    LEFT JOIN (
+                        SELECT rr.driverId, rr.year,
+                            SUM(CASE WHEN UPPER(COALESCE(rr.positionText, '')) NOT IN ('DNS', 'DNQ', 'DNPQ', 'WD') THEN 1 ELSE 0 END) AS totalRaceStarts,
+                            SUM(CASE WHEN rr.positionNumber = 1 THEN 1 ELSE 0 END) AS totalRaceWins,
+                            SUM(CASE WHEN rr.positionNumber BETWEEN 1 AND 3 THEN 1 ELSE 0 END) AS totalPodiums,
+                            SUM(CASE WHEN LOWER(CAST(rr.polePosition AS CHAR)) IN ('1', 'true') THEN 1 ELSE 0 END) AS totalPolePositions,
+                            SUM(CASE WHEN LOWER(CAST(rr.fastestLap AS CHAR)) IN ('1', 'true') THEN 1 ELSE 0 END) AS totalFastestLaps,
+                            SUM(COALESCE(rr.points, 0)) AS totalPoints
+                        FROM races_race_results rr
+                        WHERE rr.driverId = ?
+                        GROUP BY rr.driverId, rr.year
+                    ) raceStats ON raceStats.driverId = career.driverId AND raceStats.year = career.year
+
+                    LEFT JOIN (
+                        SELECT rr.driverId, rr.year,
+                            GROUP_CONCAT(DISTINCT k.name ORDER BY k.name SEPARATOR '||') AS teams
+                        FROM races_race_results rr
+                        JOIN constructors k ON k.id = rr.constructorId
+                        WHERE rr.driverId = ?
+                        GROUP BY rr.driverId, rr.year
+                    ) seasonTeams ON seasonTeams.driverId = career.driverId AND seasonTeams.year = career.year
+
+                    ORDER BY career.year DESC
+                `, [req.params.id, req.params.id, req.params.id, req.params.id]),
 
 
-                connection.query(`
-                    SELECT
-                        rr.raceId,
-                        rr.year,
-                        rr.round,
-                        rr.positionNumber,
-                        rr.positionText,
-                        rr.gridPositionNumber,
-                        rr.points,
-                        rr.laps,
-                        rr.pitStops,
-                        rr.fastestLap,
-                        rr.positionsGained,
-
-                        COALESCE(NULLIF(gp.fullName, ''), r.officialName) AS name,
-                        gp.shortName,
-                        r.officialName,
-                        r.date,
-
-                        COALESCE(NULLIF(c.fullName, ''), c.name) AS circuitName,
-
-                        k.name AS constructorName
-
-                    FROM races_race_results rr
-
-                    JOIN races r
-                        ON r.id = rr.raceId
-
-                    LEFT JOIN grands_prix gp
-                        ON gp.id = r.grandPrixId
-
-                    LEFT JOIN circuits c
-                        ON c.id = r.circuitId
-
-                    LEFT JOIN constructors k
-                        ON k.id = rr.constructorId
-
-                    WHERE rr.driverId = ?
-
-                    ORDER BY
-                        rr.year DESC,
-                        rr.round DESC
-
-                    LIMIT 200
-                `, [req.params.id])
+                summaryOnly ? Promise.resolve([]) : connection.query(F1_DRIVER_RESULTS_SQL, [req.params.id])
 
             ]);
 

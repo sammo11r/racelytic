@@ -129,7 +129,7 @@ test('modern F2 and F3 grids are derived from qualifying when official grid sess
 
 test('junior race API promotes best laps to practice and qualifying classification times', () => {
     const source = fs.readFileSync(path.join(__dirname, '../backend/routes/races.js'), 'utf8');
-    assert.match(source, /time: row\.time \|\| \(!isRace \? row\.fastestLapTime : null\)/);
-    assert.match(source, /gridPositionNumber: context\.gridByDriver/);
+    assert.match(source, /time: juniorClassificationTime\(row\.time\) \|\| \(!isRace \? juniorClassificationTime\(row\.fastestLapTime\) : null\)/);
+    assert.match(source, /gridPositionNumber: juniorClassificationPosition\(context\.gridByDriver/);
     assert.match(source, /name: 'Starting Grid'/);
 });

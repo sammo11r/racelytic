@@ -15,6 +15,8 @@ function f2CircuitRaceSummary(race) {
 }
 
 async function loadF2Circuit() {
+  const returnPath = params().get('return');
+  if (returnPath === '/f2/circuits' || returnPath?.startsWith('/f2/circuits?')) document.getElementById('circuit-back-link').href = returnPath;
   const id = params().get('id');
   if (!id) return setError('f2-circuit-head', 'No Formula 2 circuit selected.');
   try {

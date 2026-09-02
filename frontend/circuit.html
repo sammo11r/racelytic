@@ -2,11 +2,23 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/assets/favicon.svg" type="image/svg+xml"><title>Racelytic</title><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/polish.css"></head>
 <body>
 <div id="header"></div>
-<main class="container page">
-  <a class="back-link" href="/circuits"><span aria-hidden="true">←</span>All circuits</a>
-  <div id="circuit-head"></div>
-  <section class="detail-section"><div class="section-heading"><div><div class="eyebrow">CIRCUIT</div><h2>Track profile</h2></div></div><div id="circuit-stats" class="detail-stat-grid"></div></section>
-  <section class="detail-section"><div class="section-heading"><div><div class="eyebrow">HISTORY</div><h2>Races at this circuit</h2></div><div id="circuit-years" class="section-note"></div></div><div id="circuit-races" class="circuit-history-grid"></div></section>
+<main class="container page circuit-detail-page">
+  <a id="circuit-back-link" class="back-link" href="/circuits"><span aria-hidden="true">←</span>All circuits</a>
+  <div id="circuit-load-status" role="status"></div>
+  <div id="circuit-head" aria-busy="true"><div class="circuit-detail-skeleton circuit-hero-placeholder" aria-hidden="true"></div></div>
+  <section class="circuit-facts-section" aria-label="Circuit facts"><div id="circuit-stats" class="circuit-facts"><div class="circuit-detail-skeleton" aria-hidden="true"></div></div><p id="circuit-layout-note" class="section-note"></p></section>
+  <section id="circuit-upcoming" class="circuit-plain-section" aria-label="Scheduled appearances" hidden></section>
+  <section class="circuit-plain-section" aria-labelledby="circuit-records-title"><header class="section-heading"><div><div class="eyebrow">ALL-TIME RECORDS</div><h2 id="circuit-records-title">Circuit records</h2></div><a id="circuit-analysis-link" class="text-link" href="/circuit-analysis">Explore circuit analysis →</a></header><p class="section-note">Grand Prix wins across all recorded layouts.</p><div id="circuit-records" class="circuit-record-columns"><div class="circuit-detail-skeleton" aria-hidden="true"></div><div class="circuit-detail-skeleton" aria-hidden="true"></div></div></section>
+  <section class="circuit-plain-section" aria-labelledby="circuit-history-title">
+    <header class="section-heading"><div><div class="eyebrow">GRAND PRIX RESULTS</div><h2 id="circuit-history-title">Race history</h2></div><span id="circuit-years" class="section-note" aria-live="polite">Loading races…</span></header>
+    <div class="circuit-history-filters" role="search" aria-label="Filter race history">
+      <label><span>Search races or winners</span><input id="circuit-history-search" class="search" type="search" placeholder="Race, driver or constructor…"></label>
+      <label><span>Season</span><select id="circuit-history-season"><option value="">All seasons</option></select></label>
+      <label><span>Order by</span><select id="circuit-history-sort"><option value="newest">Newest first</option><option value="oldest">Oldest first</option></select></label>
+      <button id="circuit-history-clear" type="button" class="button secondary">Clear filters</button>
+    </div>
+    <div id="circuit-races" aria-busy="true"><div class="circuit-detail-skeleton circuit-history-placeholder" aria-hidden="true"></div></div>
+  </section>
 </main>
 <footer class="footer"><div class="container">Racelytic</div></footer>
 <script src="/js/utils.js"></script>

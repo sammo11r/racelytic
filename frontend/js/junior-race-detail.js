@@ -18,14 +18,46 @@ function juniorResultValue(value) {
   return value === null || value === undefined || value === '' ? '—' : esc(value);
 }
 
+function juniorResultFinish(result, isRace = true) {
+  const position = Number(result.positionNumber);
+  if (position >= 999) {
+    const status = String(result.status || '');
+    if (status && !/^(CLA|CLASSIFIED|FINISHED|RUNNING)$/i.test(status)) return status;
+    return position === 999 && isRace ? 'DNF' : 'NC';
+  }
+  return result.positionNumber || result.status || '—';
+}
+
 function juniorGap(result, useTimeFallback = true) {
   if (Number(result.gapLaps || 0) > 0) return `+${fmtNumber(result.gapLaps)} lap${Number(result.gapLaps) === 1 ? '' : 's'}`;
   if (Number(result.gapMillis || 0) > 0) return `+${(Number(result.gapMillis) / 1000).toFixed(3)}s`;
-  return (useTimeFallback ? result.time : null) || result.status || '—';
+  const status = Number(result.positionNumber) >= 999 ? juniorResultFinish(result) : result.status;
+  return (useTimeFallback ? juniorTime(result) : null) || juniorTimingText(status) || '—';
+}
+
+function juniorTimingText(value) {
+  const text = String(value ?? '').trim();
+  return !text || /^(CLA|CLASSIFIED|FINISHED|RUNNING)$/i.test(text) ? null : text;
+}
+
+function juniorTime(result) {
+  const text = juniorTimingText(result.time);
+  if (text) return text;
+  const millis = Math.round(Number(result.timeMillis));
+  if (!Number.isFinite(millis) || millis <= 0) return null;
+  const hours = Math.floor(millis / 3600000);
+  const minutes = Math.floor(millis / 60000) % 60;
+  const seconds = (millis % 60000 / 1000).toFixed(3).padStart(6, '0');
+  return hours ? `${hours}:${String(minutes).padStart(2, '0')}:${seconds}` : `${minutes}:${seconds}`;
+}
+
+function juniorGridValue(value) {
+  const grid = Number(value);
+  return Number.isInteger(grid) && grid > 0 && grid < 999 ? esc(grid) : '—';
 }
 
 function juniorResultStatusClass(result) {
-  const status = String(result.status || '').toUpperCase();
+  const status = String(Number(result.positionNumber) >= 999 ? juniorResultFinish(result) : result.status || '').toUpperCase();
   if (/DSQ|DQ|DISQ|EXC/.test(status)) return ' disqualified';
   if (/DNS|DID NOT START/.test(status)) return ' did-not-start';
   if (/DNF|RET|NC/.test(status) || (!Number(result.positionNumber) && status)) return ' retired';
@@ -40,7 +72,7 @@ function juniorResultMarkers(result) {
 function juniorGridMovement(result) {
   const finish = Number(result.positionNumber);
   const grid = Number(result.gridPositionNumber);
-  if (!finish || !grid) return '—';
+  if (!finish || !grid || finish >= 999 || grid >= 999) return '—';
   const places = grid - finish;
   if (!places) return '<span class="grid-movement same" title="Finished in the starting position">—</span>';
   return `<span class="grid-movement ${places > 0 ? 'gained' : 'lost'}" title="${Math.abs(places)} place${Math.abs(places) === 1 ? '' : 's'} ${places > 0 ? 'gained' : 'lost'}">${places > 0 ? '↑' : '↓'}${Math.abs(places)}</span>`;
@@ -136,7 +168,7 @@ function renderJuniorRaceOverview(status) {
     <div class="race-podium-card"><div class="eyebrow">${esc(juniorSessionName(session).toUpperCase())} PODIUM</div><ol>${podium.map(result => `<li><span>${result.positionNumber}</span><div>${juniorDriverLink(result)}<small>${esc(result.constructorName || '—')}</small></div></li>`).join('')}</ol></div>
     <div class="race-summary-facts">
       <div><span>Winner</span><strong>${esc(winner?.driverName || '—')}</strong><small>${winner?.constructorName ? esc(winner.constructorName) : 'Classification pending'}</small></div>
-      <div><span>Winning margin</span><strong>${esc(runnerUp ? juniorGap(runnerUp, false) : winner?.time || '—')}</strong><small>${runnerUp ? 'To second place' : 'Winner’s race time'}</small></div>
+      <div><span>Winning margin</span><strong>${esc(runnerUp ? juniorGap(runnerUp, false) : juniorTime(winner || {}) || '—')}</strong><small>${runnerUp ? 'To second place' : 'Winner’s race time'}</small></div>
       <div><span>Pole position</span><strong>${esc(pole?.driverName || '—')}</strong><small>${pole?.constructorName ? esc(pole.constructorName) : 'Not recorded'}</small></div>
       <div><span>Fastest lap</span><strong>${esc(fastest?.driverName || '—')}</strong><small>${fastest?.fastestLapTime ? esc(fastest.fastestLapTime) : fastest?.constructorName ? esc(fastest.constructorName) : 'Not recorded'}</small></div>
       <div><span>Race attrition</span><strong>${fmtNumber(retirements)} retirement${retirements === 1 ? '' : 's'}</strong><small>${fmtNumber(session.results.length - retirements)} classified</small></div>
@@ -152,13 +184,13 @@ function renderJuniorDesktopResults(session) {
       ? '<th>Pos.</th><th>Driver</th><th>Team</th><th>Number</th>'
       : '<th>Pos.</th><th>Driver</th><th>Team</th><th>Time</th><th>Gap</th><th>Laps</th>';
   return `<div class="table-wrap race-results-table-wrap"><table class="session-results-table"><thead><tr>${heading}</tr></thead><tbody>${session.results.map(result => {
-    const position = juniorResultValue(result.positionNumber || result.status);
+    const position = juniorResultValue(juniorResultFinish(result, kind === 'race'));
     const driver = `${juniorDriverLink(result)}${result.driverNumber ? `<small>#${esc(result.driverNumber)}${result.abbreviation ? ` · ${esc(result.abbreviation)}` : ''}</small>` : ''}`;
     const rowClass = juniorResultStatusClass(result).trim();
     const positionCell = `<span class="finish-position${juniorResultStatusClass(result)}">${position}</span>`;
-    if (kind === 'race') return `<tr class="${rowClass}"><td>${positionCell}</td><td>${driver}${juniorResultMarkers(result)}</td><td>${juniorTeamLink(result)}</td><td>${juniorResultValue(result.gridPositionNumber)}</td><td>${juniorGridMovement(result)}</td><td>${juniorResultValue(result.laps)}</td><td>${esc(juniorGap(result))}</td><td class="result-points-total">${result.points === null ? '—' : fmtNumber(result.points)}</td></tr>`;
+    if (kind === 'race') return `<tr class="${rowClass}"><td>${positionCell}</td><td>${driver}${juniorResultMarkers(result)}</td><td>${juniorTeamLink(result)}</td><td>${juniorGridValue(result.gridPositionNumber)}</td><td>${juniorGridMovement(result)}</td><td>${juniorResultValue(result.laps)}</td><td>${esc(juniorGap(result))}</td><td class="result-points-total">${result.points === null ? '—' : fmtNumber(result.points)}</td></tr>`;
     if (kind === 'grid') return `<tr class="${rowClass}"><td>${positionCell}</td><td>${driver}</td><td>${juniorTeamLink(result)}</td><td>${juniorResultValue(result.driverNumber)}</td></tr>`;
-    return `<tr class="${rowClass}"><td>${positionCell}</td><td>${driver}${juniorResultMarkers(result)}</td><td>${juniorTeamLink(result)}</td><td>${juniorResultValue(result.time)}</td><td>${esc(juniorGap(result, false))}</td><td>${juniorResultValue(result.laps)}</td></tr>`;
+    return `<tr class="${rowClass}"><td>${positionCell}</td><td>${driver}${juniorResultMarkers(result)}</td><td>${juniorTeamLink(result)}</td><td>${juniorResultValue(juniorTime(result))}</td><td>${esc(juniorGap(result, false))}</td><td>${juniorResultValue(result.laps)}</td></tr>`;
   }).join('')}</tbody></table></div>`;
 }
 
@@ -166,12 +198,12 @@ function renderJuniorMobileResults(session) {
   const kind = juniorSessionKind(session);
   return `<div class="session-result-cards">${session.results.map(result => {
     const details = kind === 'race'
-      ? [['Grid', juniorResultValue(result.gridPositionNumber)], ['Change', juniorGridMovement(result)], ['Laps', juniorResultValue(result.laps)], ['Time / status', esc(juniorGap(result))], ['Points', result.points === null ? '—' : fmtNumber(result.points)]]
+      ? [['Grid', juniorGridValue(result.gridPositionNumber)], ['Change', juniorGridMovement(result)], ['Laps', juniorResultValue(result.laps)], ['Time / status', esc(juniorGap(result))], ['Points', result.points === null ? '—' : fmtNumber(result.points)]]
       : kind === 'grid'
         ? [['Grid number', juniorResultValue(result.driverNumber)]]
-        : [['Time', juniorResultValue(result.time)], ['Gap', esc(juniorGap(result, false))], ['Laps', juniorResultValue(result.laps)]];
+        : [['Time', juniorResultValue(juniorTime(result))], ['Gap', esc(juniorGap(result, false))], ['Laps', juniorResultValue(result.laps)]];
     return `<article class="session-result-card${juniorResultStatusClass(result)}">
-      <div class="session-result-card-head"><span class="finish-position${juniorResultStatusClass(result)}">${juniorResultValue(result.positionNumber || result.status)}</span><div>${juniorDriverLink(result)}<small>${esc(result.constructorName || '—')}${result.driverNumber ? ` · #${esc(result.driverNumber)}` : ''}</small></div><div class="result-card-markers">${juniorResultMarkers(result)}</div></div>
+      <div class="session-result-card-head"><span class="finish-position${juniorResultStatusClass(result)}">${juniorResultValue(juniorResultFinish(result, kind === 'race'))}</span><div>${juniorDriverLink(result)}<small>${esc(result.constructorName || '—')}${result.driverNumber ? ` · #${esc(result.driverNumber)}` : ''}</small></div><div class="result-card-markers">${juniorResultMarkers(result)}</div></div>
       <dl>${details.map(([label, value]) => `<div><dt>${label}</dt><dd>${value}</dd></div>`).join('')}</dl>
     </article>`;
   }).join('')}</div>`;

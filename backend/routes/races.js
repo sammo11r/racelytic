@@ -5,17 +5,9 @@ const { f2SessionType, f3SessionType, academySessionType } = require('./seasons'
 const { isJuniorSeries, minimumSeasonYear, seriesPrefix } = require('../series-config');
 const { academyRaceAwardsPole, academyRaceDisplayName, academyRaceGridContext } = require('../academy-race-analysis');
 const { juniorRaceGridContext } = require('../junior-race-analysis');
+const { juniorClassificationPosition, juniorClassificationStatus, juniorClassificationTime } = require('../junior-classification');
 
 const router = express.Router();
-
-function juniorClassificationPosition(value) {
-    const position = Number(value);
-    return Number.isInteger(position) && position > 0 && position < 1000 ? position : null;
-}
-
-function juniorClassificationStatus(status, value) {
-    return status || (Number(value) >= 1000 ? 'NC' : null);
-}
 
 // ============================================================
 // Races
@@ -120,8 +112,8 @@ router.get('/api/races/:id', async (req, res) => {
                     resultsBySession.get(sessionId).push({
                         ...row,
                         positionNumber,
-                        status: juniorClassificationStatus(row.status, row.positionNumber),
-                        time: row.time || (!isRace ? row.fastestLapTime : null),
+                        status: juniorClassificationStatus(row.status, row.positionNumber, isRace),
+                        time: juniorClassificationTime(row.time) || (!isRace ? juniorClassificationTime(row.fastestLapTime) : null),
                         timeMillis: row.timeMillis || (!isRace ? row.fastestLapTimeMillis : null),
                         points: isDisqualified(row) ? 0 : row.points === null ? null : Number(row.points),
                         laps: row.laps === null ? null : Number(row.laps),
@@ -146,8 +138,8 @@ router.get('/api/races/:id', async (req, res) => {
                             : null;
                         const results = (resultsBySession.get(String(session.id)) || []).map(result => !context ? result : ({
                             ...result,
-                            qualificationPositionNumber: context.qualificationByDriver.get(String(result.driverId)) ?? null,
-                            gridPositionNumber: context.gridByDriver.get(String(result.driverId)) ?? null,
+                            qualificationPositionNumber: juniorClassificationPosition(context.qualificationByDriver.get(String(result.driverId))),
+                            gridPositionNumber: juniorClassificationPosition(context.gridByDriver.get(String(result.driverId))),
                             polePosition: series === 'academy' ? Boolean(
                                 academyRaceAwardsPole({ ...session, isRace: true }, normalizedSessions, raceRows[0].year)
                                 && context.gridByDriver.get(String(result.driverId)) === 1

@@ -1,3 +1,5 @@
+const { juniorClassificationPosition } = require('./junior-classification');
+
 function academyRaceDisplayName(session) {
     return String(session?.name || 'Race');
 }
@@ -35,10 +37,10 @@ function academyRaceGridContext(session, sessions, resultsBySession, year) {
     }
 
     const qualificationResults = qualifying ? resultsBySession.get(String(qualifying.id)) || [] : [];
-    const qualificationByDriver = new Map(qualificationResults.map(result => [String(result.driverId), result.positionNumber]));
+    const qualificationByDriver = new Map(qualificationResults.map(result => [String(result.driverId), juniorClassificationPosition(result.positionNumber)]));
     const gridByDriver = new Map(qualificationResults.map(result => {
-        const position = Number(result.positionNumber);
-        return [String(result.driverId), reverseTopEight && position >= 1 && position <= 8 ? 9 - position : result.positionNumber];
+        const position = juniorClassificationPosition(result.positionNumber);
+        return [String(result.driverId), reverseTopEight && position >= 1 && position <= 8 ? 9 - position : position];
     }));
     return { qualificationByDriver, gridByDriver, gridNote };
 }

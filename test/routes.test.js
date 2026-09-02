@@ -41,6 +41,7 @@ test('all public API routes remain registered after modularization', () => {
         '/api/drivers',
         '/api/drivers/:id',
         '/api/drivers/:id/form',
+        '/api/drivers/:id/results',
         '/api/drivers/:id/teammates',
         '/api/drivers/compare',
         '/api/games/race-winners',

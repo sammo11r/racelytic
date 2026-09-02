@@ -2,22 +2,39 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/assets/favicon.svg" type="image/svg+xml"><title>Racelytic</title><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/polish.css"></head>
 <body>
 <div id="header"></div>
-<main class="container page">
-  <div class="page-head"><div><div class="eyebrow">THE GRID</div><h1>Drivers</h1><p>Browse the drivers in the F1DB dataset.</p></div><input class="search" id="search" type="search" aria-label="Search drivers" placeholder="Search drivers..."></div>
-  <div class="browser-toolbar">
-    <div class="browser-count" id="driver-count" aria-live="polite"></div>
-    <label class="sort-control" for="driver-sort">
-      <span>Order by</span>
-      <select id="driver-sort">
-        <option value="name-asc">Name A–Z</option>
-        <option value="name-desc">Name Z–A</option>
-        <option value="recent">Most recent season</option>
-        <option value="best-finish">Best championship finish</option>
-        <option value="wins-desc">Most wins</option>
-      </select>
-    </label>
+<main class="container page drivers-page">
+  <header class="page-head drivers-page-head"><div><div class="eyebrow">THE GRID</div><h1>Drivers</h1><p>Explore every Formula 1 driver, from the current grid to the earliest championship seasons.</p></div></header>
+  <section class="driver-browser" aria-labelledby="driver-browser-title">
+    <div class="driver-browser-primary">
+      <div><h2 id="driver-browser-title">Find a driver</h2></div>
+      <div id="driver-view" class="standings-mode driver-view" role="tablist" aria-label="Driver archive view">
+        <button type="button" class="standings-mode-button active" role="tab" data-view="current" aria-selected="true">Current grid</button>
+        <button type="button" class="standings-mode-button" role="tab" data-view="all" aria-selected="false">All-time archive</button>
+      </div>
+    </div>
+    <div class="driver-filter-grid" role="search" aria-label="Filter drivers">
+      <label class="driver-search-field"><span>Search</span><input class="search" id="search" type="search" placeholder="Name, code, number, country or season…" autocomplete="off"></label>
+      <label><span>Season</span><select id="driver-season"><option value="">All seasons</option></select></label>
+      <label><span>Nationality</span><select id="driver-country"><option value="">All nationalities</option></select></label>
+      <label><span>Achievement</span><select id="driver-achievement"><option value="all">All drivers</option><option value="champions">World champions</option><option value="winners">Race winners</option><option value="podiums">Podium finishers</option></select></label>
+      <label><span>Order by</span><select id="driver-sort"><option value="recent">Most recent season</option><option value="name-asc">Name A–Z</option><option value="name-desc">Name Z–A</option><option value="best-finish">Best championship finish</option><option value="wins-desc">Most wins</option><option value="starts-desc">Most starts</option></select></label>
+      <button type="button" id="driver-clear" class="button secondary driver-clear">Clear filters</button>
+    </div>
+  </section>
+  <div class="driver-browser-toolbar">
+    <div class="browser-count" id="driver-count" aria-live="polite">Loading drivers…</div>
+    <nav id="driver-letters" class="driver-letters" aria-label="Jump to driver surname initial"></nav>
   </div>
-  <div id="drivers" class="entity-grid"></div>
+  <div id="drivers" class="entity-grid driver-archive-grid" aria-busy="true" aria-label="Loading Formula 1 drivers">
+    <div class="f1-driver-archive-card driver-card-skeleton" aria-hidden="true"><i></i><b></b><span></span><em></em></div>
+    <div class="f1-driver-archive-card driver-card-skeleton" aria-hidden="true"><i></i><b></b><span></span><em></em></div>
+    <div class="f1-driver-archive-card driver-card-skeleton" aria-hidden="true"><i></i><b></b><span></span><em></em></div>
+    <div class="f1-driver-archive-card driver-card-skeleton" aria-hidden="true"><i></i><b></b><span></span><em></em></div>
+    <div class="f1-driver-archive-card driver-card-skeleton" aria-hidden="true"><i></i><b></b><span></span><em></em></div>
+    <div class="f1-driver-archive-card driver-card-skeleton" aria-hidden="true"><i></i><b></b><span></span><em></em></div>
+    <div class="f1-driver-archive-card driver-card-skeleton" aria-hidden="true"><i></i><b></b><span></span><em></em></div>
+    <div class="f1-driver-archive-card driver-card-skeleton" aria-hidden="true"><i></i><b></b><span></span><em></em></div>
+  </div>
 </main>
 <footer class="footer"><div class="container">Racelytic</div></footer>
 <script src="/js/utils.js"></script>

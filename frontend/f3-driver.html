@@ -1,23 +1,21 @@
 <!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="description" content="Explore a Formula 3 driver's championship and race history.">
-  <link rel="icon" href="/assets/favicon-f3.svg" type="image/svg+xml">
-  <title>Formula 3 Driver · Racelytic</title>
-  <link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/polish.css">
-</head>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="Explore a Formula 3 driver's career, seasons and race results."><link rel="icon" href="/assets/favicon-f3.svg" type="image/svg+xml"><title>Formula 3 Driver · Racelytic</title><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/polish.css"></head>
 <body class="f3-mode">
-  <div id="header"></div>
-  <main class="container page">
-    <a class="back-link" href="/f3/drivers"><span aria-hidden="true">←</span> All F3 drivers</a>
-    <div id="f3-driver-head"></div>
-    <section class="detail-section"><div class="section-heading"><div><div class="eyebrow">FORMULA 3 RECORD</div><h2>At a glance</h2></div></div><div id="f3-driver-stats" class="detail-stat-grid"></div></section>
-    <section class="detail-section"><div class="section-heading"><div><div class="eyebrow">CHAMPIONSHIP HISTORY</div><h2>Season by season</h2></div><div id="f3-driver-career-span" class="section-note"></div></div><div id="f3-driver-seasons"></div></section>
-    <section class="detail-section"><div class="section-heading"><div><div class="eyebrow">RACE HISTORY</div><h2>Sprint and feature races</h2></div><div class="section-note">Latest 300 starts</div></div><div id="f3-driver-results" class="table-wrap detail-results f2-driver-results"></div></section>
-  </main>
-  <footer class="footer"><div class="container">Racelytic</div></footer>
-  <script src="/js/utils.js"></script><script src="/js/header.js"></script><script src="/js/f3-driver.js"></script>
-</body>
-</html>
+<div id="header"></div>
+<main class="container page driver-detail-page">
+  <a id="driver-back-link" class="back-link" href="/f3/drivers"><span aria-hidden="true">←</span>All F3 drivers</a>
+  <div id="driver-head" aria-busy="true"><section class="detail-hero profile-hero driver-profile-hero driver-detail-skeleton" aria-hidden="true"><div><b></b><span></span><em></em></div></section></div>
+  <section class="detail-section driver-plain-section"><div class="section-heading"><div><div class="eyebrow">CAREER</div><h2>At a glance</h2></div></div><div id="driver-stats" class="detail-stat-grid driver-stat-grid" aria-busy="true"><div class="detail-stat driver-stat-skeleton"></div><div class="detail-stat driver-stat-skeleton"></div><div class="detail-stat driver-stat-skeleton"></div><div class="detail-stat driver-stat-skeleton"></div><div class="detail-stat driver-stat-skeleton"></div><div class="detail-stat driver-stat-skeleton"></div><div class="detail-stat driver-stat-skeleton"></div><div class="detail-stat driver-stat-skeleton"></div></div></section>
+  <section class="detail-section driver-plain-section driver-timeline-section"><div class="section-heading driver-timeline-heading"><div><div class="eyebrow">CAREER TIMELINE</div><h2>Season by season</h2></div><div class="driver-timeline-actions"><div id="driver-career-span" class="section-note"></div><button id="driver-timeline-previous" type="button" aria-label="Earlier seasons" disabled>←</button><button id="driver-timeline-next" type="button" aria-label="Later seasons" disabled>→</button></div></div><div id="driver-seasons" class="driver-timeline-card" aria-busy="true"><div class="career-timeline driver-timeline-skeleton" aria-hidden="true"><i></i><i></i><i></i><i></i></div></div></section>
+  <section class="detail-section driver-plain-section driver-results-section"><div class="section-heading"><div><div class="eyebrow">RESULTS</div><h2>Race history</h2></div><div class="section-note">Complete F3 record</div></div>
+    <div class="driver-result-filters" role="search" aria-label="Filter race history"><label><span>Search</span><input id="driver-result-search" type="search" placeholder="Race, circuit or constructor…" autocomplete="off"></label><label><span>Season</span><select id="driver-result-season"><option value="">All seasons</option></select></label><label><span>Result</span><select id="driver-result-outcome"><option value="all">All results</option><option value="wins">Wins</option><option value="podiums">Podiums</option><option value="points">Points finishes</option><option value="retirements">Retirements</option></select></label><button id="driver-result-clear" type="button" class="button secondary">Clear</button></div>
+    <div id="driver-result-count" class="browser-count" aria-live="polite">Loading race history…</div>
+    <div id="driver-results" class="table-wrap detail-results" aria-busy="true"><div class="driver-results-skeleton" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div></div>
+  </section>
+</main>
+<footer class="footer"><div class="container">Racelytic</div></footer>
+<script src="/js/utils.js"></script>
+<script src="/js/header.js"></script>
+<script src="/js/f3-driver.js"></script>
+<script src="/js/driver.js"></script>
+</body></html>

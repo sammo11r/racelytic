@@ -28,6 +28,8 @@ function f3CircuitRaceSummary(race) {
 }
 
 async function loadF3Circuit() {
+  const returnPath = params().get('return');
+  if (returnPath === '/f3/circuits' || returnPath?.startsWith('/f3/circuits?')) document.getElementById('circuit-back-link').href = returnPath;
   const id = params().get('id');
   if (!id) return setError('f3-circuit-head', 'No Formula 3 circuit selected.');
   try {
