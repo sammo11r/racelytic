@@ -1,7 +1,35 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" href="/assets/favicon.svg" type="image/svg+xml"><title>Racelytic</title><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/polish.css"></head>
-<body><div id="header"></div><main class="container page">
-  <div class="page-head"><div><div class="eyebrow">CARS & POWER UNITS</div><h1>Chassis</h1><p>Every Formula 1 chassis and the engines that powered it.</p></div><input class="search" id="chassis-search" type="search" aria-label="Search chassis, constructors or engines" placeholder="Search chassis, constructor or engine…"></div>
-  <div class="browser-toolbar"><div class="browser-count" id="chassis-count" aria-live="polite"></div><label class="sort-control"><span>Engine</span><select id="chassis-engine"><option value="">All manufacturers</option></select></label></div>
-  <div id="chassis" class="constructor-chassis-grid chassis-browser-grid"></div>
-</main><footer class="footer"><div class="container">Racelytic</div></footer><script src="/js/utils.js"></script><script src="/js/header.js"></script><script src="/js/chassis.js"></script></body></html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Explore current and historic Formula 1 chassis by season, constructor, engine and performance."><link rel="icon" href="/assets/favicon.svg" type="image/svg+xml"><title>Formula 1 Chassis · Racelytic</title><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/polish.css"></head>
+<body><div id="header"></div>
+<main class="container page chassis-page">
+  <header class="page-head drivers-page-head"><div><div class="eyebrow">CARS &amp; POWER UNITS</div><h1>Chassis</h1><p>Explore the current Formula 1 grid and every recorded chassis in the archive.</p></div></header>
+  <section class="driver-browser chassis-browser" aria-labelledby="chassis-browser-title">
+    <div class="driver-browser-primary"><h2 id="chassis-browser-title">Find a chassis</h2>
+      <div class="standings-mode" role="group" aria-label="Chassis archive view">
+        <button type="button" class="standings-mode-button active" data-chassis-view="current" aria-pressed="true">Current grid</button>
+        <button type="button" class="standings-mode-button" data-chassis-view="all" aria-pressed="false">All chassis</button>
+      </div>
+    </div>
+    <div class="driver-filter-grid chassis-filter-grid" role="search" aria-label="Filter chassis">
+      <label class="driver-search-field"><span>Search</span><input class="search" id="chassis-search" type="search" placeholder="Chassis, constructor or engine…" autocomplete="off"></label>
+      <label><span>Season</span><select id="chassis-season"><option value="">Current season</option></select></label>
+      <label><span>Engine manufacturer</span><select id="chassis-engine"><option value="">All manufacturers</option></select></label>
+      <label><span>Order by</span><select id="chassis-sort"><option value="name">Name A–Z</option><option value="recent">Most recent</option><option value="starts">Most race starts</option><option value="wins">Most race wins</option></select></label>
+      <button type="button" id="chassis-clear" class="button secondary driver-clear">Clear filters</button>
+    </div>
+  </section>
+  <div class="driver-browser-toolbar"><span id="chassis-count" class="browser-count" aria-live="polite">Loading chassis…</span><span id="chassis-load-status" class="section-note" role="status"></span></div>
+  <div id="chassis" class="entity-grid chassis-archive-grid" aria-busy="true" aria-label="Formula 1 chassis">
+    <div class="chassis-archive-card chassis-card-skeleton" aria-hidden="true"><i></i><b></b><span></span><em></em></div>
+    <div class="chassis-archive-card chassis-card-skeleton" aria-hidden="true"><i></i><b></b><span></span><em></em></div>
+    <div class="chassis-archive-card chassis-card-skeleton" aria-hidden="true"><i></i><b></b><span></span><em></em></div>
+    <div class="chassis-archive-card chassis-card-skeleton" aria-hidden="true"><i></i><b></b><span></span><em></em></div>
+    <div class="chassis-archive-card chassis-card-skeleton" aria-hidden="true"><i></i><b></b><span></span><em></em></div>
+    <div class="chassis-archive-card chassis-card-skeleton" aria-hidden="true"><i></i><b></b><span></span><em></em></div>
+    <div class="chassis-archive-card chassis-card-skeleton" aria-hidden="true"><i></i><b></b><span></span><em></em></div>
+    <div class="chassis-archive-card chassis-card-skeleton" aria-hidden="true"><i></i><b></b><span></span><em></em></div>
+  </div>
+</main>
+<footer class="footer"><div class="container">Racelytic</div></footer>
+<script src="/js/utils.js"></script><script src="/js/header.js"></script><script src="/js/chassis.js"></script>
+</body></html>

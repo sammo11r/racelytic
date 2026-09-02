@@ -1,20 +1,39 @@
 <!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="description" content="Browse every Formula 3 team in Racelytic.">
-  <link rel="icon" href="/assets/favicon-f3.svg" type="image/svg+xml">
-  <title>Formula 3 Teams · Racelytic</title>
-  <link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/polish.css">
-</head>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="Explore Formula 3 teams, from the current grid to historic teams. Filter by season, nationality and championship wins."><link rel="icon" href="/assets/favicon-f3.svg" type="image/svg+xml"><title>Formula 3 Teams · Racelytic</title><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/polish.css"></head>
 <body class="f3-mode">
-  <div id="header"></div>
-  <main class="container page">
-    <div class="page-head"><div><div class="eyebrow">FORMULA 3 PADDOCK</div><h1>Teams</h1><p>Explore every team’s FIA Formula 3 championship history, drivers and race results.</p></div><input class="search" id="f3-team-search" type="search" aria-label="Search Formula 3 teams" placeholder="Search teams..."></div>
-    <div class="browser-toolbar"><span id="f3-team-count" class="browser-count">Loading teams…</span><label class="sort-control">Sort <select id="f3-team-sort"><option value="recent">Most recent</option><option value="name">Name</option><option value="wins">Race wins</option><option value="titles">Championships</option></select></label></div>
-    <div id="f3-teams" class="entity-grid"></div>
-  </main>
-  <footer class="footer"><div class="container">Racelytic</div></footer>
-  <script src="/js/utils.js"></script><script src="/js/header.js"></script><script src="/js/f3-teams.js"></script>
-</body>
-</html>
+<div id="header"></div>
+<main class="container page constructors-page">
+  <header class="page-head drivers-page-head"><div><div class="eyebrow">TEAMS &amp; HISTORY</div><h1>Teams</h1><p>Explore the current Formula 3 grid and the teams that shaped its history.</p></div></header>
+  <section class="driver-browser constructor-browser" aria-labelledby="constructor-browser-title">
+    <div class="driver-browser-primary"><h2 id="constructor-browser-title">Find a team</h2>
+      <div class="standings-mode" role="group" aria-label="Team archive view">
+        <button type="button" class="standings-mode-button active" data-constructor-view="current" aria-pressed="true">Current grid</button>
+        <button type="button" class="standings-mode-button" data-constructor-view="all" aria-pressed="false">All teams</button>
+      </div>
+    </div>
+    <div class="driver-filter-grid constructor-filter-grid" role="search" aria-label="Filter teams">
+      <label class="driver-search-field"><span>Search</span><input class="search" id="search" type="search" placeholder="Team name or nationality…" autocomplete="off"></label>
+      <label><span>Season</span><select id="constructor-season"><option value="">Current season</option></select></label>
+      <label><span>Nationality</span><select id="constructor-country"><option value="">All nationalities</option></select></label>
+      <label><span>Achievements</span><select id="constructor-type"><option value="">All teams</option></select></label>
+      <label><span>Order by</span><select id="constructor-sort"><option value="name">Name A–Z</option><option value="recent">Most recent</option><option value="starts">Most race starts</option><option value="wins">Most race wins</option><option value="titles">Most teams’ titles</option></select></label>
+      <button type="button" id="constructor-clear" class="button secondary driver-clear">Clear filters</button>
+    </div>
+  </section>
+  <div class="driver-browser-toolbar"><span id="constructor-count" class="browser-count" aria-live="polite">Loading teams…</span><span id="constructor-load-status" class="section-note" role="status"></span></div>
+  <div id="constructors" class="entity-grid constructor-archive-grid" aria-busy="true" aria-label="Formula 3 teams">
+    <div class="constructor-archive-card constructor-card-skeleton" aria-hidden="true"><i></i><b></b><span></span><em></em></div>
+    <div class="constructor-archive-card constructor-card-skeleton" aria-hidden="true"><i></i><b></b><span></span><em></em></div>
+    <div class="constructor-archive-card constructor-card-skeleton" aria-hidden="true"><i></i><b></b><span></span><em></em></div>
+    <div class="constructor-archive-card constructor-card-skeleton" aria-hidden="true"><i></i><b></b><span></span><em></em></div>
+    <div class="constructor-archive-card constructor-card-skeleton" aria-hidden="true"><i></i><b></b><span></span><em></em></div>
+    <div class="constructor-archive-card constructor-card-skeleton" aria-hidden="true"><i></i><b></b><span></span><em></em></div>
+    <div class="constructor-archive-card constructor-card-skeleton" aria-hidden="true"><i></i><b></b><span></span><em></em></div>
+    <div class="constructor-archive-card constructor-card-skeleton" aria-hidden="true"><i></i><b></b><span></span><em></em></div>
+  </div>
+</main>
+<footer class="footer"><div class="container">Racelytic</div></footer>
+<script src="/js/utils.js"></script>
+<script src="/js/header.js"></script>
+<script src="/js/constructors.js"></script>
+</body></html>

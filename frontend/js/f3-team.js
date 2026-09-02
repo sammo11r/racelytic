@@ -12,6 +12,8 @@ function f3TeamCountry(code) {
 }
 
 async function loadF3Team() {
+  const returnPath = params().get('return');
+  if (returnPath === '/f3/teams' || returnPath?.startsWith('/f3/teams?')) document.getElementById('constructor-back-link').href = returnPath;
   const id = params().get('id');
   if (!id) return setError('f3-team-head', 'No Formula 3 team selected.');
   try {

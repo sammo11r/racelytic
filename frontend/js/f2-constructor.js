@@ -3,6 +3,8 @@ function f2ConstructorStat(label, value, highlight = false) {
 }
 
 async function loadF2Constructor() {
+  const returnPath = params().get('return');
+  if (returnPath === '/f2/constructors' || returnPath?.startsWith('/f2/constructors?')) document.getElementById('constructor-back-link').href = returnPath;
   const id = params().get('id');
   if (!id) return setError('f2-constructor-head', 'No Formula 2 constructor selected.');
   try {

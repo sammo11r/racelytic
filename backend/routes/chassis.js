@@ -117,31 +117,68 @@ router.get('/api/chassis', async (req, res) => {
         }
         const rows = await withConnection(connection => connection.query(`
             SELECT ch.id, ch.constructorId, ch.name, ch.fullName,
-                k.name AS constructorName,
-                MIN(sec.year) AS firstYear,
-                MAX(sec.year) AS lastYear,
-                GROUP_CONCAT(DISTINCT em.id ORDER BY em.name SEPARATOR '||') AS engineManufacturerIds,
-                GROUP_CONCAT(DISTINCT em.name ORDER BY em.name SEPARATOR '||') AS engineManufacturers,
-                GROUP_CONCAT(DISTINCT e.fullName ORDER BY e.fullName SEPARATOR '||') AS engines
+                k.name AS constructorName, current.year AS currentSeason,
+                career.seasonYears, career.firstYear, career.lastYear,
+                career.engineManufacturerIds, career.engineManufacturers, career.engines,
+                COALESCE(performance.totalRaceStarts, 0) AS totalRaceStarts,
+                COALESCE(performance.totalRaceWins, 0) AS totalRaceWins,
+                COALESCE(performance.totalPodiums, 0) AS totalPodiums,
+                COALESCE(performance.totalPolePositions, 0) AS totalPolePositions,
+                COALESCE(performance.totalPoints, 0) AS totalPoints,
+                COALESCE(performance.performanceSeasons, 0) AS performanceSeasons
             FROM chassis ch
             LEFT JOIN constructors k ON k.id = ch.constructorId
-            LEFT JOIN seasons_entrants_chassis sec ON sec.chassisId = ch.id
-            LEFT JOIN engine_manufacturers em ON em.id = sec.engineManufacturerId
-            LEFT JOIN seasons_entrants_engines see
-                ON see.year = sec.year AND see.entrantId = sec.entrantId
-                AND see.constructorId = sec.constructorId
-                AND see.engineManufacturerId = sec.engineManufacturerId
-            LEFT JOIN engines e ON e.id = see.engineId
-            GROUP BY ch.id, ch.constructorId, ch.name, ch.fullName, k.name
-            ORDER BY COALESCE(MAX(sec.year), 0) DESC, ch.fullName
+            CROSS JOIN (SELECT MAX(year) AS year FROM races) current
+            LEFT JOIN (
+                SELECT sec.chassisId,
+                    GROUP_CONCAT(DISTINCT sec.year ORDER BY sec.year DESC SEPARATOR ',') AS seasonYears,
+                    MIN(sec.year) AS firstYear, MAX(sec.year) AS lastYear,
+                    GROUP_CONCAT(DISTINCT em.id ORDER BY em.name SEPARATOR '||') AS engineManufacturerIds,
+                    GROUP_CONCAT(DISTINCT em.name ORDER BY em.name SEPARATOR '||') AS engineManufacturers,
+                    GROUP_CONCAT(DISTINCT e.fullName ORDER BY e.fullName SEPARATOR '||') AS engines
+                FROM seasons_entrants_chassis sec
+                LEFT JOIN engine_manufacturers em ON em.id = sec.engineManufacturerId
+                LEFT JOIN seasons_entrants_engines see
+                    ON see.year = sec.year AND see.entrantId = sec.entrantId
+                    AND see.constructorId = sec.constructorId
+                    AND see.engineManufacturerId = sec.engineManufacturerId
+                LEFT JOIN engines e ON e.id = see.engineId
+                GROUP BY sec.chassisId
+            ) career ON career.chassisId = ch.id
+            LEFT JOIN (
+                SELECT singleChassis.chassisId, COUNT(DISTINCT season.year) AS performanceSeasons,
+                    SUM(season.totalRaceStarts) AS totalRaceStarts,
+                    SUM(season.totalRaceWins) AS totalRaceWins,
+                    SUM(season.totalPodiums) AS totalPodiums,
+                    SUM(season.totalPolePositions) AS totalPolePositions,
+                    SUM(season.totalPoints) AS totalPoints
+                FROM (
+                    SELECT year, constructorId, MIN(chassisId) AS chassisId
+                    FROM seasons_entrants_chassis
+                    GROUP BY year, constructorId
+                    HAVING COUNT(DISTINCT chassisId) = 1
+                ) singleChassis
+                JOIN seasons_constructors season
+                    ON season.year = singleChassis.year AND season.constructorId = singleChassis.constructorId
+                GROUP BY singleChassis.chassisId
+            ) performance ON performance.chassisId = ch.id
+            ORDER BY COALESCE(career.lastYear, 0) DESC, ch.fullName
         `));
         res.json(rows.map(row => ({
             ...row,
             firstYear: row.firstYear === null ? null : Number(row.firstYear),
             lastYear: row.lastYear === null ? null : Number(row.lastYear),
+            currentSeason: Number(row.currentSeason) || null,
+            seasons: String(row.seasonYears || '').split(',').map(Number).filter(year => year > 0),
             engineManufacturerIds: row.engineManufacturerIds ? row.engineManufacturerIds.split('||') : [],
             engineManufacturers: row.engineManufacturers ? row.engineManufacturers.split('||') : [],
-            engines: row.engines ? row.engines.split('||') : []
+            engines: row.engines ? row.engines.split('||') : [],
+            totalRaceStarts: Number(row.totalRaceStarts || 0),
+            totalRaceWins: Number(row.totalRaceWins || 0),
+            totalPodiums: Number(row.totalPodiums || 0),
+            totalPolePositions: Number(row.totalPolePositions || 0),
+            totalPoints: Number(row.totalPoints || 0),
+            performanceSeasons: Number(row.performanceSeasons || 0)
         })));
     } catch (error) {
         sendError(res, error);

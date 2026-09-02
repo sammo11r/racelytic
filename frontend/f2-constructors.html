@@ -1,24 +1,39 @@
 <!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="description" content="Browse every Formula 2 constructor in Racelytic.">
-  <link rel="icon" href="/assets/favicon-f2.svg" type="image/svg+xml">
-  <title>Formula 2 Constructors · Racelytic</title>
-  <link rel="stylesheet" href="/css/style.css">
-  <link rel="stylesheet" href="/css/polish.css">
-</head>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="Explore Formula 2 constructors, from the current grid to historic teams. Filter by season, nationality and championship wins."><link rel="icon" href="/assets/favicon-f2.svg" type="image/svg+xml"><title>Formula 2 Constructors · Racelytic</title><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/polish.css"></head>
 <body class="f2-mode">
-  <div id="header"></div>
-  <main class="container page">
-    <div class="page-head"><div><div class="eyebrow">FORMULA 2 TEAMS</div><h1>Constructors</h1><p>Explore every team’s Formula 2 championship history, drivers and results.</p></div><input class="search" id="f2-constructor-search" type="search" aria-label="Search Formula 2 constructors" placeholder="Search teams..."></div>
-    <div class="browser-toolbar"><span id="f2-constructor-count" class="browser-count">Loading constructors…</span><label class="sort-control">Sort <select id="f2-constructor-sort"><option value="recent">Most recent</option><option value="name">Name</option><option value="wins">Race wins</option><option value="titles">Championships</option></select></label></div>
-    <div id="f2-constructors" class="entity-grid"></div>
-  </main>
-  <footer class="footer"><div class="container">Racelytic</div></footer>
-  <script src="/js/utils.js"></script>
-  <script src="/js/header.js"></script>
-  <script src="/js/f2-constructors.js"></script>
-</body>
-</html>
+<div id="header"></div>
+<main class="container page constructors-page">
+  <header class="page-head drivers-page-head"><div><div class="eyebrow">TEAMS &amp; HISTORY</div><h1>Constructors</h1><p>Explore the current Formula 2 grid and the constructors that shaped its history.</p></div></header>
+  <section class="driver-browser constructor-browser" aria-labelledby="constructor-browser-title">
+    <div class="driver-browser-primary"><h2 id="constructor-browser-title">Find a constructor</h2>
+      <div class="standings-mode" role="group" aria-label="Constructor archive view">
+        <button type="button" class="standings-mode-button active" data-constructor-view="current" aria-pressed="true">Current grid</button>
+        <button type="button" class="standings-mode-button" data-constructor-view="all" aria-pressed="false">All constructors</button>
+      </div>
+    </div>
+    <div class="driver-filter-grid constructor-filter-grid" role="search" aria-label="Filter constructors">
+      <label class="driver-search-field"><span>Search</span><input class="search" id="search" type="search" placeholder="Constructor name or nationality…" autocomplete="off"></label>
+      <label><span>Season</span><select id="constructor-season"><option value="">Current season</option></select></label>
+      <label><span>Nationality</span><select id="constructor-country"><option value="">All nationalities</option></select></label>
+      <label><span>Achievements</span><select id="constructor-type"><option value="">All constructors</option></select></label>
+      <label><span>Order by</span><select id="constructor-sort"><option value="name">Name A–Z</option><option value="recent">Most recent</option><option value="starts">Most race starts</option><option value="wins">Most race wins</option><option value="titles">Most teams’ titles</option></select></label>
+      <button type="button" id="constructor-clear" class="button secondary driver-clear">Clear filters</button>
+    </div>
+  </section>
+  <div class="driver-browser-toolbar"><span id="constructor-count" class="browser-count" aria-live="polite">Loading constructors…</span><span id="constructor-load-status" class="section-note" role="status"></span></div>
+  <div id="constructors" class="entity-grid constructor-archive-grid" aria-busy="true" aria-label="Formula 2 constructors">
+    <div class="constructor-archive-card constructor-card-skeleton" aria-hidden="true"><i></i><b></b><span></span><em></em></div>
+    <div class="constructor-archive-card constructor-card-skeleton" aria-hidden="true"><i></i><b></b><span></span><em></em></div>
+    <div class="constructor-archive-card constructor-card-skeleton" aria-hidden="true"><i></i><b></b><span></span><em></em></div>
+    <div class="constructor-archive-card constructor-card-skeleton" aria-hidden="true"><i></i><b></b><span></span><em></em></div>
+    <div class="constructor-archive-card constructor-card-skeleton" aria-hidden="true"><i></i><b></b><span></span><em></em></div>
+    <div class="constructor-archive-card constructor-card-skeleton" aria-hidden="true"><i></i><b></b><span></span><em></em></div>
+    <div class="constructor-archive-card constructor-card-skeleton" aria-hidden="true"><i></i><b></b><span></span><em></em></div>
+    <div class="constructor-archive-card constructor-card-skeleton" aria-hidden="true"><i></i><b></b><span></span><em></em></div>
+  </div>
+</main>
+<footer class="footer"><div class="container">Racelytic</div></footer>
+<script src="/js/utils.js"></script>
+<script src="/js/header.js"></script>
+<script src="/js/constructors.js"></script>
+</body></html>
