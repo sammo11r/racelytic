@@ -1,0 +1,101 @@
+.teammate-page.page { padding-top: 22px; }
+.teammate-page [hidden] { display: none !important; }
+.teammate-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 26px; margin: 8px 0 14px; }
+.teammate-heading { min-width: 245px; }
+.teammate-head h1 { margin: 7px 0 5px; font-size: clamp(30px,4vw,48px); line-height: 1.04; letter-spacing: -.045em; }
+.teammate-head p { margin: 0; color: var(--text-secondary); font-size: 13px; }
+.teammate-controls { display: grid; grid-template-columns: minmax(205px,1fr) auto minmax(205px,1fr); align-items: end; gap: 8px; width: min(590px,100%); }
+.teammate-page label { display: grid; gap: 5px; color: var(--text-secondary); font-size: 11px; font-weight: 750; }
+.teammate-page input,.teammate-page select { width: 100%; min-height: 40px; padding: 8px 11px; border: 1px solid var(--border); border-radius: 8px; background: #fff; color: var(--text); font: inherit; }
+.teammate-page button { cursor: pointer; }
+.battle-control-actions { display: flex; gap: 4px; }
+.battle-control-actions button { width: 40px; min-height: 40px; border: 1px solid var(--border); border-radius: 8px; background: #fff; color: var(--text); font-size: 18px; }
+.battle-control-actions button:disabled { cursor: default; opacity: .4; }
+.teammate-page .analysis-status { margin: 0 0 12px; color: var(--text-secondary); font-size: 12px; }
+.battle-identity { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; overflow: hidden; border: 1px solid var(--border); border-radius: 12px; background: #fff; }
+.battle-identity > a { min-width: 0; padding: 17px 19px; color: var(--text); }
+.battle-identity > a:last-child { text-align: right; }
+.battle-identity > div { padding: 12px 20px; border-right: 1px solid var(--border); border-left: 1px solid var(--border); color: var(--text-secondary); font-size: 10px; font-weight: 750; text-align: center; text-transform: uppercase; }
+.battle-identity span { display: block; color: var(--accent); font-size: 9px; font-weight: 850; letter-spacing: .07em; text-transform: uppercase; }
+.battle-identity h2 { overflow: hidden; margin: 5px 0 0; font-size: 20px; text-overflow: ellipsis; white-space: nowrap; }
+#battle-workspace { margin-top: 16px; border: 1px solid var(--border); border-radius: 14px; background: #fff; }
+.teammate-page .analysis-visualization-menu { margin: 0; padding: 0; border: 0; border-bottom: 1px solid var(--border); border-radius: 14px 14px 0 0; background: var(--surface-alt); box-shadow: none; }
+.teammate-page .analysis-visualization-tabs { grid-template-columns: repeat(3,minmax(0,1fr)); gap: 0; padding: 0; border-radius: inherit; background: transparent; }
+.teammate-page .analysis-visualization-tabs button { min-height: 50px; margin-bottom: -1px; padding: 14px 12px; border: 0; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); border-radius: 0; background: transparent; color: var(--text-secondary); font: inherit; font-size: 13px; font-weight: 750; text-align: center; box-shadow: none; }
+.teammate-page .analysis-visualization-tabs button:first-child { border-top-left-radius: 13px; }
+.teammate-page .analysis-visualization-tabs button:last-child { border-right: 0; border-top-right-radius: 13px; }
+.teammate-page .analysis-visualization-tabs button::before { display: none; }
+.teammate-page .analysis-visualization-tabs button[aria-selected="true"] { color: var(--text); background: #fff; border-bottom-color: #fff; box-shadow: inset 0 3px var(--accent); }
+.teammate-page .analysis-mobile-view { display: none; }
+.battle-workspace-content { padding: 20px; }
+.battle-score-grid { grid-template-columns: repeat(3,minmax(0,1fr)); gap: 10px; margin: 0 0 12px; }
+.teammate-page .battle-score { padding: 17px; border-radius: 11px; box-shadow: none; }
+.teammate-page .battle-score-heading { display: block; }
+.teammate-page .battle-score-heading small { display: block; min-height: 27px; margin-top: 4px; font-size: 9px; line-height: 1.35; }
+.teammate-page .battle-score-numbers { margin-top: 14px; }
+.teammate-page .battle-score-foot { margin: 10px 0 0; color: var(--text-secondary); font-size: 9px; line-height: 1.4; }
+.teammate-page .battle-metrics { margin: 0; border-radius: 11px; box-shadow: none; }
+.battle-method { margin: 12px 0 0; color: var(--text-secondary); font-size: 11px; line-height: 1.5; }
+.battle-season-toolbar,.battle-race-filters { display: grid; grid-template-columns: repeat(3,minmax(135px,1fr)) auto; align-items: end; gap: 8px; margin-bottom: 13px; }
+.battle-season-toolbar { grid-template-columns: minmax(150px,230px); }
+.battle-season-card { border-radius: 11px; box-shadow: none; }
+.battle-season-card dl { grid-template-columns: repeat(4,1fr); }
+.battle-season-card p { margin: 6px 0 0; color: var(--text-secondary); font-size: 9px; }
+.battle-race-heading { display: flex; align-items: end; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+.battle-race-heading h2 { margin: 0; font-size: 23px; }
+.battle-race-heading p { margin: 5px 0 0; color: var(--text-secondary); font-size: 11px; }
+.battle-results-count { color: var(--text-secondary); font-size: 11px; }
+.battle-filter-reset { min-height: 40px; padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; background: #fff; color: var(--text-secondary); font: inherit; font-size: 11px; font-weight: 750; }
+.battle-results-table { min-width: 1120px; }
+.battle-results-table th button { width: 100%; padding: 10px 8px; border: 0; background: transparent; color: inherit; font: inherit; font-size: 9px; font-weight: 800; text-align: inherit; text-transform: uppercase; white-space: nowrap; }
+.battle-results-table td { padding: 8px 10px; font-size: 11px; white-space: nowrap; }
+.battle-result-status { font-weight: 750; }
+.battle-result-status.retired { color: #a0232e; }
+.battle-result-status.nonstarter,.battle-result-status.unclassified { color: #73520b; }
+.battle-result-status.disqualified { display: inline-block; padding: 3px 5px; border-radius: 4px; background: #20232a; color: #fff; }
+.battle-mobile-results { display: none; }
+.battle-mobile-card { padding: 14px 0; border-bottom: 1px solid var(--border); }
+.battle-mobile-card:first-child { padding-top: 0; }
+.battle-mobile-card:last-child { padding-bottom: 0; border-bottom: 0; }
+.battle-mobile-card > a { color: var(--text); font-size: 12px; font-weight: 800; }
+.battle-mobile-card > small { display: block; margin-top: 3px; color: var(--text-secondary); font-size: 9px; }
+.battle-mobile-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+.battle-mobile-pair > div { padding: 9px; border-radius: 8px; background: var(--surface-alt); }
+.battle-mobile-pair strong,.battle-mobile-pair span { display: block; }
+.battle-mobile-pair strong { overflow: hidden; font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
+.battle-mobile-pair span { margin-top: 4px; color: var(--text-secondary); font-size: 9px; line-height: 1.45; }
+.teammate-page .pagination { margin-top: 13px; }
+.teammate-page .empty-state { padding: 24px; border: 1px dashed var(--border); border-radius: 10px; color: var(--text-secondary); text-align: center; }
+@media (max-width: 1050px) {
+  .teammate-head { align-items: stretch; flex-direction: column; }
+  .teammate-controls { width: 100%; }
+  .battle-score-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 760px) {
+  .teammate-page.page { padding-top: 18px; }
+  .teammate-head { gap: 13px; }
+  .teammate-head h1 { font-size: 32px; }
+  .teammate-controls { grid-template-columns: minmax(0,1fr) auto minmax(0,1fr); }
+  .battle-control-actions button { width: 36px; }
+  .battle-identity > a { padding: 13px 11px; }
+  .battle-identity > div { padding: 10px 8px; }
+  .battle-identity h2 { font-size: 15px; }
+  .teammate-page .analysis-visualization-tabs { display: none; }
+  .teammate-page .analysis-mobile-view { display: grid; padding: 12px; }
+  .battle-workspace-content { padding: 15px 12px; }
+  .battle-season-card { grid-template-columns: 1fr; gap: 14px; }
+  .battle-season-card dl { grid-template-columns: 1fr 1fr; }
+  .battle-season-card dl > div:nth-child(odd) { padding-left: 0; border-left: 0; }
+  .battle-race-filters { grid-template-columns: 1fr 1fr; }
+  .battle-results-table-wrap { display: none; }
+  .battle-mobile-results { display: block; }
+}
+@media (max-width: 480px) {
+  .teammate-controls { grid-template-columns: 1fr auto; }
+  .teammate-controls label:first-child { grid-column: 1 / -1; }
+  .teammate-controls label:last-child { grid-column: 1; grid-row: 2; }
+  .battle-control-actions { grid-column: 2; grid-row: 2; }
+  .battle-identity > div { font-size: 8px; }
+  .battle-race-filters { grid-template-columns: 1fr; }
+  .battle-race-heading { align-items: flex-start; flex-direction: column; }
+}

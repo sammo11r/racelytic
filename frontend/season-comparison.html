@@ -1,7 +1,42 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" href="/assets/favicon.svg" type="image/svg+xml"><title>Racelytic</title><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/polish.css"></head>
-<body><div id="header"></div><main class="container page analysis-detail-page season-comparison-page">
-  <a class="back-link" href="/analysis">← Analysis</a>
-  <section class="analysis-detail-head"><div><div class="eyebrow">SEASON COMPARISON</div><h1>How different were two championships?</h1><p>Compare competition, title margins, winner diversity, reliability and the shape of each season.</p></div></section>
-  <section class="comparison-picker season-comparison-picker"><label><span>First season</span><select id="comparison-season-one"><option>Loading…</option></select></label><div class="comparison-versus">VS</div><label><span>Second season</span><select id="comparison-season-two"><option>Loading…</option></select></label><button id="compare-seasons" type="button">Compare seasons</button></section>
-  <div id="season-comparison-content"><div class="loading-state">Loading championships…</div></div>
-</main><footer class="footer"><div class="container">Racelytic</div></footer><script src="/js/utils.js"></script><script src="/js/header.js"></script><script src="/js/season-comparison.js"></script></body></html>
+<!doctype html>
+<html lang="en"><head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml"><title>Season comparison · Formula 1 · Racelytic</title>
+  <link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/polish.css"><link rel="stylesheet" href="/css/season-analysis.css"><link rel="stylesheet" href="/css/f1-season-comparison.css">
+</head><body><div id="header"></div>
+<main class="container page analysis-detail-page season-analysis-page season-comparison-page">
+  <header class="analysis-detail-head"><div>
+    <div class="eyebrow">FORMULA 1 · SEASON COMPARISON</div>
+    <div class="comparison-title-row"><h1>Two seasons, side by side</h1><div class="comparison-years" aria-label="Seasons to compare">
+      <select id="comparison-season-one" class="comparison-year first-year" aria-label="First season" disabled><option value="">—</option></select>
+      <button type="button" id="swap-seasons" aria-label="Swap seasons" title="Swap seasons" disabled>↔</button>
+      <select id="comparison-season-two" class="comparison-year second-year" aria-label="Second season" disabled><option value="">—</option></select>
+    </div></div>
+    <p>Compare the title fight, race winners and driver field across Formula 1 seasons.</p>
+  </div></header>
+  <p id="comparison-status" class="analysis-status" role="status">Loading seasons…</p>
+  <div id="comparison-loaded" hidden>
+    <div id="comparison-season-heads" class="comparison-season-context" aria-label="Compared seasons"></div>
+    <section id="season-analysis-workspace" aria-label="Season comparison">
+      <nav class="analysis-visualization-menu" aria-label="Comparison views">
+        <label class="analysis-mobile-view" for="comparison-view">Comparison view<select id="comparison-view"><option value="overview">Overview</option><option value="progression">Progression</option><option value="competition">Title fight</option><option value="field">Driver field</option></select></label>
+        <div class="analysis-visualization-tabs comparison-tabs" role="tablist" aria-label="Season comparison">
+          <button id="tab-overview" type="button" role="tab" aria-controls="panel-overview" aria-selected="true" data-comparison-view="overview">Overview</button>
+          <button id="tab-progression" type="button" role="tab" aria-controls="panel-progression" aria-selected="false" tabindex="-1" data-comparison-view="progression">Progression</button>
+          <button id="tab-competition" type="button" role="tab" aria-controls="panel-competition" aria-selected="false" tabindex="-1" data-comparison-view="competition">Title fight</button>
+          <button id="tab-field" type="button" role="tab" aria-controls="panel-field" aria-selected="false" tabindex="-1" data-comparison-view="field">Driver field</button>
+        </div>
+      </nav>
+      <div class="comparison-scope"><label for="comparison-basis">Compare<select id="comparison-basis"><option value="available">Available season results</option><option value="matched">Through the same round</option></select></label><label id="comparison-round-label" for="comparison-round" hidden>Through round<select id="comparison-round"></select></label><p id="comparison-scope-note" class="analysis-method"></p></div>
+      <div class="analysis-visualization-workspace">
+        <section id="panel-overview" role="tabpanel" aria-labelledby="tab-overview" data-comparison-panel="overview"><h2>Season overview</h2><div id="comparison-overview" class="table-wrap"></div><p class="analysis-method">Differences are second season minus first—not a rating. Rates help compare different calendar lengths; raw points depend on the scoring system.</p></section>
+        <section id="panel-progression" role="tabpanel" aria-labelledby="tab-progression" data-comparison-panel="progression" hidden><h2>Points progression</h2><p class="analysis-method">Champion or comparison leader’s counted points as a share of their reconstructed total at the selected cutoff. Historical dropped scores are applied consistently. This shows when points were earned, not which season was more competitive.</p><div id="comparison-progression-legend" class="comparison-chart-legend"></div><div id="comparison-progression-chart" class="interactive-chart"></div><div id="comparison-progression-readout" class="analysis-round-readout" aria-live="polite"></div></section>
+        <section id="panel-competition" role="tabpanel" aria-labelledby="tab-competition" data-comparison-panel="competition" hidden><h2>The title fight</h2><div id="comparison-competition-metrics" class="table-wrap"></div><h3>Lead after each round</h3><p class="analysis-method">Gap between the first two drivers as a percentage of the leader’s counted points. Ties are shown explicitly; countback and retrospective adjustments are not reconstructed.</p><div id="comparison-margin-legend" class="comparison-chart-legend"></div><div id="comparison-margin-chart" class="interactive-chart"></div><div id="comparison-margin-readout" class="analysis-round-readout" aria-live="polite"></div></section>
+        <section id="panel-field" role="tabpanel" aria-labelledby="tab-field" data-comparison-panel="field" hidden><div class="comparison-field-head"><h2>Driver field</h2><label for="comparison-field-size">Show<select id="comparison-field-size"><option value="all">Full field</option><option value="ten">Top ten by standing</option></select></label></div><p class="analysis-method">Each season is a separate field, not a driver-to-driver matchup. Means exclude non-classified positions; sample counts are shown beneath each average. Lower spread means more consistent classified finishes. Sort a column to sort both seasons.</p><div id="comparison-fields" class="comparison-fields"></div></section>
+        <details class="comparison-methodology"><summary>Definitions and data notes</summary><div id="comparison-data-notes"></div><p>Race measures include Grands Prix only; points include sprint points. Retirement rate is recorded retirements divided by starts, excluding DNS, DNQ, withdrawals and disqualifications from the retirement count. Disqualifications still count as starts. NC alone is not treated as a retirement. Missing results are not zero-performance evidence.</p><p>Through-the-same-round comparisons use a continuous run of recorded Grands Prix in both seasons. Standings and points in that mode are reconstructed at the cutoff. Available-results comparisons use season standings for the summary and recorded results for charts. Historical shared-drive records and retrospective adjustments can produce differences, listed above.</p></details>
+      </div>
+    </section>
+  </div>
+</main><footer class="footer"><div class="container">Racelytic</div></footer>
+<script src="/js/utils.js"></script><script src="/js/header.js"></script><script src="/js/f1-points-systems.js"></script><script src="/js/season-analysis-model.js"></script><script src="/js/f1-season-comparison-model.js"></script><script src="/js/f1-season-comparison.js"></script>
+</body></html>

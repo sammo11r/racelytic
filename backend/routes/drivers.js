@@ -340,7 +340,9 @@ router.get('/api/drivers/compare', async (req, res) => {
                     connection.query(`SELECT d.id, d.name, d.countryCode AS nationalityCountryId,
                         COALESCE(SUM(s.wins), 0) AS totalRaceWins, COALESCE(SUM(s.podiums), 0) AS totalPodiums,
                         COALESCE(SUM(s.poles), 0) AS totalPolePositions, COALESCE(SUM(s.fastestLaps), 0) AS totalFastestLaps,
-                        COALESCE(SUM(s.points), 0) AS totalPoints,
+                        COALESCE(SUM(s.points), 0) AS totalPoints, COALESCE(SUM(s.starts), 0) AS totalRaceStarts,
+                        MIN(s.year) AS firstYear, MAX(s.year) AS lastYear, COUNT(DISTINCT s.year) AS seasons,
+                        MIN(NULLIF(s.positionNumber, 0)) AS bestChampionshipPosition,
                         COALESCE(SUM(s.positionNumber = 1 AND (LOWER(CAST(s.championshipWon AS CHAR)) IN ('1','true') OR s.year < YEAR(CURRENT_DATE()))), 0) AS totalChampionshipWins
                         FROM ${prefix}drivers d LEFT JOIN ${prefix}season_driver_standings s ON s.driverId = d.id
                         WHERE d.id IN (?, ?) GROUP BY d.id, d.name, d.countryCode`, ids),
@@ -422,9 +424,17 @@ router.get('/api/drivers/compare', async (req, res) => {
         }
         const data = await withConnection(async connection => {
             const [drivers, sharedRaces] = await Promise.all([
-                connection.query(`SELECT id, name, fullName, nationalityCountryId, totalRaceWins,
-                    totalPodiums, totalPolePositions, totalFastestLaps, totalPoints, totalChampionshipWins
-                    FROM drivers WHERE id IN (?, ?)`, ids),
+                connection.query(`SELECT drivers.id, drivers.name, drivers.fullName, drivers.nationalityCountryId,
+                    drivers.totalRaceWins, drivers.totalPodiums, drivers.totalPolePositions, drivers.totalFastestLaps,
+                    drivers.totalPoints, drivers.totalChampionshipWins, drivers.totalRaceStarts,
+                    career.firstYear, career.lastYear, career.seasons, career.bestChampionshipPosition
+                    FROM drivers
+                    LEFT JOIN (
+                        SELECT driverId, MIN(year) AS firstYear, MAX(year) AS lastYear,
+                            COUNT(DISTINCT year) AS seasons, MIN(NULLIF(positionNumber, 0)) AS bestChampionshipPosition
+                        FROM seasons_driver_standings GROUP BY driverId
+                    ) career ON career.driverId = drivers.id
+                    WHERE drivers.id IN (?, ?)`, ids),
                 connection.query(`SELECT a.raceId, a.year, a.round,
                     COALESCE(NULLIF(gp.fullName, ''), r.officialName) AS name, gp.shortName, r.officialName, r.date,
                     a.constructorId AS firstConstructorId, firstConstructor.name AS firstConstructorName,
@@ -500,7 +510,7 @@ router.get('/api/drivers/:id/form', async (req, res) => {
                         races.circuitId, circuits.name AS circuitName,
                         results.constructorId, constructors.name AS constructorName, results.positionNumber,
                         results.status AS positionText, sessions.sessionNumber, results.points,
-                        results.laps, results.laps AS raceLaps,
+                        results.laps, results.laps AS raceLaps, results.time, results.gapMillis, results.gapLaps,
                         results.status AS reasonRetired, results.fastestLap, results.polePosition
                         FROM ${prefix}session_results results JOIN ${prefix}sessions sessions ON sessions.id = results.sessionId
                         JOIN ${prefix}races races ON races.id = results.raceId LEFT JOIN ${prefix}circuits circuits ON circuits.id = races.circuitId
@@ -558,7 +568,7 @@ router.get('/api/drivers/:id/form', async (req, res) => {
                     : genericLookups.qualifyingPosition(row);
                 const teammateMap = new Map();
                 teammates.forEach(row => { const key=String(row.sessionId); if(!teammateMap.has(key))teammateMap.set(key,[]); teammateMap.get(key).push({driverId:row.driverId,driverName:row.driverName,position:row.positionNumber===null?null:Number(row.positionNumber),positionText:row.positionText,qualifying:qualifyingPosition(row),grid:gridPosition(row),points:Number(row.points||0),reasonRetired:row.reasonRetired}); });
-                return {driver:drivers[0],results:results.map(row=>({raceId:row.raceId,sessionId:row.sessionId,year:Number(row.year),round:Number(row.round),date:row.date,officialName:row.officialName,circuitId:row.circuitId,circuitName:row.circuitName,constructorId:row.constructorId,constructorName:row.constructorName,position:row.positionNumber===null?null:Number(row.positionNumber),positionText:row.positionText,qualifying:qualifyingPosition({...row,driverId:req.params.id}),grid:gridPosition({...row,driverId:req.params.id}),points:Number(row.points||0),laps:Number(row.laps||0),raceLaps:Number(row.raceLaps||0),reasonRetired:row.reasonRetired,fastestLap:Boolean(row.fastestLap),polePosition:Boolean(row.polePosition),teammates:teammateMap.get(String(row.sessionId))||[]}))};
+                return {driver:drivers[0],results:results.map(row=>({raceId:row.raceId,sessionId:row.sessionId,sessionName:row.sessionName,year:Number(row.year),round:Number(row.round),date:row.date,officialName:row.officialName,circuitId:row.circuitId,circuitName:row.circuitName,constructorId:row.constructorId,constructorName:row.constructorName,position:row.positionNumber===null?null:Number(row.positionNumber),positionText:row.positionText,qualifying:qualifyingPosition({...row,driverId:req.params.id}),grid:gridPosition({...row,driverId:req.params.id}),points:Number(row.points||0),laps:Number(row.laps||0),raceLaps:Number(row.raceLaps||0),time:row.time,gapMillis:row.gapMillis===null?null:Number(row.gapMillis),gapLaps:row.gapLaps===null?null:Number(row.gapLaps),reasonRetired:row.reasonRetired,fastestLap:Boolean(row.fastestLap),polePosition:Boolean(row.polePosition),teammates:teammateMap.get(String(row.sessionId))||[]}))};
             });
             if (!data) return res.status(404).json({ error: 'Driver not found.' });
             return res.json(data);
@@ -570,7 +580,7 @@ router.get('/api/drivers/:id/form', async (req, res) => {
                     COALESCE(NULLIF(gp.fullName, ''), r.officialName) AS name, gp.shortName, r.officialName,
                     r.circuitId, COALESCE(NULLIF(c.fullName, ''), c.name) AS circuitName, rr.constructorId, k.name AS constructorName,
                     rr.positionNumber, rr.positionText, rr.qualificationPositionNumber,
-                    rr.gridPositionNumber, rr.points, rr.laps, r.laps AS raceLaps,
+                    rr.gridPositionNumber, rr.points, rr.laps, r.laps AS raceLaps, rr.time, rr.gap,
                     rr.reasonRetired, rr.fastestLap, rr.polePosition
                     FROM races_race_results rr JOIN races r ON r.id = rr.raceId
                     LEFT JOIN grands_prix gp ON gp.id = r.grandPrixId
@@ -602,7 +612,7 @@ router.get('/api/drivers/:id/form', async (req, res) => {
                 constructorId: row.constructorId, constructorName: row.constructorName,
                 position: row.positionNumber === null ? null : Number(row.positionNumber), positionText: row.positionText,
                 qualifying: row.qualificationPositionNumber === null ? null : Number(row.qualificationPositionNumber),
-                grid: row.gridPositionNumber === null ? null : Number(row.gridPositionNumber), points: Number(row.points || 0),
+                grid: row.gridPositionNumber === null ? null : Number(row.gridPositionNumber), points: Number(row.points || 0), time: row.time, gap: row.gap,
                 laps: Number(row.laps || 0), raceLaps: Number(row.raceLaps || 0), reasonRetired: row.reasonRetired,
                 fastestLap: Boolean(row.fastestLap), polePosition: Boolean(row.polePosition), teammates: teammateMap.get(String(row.raceId)) || []
             })) };

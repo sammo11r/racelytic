@@ -4,6 +4,7 @@ const { f2SessionType, f3SessionType, academySessionType } = require('./seasons'
 const { isJuniorSeries, seriesPrefix } = require('../series-config');
 const { juniorCircuitArchiveRow } = require('../circuit-archive');
 const { buildCircuitDetail, buildJuniorCircuitDetail } = require('../circuit-detail');
+const { buildJuniorCircuitAnalysis } = require('../junior-circuit-analysis');
 
 const router = express.Router();
 
@@ -116,96 +117,40 @@ router.get('/api/circuits/:id/analysis', async (req, res) => {
         if (isJuniorSeries(series)) {
             const prefix = seriesPrefix(series);
             const data = await withConnection(async connection => {
-                const [circuits, rows, gridRows] = await Promise.all([
-                    connection.query(`SELECT id, name, name AS fullName, placeName,
-                        NULL AS countryId, NULL AS layoutId
+                const [circuits, rows] = await Promise.all([
+                    connection.query(`SELECT id, name, name AS fullName, placeName, type, direction, lengthMeters, turns
                         FROM ${prefix}circuits WHERE id = ?`, [req.params.id]),
                     connection.query(`SELECT sessions.id AS sessionId, races.id AS raceId,
-                        sessions.sessionNumber, sessions.name AS sessionName,
+                        sessions.sessionNumber, sessions.name AS sessionName, sessions.isRace, sessions.cancelled, sessions.startTimeUtc,
                         races.name AS raceName, races.year, races.round, races.date,
                         results.driverId, drivers.name AS driverName, results.constructorId, constructors.name AS constructorName,
-                        results.positionNumber, results.status AS positionText, results.laps, results.gapMillis AS gap,
-                        results.status AS reasonRetired, results.polePosition, results.fastestLap, results.points
+                        results.positionNumber, results.status AS positionText, results.laps, results.gapMillis, results.gapLaps,
+                        results.polePosition, results.fastestLap, results.points
                         FROM ${prefix}races races JOIN ${prefix}sessions sessions ON sessions.raceId = races.id
-                        JOIN ${prefix}session_results results ON results.sessionId = sessions.id
-                        JOIN ${prefix}drivers drivers ON drivers.id = results.driverId
+                        LEFT JOIN ${prefix}session_results results ON results.sessionId = sessions.id
+                        LEFT JOIN ${prefix}drivers drivers ON drivers.id = results.driverId
                         LEFT JOIN ${prefix}constructors constructors ON constructors.id = results.constructorId
-                        WHERE races.circuitId = ? AND LOWER(CAST(sessions.isRace AS CHAR)) IN ('1','true')
-                        AND (sessions.cancelled IS NULL OR LOWER(CAST(sessions.cancelled AS CHAR)) NOT IN ('1','true'))
-                        ORDER BY races.year, races.round, sessions.sessionNumber, results.positionDisplayOrder`, [req.params.id]),
-                    connection.query(`SELECT sessions.raceId, sessions.sessionNumber,
-                        results.driverId, results.positionNumber
-                        FROM ${prefix}races races
-                        JOIN ${prefix}sessions sessions ON sessions.raceId = races.id
-                        JOIN ${prefix}session_results results ON results.sessionId = sessions.id
-                        WHERE races.circuitId = ? AND LOWER(sessions.name) LIKE '%grid%'
-                            AND results.positionNumber BETWEEN 1 AND 99
-                        ORDER BY races.year, races.round, sessions.sessionNumber DESC,
-                            results.positionNumber`, [req.params.id])
+                        WHERE races.circuitId = ?
+                        ORDER BY races.year, races.round, sessions.sessionNumber, results.positionDisplayOrder`, [req.params.id])
                 ]);
                 if (!circuits.length) return null;
                 const sessionType = series === 'academy' ? academySessionType : series === 'f3' ? f3SessionType : f2SessionType;
-                const rowSessionType = row => sessionType(
-                    { ...row, name: row.sessionName },
-                    0,
-                    0,
-                    row.year
-                );
-                const gridsByRaceDriver = new Map();
-                const featureGridSessionByRace = new Map();
-                const poleDriverByRace = new Map();
-                const featureRaceSessionByRace = new Map();
-                rows.forEach(row => {
-                    if (rowSessionType(row) === 'F') {
-                        featureRaceSessionByRace.set(String(row.raceId), Number(row.sessionNumber));
-                    }
-                });
-                gridRows.forEach(row => {
-                    const raceId = String(row.raceId);
-                    const key = `${raceId}:${row.driverId}`;
-                    if (!gridsByRaceDriver.has(key)) gridsByRaceDriver.set(key, []);
-                    gridsByRaceDriver.get(key).push({
-                        sessionNumber: Number(row.sessionNumber),
-                        position: Number(row.positionNumber)
-                    });
-                    const featureSessionNumber = featureRaceSessionByRace.get(raceId);
-                    if (!featureSessionNumber || Number(row.sessionNumber) >= featureSessionNumber) return;
-                    if (!featureGridSessionByRace.has(raceId)) {
-                        featureGridSessionByRace.set(raceId, Number(row.sessionNumber));
-                    }
-                    if (featureGridSessionByRace.get(raceId) === Number(row.sessionNumber) &&
-                        Number(row.positionNumber) === 1) {
-                        poleDriverByRace.set(raceId, String(row.driverId));
-                    }
-                });
-                const races = new Map();
-                rows.forEach(row => {
-                    const raceId = String(row.raceId);
-                    const type = rowSessionType(row);
-                    const sessionLabel = type === 'F' ? 'Feature' : 'Sprint';
-                    const raceKey = String(row.sessionId);
-                    if (!races.has(raceKey)) races.set(raceKey, {id:row.raceId,sessionId:row.sessionId,year:Number(row.year),round:Number(row.round),date:row.date,officialName:`${row.raceName} ${sessionLabel}`,raceType:type,laps:0,results:[]});
-                    const race = races.get(raceKey);
-                    race.laps = Math.max(race.laps, Number(row.laps || 0));
-                    const grid = gridsByRaceDriver.get(`${raceId}:${row.driverId}`)
-                        ?.find(item => item.sessionNumber < Number(row.sessionNumber))?.position ?? null;
-                    race.results.push({driverId:row.driverId,driverName:row.driverName,constructorId:row.constructorId,constructorName:row.constructorName,position:row.positionNumber===null?null:Number(row.positionNumber),positionText:row.positionText,grid,qualifying:type==='F'?grid:null,laps:Number(row.laps||0),gap:row.gap===null?null:Number(row.gap)/1000,reasonRetired:row.reasonRetired,polePosition:type==='F'&&String(row.driverId)===poleDriverByRace.get(raceId),fastestLap:Boolean(row.fastestLap),points:/\b(?:DSQ|DQ|DISQ|DISQUALIFIED|EXC)\b/i.test(String(row.positionText||''))?0:Number(row.points||0)});
-                });
-                return {circuit:circuits[0],races:[...races.values()]};
+                return buildJuniorCircuitAnalysis(circuits[0], rows, series, sessionType);
             });
             if (!data) return res.status(404).json({ error: `${series.toUpperCase()} circuit not found.` });
             return res.json(data);
         }
         const data = await withConnection(async connection => {
             const [circuits, rows] = await Promise.all([
-                connection.query(`SELECT c.id, c.name, c.fullName, c.countryId, co.name AS countryName, cl.id AS layoutId
+                connection.query(`SELECT c.id, c.name, c.fullName, c.countryId, c.placeName, c.type, c.direction,
+                    co.name AS countryName, cl.id AS layoutId, cl.length AS layoutLength, cl.turns AS layoutTurns
                     FROM circuits c LEFT JOIN countries co ON co.id = c.countryId
                     LEFT JOIN circuits_layouts cl ON cl.circuitId = c.id AND cl.effective = 1 WHERE c.id = ?`, [req.params.id]),
                 connection.query(`SELECT r.id AS raceId, r.year, r.round, r.date,
                     COALESCE(NULLIF(gp.fullName, ''), r.officialName) AS name, gp.shortName, r.officialName, r.laps AS raceLaps,
                     rr.driverId, d.name AS driverName, rr.constructorId, k.name AS constructorName,
                     rr.positionNumber, rr.positionText, rr.gridPositionNumber, rr.qualificationPositionNumber,
-                    rr.laps, rr.gap, rr.reasonRetired, rr.polePosition, rr.fastestLap, rr.points
+                    rr.laps, rr.gap, rr.gapMillis, rr.gapLaps, rr.reasonRetired, rr.polePosition, rr.fastestLap, rr.points
                     FROM races r JOIN races_race_results rr ON rr.raceId = r.id
                     LEFT JOIN grands_prix gp ON gp.id = r.grandPrixId
                     JOIN drivers d ON d.id = rr.driverId LEFT JOIN constructors k ON k.id = rr.constructorId
@@ -223,7 +168,9 @@ router.get('/api/circuits/:id/analysis', async (req, res) => {
                     constructorName: row.constructorName, position: row.positionNumber === null ? null : Number(row.positionNumber),
                     positionText: row.positionText, grid: row.gridPositionNumber === null ? null : Number(row.gridPositionNumber),
                     qualifying: row.qualificationPositionNumber === null ? null : Number(row.qualificationPositionNumber),
-                    laps: Number(row.laps || 0), gap: row.gap, reasonRetired: row.reasonRetired,
+                    laps: Number(row.laps || 0), gap: row.gap,
+                    gapMillis: row.gapMillis == null ? null : Number(row.gapMillis),
+                    gapLaps: row.gapLaps == null ? null : Number(row.gapLaps), reasonRetired: row.reasonRetired,
                     polePosition: Boolean(row.polePosition), fastestLap: Boolean(row.fastestLap), points: Number(row.points || 0)
                 });
             });

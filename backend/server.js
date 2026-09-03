@@ -10,6 +10,9 @@ const { applySeo, renderRobots, renderSitemap } = require('./seo');
 const { renderPageShell } = require('./page-shell');
 const { seriesPageRoutes } = require('./series-pages');
 const { renderSeasonAnalysisHtml } = require('./season-analysis-renderer');
+const { renderSeasonComparisonHtml } = require('./season-comparison-renderer');
+const { renderCircuitAnalysisHtml } = require('./circuit-analysis-renderer');
+const { renderRecordsHtml } = require('./records-renderer');
 
 const app = express();
 const PORT = Number(process.env.PORT || 3000);
@@ -18,7 +21,10 @@ const frontendDirectory = path.join(__dirname, '../frontend');
 function sendSeoPage(req, res, next, file, transform = content => content) {
     fs.readFile(path.join(frontendDirectory, file), 'utf8', (error, content) => {
         if (error) return next(error);
-        const rendered = file === 'season-analysis.html' ? renderSeasonAnalysisHtml(content, req.path) : transform(content);
+        const rendered = file === 'season-analysis.html' ? renderSeasonAnalysisHtml(content, req.path)
+            : file === 'season-comparison.html' ? renderSeasonComparisonHtml(content, req.path)
+            : file === 'circuit-analysis.html' ? renderCircuitAnalysisHtml(transform(content), req.path)
+            : file === 'records.html' ? renderRecordsHtml(req.path) : transform(content);
         res.type('html').send(applySeo(renderPageShell(rendered), req.path, req.query));
     });
 }

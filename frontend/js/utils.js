@@ -20,6 +20,19 @@ function activeSeriesName() {
   return window.RacelyticSeries?.all[activeSeriesKey()]?.name
     || { f1: 'Formula 1', f2: 'Formula 2', f3: 'Formula 3', academy: 'F1 Academy' }[activeSeriesKey()];
 }
+function displayCountryName(value) {
+  const raw = String(value || '').trim();
+  if (!raw) return '';
+  const alias = { RA: 'AR', UK: 'GB' }[raw.toUpperCase()] || raw.toUpperCase();
+  if (/^[A-Z]{2}$/.test(alias)) {
+    try { return new Intl.DisplayNames(['en'], { type: 'region' }).of(alias) || alias; }
+    catch { return alias; }
+  }
+  return raw.split('-').map((word, index) => {
+    const lower = word.toLowerCase();
+    return index > 0 && ['and', 'of', 'the'].includes(lower) ? lower : lower.charAt(0).toUpperCase() + lower.slice(1);
+  }).join(' ');
+}
 function seriesPageUrl(page, parameter, value) {
   const query = parameter ? `?${parameter}=${encodeURIComponent(value)}` : '';
   return `${activeSeriesBase()}/${page}${query}`;

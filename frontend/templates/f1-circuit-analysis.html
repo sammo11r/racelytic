@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" href="/assets/favicon.svg" type="image/svg+xml"><title>Circuit Analysis · Racelytic</title><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/polish.css"><link rel="stylesheet" href="/css/f1-circuit-analysis.css"></head>
+<body><div id="header"></div><main class="container page f1-circuit-analysis">
+  <header class="ca-hero" id="ca-hero"><div><div class="eyebrow">FORMULA 1 · CIRCUIT ANALYSIS</div><h1 id="ca-title">Circuit performance</h1><p id="ca-location">Explore the drivers, race trends and results behind each venue.</p><a id="ca-circuit-link" hidden>Explore circuit history ↗</a></div><figure id="ca-layout" hidden></figure></header>
+  <form class="ca-filters" id="ca-filters">
+    <div class="ca-picker" id="ca-picker">
+      <label for="ca-search">Circuit</label>
+      <div class="ca-picker-control"><input id="ca-search" type="text" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="ca-circuit-options" placeholder="Search circuit or country" autocomplete="off" required><button type="button" id="ca-picker-toggle" tabindex="-1" aria-label="Show circuits" aria-controls="ca-circuit-options" aria-expanded="false"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="m4 6 4 4 4-4"/></svg></button></div>
+      <div id="ca-picker-menu" class="ca-picker-menu" hidden><p id="ca-picker-count" role="status" aria-live="polite"></p><div id="ca-circuit-options" role="listbox" aria-label="Circuits"></div></div>
+    </div>
+    <label>Era<select id="ca-era"><option value="all">All eras</option><option value="1950-1979">1950–1979</option><option value="1980-1999">1980–1999</option><option value="2000-2009">2000–2009</option><option value="2010-2019">2010–2019</option><option value="2020-9999">2020–present</option><option value="custom">Custom years</option></select></label>
+    <label id="ca-from-label" hidden>From<input id="ca-from" type="number" min="1950" max="9999" step="1" placeholder="First" aria-label="From year"></label>
+    <label id="ca-to-label" hidden>To<input id="ca-to" type="number" min="1950" max="9999" step="1" placeholder="Latest" aria-label="To year"></label>
+    <button type="submit">Apply</button><button type="button" id="ca-share" class="ca-secondary">Copy link</button>
+  </form>
+  <p id="ca-status" role="status" aria-live="polite">Loading circuits…</p>
+  <div id="ca-format-control" class="ca-format-control" hidden><label>Race format<select id="ca-format"><option value="all">All race formats</option><option value="F">Feature races</option><option value="S">Sprint races</option></select></label><p id="ca-grid-coverage" class="ca-note"></p></div>
+  <section id="ca-summary" class="ca-summary" aria-label="Circuit summary"></section>
+  <section id="ca-empty" class="ca-empty" hidden><h2>No races in this period</h2><p id="ca-empty-message"></p><button type="button" id="ca-reset">Show all years</button></section>
+  <div id="ca-workspace" hidden>
+    <div class="ca-tabs" role="tablist" aria-label="Circuit analysis views">
+      <button type="button" id="ca-tab-specialists" role="tab" aria-controls="ca-specialists" aria-selected="true" data-view="specialists">Specialists<span>Drivers &amp; teams</span></button>
+      <button type="button" id="ca-tab-trends" role="tab" aria-controls="ca-trends" aria-selected="false" tabindex="-1" data-view="trends">Race trends<span>Margins &amp; pole conversion</span></button>
+      <button type="button" id="ca-tab-movement" role="tab" aria-controls="ca-movement" aria-selected="false" tabindex="-1" data-view="movement">Grid movement<span>Qualifying to race result</span></button>
+      <button type="button" id="ca-tab-reliability" role="tab" aria-controls="ca-reliability" aria-selected="false" tabindex="-1" data-view="reliability">Reliability<span>Retirements &amp; starters</span></button>
+    </div>
+    <section id="ca-specialists" role="tabpanel" aria-labelledby="ca-tab-specialists" tabindex="0">
+      <div class="ca-section-head"><div><h2>Who masters this circuit?</h2><p>Compare totals and success rates, with the opportunities behind each result.</p></div><div class="ca-controls"><label>Rank by<select id="ca-metric"><option value="wins">Wins</option><option value="podiums">Podiums</option><option value="winRate">Win percentage</option><option value="averageFinish">Average finish</option></select></label><label>Minimum starts<select id="ca-minimum"><option value="1">1 start</option><option value="3" selected>3 starts</option><option value="5">5 starts</option><option value="10">10 starts</option></select></label></div></div>
+      <div id="ca-rankings" class="ca-columns"></div>
+      <p class="ca-note">Driver starts count Grands Prix started. Team starts count Grands Prix with a starter; team podiums and average finishes use individual results. Average finish excludes unclassified results and requires the selected minimum number of classified results. Ties use wins, podiums, then starts. Historical shared drives can contribute multiple driver results.</p>
+    </section>
+    <section id="ca-trends" role="tabpanel" aria-labelledby="ca-tab-trends" tabindex="0" hidden></section>
+    <section id="ca-movement" role="tabpanel" aria-labelledby="ca-tab-movement" tabindex="0" hidden>
+      <div class="ca-section-head"><div><h2>From the grid to the flag</h2><p>Net position change includes strategy and other drivers retiring; it is not an overtake count.</p></div><label>Minimum measured starts<select id="ca-movement-minimum"><option value="1">1 start</option><option value="3" selected>3 starts</option><option value="5">5 starts</option><option value="10">10 starts</option></select></label></div><div id="ca-movers"></div><div id="ca-heatmap"></div>
+    </section>
+    <section id="ca-reliability" role="tabpanel" aria-labelledby="ca-tab-reliability" tabindex="0" hidden></section>
+    <details class="ca-method"><summary>Data &amp; methodology</summary><p>Grands Prix only; sprint races are excluded. DNS, DNQ, DNPQ and withdrawn entries are excluded from starts. Retirements include recorded DNF results and retirement reasons, including late retirements that were classified; disqualifications are excluded from retirements. Pole conversion uses races with a recorded pole starter. Missing values remain unavailable.</p><p>Time margins use recorded milliseconds when available, otherwise the recorded time gap. Lapped finishes are listed separately. Historical layout changes, shortened races and different regulations affect comparisons; use year filters to narrow the context. Source: <a href="https://github.com/f1db/f1db">F1DB</a>.</p></details>
+  </div>
+</main><footer class="footer"><div class="container">Racelytic</div></footer><script src="/js/utils.js"></script><script src="/js/header.js"></script><script src="/js/f1-circuit-analysis-model.js"></script><script src="/js/f1-circuit-analysis.js"></script></body></html>

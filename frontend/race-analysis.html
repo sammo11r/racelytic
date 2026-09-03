@@ -1,23 +1,68 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" href="/assets/favicon.svg" type="image/svg+xml"><title>Racelytic</title><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/polish.css"></head>
-<body><div id="header"></div><main class="container page analysis-detail-page">
-  <a class="back-link" href="/analysis">← Analysis</a>
-  <section class="analysis-detail-head"><div><div class="eyebrow">RACE ANALYSIS</div><h1>One race, unpacked.</h1><p>See grid movement and points distribution across a Grand Prix.</p></div><div class="race-analysis-selectors"><label><span>Season</span><select id="race-analysis-year"></select></label><label><span>Race</span><select id="race-analysis-race"></select></label></div></section>
-  <section id="race-analysis-summary" class="analysis-summary-strip"></section>
-  <section class="analysis-visualization-menu">
-    <div class="analysis-visualization-heading"><div class="eyebrow">VISUALIZATION</div><strong>Choose an analysis view</strong></div>
-    <div class="analysis-visualization-tabs" role="tablist" aria-label="Race analysis visualization">
-      <button type="button" role="tab" aria-selected="true" class="active" data-race-visual-button="flow"><span>Race flow</span><small>Grid to flag</small></button>
-      <button type="button" role="tab" aria-selected="false" data-race-visual-button="matrix"><span>Results</span><small>Full classification</small></button>
-      <button type="button" role="tab" aria-selected="false" data-race-visual-button="contribution"><span>Team score</span><small>Contribution</small></button>
-      <button type="button" role="tab" aria-selected="false" data-race-visual-button="attrition"><span>Attrition</span><small>Race distance</small></button>
-      <button type="button" role="tab" aria-selected="false" data-race-visual-button="conversion"><span>Conversion</span><small>Qualifying to finish</small></button>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Explore a Formula 1 Grand Prix through grid movement, classification, attrition and team points.">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml"><title>Race analysis · Racelytic</title>
+  <link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/polish.css"><link rel="stylesheet" href="/css/race-analysis.css">
+</head>
+<body><div id="header"></div>
+<main class="container page analysis-detail-page race-analysis-page">
+  <header class="race-analysis-head">
+    <div class="race-analysis-heading">
+      <div class="eyebrow"><span id="race-series-label">FORMULA 1 · RACE</span></div>
+      <h1 id="race-analysis-title">Race analysis</h1>
+      <p id="race-analysis-meta">Choose a recorded Grand Prix.</p>
     </div>
-  </section>
-  <div class="analysis-visualization-workspace">
-    <section class="analysis-chart-section" data-race-visual="flow"><div class="section-heading"><div><div class="eyebrow">GRID TO FLAG</div><h2>Race flow</h2></div><span class="section-note">Select a driver to isolate their route</span></div><div id="race-flow-chart" class="race-flow-chart"></div></section>
-    <section class="analysis-chart-section" data-race-visual="matrix" hidden><div class="section-heading"><div><div class="eyebrow">COMPLETE RESULT</div><h2>Result matrix</h2></div></div><div id="race-result-matrix" class="table-wrap"></div></section>
-    <section class="analysis-chart-section" data-race-visual="contribution" hidden><div class="section-heading"><div><div class="eyebrow">TEAM SCORE</div><h2>Constructor contribution</h2></div></div><div id="constructor-contribution-chart"></div></section>
-    <section class="analysis-chart-section" data-race-visual="attrition" hidden><div class="section-heading"><div><div class="eyebrow">RACE DISTANCE</div><h2>Attrition</h2></div></div><div id="attrition-chart"></div></section>
-    <section class="analysis-chart-section" data-race-visual="conversion" hidden><div class="section-heading"><div><div class="eyebrow">WEEKEND CONVERSION</div><h2>Qualifying, grid and finish</h2></div><span class="section-note">Grid penalties and race movement</span></div><div id="weekend-conversion-chart" class="weekend-conversion-chart"></div></section>
+    <div class="race-analysis-selectors">
+      <label><span>Season</span><select id="race-analysis-year" aria-label="Season" disabled><option>Loading…</option></select></label>
+      <label><span>Race</span><select id="race-analysis-race" aria-label="Race" disabled><option>Loading…</option></select></label>
+    </div>
+  </header>
+  <p id="race-analysis-status" class="analysis-status" role="status">Loading races…</p>
+  <section id="race-analysis-summary" class="analysis-summary-strip" aria-label="Race summary"></section>
+
+  <div id="race-analysis-workspace" hidden>
+    <nav class="analysis-visualization-menu" aria-label="Race analysis views">
+      <label class="analysis-mobile-view" for="race-analysis-view">Analysis view
+        <select id="race-analysis-view"><option value="flow">Grid to finish</option><option value="matrix">Results</option><option value="contribution">Team points</option><option value="attrition">Race distance</option></select>
+      </label>
+      <div class="analysis-visualization-tabs" role="tablist" aria-label="Race analysis visualization">
+        <button type="button" id="race-tab-flow" role="tab" aria-controls="race-panel-flow" aria-selected="true" data-race-visual-button="flow">Grid to finish</button>
+        <button type="button" id="race-tab-matrix" role="tab" aria-controls="race-panel-matrix" aria-selected="false" tabindex="-1" data-race-visual-button="matrix">Results</button>
+        <button type="button" id="race-tab-contribution" role="tab" aria-controls="race-panel-contribution" aria-selected="false" tabindex="-1" data-race-visual-button="contribution">Team points</button>
+        <button type="button" id="race-tab-attrition" role="tab" aria-controls="race-panel-attrition" aria-selected="false" tabindex="-1" data-race-visual-button="attrition">Race distance</button>
+      </div>
+    </nav>
+
+    <div class="analysis-visualization-workspace">
+      <section id="race-panel-flow" role="tabpanel" aria-labelledby="race-tab-flow" data-race-visual="flow" class="analysis-chart-section">
+        <div class="section-heading"><div><h2>Grid to finish</h2><p id="race-grid-note" class="analysis-method">Net position change; this is not an overtake count.</p></div><span id="race-selection-count"></span></div>
+        <div class="race-flow-options">
+          <label for="race-flow-mode">Positions shown<select id="race-flow-mode"><option value="race">Grid → finish</option><option value="weekend">Qualifying → grid → finish</option></select></label>
+          <div class="analysis-presets" aria-label="Driver selection presets"><button type="button" data-race-preset="ten">Top 10</button><button type="button" data-race-preset="points">Points scorers</button><button type="button" data-race-preset="all">All drivers</button></div>
+        </div>
+        <details id="race-driver-picker"><summary>Choose drivers <span id="race-driver-picker-count"></span></summary><label for="race-driver-search">Search drivers<input id="race-driver-search" type="search" placeholder="Name or abbreviation" autocomplete="off"></label><div id="race-driver-list" class="race-driver-list"></div></details>
+        <div id="race-flow-chart" class="race-flow-chart"></div>
+        <p class="analysis-method">Select or focus a driver for a persistent readout. Missing positions are omitted rather than plotted at the back.</p>
+        <div id="race-flow-readout" class="analysis-round-readout" aria-live="polite"></div>
+      </section>
+
+      <section id="race-panel-matrix" role="tabpanel" aria-labelledby="race-tab-matrix" data-race-visual="matrix" class="analysis-chart-section" hidden>
+        <div class="section-heading"><h2>Race results</h2><span>Sortable classification</span></div>
+        <div class="race-result-filters"><label for="race-result-search">Driver filter<input id="race-result-search" type="search" placeholder="Driver name" autocomplete="off"></label><label for="race-team-filter">Team filter<select id="race-team-filter"><option value="">All teams</option></select></label><button type="button" id="race-result-reset">Reset filters</button></div>
+        <div id="race-result-matrix" class="table-wrap" tabindex="0" aria-label="Race results; sortable columns"></div>
+      </section>
+
+      <section id="race-panel-contribution" role="tabpanel" aria-labelledby="race-tab-contribution" data-race-visual="contribution" class="analysis-chart-section" hidden>
+        <div class="section-heading"><h2 id="race-contribution-heading">Constructor points</h2><span>Driver contribution shown directly</span></div><div id="constructor-contribution-chart"></div>
+      </section>
+
+      <section id="race-panel-attrition" role="tabpanel" aria-labelledby="race-tab-attrition" data-race-visual="attrition" class="analysis-chart-section" hidden>
+        <div class="section-heading"><h2>Race distance</h2><span>Retirements and other classifications separated</span></div><div id="attrition-chart"></div>
+      </section>
+    </div>
   </div>
-</main><footer class="footer"><div class="container">Racelytic</div></footer><script src="/js/utils.js"></script><script src="/js/header.js"></script><script src="/js/team-colors.js"></script><script src="/js/race-analysis.js"></script></body></html>
+</main><footer class="footer"><div class="container">Racelytic</div></footer>
+<script src="/js/utils.js"></script><script src="/js/header.js"></script><script src="/js/team-colors.js"></script><script src="/js/race-analysis.js"></script>
+</body></html>

@@ -1,0 +1,64 @@
+.season-comparison-page .analysis-detail-head > div { width: 100%; }
+.season-comparison-page .comparison-title-row { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin-bottom: 8px; }
+.season-comparison-page .comparison-title-row h1 { margin: 0; }
+.season-comparison-page .comparison-years { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.season-comparison-page .comparison-year { width: 94px; min-height: 44px; height: 44px; padding: 0 28px 0 12px; border: 1px solid transparent; border-radius: 9px; appearance: none; background: #f7e9ec url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none'%3E%3Cpath d='m3 4.5 3 3 3-3' stroke='%23767b85' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 12px center; box-shadow: none; font-size: 15px; font-weight: 750; }
+.season-comparison-page .second-year { background-color: #e8ecf2; }
+body:is(.f2-mode, .f3-mode, .academy-mode) .season-comparison-page .first-year { background-color: var(--accent-light); }
+.season-comparison-page #swap-seasons { width: 38px; height: 44px; border: 0; border-radius: 8px; background: transparent; color: var(--text-secondary); font-size: 23px; }
+.season-comparison-page #swap-seasons:hover { background: var(--surface-alt); }
+.season-comparison-page .comparison-season-context { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; margin: 20px 0 4px; }
+.season-comparison-page .comparison-season-context > div { border-left: 3px solid var(--comparison-color); padding-left: 12px; }
+.season-comparison-page .comparison-season-context a { color: var(--text); font-size: 17px; font-weight: 750; text-decoration: none; }
+.season-comparison-page .comparison-season-context p { margin: 5px 0 0; font-size: 13px; }
+.season-comparison-page .comparison-season-context small { display: block; margin-top: 4px; color: var(--text-secondary); font-size: 12px; }
+.season-comparison-page .comparison-tabs { grid-template-columns: repeat(4,minmax(0,1fr)); }
+.season-comparison-page .comparison-scope { display: flex; align-items: center; gap: 16px; padding: 14px 20px; border-bottom: 1px solid var(--border); }
+.season-comparison-page .comparison-scope > label { flex: 0 0 220px; }
+.season-comparison-page .comparison-scope > #comparison-round-label { flex-basis: 115px; }
+.season-comparison-page .comparison-scope .analysis-method { margin: 0; }
+.season-comparison-page h2 { margin: 0 0 14px; font-size: 23px; letter-spacing: -.025em; }
+.season-comparison-page h3 { margin: 22px 0 8px; font-size: 17px; }
+.season-comparison-page .comparison-metrics { width: 100%; border-collapse: collapse; }
+.season-comparison-page .comparison-metrics th, .season-comparison-page .comparison-metrics td { padding: 13px 12px; font-size: 13px; text-align: right; border-bottom: 1px solid var(--border); font-variant-numeric: tabular-nums; }
+.season-comparison-page .comparison-metrics th:first-child { text-align: left; font-weight: 600; width: 37%; }
+.season-comparison-page .comparison-metrics thead th { background: #f7f8fa; font-size: 12px; }
+.season-comparison-page .comparison-metrics th small { display: block; margin-top: 4px; color: var(--text-secondary); font-size: 11px; font-weight: 400; }
+.season-comparison-page .comparison-metrics td:last-child { color: var(--text-secondary); }
+.season-comparison-page .comparison-chart-legend { display: flex; flex-wrap: wrap; gap: 16px; margin: 14px 0; font-size: 13px; }
+.season-comparison-page .comparison-chart-legend span::before { content: ''; display: inline-block; width: 22px; border-top: 3px solid var(--comparison-color); vertical-align: middle; margin-right: 7px; }
+.season-comparison-page .comparison-chart-legend span:last-child::before { border-top-style: dashed; }
+.season-comparison-page .analysis-round-readout { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; background: #f7f8fa; border: 0; }
+.season-comparison-page .analysis-round-readout strong { color: var(--comparison-color); }
+.season-comparison-page .analysis-round-readout small { display: block; margin: 6px 0; color: var(--text-secondary); }
+.season-comparison-page .analysis-round-readout p { font-size: 13px; }
+.season-comparison-page .comparison-field-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.season-comparison-page .comparison-fields { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 22px; }
+.season-comparison-page .comparison-fields h3 { margin-top: 10px; padding-left: 10px; border-left: 3px solid var(--comparison-color); }
+.season-comparison-page .comparison-fields table { min-width: 470px; width: 100%; }
+.season-comparison-page .comparison-fields th, .season-comparison-page .comparison-fields td { padding: 9px 7px; font-size: 12px; }
+.season-comparison-page .comparison-fields th button { min-height: 36px; padding: 0; border: 0; background: transparent; color: inherit; font: inherit; text-align: left; }
+.season-comparison-page .comparison-fields td a { color: var(--text); text-decoration: none; }
+.season-comparison-page .comparison-fields small { display: block; margin-top: 3px; color: var(--text-secondary); font-size: 10px; }
+.season-comparison-page .comparison-methodology { border-top: 1px solid var(--border); margin-top: 22px; padding-top: 16px; font-size: 12px; color: var(--text-secondary); }
+.season-comparison-page .comparison-methodology summary { cursor: pointer; font-weight: 700; }
+.season-comparison-page .comparison-methodology p { max-width: none; font-size: 12px; }
+.season-comparison-page .comparison-warning { padding: 10px 12px; border-left: 3px solid #c78312; background: #fff9ed; }
+.season-comparison-page button:focus-visible, .season-comparison-page select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+@media (max-width: 1000px) {
+  .season-comparison-page .comparison-title-row { flex-wrap: wrap; }
+  .season-comparison-page .comparison-fields { grid-template-columns: minmax(0,1fr); }
+}
+@media (max-width: 760px) {
+  .season-comparison-page .comparison-title-row { gap: 12px; }
+  .season-comparison-page .comparison-season-context { gap: 12px; }
+  .season-comparison-page .comparison-season-context p { font-size: 12px; }
+  .season-comparison-page .comparison-scope { flex-wrap: wrap; padding: 12px; gap: 10px; }
+  .season-comparison-page .comparison-scope > label { flex: 1 1 170px; }
+  .season-comparison-page .comparison-scope > #comparison-round-label { flex: 1 1 100px; }
+  .season-comparison-page .comparison-scope .analysis-method { flex-basis: 100%; }
+  .season-comparison-page .comparison-metrics th, .season-comparison-page .comparison-metrics td { padding: 11px 5px; font-size: 12px; }
+  .season-comparison-page .comparison-metrics thead th { font-size: 11px; }
+  .season-comparison-page .analysis-round-readout { grid-template-columns: minmax(0,1fr); gap: 12px; }
+  .season-comparison-page .comparison-field-head { align-items: start; flex-direction: column; }
+}

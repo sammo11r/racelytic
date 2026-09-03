@@ -1,7 +1,23 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" href="/assets/favicon.svg" type="image/svg+xml"><title>Racelytic</title><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/polish.css"></head>
-<body><div id="header"></div><main class="container page analysis-detail-page teammate-page">
-  <a class="back-link" href="/analysis">← Analysis</a>
-  <section class="analysis-detail-head"><div><div class="eyebrow">TEAMMATE BATTLES</div><h1>Same team. Direct comparison.</h1><p>Compare drivers only in races where they competed for the same constructor.</p></div></section>
-  <section class="comparison-picker teammate-picker"><label><span>Driver</span><select id="battle-driver"><option>Loading…</option></select></label><div class="comparison-versus">VS</div><label><span>Teammate</span><select id="battle-teammate"><option>Select a driver first</option></select></label><button id="load-battle" type="button">View battle</button></section>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Compare Formula 1 teammates across the races and seasons they contested for the same team.">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml"><title>Teammate battles · Racelytic</title>
+  <link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/polish.css"><link rel="stylesheet" href="/css/teammate-battles.css">
+</head>
+<body><div id="header"></div>
+<main class="container page analysis-detail-page teammate-page">
+  <header class="teammate-head">
+    <div class="teammate-heading"><div class="eyebrow" id="battle-series-label">FORMULA 1 · TEAMMATES</div><h1>Teammate battles</h1><p>Direct comparisons from races contested for the same team.</p></div>
+    <div class="teammate-controls">
+      <label><span>Driver</span><input id="battle-driver-search" type="search" list="battle-driver-options" placeholder="Search drivers" autocomplete="off" disabled><datalist id="battle-driver-options"></datalist><input id="battle-driver" type="hidden"></label>
+      <div class="battle-control-actions"><button id="swap-battle-drivers" type="button" aria-label="Swap drivers" title="Swap drivers">⇄</button><button id="reset-battle-drivers" type="button" aria-label="Reset pairing" title="Reset pairing">×</button></div>
+      <label><span>Teammate</span><select id="battle-teammate" disabled><option value="">Choose a driver first</option></select></label>
+    </div>
+  </header>
+  <p id="battle-status" class="analysis-status" role="status">Loading drivers…</p>
   <div id="battle-content"><div class="loading-state">Loading drivers…</div></div>
-</main><footer class="footer"><div class="container">Racelytic</div></footer><script src="/js/utils.js"></script><script src="/js/header.js"></script><script src="/js/teammate-battles.js"></script></body></html>
+</main><footer class="footer"><div class="container">Racelytic</div></footer>
+<script src="/js/utils.js"></script><script src="/js/header.js"></script><script src="/js/teammate-battles.js"></script>
+</body></html>

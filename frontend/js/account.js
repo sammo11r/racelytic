@@ -74,6 +74,9 @@ async function loadCustomChampionships() {
 }
 
 function savedRecordUrl(configuration) {
+  if (['f2', 'f3', 'academy'].includes(configuration?.series) && !configuration.raceFormat) {
+    configuration = { ...configuration, raceFormat: configuration.category === 'championships' ? 'all' : configuration.category === 'poles' ? 'F' : configuration.includeSprints ? 'all' : 'F' };
+  }
   const query = new URLSearchParams();
   Object.entries(configuration || {}).forEach(([key, value]) => {
     if (key !== 'series' && value !== null && value !== undefined && value !== '' && value !== false) query.set(key, String(value));
@@ -89,8 +92,7 @@ async function loadSavedRecords() {
   const container = document.getElementById('saved-records');
   container.innerHTML = ownedRecords.length ? ownedRecords.map(record => {
     const config = record.configuration || {};
-    const junior = ['f2', 'f3', 'academy'].includes(config.series);
-    const detail = [config.type === 'constructors' ? (['f3', 'academy'].includes(config.series) ? 'Teams' : 'Constructors') : 'Drivers', config.category, config.fromYear || config.toYear ? `${config.fromYear || (config.series === 'academy' ? '2023' : config.series === 'f3' ? '2019' : config.series === 'f2' ? '2017' : '1950')}–${config.toYear || 'present'}` : 'All-time', config.includeSprints ? 'Sprints included' : junior ? 'Feature races only' : 'Grand Prix only'];
+    const detail = [config.type === 'constructors' ? (['f3', 'academy'].includes(config.series) ? 'Teams' : 'Constructors') : 'Drivers', config.category, config.fromYear || config.toYear ? `${config.fromYear || (config.series === 'academy' ? '2023' : config.series === 'f3' ? '2019' : config.series === 'f2' ? '2017' : '1950')}–${config.toYear || 'present'}` : 'All-time', savedRecordFormat(config)];
     return `<article class="saved-record-card"><a href="${esc(savedRecordUrl(config))}"><span>${esc(record.visibility)} RECORD</span><strong>${esc(record.name)}</strong><small>${esc(detail.join(' · '))}</small></a><button type="button" data-delete-record="${esc(record.id)}" aria-label="Delete ${esc(record.name)}">Delete</button></article>`;
   }).join('') : '<div class="empty-state">Your personal record book is empty. Save a result from the Records Explorer to add it here.</div>';
   container.querySelectorAll('[data-delete-record]').forEach(button => button.addEventListener('click', async () => {
@@ -170,12 +172,22 @@ async function loadPointsSystems() {
   renderCommunityLibrary();
 }
 
+function savedRecordFormat(config) {
+  if (config.category === 'championships') return 'Season titles';
+  if (['f2', 'f3', 'academy'].includes(config.series)) {
+    const format = config.raceFormat || (config.includeSprints ? 'all' : 'F');
+    return format === 'all' ? 'All race formats' : format === 'F' ? (config.series === 'academy' ? 'Standard races' : 'Feature races') : (config.series === 'academy' ? 'Reverse-grid races' : 'Sprint races');
+  }
+  return config.includeSprints ? 'Grand Prix + sprint' : 'Grand Prix only';
+}
+
 function recordDetail(record) {
   const config = record.configuration || {};
   return [
-    config.type === 'constructors' ? 'Constructors' : 'Drivers',
+    config.type === 'constructors' ? (['f3', 'academy'].includes(config.series) ? 'Teams' : 'Constructors') : 'Drivers',
     config.category || 'wins',
-    config.fromYear || config.toYear ? `${config.fromYear || '1950'}–${config.toYear || 'present'}` : 'All-time'
+    config.fromYear || config.toYear ? `${config.fromYear || ({ f2: 2017, f3: 2019, academy: 2023 }[config.series] || 1950)}–${config.toYear || 'present'}` : 'All-time',
+    savedRecordFormat(config)
   ].join(' · ');
 }
 

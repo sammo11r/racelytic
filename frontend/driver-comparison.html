@@ -1,7 +1,26 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" href="/assets/favicon.svg" type="image/svg+xml"><title>Racelytic</title><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/polish.css"></head>
-<body><div id="header"></div><main class="container page analysis-detail-page comparison-page">
-  <a class="back-link" href="/analysis">← Analysis</a>
-  <section class="analysis-detail-head"><div><div class="eyebrow">DRIVER COMPARISON</div><h1>Settle it with the numbers.</h1><p>Compare complete careers, then isolate the races where two drivers shared a team.</p></div></section>
-  <section class="comparison-picker"><label><span>First driver</span><select id="comparison-driver-one"><option>Loading…</option></select></label><div class="comparison-versus">VS</div><label><span>Second driver</span><select id="comparison-driver-two"><option>Loading…</option></select></label><button id="compare-drivers" type="button">Compare drivers</button></section>
-  <div id="comparison-content"><div class="loading-state">Loading drivers…</div></div>
-</main><footer class="footer"><div class="container">Racelytic</div></footer><script src="/js/utils.js"></script><script src="/js/header.js"></script><script src="/js/driver-comparison.js"></script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Compare two drivers across career results, rates, teammate seasons and shared races.">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml"><title>Driver comparison · Racelytic</title>
+  <link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/polish.css"><link rel="stylesheet" href="/css/driver-comparison.css">
+</head>
+<body><div id="header"></div>
+<main class="container page analysis-detail-page comparison-page">
+  <header class="comparison-page-head">
+    <div><div id="comparison-series-label" class="eyebrow">FORMULA 1 · DRIVER COMPARISON</div><h1 id="comparison-title">Compare drivers</h1><p>Career context, opportunity-adjusted rates and direct head-to-head results.</p></div>
+    <div class="comparison-head-actions"><button id="copy-comparison-link" type="button" disabled>Copy link</button></div>
+  </header>
+  <section class="comparison-picker" aria-label="Choose drivers">
+    <label for="comparison-driver-one"><span>First driver</span><input id="comparison-driver-one" type="search" list="comparison-driver-options-one" placeholder="Search drivers" autocomplete="off" disabled></label>
+    <button id="swap-drivers" class="comparison-swap" type="button" aria-label="Swap drivers" title="Swap drivers" disabled>⇄</button>
+    <label for="comparison-driver-two"><span>Second driver</span><input id="comparison-driver-two" type="search" list="comparison-driver-options-two" placeholder="Search drivers" autocomplete="off" disabled></label>
+    <datalist id="comparison-driver-options-one"></datalist><datalist id="comparison-driver-options-two"></datalist>
+  </section>
+  <p id="comparison-status" class="analysis-status" role="status">Loading drivers…</p>
+  <div id="comparison-content"></div>
+</main>
+<footer class="footer"><div class="container">Racelytic</div></footer>
+<script src="/js/utils.js"></script><script src="/js/header.js"></script><script src="/js/driver-comparison.js"></script>
+</body></html>

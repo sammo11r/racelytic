@@ -1,0 +1,34 @@
+[
+  {
+    "status": "Unable to load race: Audit: simulated data outage",
+    "statusHidden": false,
+    "workspaceHidden": true,
+    "route": "/race-analysis",
+    "passed": true,
+    "recovered": true
+  },
+  {
+    "status": "Unable to load races: Audit: simulated data outage",
+    "statusHidden": false,
+    "workspaceHidden": true,
+    "route": "/f2/race-analysis",
+    "passed": true,
+    "recovered": true
+  },
+  {
+    "status": "Unable to load races: Audit: simulated data outage",
+    "statusHidden": false,
+    "workspaceHidden": true,
+    "route": "/f3/race-analysis",
+    "passed": true,
+    "recovered": true
+  },
+  {
+    "status": "Unable to load races: Audit: simulated data outage",
+    "statusHidden": false,
+    "workspaceHidden": true,
+    "route": "/academy/race-analysis",
+    "passed": true,
+    "recovered": true
+  }
+]

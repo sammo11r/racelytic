@@ -1,0 +1,95 @@
+.race-analysis-page.page { padding-top: 22px; }
+.race-analysis-page [hidden] { display: none !important; }
+.race-analysis-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 28px; margin: 8px 0 16px; }
+.race-analysis-heading { min-width: 0; }
+.race-analysis-head h1 { margin: 7px 0 6px; font-size: clamp(30px, 4vw, 48px); line-height: 1.04; letter-spacing: -.045em; }
+.race-analysis-head p { margin: 0; color: var(--text-secondary); font-size: 13px; }
+.race-analysis-selectors { display: grid; grid-template-columns: 100px minmax(230px, 330px); width: auto; gap: 8px; }
+.race-analysis-page label { display: grid; gap: 5px; color: var(--text-secondary); font-size: 11px; font-weight: 750; }
+.race-analysis-page select, .race-analysis-page input { width: 100%; min-height: 40px; padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; background-color: #fff; color: var(--text); font: inherit; }
+.race-analysis-page button { cursor: pointer; }
+.race-analysis-page .analysis-status { margin: 0 0 12px; color: var(--text-secondary); font-size: 12px; }
+.race-analysis-page .analysis-summary-strip { grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); margin: 0; border-radius: 12px; box-shadow: none; }
+.race-analysis-page .analysis-summary-strip > div { min-height: 88px; padding: 14px 16px; }
+.race-analysis-page .analysis-summary-strip strong { margin-top: 7px; font-size: 19px; }
+.race-analysis-page .analysis-summary-strip small { font-size: 11px; }
+#race-analysis-workspace { margin-top: 18px; border: 1px solid var(--border); border-radius: 14px; background: #fff; }
+.race-analysis-page .analysis-visualization-menu { margin: 0; padding: 0; border: 0; border-bottom: 1px solid var(--border); border-radius: 14px 14px 0 0; background: var(--surface-alt); box-shadow: none; }
+.race-analysis-page .analysis-visualization-tabs { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; padding: 0; border-radius: inherit; background: transparent; }
+.race-analysis-page .analysis-visualization-tabs button { min-height: 50px; margin-bottom: -1px; padding: 14px 12px; border: 0; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); border-radius: 0; font-size: 13px; font-weight: 750; text-align: center; box-shadow: none; }
+.race-analysis-page .analysis-visualization-tabs button:first-child { border-top-left-radius: 13px; }
+.race-analysis-page .analysis-visualization-tabs button:last-child { border-right: 0; border-top-right-radius: 13px; }
+.race-analysis-page .analysis-visualization-tabs button::before { display: none; }
+.race-analysis-page .analysis-visualization-tabs button[aria-selected="true"] { color: var(--text); background: #fff; border-bottom-color: #fff; box-shadow: inset 0 3px var(--accent); }
+.race-analysis-page .analysis-mobile-view { display: none; }
+.race-analysis-page .analysis-visualization-workspace { margin: 0; padding: 20px; }
+.race-analysis-page .analysis-chart-section { margin: 0; }
+.race-analysis-page .section-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 14px; margin: 0 0 12px; padding: 0; border: 0; }
+.race-analysis-page .section-heading h2 { margin: 0; font-size: 23px; letter-spacing: -.025em; }
+.race-analysis-page .section-heading p { margin: 5px 0 0; }
+.race-analysis-page .section-heading > span { color: var(--text-secondary); font-size: 12px; }
+.race-analysis-page .analysis-method { max-width: none; margin: 10px 0; color: var(--text-secondary); font-size: 12px; line-height: 1.55; }
+.race-flow-options { display: flex; align-items: end; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+.race-flow-options > label { width: 230px; }
+.race-analysis-page .analysis-presets { display: flex; flex-wrap: wrap; gap: 6px; }
+.race-analysis-page .analysis-presets button, #race-result-reset { min-height: 38px; padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; background: #fff; color: var(--text); font: inherit; font-size: 12px; font-weight: 700; }
+#race-driver-picker { margin-bottom: 12px; padding: 10px 14px; border: 1px solid var(--border); border-radius: 10px; background: #fff; }
+#race-driver-picker summary { font-size: 13px; font-weight: 700; cursor: pointer; }
+#race-driver-picker > label { max-width: 360px; margin: 12px 0; }
+.race-driver-list { display: flex; flex-wrap: wrap; gap: 6px; max-height: 190px; overflow-y: auto; }
+.race-driver-list button { display: inline-flex; align-items: center; gap: 7px; min-height: 35px; padding: 7px 10px; border: 1px solid var(--border); border-radius: 8px; background: #fff; color: var(--text-secondary); font: inherit; font-size: 11px; font-weight: 700; }
+.race-driver-list button i { width: 14px; height: 3px; border-radius: 3px; background: var(--driver-color); }
+.race-driver-list button[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-light); color: var(--text); }
+.race-flow-chart { width: 100%; max-width: 100%; overflow: hidden; padding: 10px 0; border: 0; border-radius: 0; box-shadow: none; }
+.race-flow-chart svg { display: block; width: 100%; min-width: 0; height: auto; }
+.race-flow-chart .flow-axis { stroke: var(--border); }
+.race-flow-chart .flow-node { fill: #fff; stroke: var(--flow-color); stroke-width: 2; }
+.race-flow-chart .flow-missing { fill: var(--text-muted); font-size: 9px; }
+.race-flow-chart .race-flow-line { stroke-width: 2.5; }
+.race-flow-chart .race-flow-line.is-current { stroke-width: 5; opacity: 1; }
+.race-analysis-page .analysis-round-readout { margin-top: 10px; min-height: 52px; padding: 13px 15px; border: 1px solid var(--border); border-radius: 10px; font-size: 13px; }
+.race-analysis-page .analysis-round-readout:empty { display: none; }
+.race-analysis-page .analysis-round-readout span { color: var(--text-secondary); }
+.race-analysis-page .analysis-round-readout strong { display: block; margin-bottom: 4px; }
+.race-result-filters { display: grid; grid-template-columns: minmax(180px, 1fr) minmax(180px, 1fr) auto; align-items: end; gap: 10px; margin-bottom: 14px; }
+.race-analysis-table th button { width: 100%; padding: 10px 8px; border: 0; background: transparent; color: inherit; font: inherit; font-size: 10px; font-weight: 800; text-align: inherit; text-transform: uppercase; white-space: nowrap; }
+.race-analysis-table td { padding: 8px 10px; font-size: 12px; }
+.race-analysis-table .result-status { font-weight: 750; }
+.race-analysis-table .status-retired { color: #a0232e; }
+.race-analysis-table .status-non-starter, .race-analysis-table .status-unclassified { color: #73520b; }
+.race-analysis-table .status-disqualified { color: #fff; background: #20232a; border-radius: 4px; padding: 3px 5px; }
+.contribution-chart, .attrition-chart { padding: 0; border: 0; box-shadow: none; }
+.contribution-row { grid-template-columns: minmax(110px, 165px) minmax(120px, 1fr) minmax(180px, auto) 44px; min-height: 42px; border-bottom: 1px solid var(--border); }
+.contribution-drivers { color: var(--text-secondary); font-size: 11px; }
+.contribution-drivers b { color: var(--text); }
+.attrition-row { grid-template-columns: minmax(110px, 165px) minmax(100px, 1fr) minmax(100px, auto); min-height: 40px; border-bottom: 1px solid var(--border); }
+.attrition-row > strong { font-size: 10px; }
+.attrition-row .status-retired { color: #a0232e; }
+.attrition-row .status-non-starter, .attrition-row .status-unclassified { color: #73520b; }
+.empty-state { padding: 24px; border: 1px dashed var(--border); border-radius: 10px; color: var(--text-secondary); text-align: center; }
+@media (max-width: 900px) {
+  .race-analysis-page .analysis-summary-strip { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .contribution-row { grid-template-columns: minmax(100px, 140px) 1fr 44px; }
+  .contribution-drivers { grid-column: 1 / -1; padding-bottom: 8px; }
+}
+@media (max-width: 760px) {
+  .race-analysis-head { align-items: stretch; flex-direction: column; gap: 14px; }
+  .race-analysis-head h1 { font-size: 32px; }
+  .race-analysis-selectors { grid-template-columns: 86px minmax(0, 1fr); }
+  .race-analysis-page .analysis-summary-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .race-analysis-page .analysis-summary-strip > div { min-height: 82px; padding: 12px; }
+  .race-analysis-page .analysis-visualization-tabs { display: none; }
+  .race-analysis-page .analysis-mobile-view { display: grid; padding: 12px; }
+  .race-analysis-page .analysis-visualization-workspace { padding: 16px 12px; }
+  .race-analysis-page .section-heading { align-items: flex-start; flex-direction: column; gap: 4px; }
+  .race-flow-options { align-items: stretch; flex-direction: column; }
+  .race-flow-options > label { width: 100%; }
+  .race-result-filters { grid-template-columns: 1fr; }
+  .contribution-row { grid-template-columns: 95px 1fr 36px; }
+  .attrition-row { grid-template-columns: 95px 1fr 88px; }
+}
+@media (max-width: 430px) {
+  .race-analysis-selectors { grid-template-columns: 1fr; }
+  .race-analysis-page .analysis-summary-strip strong { font-size: 17px; }
+  .race-flow-chart { margin-right: -4px; margin-left: -4px; width: calc(100% + 8px); }
+}
