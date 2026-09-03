@@ -9,6 +9,7 @@ const { renderSeriesHome } = require('./series-home-renderer');
 const { applySeo, renderRobots, renderSitemap } = require('./seo');
 const { renderPageShell } = require('./page-shell');
 const { seriesPageRoutes } = require('./series-pages');
+const { renderSeasonAnalysisHtml } = require('./season-analysis-renderer');
 
 const app = express();
 const PORT = Number(process.env.PORT || 3000);
@@ -17,7 +18,8 @@ const frontendDirectory = path.join(__dirname, '../frontend');
 function sendSeoPage(req, res, next, file, transform = content => content) {
     fs.readFile(path.join(frontendDirectory, file), 'utf8', (error, content) => {
         if (error) return next(error);
-        res.type('html').send(applySeo(renderPageShell(transform(content)), req.path, req.query));
+        const rendered = file === 'season-analysis.html' ? renderSeasonAnalysisHtml(content, req.path) : transform(content);
+        res.type('html').send(applySeo(renderPageShell(rendered), req.path, req.query));
     });
 }
 

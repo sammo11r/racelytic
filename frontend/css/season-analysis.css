@@ -1,0 +1,119 @@
+/* Shared season analysis layout; championship colours come from the page theme. */
+.season-analysis-page.page { padding-top: 22px; }
+.season-analysis-page .analysis-detail-head { margin: 8px 0 16px; gap: 24px; align-items: center; }
+.season-analysis-page .analysis-detail-head h1 { margin: 0 0 8px; font-size: clamp(28px, 3.4vw, 42px); line-height: 1.15; letter-spacing: -.04em; }
+.season-analysis-page .analysis-detail-head .eyebrow { margin-bottom: 9px; }
+.season-analysis-page .analysis-detail-head p { font-size: 14px; }
+.season-analysis-page label { display: grid; gap: 5px; color: var(--text-secondary); font-size: 12px; font-weight: 700; }
+.season-analysis-page select, .season-analysis-page input { width: 100%; min-height: 40px; padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; background: #fff; color: var(--text); font: inherit; }
+.season-analysis-page #analysis-season {
+  width: 94px; min-width: 94px; min-height: 44px; height: 44px; padding: 0 30px 0 13px;
+  border: 1px solid transparent; border-radius: 9px; appearance: none;
+  background: rgba(var(--accent-rgb), .055) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none'%3E%3Cpath d='m3 4.5 3 3 3-3' stroke='%23767b85' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 12px center;
+  box-shadow: none; color: var(--text); font-size: 15px; font-weight: 750; letter-spacing: 0; font-variant-numeric: tabular-nums; cursor: pointer;
+  transition: background-color .16s ease, border-color .16s ease;
+}
+.season-analysis-page #analysis-season:hover:not(:disabled) { background-color: rgba(var(--accent-rgb), .09); border-color: rgba(var(--accent-rgb), .16); }
+.season-analysis-page #analysis-season:focus { background-color: rgba(var(--accent-rgb), .055); box-shadow: none; }
+.season-analysis-page #analysis-season:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.season-analysis-page button { cursor: pointer; }
+.season-analysis-page .analysis-presets button { min-height: 38px; padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; background: #fff; color: var(--text); font: inherit; font-size: 12px; font-weight: 700; }
+.season-analysis-page .analysis-status { margin: 0 0 12px; max-width: none; font-size: 12px; color: var(--text-secondary); }
+.season-analysis-page .analysis-summary-strip { margin: 0; border-radius: 12px; box-shadow: none; }
+.season-analysis-page .analysis-summary-strip > div { min-height: 90px; padding: 15px 20px; }
+.season-analysis-page .analysis-summary-strip strong { font-size: 20px; }
+.season-analysis-page .analysis-summary-strip span { font-size: 10px; }
+.season-analysis-page .analysis-summary-strip small { font-size: 12px; }
+.season-analysis-page #season-analysis-workspace { margin-top: 18px; border: 1px solid var(--border); border-radius: 14px; background: #fff; }
+.season-analysis-page .analysis-visualization-menu { margin: 0; padding: 0; border: 0; border-bottom: 1px solid var(--border); border-radius: 14px 14px 0 0; box-shadow: none; background: var(--surface-alt); }
+.season-analysis-page .analysis-visualization-tabs { display: grid; overflow: visible; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0; padding: 0; border-radius: inherit; background: transparent; }
+.season-analysis-page .analysis-visualization-tabs button { min-width: 0; min-height: 50px; margin-bottom: -1px; padding: 14px 12px; border: 0; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); border-radius: 0; font-size: 13px; font-weight: 750; text-align: center; box-shadow: none; }
+.season-analysis-page .analysis-visualization-tabs button:first-child { border-top-left-radius: 13px; }
+.season-analysis-page .analysis-visualization-tabs button:last-child { border-right: 0; border-top-right-radius: 13px; }
+.season-analysis-page .analysis-visualization-tabs button::before { display: none; }
+.season-analysis-page .analysis-visualization-tabs button[aria-selected="true"] { color: var(--text); background: #fff; border-bottom-color: #fff; box-shadow: inset 0 3px var(--accent); }
+.season-analysis-page .analysis-visualization-tabs button:focus-visible { outline-offset: -5px; }
+.season-analysis-page .analysis-mobile-view { display: none; }
+.season-analysis-page .analysis-scoring-controls { display: flex; align-items: center; gap: 18px; margin: 0; padding: 16px 20px; border-bottom: 1px solid var(--border); }
+.season-analysis-page .analysis-scoring-controls label { flex: 0 0 210px; }
+.season-analysis-page .analysis-method { max-width: none; margin: 10px 0; font-size: 12px; line-height: 1.6; color: var(--text-secondary); }
+.season-analysis-page .has-warning { padding-left: 12px; border-left: 3px solid #c78312; }
+.season-analysis-page .analysis-method summary { cursor: pointer; }
+.season-analysis-page .analysis-method details p { margin-bottom: 0; font-size: 12px; }
+.season-analysis-page .analysis-visualization-workspace { margin-top: 0; padding: 20px; }
+.season-analysis-page .section-heading { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin: 0 0 12px; padding: 0; border: 0; }
+.season-analysis-page .section-heading h2 { margin: 0; font-size: 23px; letter-spacing: -.025em; }
+.season-analysis-page .section-heading > span { font-size: 12px; color: var(--text-secondary); }
+.season-analysis-page .analysis-presets { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.season-analysis-page .analysis-driver-controls { display: grid; grid-template-columns: auto minmax(200px, 1fr); align-items: start; gap: 12px; }
+.season-analysis-page #driver-picker[open] { grid-column: 1 / -1; }
+.season-analysis-page #driver-picker { margin-bottom: 12px; border: 1px solid var(--border); border-radius: 10px; background: #fff; padding: 10px 14px; }
+.season-analysis-page #driver-picker summary { font-size: 13px; font-weight: 700; cursor: pointer; }
+.season-analysis-page #driver-picker[data-preset-note]:not([data-preset-note=""])::after { content: attr(data-preset-note); display: block; font-size: 12px; margin-top: 8px; color: var(--text-secondary); }
+.season-analysis-page #driver-picker label { margin: 12px 0; max-width: 360px; }
+.season-analysis-page .progression-legend { display: flex; flex-wrap: wrap; overflow: visible; max-height: 230px; overflow-y: auto; margin-bottom: 0; }
+.season-analysis-page .progression-driver { min-height: 36px; font-size: 12px; opacity: 1; color: var(--text-secondary); }
+.season-analysis-page .progression-driver.active { background: var(--accent-light); border-color: var(--accent); color: var(--text); }
+.season-analysis-page .interactive-chart { width: 100%; min-width: 0; min-height: 0; padding: 12px 0 0; overflow: hidden; border: 0; border-radius: 0; background: #fff; }
+.season-analysis-page .interactive-chart svg { display: block; width: 100%; min-width: 0; height: auto; }
+.season-analysis-page .interactive-chart svg text { font-size: 11px; fill: var(--text-secondary); }
+.season-analysis-page .chart-endpoint text { font-weight: 750; }
+.season-analysis-page .chart-endpoint path { fill: none; stroke-width: 1; }
+.season-analysis-page .analysis-round-hit { fill: transparent; cursor: crosshair; }
+.season-analysis-page .analysis-round-hit.is-current, .season-analysis-page .analysis-round-hit:focus { fill: rgba(17, 19, 24, .045); stroke: rgba(17, 19, 24, .18); outline: none; }
+.season-analysis-page .analysis-round-readout { margin-top: 12px; padding: 14px 16px; background: #fff; border: 1px solid var(--border); border-radius: 10px; font-size: 13px; }
+.season-analysis-page .analysis-round-readout:empty { display: none; }
+.season-analysis-page .analysis-round-readout > span { margin-left: 10px; color: var(--text-secondary); font-size: 12px; }
+.season-analysis-page .analysis-round-readout ul { display: grid; grid-template-columns: repeat(auto-fit, minmax(215px, 1fr)); gap: 8px 20px; list-style: none; padding: 0; margin: 10px 0 0; }
+.season-analysis-page .analysis-round-readout li { display: flex; align-items: center; gap: 7px; }
+.season-analysis-page .analysis-round-readout li i { width: 12px; height: 3px; flex-shrink: 0; }
+.season-analysis-page .analysis-round-readout li b { margin-left: auto; }
+.season-analysis-page .analysis-round-readout p { margin: 6px 0 0; font-size: 14px; }
+.season-analysis-page .analysis-subheading { margin: 20px 0 10px; font-size: 16px; }
+.season-analysis-page .analysis-lead-changes { padding-left: 20px; font-size: 13px; }
+.season-analysis-page .analysis-lead-changes li { padding: 6px 0; }
+.season-analysis-page .analysis-lead-changes span { display: block; margin-top: 3px; color: var(--text-secondary); }
+.season-analysis-page .analysis-share-bars { list-style: none; padding: 0; margin: 16px 0; }
+.season-analysis-page .analysis-share-bars li { display: grid; grid-template-columns: 180px 1fr 155px; align-items: center; gap: 16px; padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
+.season-analysis-page .analysis-share-track { height: 15px; background: #e5e8ee; border-radius: 4px; overflow: hidden; }
+.season-analysis-page .analysis-share-track i { display: block; height: 100%; }
+.season-analysis-page .analysis-share-bars strong { text-align: right; font-variant-numeric: tabular-nums; }
+.season-analysis-page .analysis-share-bars small { display: inline-block; width: 55px; color: var(--text-secondary); }
+.season-analysis-page .analysis-results-table { width: max-content; min-width: 100%; border-collapse: separate; border-spacing: 3px; }
+.season-analysis-page .analysis-results-table caption { text-align: left; font-size: 12px; margin-bottom: 10px; color: var(--text-secondary); }
+.season-analysis-page .analysis-results-table th, .season-analysis-page .analysis-results-table td { padding: 0; border: 0; }
+.season-analysis-page .analysis-results-table th { background: #f5f6f8; font-size: 12px; text-align: left; }
+.season-analysis-page .analysis-results-table th[scope="col"] { width: 80px; padding: 8px; }
+.season-analysis-page .analysis-results-table th small { display: block; max-width: 80px; white-space: normal; font-size: 10px; line-height: 1.35; margin-top: 3px; text-transform: none; }
+.season-analysis-page .analysis-results-table th:first-child { position: sticky; left: 0; z-index: 1; min-width: 155px; padding: 8px; }
+.season-analysis-page .analysis-results-table th a { color: var(--text); text-decoration: none; }
+.season-analysis-page .heatmap-cell { width: 100%; min-width: 80px; min-height: 40px; border: 0; font: inherit; font-size: 12px; font-weight: 700; }
+.season-analysis-page .heatmap-cell.disqualified, .season-analysis-page .heatmap-key .disqualified { background: #17191f; color: #fff; }
+.season-analysis-page .heatmap-cell.upcoming { background: repeating-linear-gradient(135deg, #f5f6f8 0 4px, #e9ecf0 4px 5px); color: #646c78; font-weight: 400; }
+.season-analysis-page .heatmap-cell.missing, .season-analysis-page .heatmap-cell.sprint-only { background: #fff3dd; color: #79500b; font-size: 11px; }
+.season-analysis-page .heatmap-cell.cancelled { background: #e9ecf0; color: #646c78; font-weight: 400; font-size: 11px; }
+.season-analysis-page .heatmap-key span { font-size: 11px; }
+.season-analysis-page .analysis-cell-readout { font-size: 13px; min-height: 42px; max-width: none; }
+.season-analysis-page .average-position-table { min-width: 920px; }
+.season-analysis-page .average-position-table th button { border: 0; background: transparent; padding: 10px 6px; color: var(--text-secondary); font: inherit; font-size: 12px; text-align: inherit; }
+.season-analysis-page .average-position-table td { font-size: 13px; padding: 10px 12px; }
+.season-analysis-page .average-position-table td small { display: block; font-size: 11px; color: var(--text-secondary); }
+.season-analysis-page [hidden] { display: none !important; }
+@media (max-width: 760px) {
+  .season-analysis-page .analysis-driver-controls { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  .season-analysis-page .analysis-detail-head { flex-direction: column; align-items: stretch; gap: 12px; }
+  .season-analysis-page .analysis-summary-strip { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .season-analysis-page .analysis-summary-strip > div { padding: 12px; min-height: 95px; }
+  .season-analysis-page .analysis-summary-strip strong { font-size: 18px; }
+  .season-analysis-page .analysis-visualization-tabs { display: none; }
+  .season-analysis-page .analysis-mobile-view { display: grid; }
+  .season-analysis-page .analysis-visualization-menu { padding: 12px; }
+  .season-analysis-page .analysis-visualization-workspace { padding: 16px 12px; }
+  .season-analysis-page .analysis-scoring-controls { flex-direction: column; align-items: stretch; gap: 4px; padding: 12px; }
+  .season-analysis-page .analysis-scoring-controls label { flex: auto; }
+  .season-analysis-page .section-heading { align-items: flex-start; flex-direction: column; gap: 4px; }
+  .season-analysis-page .section-heading h2 { font-size: 22px; }
+  .season-analysis-page .analysis-share-bars li { grid-template-columns: 1fr auto; gap: 8px; }
+  .season-analysis-page .analysis-share-track { grid-column: 1 / -1; grid-row: 2; }
+  .season-analysis-page .analysis-round-readout > span { display: block; margin: 4px 0 0; }
+}

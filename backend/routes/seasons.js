@@ -4,6 +4,22 @@ const { academySessionType } = require('../series-config');
 
 const router = express.Router();
 
+// Keep official standings intact while including unranked participants in analysis.
+function seasonAnalysisDrivers(standings, participants, raceMap) {
+    const drivers = new Map(standings.map(driver => [String(driver.driverId), driver]));
+    const extras = new Map();
+    for (const row of participants) {
+        const id = String(row.driverId);
+        if (drivers.has(id) || extras.has(id)) continue;
+        extras.set(id, {
+            driverId: row.driverId, name: row.driverName, abbreviation: row.abbreviation,
+            position: null, positionText: null, points: null, championshipWon: false,
+            raceResults: raceMap.get(id) || {}
+        });
+    }
+    return [...drivers.values(), ...[...extras.values()].sort((a, b) => a.name.localeCompare(b.name))];
+}
+
 function isDisqualified(result) {
     return /\b(?:DSQ|DQ|DISQ|DISQUALIFIED|EXC)\b/i.test(String(result.status || result.positionText || ''));
 }
@@ -455,6 +471,7 @@ router.get('/api/seasons/:year', async (req, res) => {
                     resultsByDriver.get(driverId)[result.sessionId] = {
                         position: result.positionNumber === null ? null : Number(result.positionNumber),
                         positionText: result.positionNumber || result.status || null,
+                        status: result.status || null,
                         points: result.officialPoints === null ? null : Number(result.officialPoints),
                         constructorId: result.constructorId,
                         fastestLap: ['1', 'true'].includes(String(result.fastestLap).toLowerCase()),
@@ -655,6 +672,7 @@ router.get('/api/seasons/:year', async (req, res) => {
                         champion: official
                             ? ['1', 'true'].includes(String(official.championshipWon).toLowerCase())
                             : index === 0,
+                        championshipWon: official ? ['1', 'true'].includes(String(official.championshipWon).toLowerCase()) : false,
                         raceResults: constructor.raceResults
                     };
                     });
@@ -692,6 +710,7 @@ router.get('/api/seasons/:year', async (req, res) => {
                         champion: official
                             ? ['1', 'true'].includes(String(official.championshipWon).toLowerCase())
                             : index === 0,
+                        championshipWon: official ? ['1', 'true'].includes(String(official.championshipWon).toLowerCase()) : false,
                         starts: official ? Number(official.starts) : driver.starts,
                         wins: official ? Number(official.wins) : driver.wins,
                         podiums: official ? Number(official.podiums) : driver.podiums,
@@ -781,7 +800,9 @@ router.get('/api/seasons/:year', async (req, res) => {
                             latitude: coordinates?.latitude === undefined ? null : Number(coordinates.latitude),
                             longitude: coordinates?.longitude === undefined ? null : Number(coordinates.longitude),
                             poleDriverId: poleDriverByRace.get(race.id) || null,
-                            sessions: sessionsByRace.get(race.id) || []
+                            sessions: (sessionsByRace.get(race.id) || []).map((session, index, sessions) => ({
+                                ...session, type: sessionType(session, index, sessions.length, year)
+                            }))
                         };
                     })
                 };
@@ -945,15 +966,18 @@ router.get('/api/seasons/:year', async (req, res) => {
 
                 connection.query(`
                     SELECT
-                        round,
-                        driverId,
-                        constructorId,
-                        positionNumber,
-                        positionText,
-                        points
-                    FROM races_sprint_race_results
-                    WHERE year = ?
-                    ORDER BY driverId, round
+                        sr.round,
+                        sr.driverId,
+                        sr.constructorId,
+                        sr.positionNumber,
+                        sr.positionText,
+                        sr.points,
+                        d.name AS driverName,
+                        d.abbreviation
+                    FROM races_sprint_race_results sr
+                    JOIN drivers d ON d.id = sr.driverId
+                    WHERE sr.year = ?
+                    ORDER BY sr.driverId, sr.round
                 `, [year]),
 
 
@@ -1255,6 +1279,8 @@ router.get('/api/seasons/:year', async (req, res) => {
 
                 driverChampionship,
 
+                analysisDrivers: seasonAnalysisDrivers(driverChampionship, [...driverResults, ...sprintResults], driverRaceMap),
+
                 constructorChampionship,
 
                 calendar: races.map(race => ({
@@ -1293,6 +1319,7 @@ router.get('/api/seasons/:year', async (req, res) => {
 });
 
 module.exports = router;
+module.exports.seasonAnalysisDrivers = seasonAnalysisDrivers;
 module.exports.eligibleFastestLapDrivers = eligibleFastestLapDrivers;
 module.exports.isDisqualified = isDisqualified;
 module.exports.resolveSeasonAwards = resolveSeasonAwards;

@@ -1,23 +1,54 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" href="/assets/favicon.svg" type="image/svg+xml"><title>Racelytic</title><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/polish.css"></head>
-<body><div id="header"></div><main class="container page analysis-detail-page">
-  <a class="back-link" href="/analysis">← Analysis</a>
-  <section class="analysis-detail-head"><div><div class="eyebrow">SEASON ANALYSIS</div><h1>A championship in motion.</h1><p>Follow how the standings, title margin, and competitive order changed from race to race.</p></div><label><span>Season</span><select id="analysis-season"><option>Loading…</option></select></label></section>
-  <section id="season-analysis-summary" class="analysis-summary-strip"></section>
-  <section class="analysis-visualization-menu">
-    <div class="analysis-visualization-heading"><div class="eyebrow">VISUALIZATION</div><strong>Choose an analysis view</strong></div>
-    <div class="analysis-visualization-tabs" role="tablist" aria-label="Season analysis visualization">
-      <button type="button" role="tab" aria-selected="true" class="active" data-season-visual-button="progression"><span>Progression</span><small>Round by round</small></button>
-      <button type="button" role="tab" aria-selected="false" data-season-visual-button="margin"><span>Winning margin</span><small>Title fight</small></button>
-      <button type="button" role="tab" aria-selected="false" data-season-visual-button="distribution"><span>Points share</span><small>Distribution</small></button>
-      <button type="button" role="tab" aria-selected="false" data-season-visual-button="heatmap"><span>Results</span><small>Race heatmap</small></button>
-      <button type="button" role="tab" aria-selected="false" data-season-visual-button="averages"><span>Averages</span><small>Consistency</small></button>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Explore Formula 1 championship progression, title leads, points, race results and driver consistency.">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml"><title>Season analysis · Formula 1 · Racelytic</title>
+  <link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/polish.css"><link rel="stylesheet" href="/css/season-analysis.css">
+</head>
+<body><div id="header"></div>
+<main class="container page analysis-detail-page season-analysis-page">
+  <header class="analysis-detail-head">
+    <div><div class="eyebrow">FORMULA 1 · SEASON <select id="analysis-season" aria-label="Season" disabled><option value="">Loading…</option></select></div><h1>A championship in motion</h1><p>Explore the title fight, standout results and consistency across a season.</p></div>
+  </header>
+  <p id="analysis-status" class="analysis-status" role="status">Loading season data…</p>
+  <section id="season-analysis-summary" class="analysis-summary-strip" aria-label="Season summary"></section>
+  <div id="season-analysis-workspace" hidden>
+    <nav class="analysis-visualization-menu" aria-label="Analysis views">
+      <label class="analysis-mobile-view" for="analysis-view">Analysis view<select id="analysis-view"><option value="progression">Progression</option><option value="margin">Championship lead</option><option value="distribution">Points share</option><option value="heatmap">Results</option><option value="averages">Averages</option></select></label>
+      <div class="analysis-visualization-tabs" role="tablist" aria-label="Season analysis visualization">
+        <button type="button" id="tab-progression" role="tab" aria-controls="panel-progression" aria-selected="true" data-season-visual-button="progression">Progression</button>
+        <button type="button" id="tab-margin" role="tab" aria-controls="panel-margin" aria-selected="false" tabindex="-1" data-season-visual-button="margin">Championship lead</button>
+        <button type="button" id="tab-distribution" role="tab" aria-controls="panel-distribution" aria-selected="false" tabindex="-1" data-season-visual-button="distribution">Points share</button>
+        <button type="button" id="tab-heatmap" role="tab" aria-controls="panel-heatmap" aria-selected="false" tabindex="-1" data-season-visual-button="heatmap">Results</button>
+        <button type="button" id="tab-averages" role="tab" aria-controls="panel-averages" aria-selected="false" tabindex="-1" data-season-visual-button="averages">Averages</button>
+      </div>
+    </nav>
+    <div id="analysis-scoring-controls" class="analysis-scoring-controls"><label for="analysis-scoring">Chart scoring<select id="analysis-scoring"><option value="counted">Championship points</option><option value="scored">All points scored</option></select></label><div id="analysis-scoring-note" class="analysis-method"></div></div>
+    <div class="analysis-visualization-workspace">
+      <section id="panel-progression" role="tabpanel" aria-labelledby="tab-progression" data-season-visual="progression" class="analysis-chart-section">
+        <div class="section-heading"><h2>Championship progression</h2><span id="selection-count"></span></div>
+        <div class="analysis-driver-controls"><div class="analysis-presets" aria-label="Driver selection presets"><button type="button" data-preset="contenders">Title contenders</button><button type="button" data-preset="five">Top five</button><button type="button" data-preset="all">All drivers</button><button type="button" data-preset="clear">Clear</button></div>
+        <details id="driver-picker"><summary>Choose drivers <span id="driver-picker-count"></span></summary><label for="driver-search">Search drivers<input id="driver-search" type="search" placeholder="Name or abbreviation" autocomplete="off"></label><div id="progression-legend" class="progression-legend"></div></details>
+        </div><div id="season-progression-chart" class="interactive-chart"></div>
+        <p class="analysis-method">Tap or focus a round for all selected drivers. Endpoint labels show their latest totals. Gaps indicate rounds with no recorded data.</p>
+        <div id="round-readout" class="analysis-round-readout" aria-live="polite"></div>
+      </section>
+      <section id="panel-margin" role="tabpanel" aria-labelledby="tab-margin" data-season-visual="margin" class="analysis-chart-section" hidden>
+        <div class="section-heading"><h2>Championship lead</h2></div><p class="analysis-method">Gap between the first two drivers on the selected points basis after each recorded round. Ties are shown explicitly; countback and retrospective penalties are not reconstructed.</p>
+        <div id="winning-margin-chart" class="interactive-chart"></div><div id="lead-readout" class="analysis-round-readout" aria-live="polite"></div><h3 class="analysis-subheading">Lead changes</h3><ol id="lead-changes" class="analysis-lead-changes"></ol>
+      </section>
+      <section id="panel-distribution" role="tabpanel" aria-labelledby="tab-distribution" data-season-visual="distribution" class="analysis-chart-section" hidden>
+        <div class="section-heading"><h2>Points share</h2></div><p class="analysis-method">Each driver’s share of the recorded championship points total, including sprint points. Uses official standings, not the chart’s reconstructed totals. All points scorers are shown.</p><div id="points-distribution-chart"></div>
+      </section>
+      <section id="panel-heatmap" role="tabpanel" aria-labelledby="tab-heatmap" data-season-visual="heatmap" class="analysis-chart-section" hidden>
+        <div class="section-heading"><h2>Race results</h2><span>Full field · Grand Prix classifications</span></div><p class="analysis-method">Points colours use actual race points awarded, not today’s top-ten rule. Tap or focus a cell for race details and sprint points.</p><div id="results-heatmap" class="results-heatmap-wrap" tabindex="0" aria-label="Race results; scroll horizontally for more rounds"></div><p id="heatmap-readout" class="analysis-cell-readout" aria-live="polite">Select a result for details.</p>
+      </section>
+      <section id="panel-averages" role="tabpanel" aria-labelledby="tab-averages" data-season-visual="averages" class="analysis-chart-section" hidden>
+        <div class="section-heading"><h2>Average positions &amp; consistency</h2></div><p class="analysis-method">Means use available positive numeric race and qualifying positions; unclassified results are excluded. Finish spread is the population standard deviation (lower is more consistent, at any finishing level). Retirement rate is recorded retirements ÷ starts, excluding DNS/DNQ/withdrawals. Samples differ; compare them before drawing conclusions. Sprints are excluded.</p><div id="average-position-table" class="table-wrap" tabindex="0" aria-label="Driver averages; sortable columns"></div>
+      </section>
     </div>
-  </section>
-  <div class="analysis-visualization-workspace">
-    <section class="analysis-chart-section season-progression-section" data-season-visual="progression"><div class="section-heading"><div><div class="eyebrow">ROUND BY ROUND</div><h2>Championship progression</h2></div><span class="section-note">Select drivers to show or hide</span></div><div id="progression-legend" class="progression-legend"></div><div id="season-progression-chart" class="interactive-chart"></div></section>
-    <section class="analysis-chart-section" data-season-visual="margin" hidden><div class="section-heading"><div><div class="eyebrow">TITLE FIGHT</div><h2>Winning margin</h2></div></div><div id="winning-margin-chart" class="interactive-chart compact-chart"></div></section>
-    <section class="analysis-chart-section" data-season-visual="distribution" hidden><div class="section-heading"><div><div class="eyebrow">POINTS SHARE</div><h2>Points distribution</h2></div></div><div id="points-distribution-chart"></div></section>
-    <section class="analysis-chart-section" data-season-visual="heatmap" hidden><div class="section-heading"><div><div class="eyebrow">RACE BY RACE</div><h2>Results heatmap</h2></div><span class="section-note">Finishing position by round</span></div><div id="results-heatmap" class="results-heatmap-wrap"></div></section>
-    <section class="analysis-chart-section" data-season-visual="averages" hidden><div class="section-heading"><div><div class="eyebrow">CONSISTENCY</div><h2>Average positions</h2></div><span class="section-note">Race and qualifying sessions</span></div><div id="average-position-table" class="table-wrap"></div></section>
   </div>
-</main><footer class="footer"><div class="container">Racelytic</div></footer><script src="/js/utils.js"></script><script src="/js/header.js"></script><script src="/js/team-colors.js"></script><script src="/js/season-analysis.js"></script></body></html>
+</main><footer class="footer"><div class="container">Racelytic</div></footer>
+<script src="/js/utils.js"></script><script src="/js/header.js"></script><script src="/js/team-colors.js"></script><script src="/js/f1-points-systems.js"></script><script src="/js/season-analysis-model.js"></script><script src="/js/season-analysis.js"></script>
+</body></html>

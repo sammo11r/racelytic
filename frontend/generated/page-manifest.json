@@ -35,6 +35,7 @@
     }
   },
   "sharedTemplates": {
+    "season-analysis": "season-analysis.html",
     "season-comparison": "season-comparison.html",
     "race-analysis": "race-analysis.html",
     "driver-comparison": "driver-comparison.html",
@@ -133,7 +134,7 @@
       "series": "f2",
       "slug": "season-analysis",
       "route": "/f2/season-analysis",
-      "template": "f2-season-analysis.html"
+      "template": "season-analysis.html"
     },
     {
       "series": "f2",
@@ -325,7 +326,7 @@
       "series": "f3",
       "slug": "season-analysis",
       "route": "/f3/season-analysis",
-      "template": "f2-season-analysis.html"
+      "template": "season-analysis.html"
     },
     {
       "series": "f3",
@@ -511,7 +512,7 @@
       "series": "academy",
       "slug": "season-analysis",
       "route": "/academy/season-analysis",
-      "template": "f2-season-analysis.html"
+      "template": "season-analysis.html"
     },
     {
       "series": "academy",

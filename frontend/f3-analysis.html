@@ -1,17 +1,25 @@
 <!doctype html>
 <html lang="en">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Explore Formula 3 analysis in Racelytic."><link rel="icon" href="/assets/favicon-f3.svg" type="image/svg+xml"><title>Formula 3 Analysis · Racelytic</title><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/polish.css"></head>
-<body class="f3-mode"><div id="header"></div><main class="container page analysis-page">
-  <section class="analysis-hero"><div class="eyebrow">FORMULA 3 DATA LAB</div><h1>Find the story behind the standings.</h1><p>Connect title progression, driver form, teammate battles, race weekends and circuit performance across Formula 3.</p></section>
-  <section class="analysis-tool-grid">
-    <a class="analysis-tool-card" href="/f3/season-analysis"><span>01 · CHAMPIONSHIPS</span><h2>Season analysis</h2><p>Follow points progression, title margins and results through every sprint and feature race.</p><strong>Analyse a season →</strong></a>
-    <a class="analysis-tool-card" href="/f3/season-comparison"><span>02 · ACROSS SEASONS</span><h2>Season comparison</h2><p>Compare championship competitiveness, winner diversity and reliability across years.</p><strong>Compare seasons →</strong></a>
-    <a class="analysis-tool-card" href="/f3/race-analysis"><span>03 · RACE WEEKEND</span><h2>Race analysis</h2><p>Inspect classifications, grid movement, points and awards across a Formula 3 race.</p><strong>Explore races →</strong></a>
-    <a class="analysis-tool-card" href="/f3/driver-comparison"><span>04 · HEAD TO HEAD</span><h2>Driver comparison</h2><p>Compare Formula 3 careers and sessions shared as teammates.</p><strong>Compare drivers →</strong></a>
-    <a class="analysis-tool-card" href="/f3/driver-form"><span>05 · MOMENTUM</span><h2>Driver form</h2><p>Analyse rolling race results, points, qualifying performance and reliability.</p><strong>Analyse form →</strong></a>
-    <a class="analysis-tool-card" href="/f3/teammate-battles"><span>06 · INTRA-TEAM</span><h2>Teammate battles</h2><p>Compare drivers only while they competed for the same Formula 3 team.</p><strong>Choose a pairing →</strong></a>
-    <a class="analysis-tool-card" href="/f3/circuit-analysis"><span>07 · VENUES</span><h2>Circuit analysis</h2><p>Discover specialists, team performance and trends at each Formula 3 venue.</p><strong>Choose a circuit →</strong></a>
-    <a class="analysis-tool-card" href="/f3/records"><span>08 · RECORDS</span><h2>Formula 3 records</h2><p>Rank drivers and teams across the major categories in the modern championship.</p><strong>View records →</strong></a>
-  </section>
-</main><footer class="footer"><div class="container">Racelytic</div></footer><script src="/js/header.js"></script></body>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Explore Formula 3 analysis in Racelytic."><link rel="icon" href="/assets/favicon-f3.svg" type="image/svg+xml"><title>Formula 3 Analysis · Racelytic</title><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/polish.css"><link rel="stylesheet" href="/css/database-overview.css"><link rel="stylesheet" href="/css/analysis-overview.css"></head>
+<body class="f3-mode"><div id="header"></div><main class="container page database-directory analysis-directory" data-analysis-series="Formula 3" data-analysis-base="/f3">
+  <header class="database-directory-heading analysis-directory-heading">
+    <div class="analysis-directory-intro"><div class="eyebrow">FORMULA 3 ANALYSIS</div><h1>Turn results into answers</h1><p>Compare seasons and drivers, unpack race weekends, and discover the patterns behind Formula 3.</p></div>
+    <a class="analysis-example-card" href="/f3/season-analysis" data-analysis-example-link aria-label="Explore season analysis: Which championship had the most dramatic points swing?">
+      <div class="analysis-example-kicker"><span>EXAMPLE ANALYSIS</span><span data-analysis-example-count>01 / 08</span></div>
+      <div class="analysis-example-content" data-analysis-example-content><p data-analysis-example-question>Which championship had the most dramatic points swing?</p><span data-analysis-example-tool>Season analysis <b aria-hidden="true">→</b></span></div>
+      <div class="analysis-example-progress" aria-hidden="true"><i class="is-active"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    </a>
+  </header>
+  <h2 class="eyebrow database-navigation-title" id="analysis-navigation-title">CHOOSE AN ANALYSIS</h2>
+  <nav class="database-category-grid" aria-labelledby="analysis-navigation-title">
+    <a class="database-category" href="/f3/season-analysis"><div class="database-category-heading"><h3>Season analysis</h3></div><p>Championship progression, title margins and every sprint and feature result.</p><strong class="database-category-action">Analyse a season <span aria-hidden="true">→</span></strong></a>
+    <a class="database-category" href="/f3/season-comparison"><div class="database-category-heading"><h3>Season comparison</h3></div><p>Two championships compared through competitiveness, winners and reliability.</p><strong class="database-category-action">Compare seasons <span aria-hidden="true">→</span></strong></a>
+    <a class="database-category" href="/f3/race-analysis"><div class="database-category-heading"><h3>Race analysis</h3></div><p>Grid-to-finish movement, race classifications and team points.</p><strong class="database-category-action">Analyse a race <span aria-hidden="true">→</span></strong></a>
+    <a class="database-category" href="/f3/driver-comparison"><div class="database-category-heading"><h3>Driver comparison</h3></div><p>Career statistics and shared sessions for two drivers, side by side.</p><strong class="database-category-action">Compare drivers <span aria-hidden="true">→</span></strong></a>
+    <a class="database-category" href="/f3/driver-form"><div class="database-category-heading"><h3>Driver form</h3></div><p>Rolling results, points, qualifying performance and reliability.</p><strong class="database-category-action">Analyse form <span aria-hidden="true">→</span></strong></a>
+    <a class="database-category" href="/f3/teammate-battles"><div class="database-category-heading"><h3>Teammate battles</h3></div><p>Qualifying and race performances while drivers shared the same team.</p><strong class="database-category-action">Compare teammates <span aria-hidden="true">→</span></strong></a>
+    <a class="database-category" href="/f3/circuit-analysis"><div class="database-category-heading"><h3>Circuit analysis</h3></div><p>Circuit specialists, successful teams and performance across seasons.</p><strong class="database-category-action">Analyse a circuit <span aria-hidden="true">→</span></strong></a>
+    <a class="database-category" href="/f3/records"><div class="database-category-heading"><h3>Records</h3></div><p>Driver and team rankings across the championship’s major statistics.</p><strong class="database-category-action">View records <span aria-hidden="true">→</span></strong></a>
+  </nav>
+</main><footer class="footer"><div class="container">Racelytic</div></footer><script src="/js/header.js"></script><script src="/js/analysis-overview.js"></script></body>
 </html>

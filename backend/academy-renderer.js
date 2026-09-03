@@ -17,7 +17,8 @@ const PAGE_COPY = Object.freeze({
         ['The two Dallara generations, their technical specifications and championship usage.', 'The Tatuus chassis, its technical specifications and championship usage.']
     ],
     'f3-analysis.html': [
-        ['Follow points progression, title margins and results through every sprint and feature race.', 'Follow points progression, title margins and results through every race.']
+        ['Follow points progression, title margins and results through every sprint and feature race.', 'Follow points progression, title margins and results through every race.'],
+        ['Championship progression, title margins and every sprint and feature result.', 'Championship progression, title margins and every race result.']
     ],
     'f3-driver.html': [
         ['Sprint and feature races', 'Race history']

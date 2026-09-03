@@ -1,6 +1,7 @@
 const { all: SERIES } = require('../frontend/js/series-config');
 
 const SHARED_PAGE_TEMPLATES = Object.freeze({
+    'season-analysis': 'season-analysis.html',
     'season-comparison': 'season-comparison.html',
     'race-analysis': 'race-analysis.html',
     'driver-comparison': 'driver-comparison.html',
@@ -17,7 +18,7 @@ const SERIES_PAGE_TEMPLATES = Object.freeze({
         races: 'f2-races.html', race: 'f2-race.html', drivers: 'f2-drivers.html', driver: 'f2-driver.html',
         circuits: 'f2-circuits.html', circuit: 'f2-circuit.html', constructors: 'f2-constructors.html',
         constructor: 'f2-constructor.html', chassis: 'f2-chassis.html', about: 'f2-about.html',
-        analysis: 'f2-analysis.html', 'season-analysis': 'f2-season-analysis.html',
+        analysis: 'f2-analysis.html',
         ...SHARED_PAGE_TEMPLATES,
         simulator: 'f2-simulator.html', 'simulate-season': 'simulator.html',
         'scenario-calculator': 'scenario-calculator.html', 'championship-builder': 'championship-builder.html',
@@ -29,7 +30,7 @@ const SERIES_PAGE_TEMPLATES = Object.freeze({
         database: 'f3-database.html', seasons: 'f3-seasons.html', season: 'f3-season.html',
         races: 'f3-races.html', race: 'f3-race.html', drivers: 'f3-drivers.html', driver: 'f3-driver.html',
         teams: 'f3-teams.html', team: 'f3-team.html', circuits: 'f3-circuits.html', circuit: 'f3-circuit.html',
-        chassis: 'f3-chassis.html', analysis: 'f3-analysis.html', 'season-analysis': 'f2-season-analysis.html',
+        chassis: 'f3-chassis.html', analysis: 'f3-analysis.html',
         ...SHARED_PAGE_TEMPLATES,
         simulator: 'f3-simulator.html', 'simulate-season': 'f3-simulate-season.html',
         'scenario-calculator': 'f3-scenario-calculator.html', 'championship-builder': 'f3-championship-builder.html',
@@ -40,7 +41,7 @@ const SERIES_PAGE_TEMPLATES = Object.freeze({
         '': 'f3.html', database: 'f3-database.html', seasons: 'f3-seasons.html', season: 'f3-season.html',
         races: 'f3-races.html', race: 'f3-race.html', drivers: 'f3-drivers.html', driver: 'f3-driver.html',
         teams: 'f3-teams.html', team: 'f3-team.html', circuits: 'f3-circuits.html', circuit: 'f3-circuit.html',
-        chassis: 'f3-chassis.html', analysis: 'f3-analysis.html', 'season-analysis': 'f2-season-analysis.html',
+        chassis: 'f3-chassis.html', analysis: 'f3-analysis.html',
         ...SHARED_PAGE_TEMPLATES,
         simulator: 'f3-simulator.html', 'simulate-season': 'f3-simulate-season.html',
         'scenario-calculator': 'f3-scenario-calculator.html', 'championship-builder': 'f3-championship-builder.html',

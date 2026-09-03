@@ -4,7 +4,8 @@ const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
 
-const source = fs.readFileSync(path.join(__dirname, '../frontend/js/f2-season-analysis.js'), 'utf8');
+const source = fs.readFileSync(path.join(__dirname, '../frontend/js/season-analysis.js'), 'utf8');
+const model = require('../frontend/js/season-analysis-model');
 
 for (const series of ['f2', 'f3', 'academy']) {
     test(`${series} season preview links select valid years and ignore unsupported years`, async () => {
@@ -16,19 +17,24 @@ for (const series of ['f2', 'f3', 'academy']) {
                 activeSeriesKey: () => series,
                 activeSeriesName: () => series,
                 activeSeriesAccent: () => '#123456',
-                window: { location: { search } },
+                SeasonAnalysisModel: model,
+                location: { search },
+                window: { addEventListener() {} },
+                ResizeObserver: class { observe() {} },
                 URLSearchParams,
-                document: { getElementById: () => select, querySelector: () => null, querySelectorAll: () => [] },
+                document: { getElementById: id => id === 'analysis-season' ? select : { addEventListener() {} }, querySelector: () => null, querySelectorAll: () => [] },
                 getJSON: async url => {
                     assert.equal(url, `/api/seasons?series=${series}`);
                     return [{ year: 2026 }, { year: 2024 }, { year: 2020 }];
                 },
                 esc: String,
                 setError: (...args) => errors.push(args),
-                recordRender: () => { renderedYear = select.value; }
+                recordRender: year => { renderedYear = year; }
             };
             // Isolate initialization from chart rendering and network requests.
-            vm.runInNewContext(`${source}\nfunction renderF2SeasonAnalysis() { recordRender(); }`, context);
+            const initialization = source.replace(/  async function loadSeason[\s\S]+?(?=  \$\('analysis-season'\)\.addEventListener)/,
+                '  async function loadSeason(year) { recordRender(year); }\n');
+            vm.runInNewContext(initialization, context);
             await new Promise(resolve => setImmediate(resolve));
             assert.deepEqual(errors, []);
             assert.equal(renderedYear, expected);
