@@ -18,6 +18,95 @@ let simulationRequest = 0;
 let customSystems = [];
 let simulationMode = 'drivers';
 
+function simulatorBase() {
+  if (isAcademySimulator) return '/academy';
+  if (isF3Simulator) return '/f3';
+  if (isF2Simulator) return '/f2';
+  return '';
+}
+
+function signedNumber(value) {
+  const number = Number(value || 0);
+  if (!number) return '0';
+  return `${number > 0 ? '+' : '−'}${fmtNumber(Math.abs(number))}`;
+}
+
+function marginDescription(value) {
+  const margin = Number(value || 0);
+  return margin ? `by ${fmtNumber(margin)} point${margin === 1 ? '' : 's'}` : 'on countback';
+}
+
+function pointsDifferenceDescription(value) {
+  const difference = Number(value || 0);
+  if (!difference) return 'the same points total';
+  return `${fmtNumber(Math.abs(difference))} point${Math.abs(difference) === 1 ? '' : 's'} ${difference > 0 ? 'more' : 'fewer'}`;
+}
+
+function selectedSystemKind(key) {
+  if (key.startsWith('custom:')) return 'Custom rules';
+  if (key.includes('current') || key === '2025-present') return 'Official current rules';
+  return 'Official historical rules';
+}
+
+function countingDescription(system, isDrivers) {
+  if (!isDrivers && system.constructorCountBest !== undefined) {
+    return system.constructorCountBest === Infinity ? 'Every result' : `Best ${system.constructorCountBest} results`;
+  }
+  if (system.bestFirstRounds || system.bestLastRounds) {
+    const parts = [];
+    if (system.bestFirstRounds) parts.push(`best ${system.bestFirstRounds} of first ${system.firstRoundsWindow}`);
+    if (system.bestLastRounds) parts.push(`best ${system.bestLastRounds} of last ${system.lastRoundsWindow}`);
+    return parts.join(' · ');
+  }
+  return system.countBest === Infinity ? 'Every round' : `Best ${system.countBest} rounds`;
+}
+
+function renderRuleSummary(system, isDrivers, notice = '') {
+  const key = document.getElementById('simulation-points').value;
+  const raceScale = isDrivers ? system.race : system.constructorRace || system.race;
+  const fastestLapBonus = Number(!isDrivers && system.constructorFastestLapBonus !== undefined
+    ? system.constructorFastestLapBonus : system.fastestLapBonus ?? (system.fastestLap ? 1 : 0));
+  const fastestLap = fastestLapBonus
+    ? `${fmtNumber(fastestLapBonus)} pt${fastestLapBonus === 1 ? '' : 's'}${system.fastestLapMaxPosition ? ` · Top ${system.fastestLapMaxPosition}` : ''}`
+    : 'None';
+  document.getElementById('simulation-explanation').innerHTML = `
+    <div class="simulation-rules-heading">
+      <div><span>${esc(selectedSystemKind(key))}</span><strong>${esc(system.name)}</strong></div>
+      <small>Updates automatically</small>
+    </div>
+    <dl class="simulation-rule-grid">
+      <div><dt>Race points</dt><dd>${raceScale?.length ? raceScale.join('–') : 'None'}</dd></div>
+      <div><dt>Sprint points</dt><dd>${system.sprint?.length ? system.sprint.join('–') : 'None'}</dd></div>
+      <div><dt>Pole bonus</dt><dd>${Number(system.poleBonus || 0) ? `${fmtNumber(system.poleBonus)} pts` : 'None'}</dd></div>
+      <div><dt>Fastest lap</dt><dd>${fastestLap}</dd></div>
+      <div><dt>Results counted</dt><dd>${esc(countingDescription(system, isDrivers))}</dd></div>
+    </dl>
+    ${notice ? `<p class="simulation-rule-notice">${notice}</p>` : ''}`;
+}
+
+function ruleMethodNotice(system, isDrivers) {
+  const notes = [];
+  if (system.qualifying?.length) notes.push(`Qualifying awards ${system.qualifying.join('–')} points.`);
+  if (!isDrivers && system.constructorScoringCars === 1) notes.push('Only the highest-scoring car counts for each constructor at each race.');
+  if (preservesOfficialPoints(system, simulationData?.year)) notes.push('Recorded session points are retained, including shortened-race scales, penalties and classification adjustments.');
+  if (system.doublePointsFinalRound) notes.push('The final race awards double points.');
+  return notes.join(' ');
+}
+
+function syncSimulationUrl() {
+  const year = document.getElementById('simulation-season').value;
+  const points = document.getElementById('simulation-points').value;
+  if (!year || !points) return;
+  const url = new URL(window.location.href);
+  url.searchParams.set('year', year);
+  url.searchParams.set('points', points);
+  if (simulationMode === 'constructors') url.searchParams.set('mode', 'constructors');
+  else url.searchParams.delete('mode');
+  if (document.getElementById('simulation-changes-only').checked) url.searchParams.set('changed', '1');
+  else url.searchParams.delete('changed');
+  history.replaceState(null, '', `${url.pathname}${url.search}`);
+}
+
 function preservesOfficialPoints(system, year) {
   return system.preserveOfficialPointsFrom && Number(year) >= Number(system.preserveOfficialPointsFrom);
 }
@@ -208,12 +297,15 @@ function renderSimulation() {
   const system = POINT_SYSTEMS[document.getElementById('simulation-points').value];
   const isDrivers = simulationMode === 'drivers';
   const coverage = simulationCoverage(simulationData);
+  const methodNotice = ruleMethodNotice(system, isDrivers);
+  renderRuleSummary(system, isDrivers, methodNotice);
+  syncSimulationUrl();
   if (!preservesOfficialPoints(system, simulationData.year) && !coverage.complete) {
-    const championshipLabel = isDrivers ? 'Driver' : isF3Simulator ? 'Team' : 'Constructor';
+    const championshipLabel = isDrivers ? 'Driver' : (isF3Simulator || isAcademySimulator) ? 'Team' : 'Constructor';
     const roundLabel = coverage.availableRounds === 1 ? 'round' : 'rounds';
     document.getElementById('simulation-championship-title').textContent = `${championshipLabel} championship`;
     document.getElementById('simulation-status').textContent = `${simulationData.year} · incomplete classifications`;
-    document.getElementById('simulation-explanation').innerHTML = `<strong>${esc(system.name)} cannot be applied reliably.</strong> The official standings are newer than the detailed race classifications currently available in Racelytic.`;
+    renderRuleSummary(system, isDrivers, `${methodNotice} <strong>${esc(system.name)} cannot be applied reliably.</strong> The official standings are newer than the detailed race classifications currently available in Racelytic.`.trim());
     document.getElementById('simulation-summary').innerHTML = '';
     document.getElementById('simulation-results').innerHTML = `<div class="empty-state">Alternate scoring is unavailable for ${esc(simulationData.year)} because detailed results are available for only ${coverage.availableRounds} ${roundLabel}. Choose the official current system or a season with complete classifications.</div>`;
     return;
@@ -221,7 +313,7 @@ function renderSimulation() {
   if (!isDrivers && system.constructorsAvailable === false) {
     document.getElementById('simulation-championship-title').textContent = isF3Simulator ? 'Team championship' : 'Constructor championship';
     document.getElementById('simulation-status').textContent = `${simulationData.year} · constructors`;
-    document.getElementById('simulation-explanation').textContent = `${system.name} predates the World Constructors’ Championship, which began in 1958.`;
+    renderRuleSummary(system, isDrivers, `${methodNotice} ${esc(system.name)} predates the World Constructors’ Championship, which began in 1958.`.trim());
     document.getElementById('simulation-summary').innerHTML = '';
     document.getElementById('simulation-results').innerHTML = '<div class="empty-state">No Constructors’ Championship was awarded under this points system.</div>';
     return;
@@ -231,60 +323,52 @@ function renderSimulation() {
   const originalChampion = (isDrivers ? simulationData.driverChampionship : simulationData.constructorChampionship)[0];
   const originalChampionId = isDrivers ? originalChampion.driverId : originalChampion.constructorId;
   const changedChampion = String(champion.id) !== String(originalChampionId);
+  const simulatedRunnerUp = standings[1];
+  const originalStandings = isDrivers ? simulationData.driverChampionship : simulationData.constructorChampionship;
+  const originalRunnerUp = originalStandings[1];
+  const simulatedMargin = simulatedRunnerUp ? champion.points - simulatedRunnerUp.points : 0;
+  const originalMargin = originalRunnerUp ? Number(originalChampion.points) - Number(originalRunnerUp.points) : 0;
+  const championPointsChange = champion.points - champion.originalPoints;
   const label = isDrivers ? 'Driver' : (isF3Simulator || isAcademySimulator) ? 'Team' : 'Constructor';
-  const link = isDrivers ? (isAcademySimulator ? 'academy/driver' : isF3Simulator ? 'f3/driver' : 'driver') : isAcademySimulator ? 'academy/team' : isF3Simulator ? 'f3/team' : 'constructor';
-  const displayedFastestLapBonus = Number(!isDrivers && system.constructorFastestLapBonus !== undefined
-    ? system.constructorFastestLapBonus
-    : system.fastestLapBonus ?? (system.fastestLap ? 1 : 0));
-
+  const link = isDrivers
+    ? isAcademySimulator ? 'academy/driver' : isF3Simulator ? 'f3/driver' : isF2Simulator ? 'f2/driver' : 'driver'
+    : isAcademySimulator ? 'academy/team' : isF3Simulator ? 'f3/team' : isF2Simulator ? 'f2/constructor' : 'constructor';
   document.getElementById('simulation-championship-title').textContent = `${label} championship`;
-  document.getElementById('simulation-status').textContent = `${simulationData.year} · ${standings.length} ${(isF3Simulator || isAcademySimulator) && !isDrivers ? 'teams' : simulationMode}`;
-  document.getElementById('simulation-explanation').innerHTML = `
-    <strong>${esc(system.name)}</strong> awards ${(isDrivers ? system.race : system.constructorRace || system.race).join('–')} points in races${system.sprint.length ? ` and ${system.sprint.join('–')} in sprints` : ', with sprint races excluded'}.
-    ${system.qualifying?.length ? `Qualifying awards ${system.qualifying.join('–')} points.` : 'No qualifying points are awarded.'}
-    ${Number(system.poleBonus || 0) ? `Pole position earns ${fmtNumber(system.poleBonus)} bonus points.` : 'No pole-position bonus is awarded.'}
-    ${displayedFastestLapBonus ? `Fastest lap earns ${fmtNumber(displayedFastestLapBonus)} bonus points${system.fastestLapMaxPosition ? ` when finishing in the top ${system.fastestLapMaxPosition}` : ''}.` : 'No fastest-lap bonus is awarded.'}
-    ${!isDrivers && system.constructorCountBest !== undefined
-      ? system.constructorCountBest === Infinity ? 'Every constructor result counts.' : `Only the best ${system.constructorCountBest} constructor results count.`
-      : system.bestFirstRounds || system.bestLastRounds
-      ? `${system.bestFirstRounds ? `The best ${system.bestFirstRounds} of the first ${system.firstRoundsWindow} races count.` : ''} ${system.bestLastRounds ? `The best ${system.bestLastRounds} of the last ${system.lastRoundsWindow} races count.` : ''}`
-      : system.countBest === Infinity ? 'Every round counts.' : `Only each ${label.toLowerCase()}’s best ${system.countBest} round totals count.`}
-    ${!isDrivers && system.constructorScoringCars === 1 ? 'Only the highest-scoring car from each constructor counts at each race.' : ''}
-    ${preservesOfficialPoints(system, simulationData.year) ? 'Official awarded session points are retained, including shortened-race scales, penalties and classification adjustments.' : ''}
-    ${system.doublePointsFinalRound ? 'The final race awards double points.' : ''}`;
+  const changedCount = standings.filter(entry => entry.change).length;
+  const changesOnly = document.getElementById('simulation-changes-only').checked;
+  const displayedStandings = changesOnly ? standings.filter(entry => entry.change) : standings;
+  document.getElementById('simulation-status').textContent = `${simulationData.year} · ${changesOnly ? `${displayedStandings.length} of ` : ''}${standings.length} ${(isF3Simulator || isAcademySimulator) && !isDrivers ? 'teams' : simulationMode}${changedCount ? ` · ${changedCount} changed` : ''}`;
   document.getElementById('simulation-summary').innerHTML = `
     <div class="simulation-champion">
       <span>Simulated champion</span>
       <strong>${esc(champion.name)}</strong>
-      <small>${fmtNumber(champion.points)} points</small>
+      <small>${fmtNumber(champion.points)} points · wins ${marginDescription(simulatedMargin)}</small>
     </div>
     <div class="simulation-outcome${changedChampion ? ' changed' : ''}">
       <span>${changedChampion ? 'Championship changes hands' : 'Champion unchanged'}</span>
       <strong>${changedChampion ? `${esc(originalChampion.name)} → ${esc(champion.name)}` : esc(champion.name)}</strong>
-      <small>Original champion: ${esc(originalChampion.name)} · ${fmtNumber(originalChampion.points)} points</small>
+      <small>Official result: ${esc(originalChampion.name)} won ${marginDescription(originalMargin)} · ${esc(champion.name)} scores ${pointsDifferenceDescription(championPointsChange)}</small>
     </div>`;
 
-  document.getElementById('simulation-results').innerHTML = `
+  document.getElementById('simulation-results').innerHTML = displayedStandings.length ? `
     <table class="simulation-table">
-      <thead><tr><th>Pos.</th><th>${label}</th><th>Simulated points</th><th>Original</th><th>Change</th></tr></thead>
-      <tbody>${standings.map(entry => `<tr${entry.simulatedPosition === 1 ? ' class="simulated-leader"' : ''}>
-        <td class="simulation-position">${entry.simulatedPosition}</td>
-        <td><a href="/${link}?id=${encodeURIComponent(entry.id)}"><strong>${esc(entry.name)}</strong>${entry.abbreviation ? `<small>${esc(entry.abbreviation)}</small>` : ''}</a></td>
-        <td class="simulated-points">${fmtNumber(entry.points)}${entry.droppedPoints ? `<small>${fmtNumber(entry.droppedPoints)} dropped</small>` : ''}</td>
-        <td><span class="original-result">P${entry.originalPosition}</span><small>${fmtNumber(entry.originalPoints)} pts</small></td>
-        <td>${movement(entry.change)}</td>
+      <thead><tr><th>Pos.</th><th>${label}</th><th>Simulated</th><th>Official</th><th>Difference</th></tr></thead>
+      <tbody>${displayedStandings.map(entry => `<tr${entry.simulatedPosition === 1 ? ' class="simulated-leader"' : entry.change ? ' class="simulation-changed"' : ''}>
+        <td class="simulation-position" data-label="Simulated position">${entry.simulatedPosition}</td>
+        <td data-label="${label}"><a href="/${link}?id=${encodeURIComponent(entry.id)}"><strong>${esc(entry.name)}</strong>${entry.abbreviation ? `<small>${esc(entry.abbreviation)}</small>` : ''}</a></td>
+        <td class="simulated-points" data-label="Simulated">${fmtNumber(entry.points)} pts${entry.droppedPoints ? `<small>${fmtNumber(entry.droppedPoints)} dropped</small>` : ''}</td>
+        <td data-label="Official"><span class="original-result">P${entry.originalPosition}</span><small>${fmtNumber(entry.originalPoints)} pts</small></td>
+        <td data-label="Difference">${movement(entry.change)}<small class="simulation-points-change">${signedNumber(entry.points - entry.originalPoints)} pts</small></td>
       </tr>`).join('')}</tbody>
-    </table>`;
+    </table>` : '<div class="empty-state">No championship positions changed under this points system.</div>';
 }
 
 async function loadSimulationSeason() {
   const year = document.getElementById('simulation-season').value;
   if (!year) return;
   const request = ++simulationRequest;
-  const button = document.getElementById('run-simulation');
   simulationData = null;
-  button.disabled = true;
-  button.textContent = 'Simulating…';
+  document.querySelector('.simulator-results').setAttribute('aria-busy', 'true');
   document.getElementById('simulation-status').textContent = `Loading ${year}…`;
   try {
     const data = await getJSON(`/api/seasons/${encodeURIComponent(year)}`);
@@ -295,8 +379,7 @@ async function loadSimulationSeason() {
     setError('simulation-results', error.message);
   } finally {
     if (request !== simulationRequest) return;
-    button.disabled = false;
-    button.textContent = 'Run simulation';
+    document.querySelector('.simulator-results').setAttribute('aria-busy', 'false');
   }
 }
 
@@ -354,15 +437,23 @@ async function initialiseSimulator() {
     }
     const requestedPoints = requestedPreview.get('points');
     if ([...pointsSelect.options].some(option => option.value === requestedPoints)) pointsSelect.value = requestedPoints;
+    if (requestedPreview.get('mode') === 'constructors') simulationMode = 'constructors';
+    document.querySelectorAll('[data-simulation-mode]').forEach(option => {
+      const active = option.dataset.simulationMode === simulationMode;
+      option.classList.toggle('active', active);
+      option.setAttribute('aria-pressed', String(active));
+    });
+    document.getElementById('simulation-changes-only').checked = requestedPreview.get('changed') === '1';
+    document.getElementById('manage-points-systems').href = `${simulatorBase()}/points-systems`;
     await loadSimulationSeason();
   } catch (error) {
     setError('simulation-results', error.message);
   }
 }
 
-document.getElementById('run-simulation').addEventListener('click', loadSimulationSeason);
 document.getElementById('simulation-season').addEventListener('change', loadSimulationSeason);
 document.getElementById('simulation-points').addEventListener('change', () => simulationData && renderSimulation());
+document.getElementById('simulation-changes-only').addEventListener('change', () => simulationData && renderSimulation());
 document.querySelectorAll('[data-simulation-mode]').forEach(button => button.addEventListener('click', () => {
   simulationMode = button.dataset.simulationMode;
   document.querySelectorAll('[data-simulation-mode]').forEach(option => {

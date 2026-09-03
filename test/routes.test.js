@@ -22,6 +22,7 @@ test('all public API routes remain registered after modularization', () => {
         '/api/account',
         '/api/account/login',
         '/api/account/logout',
+        '/api/account/password',
         '/api/account/register',
         '/api/analytics/heartbeat',
         '/api/analytics/report',
@@ -130,6 +131,7 @@ test('public pages use extensionless URLs and preserve legacy query strings', as
         const f3RawRoute = await request(port, '/f3-team?id=campos-racing');
         const privacy = await request(port, '/privacy');
         const terms = await request(port, '/terms');
+        const dataSources = await request(port, '/data-sources');
         const simulateRace = await request(port, '/simulate-race');
         const idleManager = await request(port, '/idle-racing-manager');
         const f2IdleManager = await request(port, '/f2/idle-racing-manager');
@@ -172,6 +174,8 @@ test('public pages use extensionless URLs and preserve legacy query strings', as
         assert.equal(f3RawRoute.headers.location, '/f3/team?id=campos-racing');
         assert.equal(privacy.statusCode, 200);
         assert.equal(terms.statusCode, 200);
+        assert.equal(dataSources.statusCode, 200);
+        assert.match(dataSources.body, /Data Sources &amp; Licences/);
         assert.equal(simulateRace.statusCode, 200);
         assert.match(simulateRace.body, /Simulate race/);
         assert.equal(idleManager.statusCode, 200);

@@ -40,7 +40,8 @@ const PAGE_META = Object.freeze({
     'champions-quiz': ['Champions Quiz', 'Name every champion and test your racing knowledge.'],
     'idle-racing-manager': ['Idle Racing Manager', 'Build a racing team, develop the car and compete across fictional circuits.'],
     'lights-out': ['Lights Out', 'Test your reaction time against the starting lights.'],
-    about: ['About', 'Learn about Racelytic, its racing data and the tools built on top of it.'],
+    about: ['About Racelytic', 'Learn why Racelytic exists, how its motorsport archive is built, and the principles behind the project.'],
+    'data-sources': ['Data Sources & Licences', 'Review the provenance, attribution, licences and corrections behind the Racelytic archive.'],
     privacy: ['Privacy Notice', 'Read how Racelytic processes personal data and analytics preferences.'],
     terms: ['Terms of Service', 'Read the terms that apply when using Racelytic.'],
     account: ['Account', 'Sign in to save custom points systems and championships.'],
@@ -80,6 +81,7 @@ function humanizeSlug(value) {
 
 function canonicalPath(pathname, query) {
     const context = routeContext(pathname);
+    if (context.page === 'about') return '/about';
     const parameter = DETAIL_PARAMS[context.page];
     const value = parameter ? queryValue(query, parameter) : '';
     return `${context.cleanPath}${value ? `?${parameter}=${encodeURIComponent(value)}` : ''}`;
@@ -96,7 +98,10 @@ function metadataFor(pathname, query = {}) {
 
     let title;
     let description;
-    if (context.page === 'home') {
+    if (context.page === 'about') {
+        title = 'About Racelytic · Racelytic';
+        description = pageMeta[1];
+    } else if (context.page === 'home') {
         title = `${context.series.name} History, Statistics & Analysis · Racelytic`;
         description = `Explore ${context.series.name} history, results, drivers, teams, circuits, analysis, simulators and games with Racelytic.`;
     } else {

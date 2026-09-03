@@ -8,6 +8,7 @@ const {
     getUserFromRequest,
     hashPassword,
     parseCookies,
+    requireUser,
     sessionCookie,
     tokenHash,
     verifyPassword,
@@ -124,6 +125,34 @@ router.post('/api/account/logout', async (req, res) => {
         const token = parseCookies(req.headers.cookie)[SESSION_COOKIE];
         if (token) await pool.query('DELETE FROM app_sessions WHERE id = ?', [tokenHash(token)]);
         res.setHeader('Set-Cookie', sessionCookie('', 0));
+        res.status(204).end();
+    } catch (error) {
+        sendError(res, error);
+    }
+});
+
+router.post('/api/account/password', requireUser, async (req, res) => {
+    const currentPassword = String(req.body.currentPassword || '');
+    const newPassword = String(req.body.newPassword || '');
+    if (newPassword.length < 10 || newPassword.length > 200) {
+        return res.status(400).json({ error: 'New password must be at least 10 characters.' });
+    }
+    if (currentPassword === newPassword) {
+        return res.status(400).json({ error: 'Choose a password different from your current password.' });
+    }
+
+    try {
+        await ensureAuthSchema();
+        const updated = await withConnection(async connection => {
+            const rows = await connection.query('SELECT password_hash AS passwordHash FROM app_users WHERE id = ?', [req.user.id]);
+            if (!rows[0] || !await verifyPassword(currentPassword, rows[0].passwordHash)) return false;
+            const passwordHash = await hashPassword(newPassword);
+            await connection.query('UPDATE app_users SET password_hash = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?', [passwordHash, req.user.id]);
+            const currentToken = parseCookies(req.headers.cookie)[SESSION_COOKIE];
+            if (currentToken) await connection.query('DELETE FROM app_sessions WHERE user_id = ? AND id <> ?', [req.user.id, tokenHash(currentToken)]);
+            return true;
+        });
+        if (!updated) return res.status(401).json({ error: 'Current password is incorrect.' });
         res.status(204).end();
     } catch (error) {
         sendError(res, error);

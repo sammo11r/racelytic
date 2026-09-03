@@ -8,20 +8,19 @@
   <title>Simulate Season · Formula 3 · Racelytic</title>
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/polish.css">
+  <link rel="stylesheet" href="/css/simulator-season.css">
 </head>
 <body class="f3-mode">
   <div id="header"></div>
   <main class="container page simulator-page">
-    <section class="simulator-hero">
-      <div>
-        <div class="eyebrow">FORMULA 3 SIMULATOR</div>
-        <h1>Rewrite a Formula 3 championship.</h1>
-        <p>Apply a different feature, sprint and bonus-points system to any FIA Formula 3 season.</p>
-      </div>
-      <div class="simulator-hero-mark" aria-hidden="true">Σ</div>
-    </section>
+    <header class="simulator-page-heading">
+      <div class="eyebrow">SIMULATE A SEASON</div>
+      <h1>Recalculate a championship</h1>
+      <p>Apply different scoring and championship rules, then compare the result with the official standings.</p>
+    </header>
 
-    <section class="simulator-controls" aria-label="Simulation settings">
+    <section class="simulator-workspace" aria-label="Simulation settings">
+      <div class="simulator-controls">
       <label>
         <span>Season</span>
         <select id="simulation-season"><option value="">Loading seasons…</option></select>
@@ -29,12 +28,11 @@
       <label class="ruleset-control">
         <span>Points system</span>
         <select id="simulation-points"></select>
-        <small>Choose current or 2019–2021 Formula 3 scoring, or apply a custom ruleset to the complete season.</small>
+        <small><a id="manage-points-systems" href="/f3/points-systems">Create or edit scoring rules →</a></small>
       </label>
-      <button class="button primary" id="run-simulation" type="button">Run simulation</button>
+      </div>
+      <section id="simulation-explanation" class="simulation-explanation" aria-label="Selected scoring rules" aria-live="polite"></section>
     </section>
-
-    <section id="simulation-explanation" class="simulation-explanation" aria-live="polite"></section>
 
     <section class="simulator-results">
       <div class="section-heading">
@@ -44,6 +42,7 @@
             <button class="standings-mode-button active" type="button" data-simulation-mode="drivers" aria-pressed="true">Drivers</button>
             <button class="standings-mode-button" type="button" data-simulation-mode="constructors" aria-pressed="false">Teams</button>
           </div>
+          <label class="simulation-change-filter"><input id="simulation-changes-only" type="checkbox"><span>Changed positions only</span></label>
           <div id="simulation-status" class="section-note"></div>
         </div>
       </div>

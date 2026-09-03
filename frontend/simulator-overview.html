@@ -1,12 +1,89 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" href="/assets/favicon.svg" type="image/svg+xml"><title>Racelytic</title><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/polish.css"></head>
-<body><div id="header"></div><main class="container page simulator-overview-page">
-  <section class="analysis-hero simulator-overview-hero"><div class="eyebrow">SIMULATOR</div><h1>Rewrite what happened or what comes next.</h1><p>Recalculate complete championships, explore title scenarios and build scoring systems that work across Formula 1 history.</p></section>
-  <section class="analysis-tool-grid simulator-tool-grid">
-    <a class="analysis-tool-card" href="/simulator"><span>01 · ALTERNATE HISTORY</span><h2>Simulate season</h2><p>Apply another points system and its championship rules to a completed season, for both drivers and constructors.</p><strong>Recalculate a season →</strong></a>
-    <a class="analysis-tool-card" href="/scenario-calculator"><span>02 · TITLE RUN-IN</span><h2>Scenario calculator</h2><p>Freeze the standings after any round, rewrite future results and discover who can still become champion.</p><strong>Build a scenario →</strong></a>
-    <a class="analysis-tool-card" href="/championship-builder"><span>03 · CUSTOM CALENDAR</span><h2>Championship builder</h2><p>Combine races from different eras, choose the field and create a championship of your own.</p><strong>Build a championship →</strong></a>
-    <a class="analysis-tool-card" href="/points-systems"><span>04 · RULES</span><h2>Points systems</h2><p>Create reusable scoring rules for races, sprints, qualifying, bonuses and dropped-result championships.</p><strong>Manage points systems →</strong></a>
-    <a class="analysis-tool-card" href="/simulate-race"><span>05 · RACE REPLAY</span><h2>Simulate race</h2><p>Select a modern Formula 1 race and watch it unfold from recorded car positions and running order.</p><strong>Simulate a race →</strong></a>
-  </section>
-  <section class="simulator-overview-note"><div class="eyebrow">HOW IT FITS TOGETHER</div><h2>One ruleset, two ways to explore.</h2><p>Points systems created in your account become available in both the season simulator and championship scenario calculator.</p></section>
-</main><footer class="footer"><div class="container">Racelytic</div></footer><script src="/js/header.js"></script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Recalculate Formula 1 seasons, test championship scenarios, create scoring rules and build custom championships.">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <title>Formula 1 simulator · Racelytic</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/polish.css">
+  <link rel="stylesheet" href="/css/database-overview.css">
+  <link rel="stylesheet" href="/css/simulator-overview.css">
+</head>
+<body>
+  <div id="header"></div>
+  <main class="container page database-directory simulator-directory">
+    <header class="database-directory-heading simulator-directory-heading">
+      <div class="simulator-directory-intro">
+        <div class="eyebrow">FORMULA 1 SIMULATOR</div>
+        <h1>Rewrite Formula 1</h1>
+        <p>Recalculate championships, test future results and build your own rules.</p>
+      </div>
+      <a class="simulator-example-card" href="/simulator?year=2008&amp;points=1991-2002" aria-label="Recalculate the 2008 Formula 1 season with the 1991 to 2002 points system">
+        <div class="simulator-example-kicker"><span>TRY AN EXAMPLE</span><span>PAST SEASON</span></div>
+        <p>What if 2008 used the 1991–2002 points system?</p>
+        <strong>Recalculate 2008 <span aria-hidden="true">→</span></strong>
+      </a>
+    </header>
+
+    <section class="simulator-tool-group" aria-labelledby="choose-simulation-title">
+      <h2 class="eyebrow database-navigation-title" id="choose-simulation-title">CHOOSE A SIMULATION</h2>
+      <nav class="database-category-grid simulator-tool-grid" aria-labelledby="choose-simulation-title">
+        <a class="database-category simulator-tool-card" href="/simulator">
+          <span class="simulator-tool-meta">Completed seasons · Drivers and constructors</span>
+          <div class="database-category-heading"><h3>Recalculate a past season</h3></div>
+          <p>Apply another points system and its championship rules to a complete season.</p>
+          <strong class="database-category-action">Simulate a season <span aria-hidden="true">→</span></strong>
+        </a>
+        <a class="database-category simulator-tool-card" href="/scenario-calculator">
+          <span class="simulator-tool-meta">Any completed round · Future results</span>
+          <div class="database-category-heading"><h3>Rewrite the title run-in</h3></div>
+          <p>Freeze the standings, change the remaining classifications and see who can still become champion.</p>
+          <strong class="database-category-action">Build a scenario <span aria-hidden="true">→</span></strong>
+        </a>
+        <a class="database-category simulator-tool-card" href="/championship-builder">
+          <span class="simulator-tool-meta">Any era · Custom calendar and field</span>
+          <div class="database-category-heading"><h3>Build a custom championship</h3></div>
+          <p>Combine races from different eras, choose the competitors and calculate new standings.</p>
+          <strong class="database-category-action">Build a championship <span aria-hidden="true">→</span></strong>
+        </a>
+        <a class="database-category simulator-tool-card" href="/points-systems">
+          <span class="simulator-tool-meta">Race, sprint, bonuses and dropped results</span>
+          <div class="database-category-heading"><h3>Create scoring rules</h3></div>
+          <p>Design reusable points systems for every championship simulation tool.</p>
+          <strong class="database-category-action">Manage points systems <span aria-hidden="true">→</span></strong>
+        </a>
+      </nav>
+    </section>
+
+    <section class="simulator-replay-feature" aria-labelledby="race-replay-title">
+      <div>
+        <span class="simulator-tool-meta">Modern races · Recorded running order</span>
+        <h2 id="race-replay-title">Watch a race unfold again</h2>
+        <p>Follow recorded car positions and running order through an interactive race replay.</p>
+      </div>
+      <a class="button primary" href="/simulate-race">Open race replay <span aria-hidden="true">→</span></a>
+    </section>
+
+    <section class="simulator-workflow" aria-labelledby="simulator-workflow-title">
+      <div class="simulator-workflow-heading">
+        <div class="eyebrow">HOW IT FITS TOGETHER</div>
+        <h2 id="simulator-workflow-title">Build rules once. Use them everywhere.</h2>
+        <p>Experiment freely. Sign in only when you want to save private rules or championships.</p>
+      </div>
+      <div class="simulator-workflow-flow">
+        <a href="/points-systems"><span>1</span><strong>Create a points system</strong></a>
+        <div class="simulator-workflow-arrow" aria-hidden="true">→</div>
+        <div class="simulator-workflow-destinations">
+          <a href="/simulator">Recalculate a season</a>
+          <a href="/scenario-calculator">Test a scenario</a>
+          <a href="/championship-builder">Build a championship</a>
+        </div>
+      </div>
+    </section>
+  </main>
+  <footer class="footer"><div class="container">Racelytic</div></footer>
+  <script src="/js/header.js"></script>
+</body>
+</html>

@@ -17,7 +17,7 @@ async function loadHeader() {
         const requestedSeries = new URLSearchParams(window.location.search).get('series');
         let rememberedSeries = '';
         try { rememberedSeries = localStorage.getItem('racelytic-series') || ''; } catch {}
-        const seriesNeutralPages = ['/account', '/privacy', '/terms'];
+        const seriesNeutralPages = ['/account', '/privacy', '/terms', '/about'];
         const isSeriesNeutralPage = seriesNeutralPages.includes(window.location.pathname);
         const seriesKeys = Object.keys(window.RacelyticSeries.all);
         const pathSeries = window.RacelyticSeries.fromPath().key;
@@ -30,6 +30,7 @@ async function loadHeader() {
         const isF3Mode = activeSeries === 'f3';
         const isAcademyMode = activeSeries === 'academy';
         try { localStorage.setItem('racelytic-series', activeSeries); } catch {}
+        if (window.location.pathname === '/about') document.title = 'About Racelytic · Racelytic';
 
         const academyContentLinkMap = {
             '/analysis': '/academy/analysis', '/season': '/academy/season', '/race': '/academy/race',
@@ -65,7 +66,7 @@ async function loadHeader() {
         document.body.classList.toggle('f2-mode', isF2Mode);
         document.body.classList.toggle('f3-mode', isF3Mode);
         document.body.classList.toggle('academy-mode', isAcademyMode);
-        if (activeSeries === 'f1' && !document.title.includes('Formula 1')) {
+        if (!isSeriesNeutralPage && activeSeries === 'f1' && !document.title.includes('Formula 1')) {
             document.title = document.title === 'Racelytic'
                 ? 'Formula 1 · Racelytic'
                 : `${document.title.replace(/\s*·\s*Racelytic$/, '')} · Formula 1 · Racelytic`;
@@ -208,14 +209,16 @@ async function loadHeader() {
             const seriesBase = isAcademyMode ? '/academy' : '/f3';
             const seriesName = isAcademyMode ? 'F1 Academy' : 'Formula 3';
             const seriesShortName = isAcademyMode ? 'F1 Academy' : 'F3';
-            document.title = document.title
-                .replace('Formula 1', seriesName)
-                .replace('Formula 2', seriesName)
-                .replace('Formula 3', seriesName);
-            if (!document.title.includes(seriesName)) {
-                document.title = document.title === 'Racelytic'
-                    ? `${seriesName} · Racelytic`
-                    : `${document.title.replace(/\s*·\s*Racelytic$/, '')} · ${seriesName} · Racelytic`;
+            if (!isSeriesNeutralPage) {
+                document.title = document.title
+                    .replace('Formula 1', seriesName)
+                    .replace('Formula 2', seriesName)
+                    .replace('Formula 3', seriesName);
+                if (!document.title.includes(seriesName)) {
+                    document.title = document.title === 'Racelytic'
+                        ? `${seriesName} · Racelytic`
+                        : `${document.title.replace(/\s*·\s*Racelytic$/, '')} · ${seriesName} · Racelytic`;
+                }
             }
             const navigationDropdowns = [...container.querySelectorAll('.nav-dropdown')];
             const f3Menus = [
@@ -276,7 +279,7 @@ async function loadHeader() {
                 if (title) title.textContent = menu[0];
             });
             const aboutLink = container.querySelector('a[href="/about"]');
-            if (aboutLink) aboutLink.href = `${seriesBase}/about`;
+            if (aboutLink) aboutLink.href = `/about?series=${activeSeries}`;
             container.querySelectorAll('a[href="/account"]').forEach(link => { link.href = `/account?series=${activeSeries}`; });
             const pointsSimulatorLink = document.querySelector('.points-library-hero a[href="/simulator"]');
             if (pointsSimulatorLink) pointsSimulatorLink.href = `${seriesBase}/simulate-season`;
@@ -292,13 +295,15 @@ async function loadHeader() {
             }
         }
         if (isF2Mode) {
-            document.title = document.title
-                .replace('Formula 1', 'Formula 2')
-                .replace(/(^|\s)F1(?=\s|$)/, '$1F2');
-            if (!document.title.includes('Formula 2')) {
-                document.title = document.title === 'Racelytic'
-                    ? 'Formula 2 · Racelytic'
-                    : `${document.title.replace(/\s*·\s*Racelytic$/, '')} · Formula 2 · Racelytic`;
+            if (!isSeriesNeutralPage) {
+                document.title = document.title
+                    .replace('Formula 1', 'Formula 2')
+                    .replace(/(^|\s)F1(?=\s|$)/, '$1F2');
+                if (!document.title.includes('Formula 2')) {
+                    document.title = document.title === 'Racelytic'
+                        ? 'Formula 2 · Racelytic'
+                        : `${document.title.replace(/\s*·\s*Racelytic$/, '')} · Formula 2 · Racelytic`;
+                }
             }
             const analysisBackLink = document.querySelector('.back-link[href="/analysis"]');
             if (analysisBackLink) analysisBackLink.href = '/f2/analysis';
@@ -385,7 +390,7 @@ async function loadHeader() {
             const gamesTitle = gamesDropdown?.querySelector('.dropdown-title');
             if (gamesTitle) gamesTitle.textContent = 'FORMULA 2 GAMES';
             const aboutLink = container.querySelector('a[href="/about"]');
-            if (aboutLink) aboutLink.href = '/f2/about';
+            if (aboutLink) aboutLink.href = '/about?series=f2';
             container.querySelectorAll('a[href="/account"]').forEach(link => { link.href = '/account?series=f2'; });
             const simulatorBackLink = document.querySelector('.back-link[href="/simulator"], .back-link[href="/simulator-overview"]');
             if (simulatorBackLink) simulatorBackLink.href = '/f2/simulator';

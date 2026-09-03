@@ -1,0 +1,89 @@
+/* Championship builder workspace. */
+.championship-builder-page.page { padding-top: 28px; }
+.builder-page-heading { max-width: 880px; }
+.builder-page-heading .eyebrow { margin-bottom: 9px; color: var(--accent); }
+.builder-page-heading h1 { margin: 0; color: var(--text); font-size: clamp(36px, 5vw, 62px); line-height: 1; letter-spacing: -.055em; text-wrap: balance; }
+.builder-page-heading p { max-width: 760px; margin: 14px 0 0; color: var(--text-secondary); font-size: 16px; line-height: 1.55; }
+.builder-summary { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); overflow: hidden; margin-top: 28px; border: 1px solid var(--border); border-radius: 14px; background: var(--surface); box-shadow: var(--shadow-small); }
+.builder-summary > div { min-width: 0; min-height: 116px; padding: 20px 22px; border-left: 1px solid var(--border); }
+.builder-summary > div:first-child { border-left: 0; }
+.builder-summary-primary { background: linear-gradient(135deg, var(--accent), var(--accent-gradient-end)); color: #fff; }
+.builder-summary span, .builder-save-panel > div > span { display: block; color: var(--text-muted); font-size: 9px; font-weight: 850; letter-spacing: .1em; text-transform: uppercase; }
+.builder-summary-primary span { color: rgba(255,255,255,.72); }
+.builder-summary strong { display: block; overflow: hidden; margin-top: 8px; font-size: 20px; line-height: 1.2; letter-spacing: -.025em; text-overflow: ellipsis; white-space: nowrap; }
+.builder-summary small { display: block; margin-top: 5px; color: var(--text-secondary); font-size: 11px; line-height: 1.4; }
+.builder-summary-primary small { color: rgba(255,255,255,.76); }
+.championship-builder-page .builder-layout { grid-template-columns: minmax(0, 1.5fr) minmax(340px, .72fr); align-items: start; gap: 18px; margin-top: 18px; }
+.builder-main { display: grid; min-width: 0; gap: 18px; }
+.championship-builder-page .builder-panel { padding: 22px; border-radius: 14px; }
+.championship-builder-page .builder-settings { position: static; max-height: none; overflow: visible; }
+.championship-builder-page .builder-race-picker { grid-template-columns: minmax(92px,.45fr) minmax(210px,1.25fr) auto auto; padding-bottom: 8px; }
+body.f2-mode .championship-builder-page .builder-race-picker, body.f3-mode .championship-builder-page .builder-race-picker { grid-template-columns: minmax(80px,.4fr) minmax(170px,1fr) minmax(170px,1fr) auto; }
+.championship-builder-page .builder-race-picker button { white-space: nowrap; }
+#builder-add-season { border: 1px solid var(--border); background: var(--surface); color: var(--text); }
+.builder-inline-message { display: block; min-height: 22px; color: var(--text-muted); font-size: 11px; }
+.championship-builder-page .builder-calendar { margin-top: 4px; }
+.championship-builder-page .builder-calendar-race { min-height: 64px; padding: 8px 10px 8px 14px; cursor: grab; }
+.championship-builder-page .builder-calendar-race.is-dragging { opacity: .45; }
+.championship-builder-page .builder-calendar-race strong { font-size: 12px; }
+.championship-builder-page .builder-calendar-race small { font-size: 10px; }
+.championship-builder-page .builder-calendar-race button { font-size: 12px; }
+.builder-results { margin-top: 0; }
+.builder-results-actions { display: flex; align-items: center; gap: 8px; }
+#builder-calculate { min-height: 36px; padding: 0 12px; border: 1px solid var(--border); border-radius: 9px; background: var(--surface); color: var(--text); font: inherit; font-size: 10px; font-weight: 800; cursor: pointer; }
+.builder-results #builder-results { margin-top: 14px; }
+.builder-results .simulation-table { min-width: 620px; }
+.builder-results .simulation-table td { height: 56px; }
+.builder-points-choice { margin-top: 16px; }
+.builder-points-choice small { min-height: 17px; }
+.builder-points-choice a { color: var(--accent); font-size: 11px; font-weight: 750; }
+.builder-rule-summary { display: grid; grid-template-columns: 1fr 1fr; overflow: hidden; margin-top: 12px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface-alt); }
+.builder-rule-summary > div { min-width: 0; padding: 11px; border-left: 1px solid var(--border); border-top: 1px solid var(--border); }
+.builder-rule-summary > div:nth-child(odd) { border-left: 0; }
+.builder-rule-summary > div:nth-child(-n+2) { border-top: 0; }
+.builder-rule-summary span { display: block; color: var(--text-muted); font-size: 8px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.builder-rule-summary strong { display: block; margin-top: 4px; font-size: 11px; line-height: 1.35; }
+.builder-field-section { margin-top: 16px; border-top: 1px solid var(--border); }
+.builder-field-section summary { display: flex; min-height: 52px; align-items: center; justify-content: space-between; cursor: pointer; list-style: none; }
+.builder-field-section summary::-webkit-details-marker { display: none; }
+.builder-field-section summary strong, .builder-field-section summary small { display: block; }
+.builder-field-section summary strong { font-size: 12px; }
+.builder-field-section summary small { margin-top: 3px; color: var(--text-muted); font-size: 10px; }
+.builder-field-tools { display: grid; grid-template-columns: minmax(0,1fr) auto auto; gap: 6px; padding-bottom: 8px; }
+.builder-field-tools input { min-width: 0; height: 36px; }
+.builder-field-tools button { min-height: 36px; padding: 0 8px; border: 0; background: transparent; color: var(--accent); font: inherit; font-size: 9px; font-weight: 800; cursor: pointer; }
+.championship-builder-page .builder-field-list { grid-template-columns: 1fr; max-height: 190px; gap: 2px; padding: 4px; border: 1px solid var(--border); border-radius: 9px; background: #fff; }
+.championship-builder-page .builder-field-list label { min-height: 31px; padding: 5px 7px; border-radius: 6px; font-size: 11px; }
+.championship-builder-page .builder-field-list label:hover { background: var(--surface-alt); }
+.championship-builder-page .builder-field-list label[hidden] { display: none; }
+.builder-save-panel { margin-top: 18px; padding-top: 17px; border-top: 1px solid var(--border); }
+.builder-save-panel > div > strong { display: block; margin-top: 4px; font-size: 14px; }
+.builder-save-panel > label { display: grid; gap: 6px; margin-top: 11px; }
+.builder-save-panel > label > span { color: var(--text-muted); font-size: 8px; font-weight: 850; letter-spacing: .1em; text-transform: uppercase; }
+.builder-save-panel input, .builder-save-panel textarea, .builder-save-panel select { width: 100%; }
+.builder-save-panel textarea { resize: vertical; }
+.championship-builder-page .builder-actions { margin-top: 13px; }
+.championship-builder-page .empty-state { display: grid; justify-items: center; gap: 5px; }
+.championship-builder-page .empty-state strong { font-size: 13px; }
+.championship-builder-page .empty-state span { color: var(--text-muted); font-size: 11px; }
+@media (max-width: 1050px) {
+  .builder-summary { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  .builder-summary > div:nth-child(3) { border-left: 0; }
+  .builder-summary > div:nth-child(n+3) { border-top: 1px solid var(--border); }
+  .championship-builder-page .builder-layout { grid-template-columns: 1fr; }
+  .championship-builder-page .builder-race-picker, body.f2-mode .championship-builder-page .builder-race-picker, body.f3-mode .championship-builder-page .builder-race-picker { grid-template-columns: repeat(2, minmax(0,1fr)); }
+}
+@media (max-width: 700px) {
+  .championship-builder-page.page { padding-top: 22px; }
+  .builder-page-heading h1 { font-size: 38px; }
+  .builder-summary { grid-template-columns: 1fr; margin-top: 24px; }
+  .builder-summary > div { min-height: 96px; border-top: 1px solid var(--border); border-left: 0; }
+  .builder-summary > div:first-child { border-top: 0; }
+  .championship-builder-page .builder-race-picker, body.f2-mode .championship-builder-page .builder-race-picker, body.f3-mode .championship-builder-page .builder-race-picker { grid-template-columns: 1fr; }
+  .championship-builder-page .builder-panel { padding: 18px; }
+  .builder-results > .section-heading { align-items: flex-start; flex-direction: column; gap: 12px; }
+  .builder-results-actions { width: 100%; justify-content: space-between; }
+  .builder-field-tools { grid-template-columns: 1fr 1fr; }
+  .builder-field-tools input { grid-column: 1 / -1; }
+  .championship-builder-page .builder-field-list { max-height: none; overflow: visible; }
+}

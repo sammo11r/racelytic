@@ -1,13 +1,48 @@
 <!doctype html>
 <html lang="en">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Formula 2 championship simulation tools in Racelytic."><link rel="icon" href="/assets/favicon-f2.svg" type="image/svg+xml"><title>Formula 2 Simulator · Racelytic</title><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/polish.css"></head>
-<body class="f2-mode"><div id="header"></div><main class="container page simulator-overview-page">
-  <section class="analysis-hero simulator-overview-hero"><div class="eyebrow">FORMULA 2 SIMULATOR</div><h1>Rewrite a championship weekend by weekend.</h1><p>Recalculate Formula 2 seasons with sprint and feature scoring, pole bonuses, fastest laps and custom championship rules.</p></section>
-  <section class="analysis-tool-grid simulator-tool-grid">
-    <a class="analysis-tool-card" href="/f2/simulate-season"><span>01 · ALTERNATE SCORING</span><h2>Simulate season</h2><p>Recalculate driver and team championships with Formula 2-aware race formats and custom points.</p><strong>Recalculate a season →</strong></a>
-    <a class="analysis-tool-card" href="/f2/scenario-calculator"><span>02 · TITLE RUN-IN</span><h2>Scenario calculator</h2><p>Rewrite future feature classifications while retaining sprint results to explore the title paths.</p><strong>Build a scenario →</strong></a>
-    <a class="analysis-tool-card" href="/f2/championship-builder"><span>03 · CUSTOM CALENDAR</span><h2>Championship builder</h2><p>Combine individual Formula 2 sprint and feature races with the appropriate bonus-point rules.</p><strong>Build a championship →</strong></a>
-    <a class="analysis-tool-card" href="/f2/points-systems"><span>04 · RULES</span><h2>Points systems</h2><p>Create reusable rules for feature races, sprint races, qualifying and bonuses.</p><strong>Manage points systems →</strong></a>
-  </section>
-</main><footer class="footer"><div class="container">Racelytic</div></footer><script src="/js/header.js"></script></body>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Recalculate Formula 2 seasons, test title scenarios, create scoring rules and build custom championships.">
+  <link rel="icon" href="/assets/favicon-f2.svg" type="image/svg+xml">
+  <title>Formula 2 simulator · Racelytic</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/polish.css">
+  <link rel="stylesheet" href="/css/database-overview.css">
+  <link rel="stylesheet" href="/css/simulator-overview.css">
+</head>
+<body class="f2-mode">
+  <div id="header"></div>
+  <main class="container page database-directory simulator-directory">
+    <header class="database-directory-heading simulator-directory-heading">
+      <div class="simulator-directory-intro">
+        <div class="eyebrow">FORMULA 2 SIMULATOR</div>
+        <h1>Rewrite Formula 2</h1>
+        <p>Recalculate seasons, test title outcomes and build rules for every race format.</p>
+      </div>
+      <a class="simulator-example-card" href="/f2/simulate-season">
+        <div class="simulator-example-kicker"><span>START HERE</span><span>FULL SEASON</span></div>
+        <p>How would a different ruleset reshape a Formula 2 championship?</p>
+        <strong>Choose a season <span aria-hidden="true">→</span></strong>
+      </a>
+    </header>
+
+    <section class="simulator-tool-group" aria-labelledby="f2-choose-title">
+      <h2 class="eyebrow database-navigation-title" id="f2-choose-title">CHOOSE A SIMULATION</h2>
+      <nav class="database-category-grid simulator-tool-grid" aria-labelledby="f2-choose-title">
+        <a class="database-category simulator-tool-card" href="/f2/simulate-season"><span class="simulator-tool-meta">Completed seasons · Drivers and teams</span><div class="database-category-heading"><h3>Recalculate a past season</h3></div><p>Apply custom scoring while preserving Formula 2 race formats and bonuses.</p><strong class="database-category-action">Simulate a season <span aria-hidden="true">→</span></strong></a>
+        <a class="database-category simulator-tool-card" href="/f2/scenario-calculator"><span class="simulator-tool-meta">Any completed round · Future results</span><div class="database-category-heading"><h3>Rewrite the title run-in</h3></div><p>Change the remaining classifications and explore every path to the title.</p><strong class="database-category-action">Build a scenario <span aria-hidden="true">→</span></strong></a>
+        <a class="database-category simulator-tool-card" href="/f2/championship-builder"><span class="simulator-tool-meta">Any season · Custom calendar and field</span><div class="database-category-heading"><h3>Build a custom championship</h3></div><p>Combine individual races, choose the competitors and calculate new standings.</p><strong class="database-category-action">Build a championship <span aria-hidden="true">→</span></strong></a>
+        <a class="database-category simulator-tool-card" href="/f2/points-systems"><span class="simulator-tool-meta">Feature, sprint, qualifying and bonuses</span><div class="database-category-heading"><h3>Create scoring rules</h3></div><p>Design reusable points systems for every championship simulation tool.</p><strong class="database-category-action">Manage points systems <span aria-hidden="true">→</span></strong></a>
+      </nav>
+    </section>
+
+    <section class="simulator-workflow" aria-labelledby="f2-workflow-title">
+      <div class="simulator-workflow-heading"><div class="eyebrow">HOW IT FITS TOGETHER</div><h2 id="f2-workflow-title">Build rules once. Use them everywhere.</h2><p>Experiment freely. Sign in only when you want to save private rules or championships.</p></div>
+      <div class="simulator-workflow-flow"><a href="/f2/points-systems"><span>1</span><strong>Create a points system</strong></a><div class="simulator-workflow-arrow" aria-hidden="true">→</div><div class="simulator-workflow-destinations"><a href="/f2/simulate-season">Recalculate a season</a><a href="/f2/scenario-calculator">Test a scenario</a><a href="/f2/championship-builder">Build a championship</a></div></div>
+    </section>
+  </main>
+  <footer class="footer"><div class="container">Racelytic</div></footer>
+  <script src="/js/header.js"></script>
+</body>
 </html>

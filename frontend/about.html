@@ -3,8 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Learn about Racelytic, an independent Formula 1 history, statistics and championship analysis project.">
-  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml"><title>Racelytic</title>
+  <meta name="description" content="Learn why Racelytic exists, how its motorsport archive is built, and the principles behind the project.">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <title>About Racelytic · Racelytic</title>
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/polish.css">
 </head>
@@ -14,72 +15,71 @@
   <main class="container page about-page">
     <section class="about-hero">
       <div class="eyebrow">ABOUT RACELYTIC</div>
-      <h1>Formula 1 history,<br><span>made explorable.</span></h1>
-      <p>Racelytic is an independent Formula 1 database and analysis platform built to make decades of results easier to explore, compare and understand.</p>
+      <h1>Motorsport history,<br><span>connected.</span></h1>
+      <p>Racelytic is an independent project that turns scattered racing records into a structured, explorable history.</p>
     </section>
 
-    <section class="about-intro" aria-labelledby="about-purpose">
-      <div>
+    <section class="about-section" aria-labelledby="about-purpose">
+      <div class="about-section-heading">
         <span class="about-section-number">01</span>
-        <h2 id="about-purpose">Beyond the final result</h2>
+        <h2 id="about-purpose">Why it exists</h2>
       </div>
       <div class="about-copy">
-        <p>A classification tells you who finished where. Racelytic helps reveal the larger story: how a championship developed, how teammates compared, where drivers performed best and how different rules could have changed an outcome.</p>
-        <p>The project brings historical records, interactive analysis and championship simulation into one consistent interface. It is designed for curious fans who want to move naturally from a headline statistic to the races behind it.</p>
+        <p>Motorsport history is usually encountered one result at a time. Standings live apart from the races that shaped them, careers cross teams and championships, and changing formats make different eras difficult to compare.</p>
+        <p>Racelytic brings those records together so the path from a championship table to an individual session remains visible. The aim is not simply to collect results, but to preserve the relationships and context that make them meaningful.</p>
       </div>
     </section>
 
-    <section class="about-capabilities" aria-labelledby="about-capabilities-title">
+    <section class="about-section about-method" aria-labelledby="about-method">
       <div class="about-section-heading">
         <span class="about-section-number">02</span>
-        <h2 id="about-capabilities-title">What you can do</h2>
+        <h2 id="about-method">From records to an archive</h2>
       </div>
-      <div class="about-feature-grid">
-        <a href="/database" class="about-feature">
-          <span>DATABASE</span>
-          <h3>Explore the archive</h3>
-          <p>Browse seasons, races, drivers, constructors, circuits and chassis through connected historical records.</p>
-          <strong>Open database →</strong>
-        </a>
-        <a href="/analysis" class="about-feature">
-          <span>ANALYSIS</span>
-          <h3>Find the story in the data</h3>
-          <p>Study championship progress, driver form, teammate battles, circuit performance and all-time records.</p>
-          <strong>Open analysis →</strong>
-        </a>
-        <a href="/simulator-overview" class="about-feature">
-          <span>SIMULATOR</span>
-          <h3>Rewrite the rules</h3>
-          <p>Recalculate seasons with different points systems, test championship scenarios or build a custom calendar.</p>
-          <strong>Open simulator →</strong>
-        </a>
+      <div class="about-method-steps">
+        <article>
+          <span>COLLECT</span>
+          <div><h3>Start with recorded results</h3><p>Public datasets and published classifications provide the foundation. Sources vary by championship and are credited where their data is used.</p></div>
+        </article>
+        <article>
+          <span>CONNECT</span>
+          <div><h3>Preserve the relationships</h3><p>Seasons, events, sessions, competitors, teams and venues are linked so a summary can always lead back to its underlying records.</p></div>
+        </article>
+        <article>
+          <span>INTERPRET</span>
+          <div><h3>Make assumptions visible</h3><p>Names and formats are normalized for consistency, while cancellations, substitutions, missing values and regulation changes remain part of the historical context.</p></div>
+        </article>
       </div>
     </section>
 
-    <section class="about-data" aria-labelledby="about-data-title">
-      <div class="about-data-copy">
+    <section class="about-principles-section" aria-labelledby="about-principles-title">
+      <div class="about-section-heading">
         <span class="about-section-number">03</span>
-        <h2 id="about-data-title">Built on open data</h2>
-        <p>Racelytic uses the community-maintained <a href="https://github.com/f1db/f1db" target="_blank" rel="noopener noreferrer">F1DB dataset</a>. Its breadth makes it possible to connect more than seventy years of championships, events, people, teams and machinery.</p>
-        <p>Historical motorsport data is rarely perfectly uniform. Regulations, formats and record-keeping have changed considerably over time, so calculations are analytical interpretations of the available data rather than official rulings.</p>
+        <h2 id="about-principles-title">Project principles</h2>
+        <p>The same standards guide the database, analysis and simulation layers.</p>
       </div>
-      <aside class="about-principles" aria-label="Project principles">
-        <span>PROJECT PRINCIPLES</span>
-        <ul>
-          <li><strong>Connected</strong><small>Move easily between a statistic and its source results.</small></li>
-          <li><strong>Transparent</strong><small>Make rules, filters and assumptions visible.</small></li>
-          <li><strong>Exploratory</strong><small>Encourage questions instead of presenting only conclusions.</small></li>
-        </ul>
-      </aside>
+      <div class="about-principles-grid">
+        <article><span>01</span><h3>Connected</h3><p>Keep every statistic close to the results and relationships behind it.</p></article>
+        <article><span>02</span><h3>Transparent</h3><p>Show rules, filters, limitations and analytical assumptions clearly.</p></article>
+        <article><span>03</span><h3>Contextual</h3><p>Respect the formats and circumstances that distinguish championships and eras.</p></article>
+        <article><span>04</span><h3>Exploratory</h3><p>Create room for questions and comparisons instead of presenting only conclusions.</p></article>
+      </div>
     </section>
 
-    <section class="about-notice">
-      <span class="about-section-number">04</span>
-      <div>
-        <h2>Independent by design</h2>
-        <p>Racelytic is an unofficial project and is not affiliated with Formula 1, the FIA, or any Formula 1 team. Formula 1, F1 and related marks belong to their respective owners.</p>
+    <section class="about-section about-scope" aria-labelledby="about-scope">
+      <div class="about-section-heading">
+        <span class="about-section-number">04</span>
+        <h2 id="about-scope">A growing historical record</h2>
+      </div>
+      <div class="about-copy">
+        <p>Racelytic grows championship by championship, with depth taking priority over simply adding more series. New records and tools are integrated when they can remain connected to a dependable underlying structure.</p>
+        <p>Historical sources can be incomplete or corrected later. The archive is therefore an evolving interpretation of the best available information, not an official record or final authority.</p>
       </div>
     </section>
+
+    <aside class="about-independence" aria-label="Independent project notice">
+      <span>INDEPENDENT PROJECT</span>
+      <p>Racelytic is unofficial and is not affiliated with the FIA, Formula 1, Formula 2, Formula 3, F1 Academy, or any competing team. Championship names and related marks belong to their respective owners.</p>
+    </aside>
   </main>
 
   <footer class="footer"><div class="container">Racelytic</div></footer>

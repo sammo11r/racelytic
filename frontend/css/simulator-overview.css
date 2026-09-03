@@ -1,0 +1,73 @@
+/* Championship simulator directory. */
+.simulator-directory .simulator-directory-heading {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 430px);
+  align-items: end;
+  gap: clamp(32px, 6vw, 88px);
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--border);
+}
+.simulator-directory-intro { padding-bottom: 4px; }
+.simulator-example-card {
+  --simulator-example-accent: #ff5361;
+  display: block;
+  min-height: 158px;
+  padding: 20px 22px 18px;
+  border-radius: 12px;
+  background: #17191f;
+  box-shadow: 0 16px 40px rgba(17, 19, 24, .12);
+  color: #fff;
+  text-decoration: none;
+  transition: background .18s ease, box-shadow .18s ease, transform .18s ease;
+}
+.simulator-example-card:hover { background: #20232b; box-shadow: 0 18px 44px rgba(17, 19, 24, .18); transform: translateY(-2px); }
+.simulator-example-card:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.f2-mode .simulator-example-card { --simulator-example-accent: #63a8ff; }
+.f3-mode .simulator-example-card { --simulator-example-accent: #ff944d; }
+.academy-mode .simulator-example-card { --simulator-example-accent: #ad7aff; }
+.simulator-example-kicker { display: flex; justify-content: space-between; gap: 16px; color: rgba(255, 255, 255, .54); font-size: 10px; font-weight: 800; line-height: 1.4; letter-spacing: .13em; }
+.simulator-example-card p { max-width: 360px; margin: 16px 0 12px; color: #fff; font-size: 20px; font-weight: 750; line-height: 1.25; letter-spacing: -.025em; }
+.simulator-example-card strong { color: var(--simulator-example-accent); font-size: 12px; font-weight: 800; }
+.simulator-directory .simulator-tool-group .database-navigation-title { margin-top: 32px; }
+.simulator-directory .simulator-tool-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: 1fr; }
+.simulator-tool-card { min-height: 205px; }
+.simulator-tool-meta { display: block; margin-bottom: 14px; color: var(--accent); font-size: 10px; font-weight: 800; line-height: 1.4; letter-spacing: .1em; text-transform: uppercase; }
+.simulator-replay-feature { display: flex; align-items: center; justify-content: space-between; gap: 32px; margin-top: 34px; padding: 26px 28px; border: 1px solid var(--border); border-radius: 12px; background: #17191f; color: #fff; }
+.simulator-replay-feature h2 { margin: 0; color: #fff; font-size: 26px; line-height: 1.2; letter-spacing: -.03em; }
+.simulator-replay-feature p { margin: 8px 0 0; color: #b9bdc6; font-size: 14px; line-height: 1.55; }
+.simulator-replay-feature .simulator-tool-meta { color: #ff5361; }
+.simulator-replay-feature .button { flex: 0 0 auto; }
+.simulator-workflow { display: grid; grid-template-columns: minmax(250px, .8fr) minmax(420px, 1.2fr); align-items: center; gap: clamp(28px, 5vw, 70px); margin-top: 34px; padding: 28px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface-alt); }
+.simulator-workflow-heading .eyebrow { margin-bottom: 8px; color: var(--accent); }
+.simulator-workflow-heading h2 { margin: 0; font-size: 23px; line-height: 1.2; letter-spacing: -.03em; }
+.simulator-workflow-heading p { margin: 9px 0 0; color: var(--text-secondary); font-size: 13px; line-height: 1.55; }
+.simulator-workflow-flow { display: grid; grid-template-columns: minmax(145px, .8fr) auto minmax(190px, 1fr); align-items: center; gap: 14px; }
+.simulator-workflow-flow > a { display: flex; align-items: center; gap: 10px; padding: 15px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); color: var(--text); font-size: 13px; }
+.simulator-workflow-flow > a:hover { border-color: var(--accent); color: var(--accent); }
+.simulator-workflow-flow > a span { display: grid; width: 24px; height: 24px; flex: 0 0 auto; place-items: center; border-radius: 50%; background: var(--accent); color: #fff; font-size: 11px; }
+.simulator-workflow-arrow { color: var(--accent); font-size: 22px; font-weight: 800; }
+.simulator-workflow-destinations { display: grid; gap: 5px; }
+.simulator-workflow-destinations a { padding: 7px 10px; border-left: 2px solid var(--border); color: var(--text-secondary); font-size: 12px; font-weight: 700; }
+.simulator-workflow-destinations a:hover { border-color: var(--accent); color: var(--accent); }
+@media (max-width: 900px) {
+  .simulator-directory .simulator-directory-heading { grid-template-columns: minmax(0, 1fr) minmax(300px, 370px); gap: 32px; }
+  .simulator-workflow { grid-template-columns: 1fr; }
+}
+@media (max-width: 700px) {
+  .simulator-directory .simulator-directory-heading { grid-template-columns: minmax(0, 1fr); gap: 22px; }
+  .simulator-directory-intro { padding-bottom: 0; }
+  .simulator-directory .simulator-tool-grid { grid-template-columns: minmax(0, 1fr); }
+  .simulator-replay-feature { align-items: flex-start; flex-direction: column; }
+  .simulator-replay-feature .button { width: 100%; }
+}
+@media (max-width: 520px) {
+  .simulator-example-card { min-height: 150px; padding: 18px; }
+  .simulator-example-card p { margin-top: 14px; font-size: 19px; }
+  .simulator-workflow { padding: 20px; }
+  .simulator-workflow-flow { grid-template-columns: 1fr; }
+  .simulator-workflow-arrow { transform: rotate(90deg); text-align: center; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .simulator-example-card { transition: none; }
+  .simulator-example-card:hover { transform: none; }
+}

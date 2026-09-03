@@ -3,56 +3,41 @@
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml"><title>Racelytic</title>
-  <link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/polish.css">
+  <link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/polish.css"><link rel="stylesheet" href="/css/points-systems.css">
 </head>
 <body>
   <div id="header"></div>
   <main class="container page points-library-page">
-    <section class="points-library-hero">
-      <div><div class="eyebrow">CHAMPIONSHIP RULES</div><h1>Points systems.</h1><p>Create reusable scoring rules and apply them to any season in the simulator.</p></div>
-      <a class="button secondary" href="/simulator">Simulate a season</a>
-    </section>
+    <header class="points-page-heading"><div class="eyebrow">CHAMPIONSHIP RULES</div><h1>Design the way a championship scores</h1><p>Start with an official system or build your own. Preview every race, sprint, bonus and counting rule before applying it.</p></header>
 
-    <section id="points-login-prompt" class="points-login-prompt" hidden>
-      <div><strong>Sign in to create your own system</strong><span>Your saved rules remain tied to your Racelytic account.</span></div>
-      <a class="button primary" href="/account">Sign in or create account</a>
-    </section>
+    <section class="points-presets" aria-labelledby="points-presets-title"><div class="section-heading"><div><div class="eyebrow">OFFICIAL PRESETS</div><h2 id="points-presets-title">Start from familiar rules</h2></div><span class="section-note">Available without an account</span></div><div id="official-systems" class="points-preset-grid"></div></section>
+
+    <section id="points-login-prompt" class="points-login-prompt" hidden><div><strong>Sign in to save custom rules</strong><span>You can inspect presets and public systems now. An account lets you save, edit and reuse your own.</span></div><a class="button primary" href="/account">Sign in or create account</a></section>
 
     <section id="points-system-manager" class="points-system-manager points-library-manager">
-      <div class="section-heading">
-        <div><div class="eyebrow">YOUR LIBRARY</div><h2>Your points systems</h2></div>
-        <button class="button primary" id="new-system-button" type="button" hidden>New points system</button>
-      </div>
+      <div class="section-heading"><div><div class="eyebrow">YOUR LIBRARY</div><h2>Your points systems</h2></div><button class="button primary" id="new-system-button" type="button" hidden>New points system</button></div>
       <div id="saved-systems" class="saved-systems"></div>
 
-      <form id="points-system-form" class="points-system-form" hidden>
-        <input type="hidden" name="id">
-        <div class="points-form-heading"><div><span id="points-form-kicker">NEW RULESET</span><h3 id="points-form-title">Create points system</h3></div><button type="button" class="text-link" id="cancel-system-button">Cancel</button></div>
-        <div class="points-form-grid">
-          <label class="wide"><span>Name</span><input name="name" maxlength="100" required placeholder="My points system"></label>
-          <label class="wide"><span>Race points by position</span><input name="racePoints" required placeholder="25, 18, 15, 12, 10, 8, 6, 4, 2, 1"><small>Comma-separated, starting with first place.</small></label>
-          <label class="wide"><span>Sprint points by position</span><input name="sprintPoints" placeholder="8, 7, 6, 5, 4, 3, 2, 1"><small>Leave empty to award no sprint points.</small></label>
-          <label class="wide"><span>Qualifying points by position</span><input name="qualifyingPoints" placeholder="3, 2, 1"><small>Leave empty to award no qualifying points.</small></label>
-          <label><span>Pole bonus</span><input name="poleBonus" type="number" min="0" max="1000" step="0.5" value="0"></label>
-          <label><span>Fastest-lap bonus</span><input name="fastestLapBonus" type="number" min="0" max="1000" step="0.5" value="0"></label>
-          <label><span>Fastest-lap eligibility</span><input name="fastestLapMaxPosition" type="number" min="1" max="30" placeholder="Any position"><small>Maximum finishing position, e.g. 10.</small></label>
-          <label><span>Count best rounds</span><input name="countBestRounds" type="number" min="1" max="100" placeholder="All rounds"></label>
-          <label><span>Best of first races</span><input name="bestFirstRounds" type="number" min="1" max="100" placeholder="Best X"></label>
-          <label><span>First-race window</span><input name="firstRoundsWindow" type="number" min="1" max="100" placeholder="First Y races"></label>
-          <label><span>Best of last races</span><input name="bestLastRounds" type="number" min="1" max="100" placeholder="Best X"></label>
-          <label><span>Last-race window</span><input name="lastRoundsWindow" type="number" min="1" max="100" placeholder="Last Y races"></label>
-          <label><span>Visibility</span><select name="visibility"><option value="private">Private</option><option value="public">Public</option></select></label>
-          <label class="points-checkbox wide"><input name="sprintCountsTowardRound" type="checkbox" checked><span>Include sprint points in a round before applying the best-round limit</span></label>
+      <form id="points-system-form" class="points-system-form" hidden novalidate>
+        <input type="hidden" name="id"><input type="hidden" name="racePoints"><input type="hidden" name="sprintPoints"><input type="hidden" name="qualifyingPoints">
+        <div class="points-form-heading"><div><span id="points-form-kicker">NEW RULESET</span><h3 id="points-form-title">Create points system</h3></div><button type="button" class="text-link" id="cancel-system-button">Close editor</button></div>
+        <div class="points-editor-workspace">
+          <div class="points-editor-main">
+            <section class="points-editor-section"><div class="points-editor-section-heading"><span>1</span><div><strong>Name your rules</strong><small>Choose a clear name so this system is easy to recognize in every simulator.</small></div></div><div class="points-identity-grid"><label><span>Name</span><input name="name" maxlength="100" required placeholder="My points system"></label><label><span>Visibility</span><select name="visibility"><option value="private">Private</option><option value="public">Public · visible to everyone</option></select></label></div></section>
+
+            <section class="points-editor-section"><div class="points-editor-section-heading"><span>2</span><div><strong>Award points by position</strong><small>Edit each finishing position directly. Add or remove positions as needed.</small></div></div><div class="points-score-groups"><div class="points-score-group"><div><strong>Race</strong><small>Grand Prix or feature race</small></div><div class="points-position-grid" data-points-editor="racePoints"></div><button type="button" data-add-points-position="racePoints">Add scoring position</button></div><div class="points-score-group"><div><strong id="sprint-score-label">Sprint</strong><small id="sprint-score-note">Optional sprint classification</small></div><div class="points-position-grid" data-points-editor="sprintPoints"></div><button type="button" data-add-points-position="sprintPoints">Add scoring position</button></div><div class="points-score-group"><div><strong>Qualifying</strong><small>Optional qualifying classification</small></div><div class="points-position-grid" data-points-editor="qualifyingPoints"></div><button type="button" data-add-points-position="qualifyingPoints">Add scoring position</button></div></div></section>
+
+            <section class="points-editor-section"><div class="points-editor-section-heading"><span>3</span><div><strong>Bonuses</strong><small>Add optional pole and fastest-lap awards.</small></div></div><div class="points-bonus-grid"><label><span>Pole bonus</span><input name="poleBonus" type="number" min="0" max="1000" step="0.5" value="0"></label><label><span>Fastest-lap bonus</span><input name="fastestLapBonus" type="number" min="0" max="1000" step="0.5" value="0"></label><label><span>Fastest-lap eligibility</span><input name="fastestLapMaxPosition" type="number" min="1" max="30" placeholder="Any position"><small>Highest eligible finishing position.</small></label></div></section>
+
+            <section class="points-editor-section"><div class="points-editor-section-heading"><span>4</span><div><strong>Count championship results</strong><small>Choose how race weekends contribute to the final standings.</small></div></div><label class="points-counting-mode"><span>Counting method</span><select name="countingMode"><option value="all">Count every round</option><option value="best">Count the best results</option><option value="segmented">Use first and last-season segments</option></select></label><div data-counting-fields="best" hidden><label><span>Count best</span><input name="countBestRounds" type="number" min="1" max="100" placeholder="8"><small>Highest-scoring rounds across the season.</small></label></div><div class="points-segment-grid" data-counting-fields="segmented" hidden><label><span>Best results from first segment</span><input name="bestFirstRounds" type="number" min="1" max="100" placeholder="5"></label><label><span>First segment length</span><input name="firstRoundsWindow" type="number" min="1" max="100" placeholder="7"></label><label><span>Best results from last segment</span><input name="bestLastRounds" type="number" min="1" max="100" placeholder="4"></label><label><span>Last segment length</span><input name="lastRoundsWindow" type="number" min="1" max="100" placeholder="5"></label></div><label class="points-checkbox"><input name="sprintCountsTowardRound" type="checkbox" checked><span id="sprint-counting-label">Include sprint points in the round before applying result limits</span></label></section>
+          </div>
+
+          <aside class="points-live-preview"><div class="eyebrow">LIVE PREVIEW</div><h3 id="points-preview-name">Untitled points system</h3><div id="points-preview-status" class="points-preview-status">Add a name and race points to continue.</div><div id="points-preview-scores"></div><div id="points-preview-counting"></div><div class="points-use-links" id="points-preview-links"></div><div class="points-form-actions"><button class="button primary" type="submit">Save points system</button><button class="button secondary" id="delete-system-button" type="button" hidden>Delete system</button></div><button type="button" class="text-link" id="reset-system-button">Reset editor</button><div id="points-system-message" class="account-message" aria-live="polite"></div></aside>
         </div>
-        <div class="points-form-actions"><button class="button primary" type="submit">Save points system</button><button class="button secondary" id="delete-system-button" type="button" hidden>Delete</button></div>
-        <div id="points-system-message" class="account-message" aria-live="polite"></div>
       </form>
     </section>
 
-    <section class="points-community">
-      <div class="section-heading"><div><div class="eyebrow">PUBLIC SYSTEMS</div><h2>Community rulesets</h2></div></div>
-      <div id="public-systems" class="saved-systems"></div>
-    </section>
+    <section class="points-community"><div class="section-heading"><div><div class="eyebrow">PUBLIC SYSTEMS</div><h2>Community rulesets</h2></div><label class="points-community-search"><span>Search</span><input id="points-community-search" type="search" placeholder="Search public rules"></label></div><div id="public-systems" class="saved-systems"></div></section>
   </main>
   <footer class="footer"><div class="container">Racelytic</div></footer>
   <script src="/js/utils.js"></script><script src="/js/header.js"></script><script src="/js/points-systems.js"></script>

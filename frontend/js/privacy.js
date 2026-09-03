@@ -64,32 +64,46 @@ async function loadFooter() {
         const response = await fetch('/components/footer.html');
         if (!response.ok) throw new Error('Failed to load footer');
         footer.innerHTML = (await response.text()).replace('{{year}}', String(new Date().getFullYear()));
-        const isF2Mode = window.location.pathname === '/f2' || window.location.pathname.startsWith('/f2/');
-        const isF3Mode = window.location.pathname === '/f3' || window.location.pathname.startsWith('/f3/');
-        const isAcademyMode = window.location.pathname === '/academy' || window.location.pathname.startsWith('/academy/');
+        const requestedSeries = new URLSearchParams(window.location.search).get('series');
+        const activeSeries = document.body.classList.contains('academy-mode') ? 'academy'
+            : document.body.classList.contains('f3-mode') ? 'f3'
+            : document.body.classList.contains('f2-mode') ? 'f2'
+            : ['f1', 'f2', 'f3', 'academy'].includes(requestedSeries) ? requestedSeries : 'f1';
+        const isF2Mode = activeSeries === 'f2';
+        const isF3Mode = activeSeries === 'f3';
+        const isAcademyMode = activeSeries === 'academy';
         const summary = footer.querySelector('[data-footer-summary]');
         const trademark = footer.querySelector('[data-footer-trademark]');
         const source = footer.querySelector('[data-footer-source]');
+        const seriesBase = activeSeries === 'f1' ? '' : `/${activeSeries}`;
+        const footerRoutes = {
+            database: `${seriesBase}/database`,
+            analysis: `${seriesBase}/analysis`,
+            simulator: activeSeries === 'f1' ? '/simulator-overview' : `${seriesBase}/simulator`,
+            games: `${seriesBase}/games`,
+            about: `/about?series=${activeSeries}`,
+            method: `/about?series=${activeSeries}#about-method`,
+            account: `/account?series=${activeSeries}`
+        };
+        footer.querySelectorAll('[data-footer-page]').forEach(link => { link.href = footerRoutes[link.dataset.footerPage]; });
+        if (summary) summary.textContent = 'Independent motorsport history, statistics, and championship analysis.';
         if (isF2Mode) {
             const brand = footer.querySelector('.footer-brand');
             if (brand) brand.href = '/f2';
-            if (summary) summary.textContent = 'Independent Formula 2 history, statistics, and championship analysis.';
-            if (trademark) trademark.textContent = 'Racelytic is unofficial and is not associated with or endorsed by the FIA Formula 2 Championship, the FIA, the Formula 1 companies, or any team. FIA FORMULA 2 CHAMPIONSHIP, FIA FORMULA 2, FORMULA 2, F2 and related marks are trade marks of the Fédération Internationale de l’Automobile and are used by their authorised operators under licence.';
-            if (source) source.innerHTML = 'Formula 2 statistics are compiled from <a href="https://www.motorsportstats.com/" target="_blank" rel="noopener noreferrer">Motorsport Stats</a> classifications and project-maintained corrections. Third-party materials remain subject to their owners’ rights. Data may contain errors and is not an official record.';
+            if (trademark) trademark.textContent = 'Racelytic is unofficial and is not associated with or endorsed by the FIA Formula 2 Championship, the FIA, the Formula 1 companies, any team, or any driver. Formula 2, F2 and related marks belong to their respective owners.';
+            if (source) source.innerHTML = 'Formula 2 statistics are compiled from published classifications and project-maintained corrections. See <a href="/data-sources#formula-2">Data sources &amp; licences</a> for provenance and important reuse information. Data may contain errors and is not an official record.';
         }
         if (isF3Mode) {
             const brand = footer.querySelector('.footer-brand');
             if (brand) brand.href = '/f3';
-            if (summary) summary.textContent = 'Independent Formula 3 history, statistics, and championship analysis.';
-            if (trademark) trademark.textContent = 'Racelytic is unofficial and is not associated with or endorsed by the FIA Formula 3 Championship, the FIA, the Formula 1 companies, or any team. FIA FORMULA 3 CHAMPIONSHIP, FIA FORMULA 3, FORMULA 3, F3 and related marks are trade marks of the Fédération Internationale de l’Automobile and are used by their authorised operators under licence.';
-            if (source) source.innerHTML = 'Formula 3 statistics are compiled from <a href="https://www.motorsportstats.com/" target="_blank" rel="noopener noreferrer">Motorsport Stats</a> classifications, official championship sources, and project-maintained corrections. Third-party materials remain subject to their owners’ rights. Data may contain errors and is not an official record.';
+            if (trademark) trademark.textContent = 'Racelytic is unofficial and is not associated with or endorsed by the FIA Formula 3 Championship, the FIA, the Formula 1 companies, any team, or any driver. Formula 3, F3 and related marks belong to their respective owners.';
+            if (source) source.innerHTML = 'Formula 3 statistics are compiled from published classifications and project-maintained corrections. See <a href="/data-sources#formula-3">Data sources &amp; licences</a> for provenance and important reuse information. Data may contain errors and is not an official record.';
         }
         if (isAcademyMode) {
             const brand = footer.querySelector('.footer-brand');
             if (brand) brand.href = '/academy';
-            if (summary) summary.textContent = 'Independent F1 Academy history, statistics, and championship analysis.';
-            if (trademark) trademark.textContent = 'Racelytic is unofficial and is not associated with or endorsed by F1 Academy, Formula One Management, the FIA, any team, or any driver. F1 ACADEMY, F1, FORMULA 1 and related marks belong to their respective owners.';
-            if (source) source.innerHTML = 'F1 Academy calendars, classifications and standings are compiled from the <a href="https://www.f1academy.com/" target="_blank" rel="noopener noreferrer">official F1 Academy website</a> and project-maintained normalisation. Third-party materials remain subject to their owners’ rights. Data may contain errors and is not an official record.';
+            if (trademark) trademark.textContent = 'Racelytic is unofficial and is not associated with or endorsed by F1 Academy, the Formula 1 companies, the FIA, any team, or any driver. F1 ACADEMY, F1, FORMULA 1 and related marks are trade marks of Formula One Licensing B.V.';
+            if (source) source.innerHTML = 'F1 Academy statistics are compiled from published calendars and classifications, then normalised by Racelytic. See <a href="/data-sources#f1-academy">Data sources &amp; licences</a> for provenance and important reuse information. Data may contain errors and is not an official record.';
         }
         footer.querySelector('[data-privacy-settings]')?.addEventListener('click', () => window.RacelyticPrivacy.showAnalyticsChoice(true));
     } catch (error) {

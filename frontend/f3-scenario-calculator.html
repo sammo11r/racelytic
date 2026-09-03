@@ -3,38 +3,41 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="description" content="Project Formula 3 championship scenarios by changing the remaining sprint and feature-race results.">
+  <meta name="description" content="Rewrite future Formula 3 results and explore how every championship scenario changes the title outlook.">
   <link rel="icon" href="/assets/favicon-f3.svg" type="image/svg+xml">
-  <title>Scenario Calculator · Formula 3 · Racelytic</title>
+  <title>Formula 3 scenario calculator · Racelytic</title>
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/polish.css">
+  <link rel="stylesheet" href="/css/scenario-calculator.css">
 </head>
 <body class="f3-mode">
   <div id="header"></div>
   <main class="container page scenario-page">
-    <a class="back-link" href="/f3/simulator">← Formula 3 simulator</a>
-    <section class="simulator-hero scenario-hero">
-      <div>
-        <div class="eyebrow">FORMULA 3 SCENARIOS</div>
-        <h1>Shape the title run-in.</h1>
-        <p>Freeze the Formula 3 standings after any completed round, rewrite the remaining sprint and feature results, and see who can still win.</p>
+    <header class="scenario-page-heading">
+      <div class="eyebrow">FORMULA 3 SCENARIOS</div>
+      <h1>Rewrite the title run-in</h1>
+      <p>Choose where the official standings stop, predict the remaining results and follow the title outlook live.</p>
+    </header>
+
+    <section class="scenario-setup" aria-label="Scenario settings">
+      <div class="scenario-controls">
+        <label><span>Season</span><select id="scenario-season"><option>Loading seasons…</option></select></label>
+        <label><span>Official standings after</span><select id="scenario-cutoff"></select></label>
+        <label><span>Points system</span><select id="scenario-points"><option value="modern">Formula 3 · current</option><option value="f3-legacy">Formula 3 · 2019–2021</option></select><small><a id="scenario-manage-rules" href="/f3/points-systems">Create or edit scoring rules →</a></small></label>
+        <button id="reset-scenario" type="button">Reset entire scenario</button>
       </div>
-      <div class="simulator-hero-mark" aria-hidden="true">?</div>
+      <div id="scenario-rules" class="scenario-rules" aria-live="polite"></div>
     </section>
-    <section class="scenario-controls">
-      <label><span>Season</span><select id="scenario-season"><option>Loading seasons…</option></select></label>
-      <label><span>Standings after</span><select id="scenario-cutoff"></select></label>
-      <label><span>Points system</span><select id="scenario-points"><option value="modern">Formula 3 · current</option><option value="f3-legacy">Formula 3 · 2019–2021</option></select></label>
-      <button id="reset-scenario" type="button">Reset predictions</button>
-    </section>
+
+    <section id="scenario-summary" class="scenario-summary" aria-label="Live championship outlook"><div class="loading-state">Loading championship outlook…</div></section>
+
     <section class="scenario-workspace">
       <div class="scenario-editor">
-        <div class="section-heading"><div><div class="eyebrow">PREDICTIONS</div><h2>Edit the run-in</h2></div><label class="scenario-race-choice"><span>Race</span><select id="scenario-race"></select></label></div>
+        <div class="section-heading"><div><div class="eyebrow">PREDICTIONS</div><h2>Edit a race result</h2></div><label class="scenario-race-choice"><span>Race</span><select id="scenario-race"></select></label></div>
         <div id="scenario-grid"><div class="empty-state">Choose a season to begin.</div></div>
       </div>
       <aside class="scenario-outlook">
         <div class="section-heading"><div><div class="eyebrow">TITLE OUTLOOK</div><h2>Projected standings</h2></div></div>
-        <div id="scenario-summary"></div>
         <div id="scenario-standings"></div>
       </aside>
     </section>

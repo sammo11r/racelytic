@@ -3,23 +3,24 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml"><title>Racelytic</title>
+  <meta name="description" content="Recalculate any Formula 1 season with historical or custom scoring and compare the championship outcome.">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <title>Simulate a Formula 1 season · Racelytic</title>
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/polish.css">
+  <link rel="stylesheet" href="/css/simulator-season.css">
 </head>
 <body>
   <div id="header"></div>
   <main class="container page simulator-page">
-    <section class="simulator-hero">
-      <div>
-        <div class="eyebrow">SIMULATOR</div>
-        <h1>Rewrite a championship.</h1>
-        <p>Apply a different scoring system and championship rule to any Formula 1 season.</p>
-      </div>
-      <div class="simulator-hero-mark" aria-hidden="true">Σ</div>
-    </section>
+    <header class="simulator-page-heading">
+      <div class="eyebrow">SIMULATE A SEASON</div>
+      <h1>Recalculate a championship</h1>
+      <p>Apply different scoring and championship rules, then compare the result with the official standings.</p>
+    </header>
 
-    <section class="simulator-controls" aria-label="Simulation settings">
+    <section class="simulator-workspace" aria-label="Simulation settings">
+      <div class="simulator-controls">
       <label>
         <span>Season</span>
         <select id="simulation-season"><option value="">Loading seasons…</option></select>
@@ -27,12 +28,11 @@
       <label class="ruleset-control">
         <span>Points system</span>
         <select id="simulation-points"></select>
-        <small>Official full-distance scoring and championship counting rules. Race-specific eligibility and shared-drive exceptions depend on the available result data.</small>
+        <small><a id="manage-points-systems" href="/points-systems">Create or edit scoring rules →</a></small>
       </label>
-      <button class="button primary" id="run-simulation" type="button">Run simulation</button>
+      </div>
+      <section id="simulation-explanation" class="simulation-explanation" aria-label="Selected scoring rules" aria-live="polite"></section>
     </section>
-
-    <section id="simulation-explanation" class="simulation-explanation" aria-live="polite"></section>
 
     <section class="simulator-results">
       <div class="section-heading">
@@ -42,6 +42,7 @@
             <button class="standings-mode-button active" type="button" data-simulation-mode="drivers" aria-pressed="true">Drivers</button>
             <button class="standings-mode-button" type="button" data-simulation-mode="constructors" aria-pressed="false">Constructors</button>
           </div>
+          <label class="simulation-change-filter"><input id="simulation-changes-only" type="checkbox"><span>Changed positions only</span></label>
           <div id="simulation-status" class="section-note"></div>
         </div>
       </div>
