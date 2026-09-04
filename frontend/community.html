@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <title>Community · Racelytic</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/polish.css">
+  <link rel="stylesheet" href="/css/community.css">
+</head>
+<body>
+  <div id="header"></div>
+
+  <main class="community-page">
+    <header class="container community-hero">
+      <div class="community-hero-copy">
+        <div class="eyebrow">RACELYTIC COMMUNITY</div>
+        <h1>See what others have changed.</h1>
+        <p>Explore alternative championships, scoring rules and record views created from the Racelytic archive. Open an idea as it was shared, or make it your own.</p>
+      </div>
+      <div class="community-hero-actions">
+        <a class="button primary" id="community-create-link" href="/championship-builder">Create a championship</a>
+        <a class="button secondary" id="community-account-link" href="/account">Your library</a>
+      </div>
+    </header>
+
+    <section class="community-browser">
+      <div class="container">
+        <div class="community-heading-row">
+          <div><div class="eyebrow">SHARED CREATIONS</div><h2>Find an idea to explore</h2></div>
+          <p>Every item here was made public by its creator. Opening or remixing it never changes their original.</p>
+        </div>
+
+        <form class="community-controls" id="community-controls" role="search">
+          <label class="community-query"><span>Search</span><input id="community-query" name="q" type="search" maxlength="80" placeholder="Search by title or creator"></label>
+          <label><span>Series</span><select id="community-series" name="series"><option value="all">All series</option><option value="f1">Formula 1</option><option value="f2">Formula 2</option><option value="f3">Formula 3</option><option value="academy">F1 Academy</option></select></label>
+          <label><span>Sort</span><select id="community-sort" name="sort"><option value="newest">Newest</option><option value="updated">Recently updated</option><option value="oldest">Oldest</option><option value="name">Name A–Z</option></select></label>
+        </form>
+
+        <div class="community-type-tabs" role="tablist" aria-label="Creation type">
+          <button type="button" class="active" data-community-type="all" role="tab" aria-selected="true">All creations</button>
+          <button type="button" data-community-type="championships" role="tab" aria-selected="false">Championships</button>
+          <button type="button" data-community-type="points" role="tab" aria-selected="false">Points systems</button>
+          <button type="button" data-community-type="records" role="tab" aria-selected="false">Record views</button>
+        </div>
+
+        <div class="community-result-line"><p id="community-summary" aria-live="polite">Loading public creations…</p><button id="community-clear" type="button" hidden>Clear filters</button></div>
+        <div id="community-grid" class="community-grid" aria-live="polite" aria-busy="true"></div>
+        <div class="community-more"><button class="button secondary" id="community-more" type="button" hidden>Load more</button></div>
+      </div>
+    </section>
+
+    <section class="container community-contribute">
+      <div><div class="eyebrow">ADD YOUR PERSPECTIVE</div><h2>Change the rules. Share the result.</h2><p>Create a championship or scoring system, set its visibility to public, and it will appear here for other racing fans to explore.</p></div>
+      <div><a class="button primary" id="community-builder-link" href="/championship-builder">Build a championship</a><a class="button secondary" id="community-points-link" href="/points-systems">Create scoring rules</a></div>
+    </section>
+  </main>
+
+  <footer class="footer"><div class="container">Racelytic</div></footer>
+  <script src="/js/utils.js"></script>
+  <script src="/js/header.js"></script>
+  <script src="/js/community.js"></script>
+</body>
+</html>

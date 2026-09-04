@@ -186,6 +186,14 @@ async function initialise() {
     const account = await getJSON('/api/account'); currentUser = account.user;
     document.getElementById('points-login-prompt').hidden = Boolean(currentUser); document.getElementById('new-system-button').hidden = !currentUser;
     renderPresets(); await loadSystems();
+    const copyId = new URLSearchParams(location.search).get('copy');
+    const copySource = copyId ? systems.find(system => String(system.id) === copyId) : null;
+    if (copySource && currentUser) editSystem(copySource, { copy: true });
+    else if (copySource) {
+      document.getElementById('points-community-search').value = copySource.name;
+      renderSystems();
+      document.getElementById('public-systems').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
   } catch (error) { setError('saved-systems', error.message); renderPresets(); }
 }
 

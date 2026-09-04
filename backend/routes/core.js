@@ -30,6 +30,7 @@ const SEARCH_PAGES = [
     ['Quizzes', 'Test your Formula 1 knowledge', '/quizzes'],
     ['World champions quiz', 'Name every Formula 1 world champion', '/world-champions-quiz'],
     ['Race winners quiz', 'Name Formula 1 Grand Prix winners', '/race-winners-quiz'],
+    ['Community', 'Explore public championships, scoring systems and record views', '/community'],
     ['About', 'About Racelytic and its data', '/about'],
     ['Account', 'Your saved creations and community library', '/account'],
     ['Privacy', 'Racelytic privacy information', '/privacy'],

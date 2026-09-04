@@ -45,12 +45,15 @@ const PAGE_META = Object.freeze({
     privacy: ['Privacy Notice', 'Read how Racelytic processes personal data and analytics preferences.'],
     terms: ['Terms of Service', 'Read the terms that apply when using Racelytic.'],
     account: ['Account', 'Sign in to save custom points systems and championships.'],
+    community: ['Community', 'Explore public championships, scoring systems and record views created by the Racelytic community.'],
     search: ['Search', 'Search Racelytic for drivers, teams, seasons, races and circuits.'],
     monitor: ['Traffic Monitor', 'Private Racelytic traffic monitoring.'],
+    404: ['Page not found', 'The requested Racelytic page could not be found.'],
 });
 
-const NOINDEX_PAGES = new Set(['account', 'monitor', 'search']);
-const DETAIL_PARAMS = Object.freeze({ season: 'year', race: 'id', driver: 'id', constructor: 'id', team: 'id', circuit: 'id' });
+const NOINDEX_PAGES = new Set(['404', 'account', 'monitor', 'search']);
+const NEUTRAL_PAGES = new Set(['404', 'about', 'community', 'data-sources', 'privacy', 'terms', 'account', 'monitor', 'search']);
+const DETAIL_PARAMS = Object.freeze({ season: 'year', race: 'id', driver: 'id', constructor: 'id', team: 'id', circuit: 'id', chassis: 'id', 'championship-builder': 'id' });
 
 function esc(value) {
     return String(value).replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[character]);
@@ -87,7 +90,7 @@ function canonicalPath(pathname, query) {
     return `${context.cleanPath}${value ? `?${parameter}=${encodeURIComponent(value)}` : ''}`;
 }
 
-function metadataFor(pathname, query = {}) {
+function metadataFor(pathname, query = {}, overrides = {}) {
     const context = routeContext(pathname);
     const canonical = `${siteOrigin()}${canonicalPath(context.cleanPath, query)}`;
     const image = `${siteOrigin()}${SOCIAL_IMAGE_PATH}`;
@@ -98,8 +101,8 @@ function metadataFor(pathname, query = {}) {
 
     let title;
     let description;
-    if (context.page === 'about') {
-        title = 'About Racelytic · Racelytic';
+    if (NEUTRAL_PAGES.has(context.page)) {
+        title = `${pageMeta[0]} · Racelytic`;
         description = pageMeta[1];
     } else if (context.page === 'home') {
         title = `${context.series.name} History, Statistics & Analysis · Racelytic`;
@@ -110,9 +113,11 @@ function metadataFor(pathname, query = {}) {
         description = `${pageMeta[1].replace(/\.$/, '')} across the ${context.series.name} archive.`;
     }
 
-    const missingRequiredDetail = Boolean(detailParameter && !detailValue);
-    const robots = NOINDEX_PAGES.has(context.page) || missingRequiredDetail ? 'noindex, follow' : 'index, follow';
-    return { title, description, canonical, image, robots, page: context.page };
+    const optionalDetailPage = context.page === 'championship-builder' || context.page === 'chassis';
+    const missingRequiredDetail = Boolean(detailParameter && !detailValue && !optionalDetailPage);
+    const unverifiedCommunityPage = context.page === 'championship-builder' && Boolean(detailValue);
+    const robots = NOINDEX_PAGES.has(context.page) || missingRequiredDetail || unverifiedCommunityPage ? 'noindex, follow' : 'index, follow';
+    return { title, description, canonical, image, robots, page: context.page, ...overrides };
 }
 
 function renderSeoTags(metadata) {
@@ -134,11 +139,12 @@ function renderSeoTags(metadata) {
         `<meta name="twitter:title" content="${esc(metadata.title)}">`,
         `<meta name="twitter:description" content="${esc(metadata.description)}">`,
         `<meta name="twitter:image" content="${esc(metadata.image)}">`,
+        '<meta name="twitter:image:alt" content="Racelytic racing history, statistics and analysis">',
     ].join('\n  ');
 }
 
-function applySeo(html, pathname, query = {}) {
-    const metadata = metadataFor(pathname, query);
+function applySeo(html, pathname, query = {}, overrides = {}) {
+    const metadata = metadataFor(pathname, query, overrides);
     const stripped = html
         .replace(/\s*<meta\s+name=["'](?:description|robots)["'][^>]*>/gi, '')
         .replace(/\s*<meta\s+(?:property|name)=["'](?:og:[^"']+|twitter:[^"']+)["'][^>]*>/gi, '')
@@ -157,7 +163,13 @@ function renderRobots() {
 
 function renderSitemap(routes) {
     const urls = [...new Set(routes)]
-        .filter(route => metadataFor(route).robots === 'index, follow')
+        .filter(route => {
+            const parsed = new URL(route, DEFAULT_SITE_ORIGIN);
+            const metadata = metadataFor(parsed.pathname, Object.fromEntries(parsed.searchParams));
+            const verifiedCommunityPage = routeContext(parsed.pathname).page === 'championship-builder'
+                && parsed.searchParams.has('id');
+            return metadata.robots === 'index, follow' || verifiedCommunityPage;
+        })
         .sort((a, b) => a.localeCompare(b));
     return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map(route => `  <url><loc>${esc(`${siteOrigin()}${route}`)}</loc></url>`).join('\n')}\n</urlset>\n`;
 }

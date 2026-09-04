@@ -24,6 +24,7 @@ function configureAccountLinks() {
   ['points-library-link', 'manage-points-link'].forEach(id => { accountById(id).href = pointsUrl(); });
   ['records-library-link', 'explore-records-link'].forEach(id => { accountById(id).href = recordsUrl(); });
   ['championship-library-link', 'new-championship-link'].forEach(id => { accountById(id).href = builderUrl(); });
+  accountById('community-page-link').href = `/community?series=${encodeURIComponent(accountSeries)}`;
 }
 
 function clearFieldErrors(form) {

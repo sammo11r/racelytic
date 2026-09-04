@@ -63,6 +63,7 @@ body.f2-mode .championship-builder-page .builder-race-picker, body.f3-mode .cham
 .builder-save-panel input, .builder-save-panel textarea, .builder-save-panel select { width: 100%; }
 .builder-save-panel textarea { resize: vertical; }
 .championship-builder-page .builder-actions { margin-top: 13px; }
+.championship-builder-page #builder-share { grid-column: 1 / -1; }
 .championship-builder-page .empty-state { display: grid; justify-items: center; gap: 5px; }
 .championship-builder-page .empty-state strong { font-size: 13px; }
 .championship-builder-page .empty-state span { color: var(--text-muted); font-size: 11px; }

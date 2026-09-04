@@ -2,6 +2,7 @@ const crypto = require('node:crypto');
 const express = require('express');
 const { pool, sendError, withConnection } = require('../route-helpers');
 const { PRIVACY_VERSION, TERMS_VERSION } = require('../legal');
+const { MemoryRateLimiter } = require('../rate-limit');
 const {
     createSession,
     ensureAuthSchema,
@@ -16,23 +17,24 @@ const {
 } = require('../auth');
 
 const router = express.Router();
-const attempts = new Map();
+const attemptOptions = { windowMs: 15 * 60 * 1000, limit: 10 };
+const ipAttempts = new MemoryRateLimiter(attemptOptions);
+const usernameAttempts = new MemoryRateLimiter(attemptOptions);
 
 function normalizeUsername(value) {
     return String(value || '').trim().toLowerCase();
 }
 
-function clientKey(req) {
-    return `${req.ip}:${normalizeUsername(req.body?.username)}`;
+function rateLimited(req) {
+    const username = normalizeUsername(req.body?.username) || 'missing';
+    const ipLimited = ipAttempts.consume(req.ip);
+    const usernameLimited = usernameAttempts.consume(username);
+    return ipLimited || usernameLimited;
 }
 
-function rateLimited(req) {
-    const key = clientKey(req);
-    const now = Date.now();
-    const recent = (attempts.get(key) || []).filter(time => now - time < 15 * 60 * 1000);
-    recent.push(now);
-    attempts.set(key, recent);
-    return recent.length > 10;
+function resetAttempts(req, username) {
+    ipAttempts.reset(req.ip);
+    usernameAttempts.reset(normalizeUsername(username));
 }
 
 function validateOrigin(req, res, next) {
@@ -86,6 +88,7 @@ router.post('/api/account/register', async (req, res) => {
             return { token, user: { id, username, displayName: username } };
         });
         if (!result) return res.status(409).json({ error: 'That username is already taken.' });
+        resetAttempts(req, username);
         res.setHeader('Set-Cookie', sessionCookie(result.token));
         res.status(201).json({ user: result.user });
     } catch (error) {
@@ -111,7 +114,7 @@ router.post('/api/account/login', async (req, res) => {
             return { token, user: { id: record.id, username: record.username, displayName: record.displayName } };
         });
         if (!result) return res.status(401).json({ error: 'Username or password is incorrect.' });
-        attempts.delete(clientKey(req));
+        resetAttempts(req, username);
         res.setHeader('Set-Cookie', sessionCookie(result.token));
         res.json({ user: result.user });
     } catch (error) {

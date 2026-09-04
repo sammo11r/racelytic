@@ -17,7 +17,7 @@ async function loadHeader() {
         const requestedSeries = new URLSearchParams(window.location.search).get('series');
         let rememberedSeries = '';
         try { rememberedSeries = localStorage.getItem('racelytic-series') || ''; } catch {}
-        const seriesNeutralPages = ['/account', '/privacy', '/terms', '/about'];
+        const seriesNeutralPages = ['/account', '/privacy', '/terms', '/about', '/community'];
         const isSeriesNeutralPage = seriesNeutralPages.includes(window.location.pathname);
         const seriesKeys = Object.keys(window.RacelyticSeries.all);
         const pathSeries = window.RacelyticSeries.fromPath().key;

@@ -15,6 +15,7 @@ test('footer adds useful explore and project navigation above unchanged legal co
   assert.match(footer, /data-footer-page="analysis"/);
   assert.match(footer, /data-footer-page="simulator"/);
   assert.match(footer, /data-footer-page="games"/);
+  assert.match(footer, /data-footer-page="community"/);
   assert.match(footer, /id="footer-project-title">Project/);
   assert.match(footer, /data-footer-page="method"/);
   assert.match(footer, /data-footer-trademark/);

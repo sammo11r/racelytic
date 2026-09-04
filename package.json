@@ -13,6 +13,7 @@
     "sync:data": "node scripts/sync-data.js",
     "sync:data:dry": "node scripts/sync-data.js --dry-run",
     "sync:data:status": "node scripts/sync-data.js --status",
+    "seed:community": "node scripts/seed-community.js",
     "generate:social-card": "node scripts/generate-social-card.js",
     "import:f2-results": "node scripts/import-f2-results.js",
     "import:f2-standings": "node scripts/import-f2-standings.js",

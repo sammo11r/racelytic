@@ -2,21 +2,18 @@ const express = require('express');
 const { sendError, withConnection } = require('../route-helpers');
 const { requireMonitorAuth } = require('../monitor-auth');
 const { integerOrDefault } = require('../validation');
+const { MemoryRateLimiter } = require('../rate-limit');
 
 const router = express.Router();
 let schemaPromise;
 let lastRetentionCleanup = 0;
-const ingestionWindows = new Map();
+const ingestionLimiter = new MemoryRateLimiter({ windowMs: 60 * 1000, limit: 120, maxEntries: 20000 });
 const RETENTION_CLEANUP_INTERVAL = 24 * 60 * 60 * 1000;
 
 function protectIngestion(req, res, next) {
     const origin = req.get('origin');
     if (origin && origin !== `${req.protocol}://${req.get('host')}`) return res.status(403).end();
-    const now = Date.now();
-    const window = (ingestionWindows.get(req.ip) || []).filter(time => now - time < 60000);
-    if (window.length >= 120) return res.status(429).end();
-    window.push(now);
-    ingestionWindows.set(req.ip, window);
+    if (ingestionLimiter.consume(req.ip)) return res.status(429).end();
     next();
 }
 

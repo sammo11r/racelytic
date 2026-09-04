@@ -2,6 +2,21 @@ function esc(value) {
   if (value === null || value === undefined) return '';
   return String(value).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'","&#039;");
 }
+function chartTooltipAttributes({ title = '', detail = '', value = '' } = {}) {
+  return `data-chart-tooltip data-tooltip-title="${esc(title)}" data-tooltip-detail="${esc(detail)}" data-tooltip-value="${esc(value)}"`;
+}
+function renderChartTooltip(target, source) {
+  const nodes = [
+    ['strong', source.dataset.tooltipTitle],
+    ['span', source.dataset.tooltipDetail],
+    ['b', source.dataset.tooltipValue]
+  ].filter(([, value]) => value !== undefined && value !== '');
+  target.replaceChildren(...nodes.map(([tag, value]) => {
+    const node = document.createElement(tag);
+    node.textContent = value;
+    return node;
+  }));
+}
 function params() {
   return new URLSearchParams(window.location.search);
 }

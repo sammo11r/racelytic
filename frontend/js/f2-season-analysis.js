@@ -40,7 +40,7 @@ function bindF2Tooltips(container = document) {
   }
   container.querySelectorAll('[data-chart-tooltip]').forEach(element => {
     const show = event => {
-      f2Tooltip.innerHTML = element.dataset.chartTooltip;
+      renderChartTooltip(f2Tooltip, element);
       f2Tooltip.classList.add('visible');
       const bounds = element.getBoundingClientRect();
       const x = event?.clientX ?? bounds.left;
@@ -113,8 +113,8 @@ function f2LineChart(series, { height = 430, suffix = '' } = {}) {
   const lines = series.map(item => {
     const path = item.values.map((value, index) => `${index ? 'L' : 'M'}${x(value.index).toFixed(1)},${y(value.value ?? value.points).toFixed(1)}`).join(' ');
     const dots = item.values.map(value => {
-      const tooltip = value.tooltip || `<strong>${esc(item.name)}</strong><span>${esc(value.session.label)} · ${esc(value.session.race.name)}</span><b>${fmtNumber(value.value ?? value.points)}${suffix}</b>`;
-      return `<circle tabindex="0" data-chart-tooltip="${esc(tooltip)}" cx="${x(value.index)}" cy="${y(value.value ?? value.points)}" r="4"></circle>`;
+      const tooltip = value.tooltip || { title: item.name, detail: `${value.session.label} · ${value.session.race.name}`, value: `${fmtNumber(value.value ?? value.points)}${suffix}` };
+      return `<circle tabindex="0" ${chartTooltipAttributes(tooltip)} cx="${x(value.index)}" cy="${y(value.value ?? value.points)}" r="4"></circle>`;
     }).join('');
     return `<g class="chart-series" style="--series-color:${item.color}"><path d="${path}"${item.dash ? ` stroke-dasharray="${item.dash}"` : ''}/>${dots}</g>`;
   }).join('');
@@ -139,7 +139,7 @@ function renderF2Margin() {
   const values = f2AnalysisSessions.map((session, index) => {
     const order = series.map(driver => ({ name: driver.name, points: driver.values[index].points })).sort((a, b) => b.points - a.points);
     const gap = Number(order[0]?.points || 0) - Number(order[1]?.points || 0);
-    return { index, value: gap, session, tooltip: `<strong>${esc(order[0]?.name || 'No leader')}</strong><span>${esc(session.label)} · over ${esc(order[1]?.name || '—')}</span><b>${fmtNumber(gap)} points</b>` };
+    return { index, value: gap, session, tooltip: { title: order[0]?.name || 'No leader', detail: `${session.label} · over ${order[1]?.name || '—'}`, value: `${fmtNumber(gap)} points` } };
   });
   document.getElementById('f2-margin-chart').innerHTML = f2LineChart([{ name: 'Championship lead', color: activeSeriesAccent(), values }], { height: 330, suffix: ' pts' });
   bindF2Tooltips(document.getElementById('f2-margin-chart'));
@@ -152,7 +152,7 @@ function renderF2Distribution() {
   const other = drivers.slice(9).reduce((sum, driver) => sum + Number(driver.points), 0);
   if (other) items.push({ name: 'Other', points: other, color: '#c9cdd4' });
   const container = document.getElementById('f2-distribution-chart');
-  container.innerHTML = `<div class="distribution-bar">${items.map(item => `<span tabindex="0" data-chart-tooltip="<strong>${esc(item.name)}</strong><span>Share of championship points</span><b>${fmtNumber(item.points)} pts · ${(Number(item.points)/total*100).toFixed(1)}%</b>" style="width:${Number(item.points)/total*100}%;background:${item.color}"></span>`).join('')}</div><div class="distribution-legend">${items.map(item => `<div><i style="background:${item.color}"></i><span>${esc(item.name)}</span><strong>${(Number(item.points)/total*100).toFixed(1)}%</strong></div>`).join('')}</div>`;
+  container.innerHTML = `<div class="distribution-bar">${items.map(item => `<span tabindex="0" ${chartTooltipAttributes({ title: item.name, detail: 'Share of championship points', value: `${fmtNumber(item.points)} pts · ${(Number(item.points)/total*100).toFixed(1)}%` })} style="width:${Number(item.points)/total*100}%;background:${item.color}"></span>`).join('')}</div><div class="distribution-legend">${items.map(item => `<div><i style="background:${item.color}"></i><span>${esc(item.name)}</span><strong>${(Number(item.points)/total*100).toFixed(1)}%</strong></div>`).join('')}</div>`;
   bindF2Tooltips(container);
 }
 
@@ -169,10 +169,10 @@ function f2HeatClass(result) {
 function renderF2Heatmap() {
   const drivers = f2AnalysisData.championship.slice(0, 15);
   const container = document.getElementById('f2-results-heatmap');
-  container.innerHTML = `<div class="results-heatmap" style="--rounds:${f2AnalysisSessions.length}"><div class="heatmap-corner">Driver</div>${f2AnalysisSessions.map(session => `<div class="heatmap-round" data-chart-tooltip="<strong>${esc(session.label)}</strong><span>${esc(session.race.name)}</span><b>${session.cancelled ? 'Cancelled' : esc(session.name)}</b>">${esc(session.label)}</div>`).join('')}${drivers.map(driver => `<a class="heatmap-driver" href="${JUNIOR_ANALYSIS_BASE}/driver?id=${encodeURIComponent(driver.driverId)}">${esc(driver.name)}</a>${f2AnalysisSessions.map(session => {
+  container.innerHTML = `<div class="results-heatmap" style="--rounds:${f2AnalysisSessions.length}"><div class="heatmap-corner">Driver</div>${f2AnalysisSessions.map(session => `<div class="heatmap-round" ${chartTooltipAttributes({ title: session.label, detail: session.race.name, value: session.cancelled ? 'Cancelled' : session.name })}>${esc(session.label)}</div>`).join('')}${drivers.map(driver => `<a class="heatmap-driver" href="${JUNIOR_ANALYSIS_BASE}/driver?id=${encodeURIComponent(driver.driverId)}">${esc(driver.name)}</a>${f2AnalysisSessions.map(session => {
     const result = driver.raceResults?.[session.id];
     const display = result?.positionText || result?.position || '';
-    return `<div tabindex="0" class="heatmap-cell ${f2HeatClass(result)}" data-chart-tooltip="<strong>${esc(driver.name)}</strong><span>${esc(session.label)} · ${esc(session.race.name)}</span><b>${session.cancelled ? 'Cancelled' : display ? `Finished ${esc(display)} · ${fmtNumber(result.points)} pts` : 'Did not participate'}</b>">${session.cancelled ? 'C' : esc(display)}</div>`;
+    return `<div tabindex="0" class="heatmap-cell ${f2HeatClass(result)}" ${chartTooltipAttributes({ title: driver.name, detail: `${session.label} · ${session.race.name}`, value: session.cancelled ? 'Cancelled' : display ? `Finished ${display} · ${fmtNumber(result.points)} pts` : 'Did not participate' })}>${session.cancelled ? 'C' : esc(display)}</div>`;
   }).join('')}`).join('')}</div><div class="heatmap-key"><span class="winner">Win</span><span class="podium">Podium</span><span class="points">Points</span><span class="finish">Finish</span><span class="retired">Retired / unclassified</span></div>`;
   bindF2Tooltips(container);
 }

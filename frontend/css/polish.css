@@ -1664,7 +1664,7 @@ table tbody tr:last-child td { border-bottom: 0; }
 .position-change.same { background: #eef0f3; color: var(--text-muted); }
 
 /* Accounts */
-.account-link { margin-left: 6px; border: 1px solid var(--border); background: #fff; }
+.account-link { margin-left: 6px; border: 1px solid var(--border); background: #fff; white-space: nowrap; }
 .account-page { display: grid; grid-template-columns: minmax(0,1.1fr) minmax(360px,.75fr); align-items: center; gap: 70px; }
 .account-intro h1 { max-width: 680px; margin-bottom: 24px; font-size: clamp(54px,8vw,94px); line-height: .94; letter-spacing: -.065em; }
 .account-intro p { max-width: 590px; color: var(--text-secondary); font-size: 18px; line-height: 1.65; }

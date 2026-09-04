@@ -7,6 +7,7 @@ const { requireMonitorAuth } = require('./monitor-auth');
 const { ACADEMY_PAGES, renderAcademyHtml, renderAcademyScript } = require('./academy-renderer');
 const { renderSeriesHome } = require('./series-home-renderer');
 const { applySeo, renderRobots, renderSitemap } = require('./seo');
+const { dynamicSitemapRoutes, resolveSeoMetadata } = require('./seo-data');
 const { renderPageShell } = require('./page-shell');
 const { seriesPageRoutes } = require('./series-pages');
 const { renderSeasonAnalysisHtml } = require('./season-analysis-renderer');
@@ -19,13 +20,18 @@ const PORT = Number(process.env.PORT || 3000);
 const frontendDirectory = path.join(__dirname, '../frontend');
 
 function sendSeoPage(req, res, next, file, transform = content => content) {
-    fs.readFile(path.join(frontendDirectory, file), 'utf8', (error, content) => {
+    fs.readFile(path.join(frontendDirectory, file), 'utf8', async (error, content) => {
         if (error) return next(error);
-        const rendered = file === 'season-analysis.html' ? renderSeasonAnalysisHtml(content, req.path)
-            : file === 'season-comparison.html' ? renderSeasonComparisonHtml(content, req.path)
-            : file === 'circuit-analysis.html' ? renderCircuitAnalysisHtml(transform(content), req.path)
-            : file === 'records.html' ? renderRecordsHtml(req.path) : transform(content);
-        res.type('html').send(applySeo(renderPageShell(rendered), req.path, req.query));
+        try {
+            const rendered = file === 'season-analysis.html' ? renderSeasonAnalysisHtml(content, req.path)
+                : file === 'season-comparison.html' ? renderSeasonComparisonHtml(content, req.path)
+                : file === 'circuit-analysis.html' ? renderCircuitAnalysisHtml(transform(content), req.path)
+                : file === 'records.html' ? renderRecordsHtml(req.path) : transform(content);
+            const seoOverrides = await resolveSeoMetadata(req);
+            res.type('html').send(applySeo(renderPageShell(rendered), req.path, req.query, seoOverrides));
+        } catch (renderError) {
+            next(renderError);
+        }
     });
 }
 
@@ -33,8 +39,41 @@ function sendSeoPage(req, res, next, file, transform = content => content) {
 // loopback proxies so origin checks see https without accepting spoofed headers
 // from direct external connections.
 app.set('trust proxy', 'loopback');
+app.disable('x-powered-by');
 
-app.use(express.json());
+app.use((req, res, next) => {
+    const policy = [
+        "default-src 'self'",
+        "base-uri 'self'",
+        "connect-src 'self'",
+        "font-src 'self'",
+        "form-action 'self'",
+        "frame-ancestors 'none'",
+        "img-src 'self' data:",
+        "object-src 'none'",
+        "script-src 'self'",
+        "style-src 'self' 'unsafe-inline'"
+    ];
+    if (process.env.NODE_ENV === 'production') policy.push('upgrade-insecure-requests');
+    res.set({
+        'Content-Security-Policy': policy.join('; '),
+        'Permissions-Policy': 'camera=(), geolocation=(), microphone=(), payment=(), usb=()',
+        'Referrer-Policy': 'strict-origin-when-cross-origin',
+        'X-Content-Type-Options': 'nosniff',
+        'X-Frame-Options': 'DENY'
+    });
+    if (process.env.NODE_ENV === 'production' && req.secure) {
+        res.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+    }
+    const privateApi = ['/api/account', '/api/custom-championships', '/api/points-systems', '/api/records/saved']
+        .some(route => req.path === route || req.path.startsWith(`${route}/`));
+    if (req.path === '/account' || req.path === '/monitor' || privateApi) {
+        res.set('Cache-Control', 'no-store');
+    }
+    next();
+});
+
+app.use(express.json({ limit: '100kb' }));
 
 app.get('/monitor', requireMonitorAuth, (req, res, next) => sendSeoPage(req, res, next, 'monitor.html'));
 
@@ -90,7 +129,16 @@ const sitemapRoutes = [
 ];
 
 app.get('/robots.txt', (req, res) => res.type('text/plain').send(renderRobots()));
-app.get('/sitemap.xml', (req, res) => res.type('application/xml').send(renderSitemap(sitemapRoutes)));
+app.get('/sitemap.xml', async (req, res) => {
+    let routes = sitemapRoutes;
+    try {
+        routes = [...routes, ...await dynamicSitemapRoutes()];
+    } catch (error) {
+        console.error('Unable to add database pages to sitemap:', error.message);
+    }
+    res.set('Cache-Control', 'public, max-age=300');
+    res.type('application/xml').send(renderSitemap(routes));
+});
 
 app.get('/academy-js/:file', (req, res, next) => {
     if (!/^f3-[a-z0-9-]+\.js$|^f3\.js$/.test(req.params.file)) return res.sendStatus(404);
@@ -130,8 +178,9 @@ app.use(express.static(frontendDirectory, {
     }
 }));
 
-for (const route of ['core', 'seasons', 'drivers', 'circuits', 'constructors', 'chassis', 'races', 'records', 'games', 'account', 'points-systems', 'custom-championships', 'analytics']) {
-    app.use(require(`./routes/${route}`));
+for (const route of ['core', 'seasons', 'drivers', 'circuits', 'constructors', 'chassis', 'races', 'records', 'games', 'account', 'points-systems', 'custom-championships', 'community', 'analytics']) {
+    const exported = require(`./routes/${route}`);
+    app.use(exported.router || exported);
 }
 
 app.use((error, req, res, next) => {
@@ -145,6 +194,13 @@ app.use((req, res, next) => {
         return res.status(404).json({ error: 'API endpoint not found.' });
     }
     next();
+});
+
+app.use((req, res, next) => {
+    fs.readFile(path.join(frontendDirectory, '404.html'), 'utf8', (error, content) => {
+        if (error) return next(error);
+        res.status(404).type('html').send(applySeo(renderPageShell(content), '/404'));
+    });
 });
 
 if (require.main === module) {

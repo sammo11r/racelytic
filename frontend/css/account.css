@@ -49,6 +49,7 @@
 .account-error-state button { flex: 0 0 auto; color: var(--text); font-weight: 800; }
 .account-error-state button { border: 0; background: transparent; cursor: pointer; }
 .account-community .account-section-heading { align-items: end; }
+.account-community .account-section-heading > p a { color: var(--text); font-weight: 800; }
 .account-settings { display: grid; grid-template-columns: minmax(240px, .65fr) minmax(0, 1.35fr); gap: clamp(45px, 7vw, 100px); }
 .account-settings h2 { margin: 7px 0 13px; font-size: 34px; letter-spacing: -.04em; }
 .account-settings > div > p { max-width: 370px; margin: 0; color: var(--text-secondary); font-size: 13px; line-height: 1.65; }

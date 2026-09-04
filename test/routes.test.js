@@ -31,6 +31,7 @@ test('all public API routes remain registered after modularization', () => {
         '/api/circuits',
         '/api/circuits/:id',
         '/api/circuits/:id/analysis',
+        '/api/community',
         '/api/constructors',
         '/api/constructors/:id',
         '/api/custom-championships',
