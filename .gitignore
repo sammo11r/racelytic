@@ -11,3 +11,4 @@ data/.data-sync.lock
 data/.f1db-release.json
 data/.f1db-sync-*/
 .venv-replay/
+/tmp/mysql-backup-*/

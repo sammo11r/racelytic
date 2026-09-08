@@ -1,6 +1,9 @@
 const fs = require('fs');
 const path = require('path');
 const csv = require('csv-parser');
+const {
+  F3_DECISION_DOCUMENTS_URL, fetchClassificationPdf, findClassificationDocuments
+} = require('./fia-classification-pdf');
 
 let pool;
 
@@ -37,6 +40,10 @@ const RESULT_COLUMNS = [
   'fastestLap', 'fastestLapNumber', 'fastestLapTime', 'fastestLapTimeMillis',
   'averageSpeed'
 ];
+const ENTRY_COLUMNS = [
+  'raceId', 'year', 'round', 'driverNumber', 'driverId', 'constructorId', 'chassisId', 'engineId'
+];
+const DRIVER_COLUMNS = ['id', 'name', 'firstName', 'lastName', 'abbreviation', 'countryCode', 'pictureUrl'];
 const DRIVER_STANDING_COLUMNS = [
   'year', 'positionNumber', 'driverId', 'constructorId', 'points',
   'championshipWon', 'starts', 'wins', 'podiums', 'poles', 'fastestLaps', 'retirements'
@@ -48,6 +55,12 @@ const RESULT_OVERRIDES = new Map([
   ['fia-formula-3-championship_2026_melbourne_race:louis-sharp', { points: 0, fastestLap: 'False' }],
   ['fia-formula-3-championship_2026_melbourne_race:james-wharton', { points: 1, fastestLap: 'True' }]
 ]);
+const CLASSIFICATION_DRIVER_ALIASES = {
+  gerrardxie: 'wing-lam-gerrard-xie',
+  woohyunshin: 'michael-shin'
+};
+const GENERATED_ALIAS_IDS = new Set(['gerrard-xie', 'woohyun-shin']);
+const NEW_DRIVER_METADATA = { alexpowell: { countryCode: 'us' } };
 
 function applyResultOverrides(rows) {
   rows.forEach(row => Object.assign(row, RESULT_OVERRIDES.get(`${row.sessionId}:${row.driverId}`) || {}));
@@ -67,11 +80,13 @@ const EVENTS = [
 ];
 
 const SESSION_DEFINITIONS = [
-  { path: 'session-classifications', suffix: 'free-practice', number: 1, name: 'Free Practice', isRace: false },
-  { path: 'qualifying-classification', suffix: 'qualifying', number: 2, name: 'Qualifying', isRace: false },
-  { path: 'sprint-race-classification', suffix: 'race', number: 4, name: 'Race', isRace: true },
-  { path: 'feature-race-classification', suffix: 'race-2', number: 6, name: 'Race', isRace: true }
+  { path: 'session-classifications', documentKind: 'practice', suffix: 'free-practice', number: 1, name: 'Free Practice', isRace: false },
+  { path: 'qualifying-classification', documentKind: 'qualifying', suffix: 'qualifying', number: 2, name: 'Qualifying', isRace: false },
+  { path: 'sprint-race-classification', documentKind: 'sprint', suffix: 'race', number: 4, name: 'Race', isRace: true },
+  { path: 'feature-race-classification', documentKind: 'feature', suffix: 'race-2', number: 6, name: 'Race', isRace: true }
 ];
+
+let decisionDocumentsHtml;
 
 function readCsv(filePath) {
   return new Promise((resolve, reject) => {
@@ -191,8 +206,56 @@ function classificationUrl(event, session) {
   return `https://www.fia.com/events/fia-formula-3-championship/season-${YEAR}/${event.slug}/${session.path}`;
 }
 
+function mergeGroupedQualifying(documents) {
+  const groups = documents.map(document => ({
+    ...document,
+    classified: document.rows.filter(row => /^\d+$/.test(String(row.Pos || row.Position || ''))),
+    unclassified: document.rows.filter(row => !/^\d+$/.test(String(row.Pos || row.Position || '')))
+  })).sort((first, second) => {
+    const firstTime = timeToMilliseconds(first.classified[0]?.Time);
+    const secondTime = timeToMilliseconds(second.classified[0]?.Time);
+    return (firstTime || Number.MAX_SAFE_INTEGER) - (secondTime || Number.MAX_SAFE_INTEGER);
+  });
+  const classified = [];
+  const longest = Math.max(...groups.map(group => group.classified.length));
+  for (let index = 0; index < longest; index += 1) {
+    for (const group of groups) if (group.classified[index]) classified.push(group.classified[index]);
+  }
+  return classified.map((row, index) => ({ ...row, Pos: String(index + 1), Status: 'CLA' }))
+    .concat(groups.flatMap(group => group.unclassified).map(row => ({ ...row, Pos: '' })));
+}
+
+async function classificationRows(event, definition) {
+  const url = classificationUrl(event, definition);
+  let pageError;
+  try {
+    const tables = parseClassificationTables(await fetchText(url), url);
+    const rows = tables.reduce((largest, table) => table.rows.length > largest.length ? table.rows : largest, []);
+    if (rows.length >= 20) return { rows, source: url };
+    pageError = new Error(`Suspiciously short classification (${rows.length}) at ${url}`);
+  } catch (error) {
+    pageError = error;
+  }
+
+  decisionDocumentsHtml ||= await fetchText(F3_DECISION_DOCUMENTS_URL);
+  const documents = findClassificationDocuments(
+    decisionDocumentsHtml, event.slug, definition.documentKind, YEAR, 'f3'
+  );
+  if (!documents.length) throw new Error(`${pageError.message}; no matching final classification PDF was found.`);
+  const parsed = await Promise.all(documents.map(async document => ({
+    ...document,
+    rows: await fetchClassificationPdf(document.url)
+  })));
+  const groupedQualifying = definition.documentKind === 'qualifying' && parsed.length > 1;
+  const rows = groupedQualifying ? mergeGroupedQualifying(parsed) : parsed.flatMap(document => document.rows);
+  if (rows.length < 20) throw new Error(`Suspiciously short classification PDF set (${rows.length}) for ${url}`);
+  console.log(`FIA event table unavailable; using ${documents.length} final classification PDF${documents.length === 1 ? '' : 's'}:`);
+  documents.forEach(document => console.log(`  ${document.url}`));
+  return { rows, source: documents.map(document => document.url).join(', ') };
+}
+
 function resultFromOfficial(row, displayOrder, session, race, entry) {
-  const positionText = row.Pos || row.Position || '';
+  const positionText = row.Pos || row.Position || row.Status || '';
   const positionNumber = /^\d+$/.test(positionText) ? Number(positionText) : '';
   const driverNumber = String(row.Nr || row.No || row.Number || '').replace(/\D/g, '');
   const bestLapTime = row['Best lap'] || row['Best Lap'] || '';
@@ -248,7 +311,7 @@ function parseStandingsRows(html) {
   return rows;
 }
 
-function driverForStanding(label, drivers) {
+function driverForStanding(label, drivers, activeDriverIds) {
   const match = label.match(/^(\d+)\s*(.+)$/);
   if (!match) return null;
   const position = Number(match[1]);
@@ -266,9 +329,11 @@ function driverForStanding(label, drivers) {
   const nameParts = displayName.split(/\s+/);
   const firstInitial = normalized(nameParts[0]).charAt(0);
   const lastName = normalized(nameParts.slice(1).join(' '));
-  const candidates = drivers.filter(driver =>
+  let candidates = drivers.filter(driver =>
     normalized(driver.lastName) === lastName && normalized(driver.firstName).charAt(0) === firstInitial
   );
+  const active = candidates.filter(driver => activeDriverIds?.has(driver.id));
+  if (active.length === 1) candidates = active;
   if (candidates.length !== 1) throw new Error(`Could not uniquely map official driver standing: ${displayName}`);
   return { position, driver: candidates[0] };
 }
@@ -289,6 +354,38 @@ function constructorIdForStanding(label, constructors) {
   const constructorId = exact?.id || aliases[key];
   if (!constructorId) throw new Error(`Could not map official constructor standing: ${displayName}`);
   return { position, constructorId };
+}
+
+function driverIdForClassification(name, drivers) {
+  const alias = CLASSIFICATION_DRIVER_ALIASES[normalized(name)];
+  if (alias && drivers.some(driver => driver.id === alias)) return alias;
+  const parts = String(name || '').replace(/\*/g, '').trim().split(/\s+/);
+  if (parts.length < 2) return '';
+  const initial = normalized(parts[0]).charAt(0);
+  const surname = normalized(parts.slice(1).join(' '));
+  const candidates = drivers.filter(driver =>
+    normalized(driver.lastName) === surname && normalized(driver.firstName).charAt(0) === initial
+  );
+  return candidates.length === 1 ? candidates[0].id : '';
+}
+
+function newDriverFromClassification(name, drivers) {
+  const cleaned = String(name || '').replace(/\*/g, '').replace(/\s+/g, ' ').trim();
+  const parts = cleaned.split(' ');
+  if (parts.length < 2 || parts[0].length < 2 || parts[0].includes('.')) return null;
+  const displayParts = parts.map(part => /^[A-ZÀ-Þ'-]+$/.test(part)
+    ? part.toLocaleLowerCase('en').replace(/(^|[-'])\p{L}/gu, match => match.toLocaleUpperCase('en'))
+    : part);
+  const firstName = displayParts[0];
+  const lastName = displayParts.slice(1).join(' ');
+  const id = displayParts.join('-').normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  if (!id || drivers.some(driver => driver.id === id)) return null;
+  const metadata = NEW_DRIVER_METADATA[normalized(cleaned)] || {};
+  return {
+    id, name: `${firstName} ${lastName}`, firstName, lastName,
+    abbreviation: normalized(lastName).slice(0, 3).toUpperCase(), countryCode: metadata.countryCode || '', pictureUrl: ''
+  };
 }
 
 function latestConstructor(driverId, entries) {
@@ -327,13 +424,25 @@ async function replaceDatabaseRows(table, columns, year, rows, connection) {
   await connection.batch(`INSERT INTO ${table} (${columnSql}) VALUES (${placeholders})`, values);
 }
 
-async function updateDatabase(sessions, results, driverStandings, constructorStandings) {
+async function updateDatabase(sessions, results, newDrivers, newEntries, driverStandings, constructorStandings) {
   const connection = await databasePool().getConnection();
   try {
     await connection.beginTransaction();
     const ids = sessions.map(session => session.id);
     await connection.query(`DELETE FROM f3_session_results WHERE sessionId IN (${ids.map(() => '?').join(',')})`, ids);
     await connection.query(`DELETE FROM f3_sessions WHERE id IN (${ids.map(() => '?').join(',')})`, ids);
+    if (newDrivers.length) await connection.batch(
+      `INSERT INTO f3_drivers (${DRIVER_COLUMNS.map(column => `\`${column}\``).join(',')}) VALUES (${DRIVER_COLUMNS.map(() => '?').join(',')})
+       ON DUPLICATE KEY UPDATE name = VALUES(name), firstName = VALUES(firstName), lastName = VALUES(lastName), abbreviation = VALUES(abbreviation)`,
+      newDrivers.map(row => DRIVER_COLUMNS.map(column => databaseValue(row[column])))
+    );
+    for (const entry of newEntries) {
+      await connection.query('DELETE FROM f3_entries WHERE raceId = ? AND driverNumber = ?', [entry.raceId, entry.driverNumber]);
+    }
+    if (newEntries.length) await connection.batch(
+      `INSERT INTO f3_entries (${ENTRY_COLUMNS.map(column => `\`${column}\``).join(',')}) VALUES (${ENTRY_COLUMNS.map(() => '?').join(',')})`,
+      newEntries.map(row => ENTRY_COLUMNS.map(column => databaseValue(row[column])))
+    );
     await connection.batch(
       `INSERT INTO f3_sessions (${SESSION_COLUMNS.map(column => `\`${column}\``).join(',')}) VALUES (${SESSION_COLUMNS.map(() => '?').join(',')})`,
       sessions.map(row => SESSION_COLUMNS.map(column => databaseValue(row[column])))
@@ -358,10 +467,23 @@ async function main() {
     readCsv(FILES.races), readCsv(FILES.entries), readCsv(FILES.drivers), readCsv(FILES.constructors),
     readCsv(FILES.sessions), readCsv(FILES.results), readCsv(FILES.driverStandings), readCsv(FILES.constructorStandings)
   ]);
+  for (let index = drivers.length - 1; index >= 0; index -= 1) {
+    if (GENERATED_ALIAS_IDS.has(drivers[index].id)) drivers.splice(index, 1);
+  }
+  for (const driver of drivers) {
+    const metadata = NEW_DRIVER_METADATA[normalized(driver.name)];
+    if (metadata && !driver.countryCode) Object.assign(driver, metadata);
+  }
   const racesByRound = new Map(races.filter(race => race.year === String(YEAR)).map(race => [Number(race.round), race]));
   const entriesByRaceAndNumber = new Map(entries.map(entry => [`${entry.raceId}:${entry.driverNumber}`, entry]));
+  const latestEntryByNumber = new Map(entries.filter(entry => entry.year === String(YEAR))
+    .sort((a, b) => Number(a.round) - Number(b.round)).map(entry => [String(entry.driverNumber), entry]));
+  const latestEntryByDriver = new Map(entries.filter(entry => entry.year === String(YEAR))
+    .sort((a, b) => Number(a.round) - Number(b.round)).map(entry => [entry.driverId, entry]));
   const importedSessions = [];
   const importedResults = [];
+  const newDrivers = [];
+  const newEntries = [];
   const today = new Date().toISOString().slice(0, 10);
 
   for (const event of EVENTS) {
@@ -376,14 +498,27 @@ async function main() {
         isRace: definition.isRace ? 'True' : 'False', cancelled: 'False',
         isQualifying: definition.suffix === 'qualifying'
       };
-      const url = classificationUrl(event, definition);
-      const tables = parseClassificationTables(await fetchText(url), url);
-      const officialRows = tables.reduce((largest, table) => table.rows.length > largest.length ? table.rows : largest, []);
-      if (officialRows.length < 20) throw new Error(`Suspiciously short classification (${officialRows.length}) at ${url}`);
+      const { rows: officialRows } = await classificationRows(event, definition);
       const results = officialRows.map((row, index) => {
         const number = String(row.Nr || row.No || row.Number || '').replace(/\D/g, '');
-        const entry = entriesByRaceAndNumber.get(`${race.id}:${number}`);
-        if (!entry) throw new Error(`No round ${race.round} entry for car ${number} (${row.Driver}).`);
+        let officialDriverId = driverIdForClassification(row.Driver, drivers);
+        if (!officialDriverId) {
+          const driver = newDriverFromClassification(row.Driver, drivers);
+          if (driver) {
+            drivers.push(driver);
+            newDrivers.push(driver);
+            officialDriverId = driver.id;
+          }
+        }
+        let entry = entriesByRaceAndNumber.get(`${race.id}:${number}`);
+        if (!entry || (officialDriverId && entry.driverId !== officialDriverId)) {
+          const template = latestEntryByDriver.get(officialDriverId) || entry || latestEntryByNumber.get(number);
+          if (!template) throw new Error(`No round ${race.round} entry for car ${number} (${row.Driver}).`);
+          entry = { ...template, raceId: race.id, year: String(YEAR), round: String(race.round),
+            driverNumber: number, driverId: officialDriverId || template.driverId };
+          entriesByRaceAndNumber.set(`${race.id}:${number}`, entry);
+          newEntries.push(entry);
+        }
         return resultFromOfficial(row, index + 1, session, race, entry);
       });
       if (definition.isRace) markFastestLap(results);
@@ -395,6 +530,11 @@ async function main() {
   }
 
   const importedSessionIds = new Set(importedSessions.map(session => session.id));
+  const repairedEntryKeys = new Set(newEntries.map(entry => `${entry.raceId}:${entry.driverNumber}`));
+  const mergedEntries = entries.filter(entry => !repairedEntryKeys.has(`${entry.raceId}:${entry.driverNumber}`))
+    .concat(newEntries).sort((a, b) =>
+    Number(a.year) - Number(b.year) || Number(a.round) - Number(b.round) || Number(a.driverNumber) - Number(b.driverNumber));
+  const mergedDrivers = drivers.sort((a, b) => a.name.localeCompare(b.name));
   const mergedSessions = existingSessions.filter(session => !importedSessionIds.has(session.id)).concat(importedSessions);
   const mergedResults = existingResults.filter(result => !importedSessionIds.has(result.sessionId)).concat(importedResults);
   mergedSessions.sort((a, b) => Number(a.year) - Number(b.year) || Number(a.round) - Number(b.round) || Number(a.sessionNumber) - Number(b.sessionNumber));
@@ -405,13 +545,14 @@ async function main() {
     fetchText('https://www.fiaformula3.com/en/standings/2026/drivers'),
     fetchText('https://www.fiaformula3.com/en/standings/2026/teams')
   ]);
+  const activeDriverIds = new Set(mergedEntries.filter(entry => entry.year === String(YEAR)).map(entry => entry.driverId));
   const driverStandings = parseStandingsRows(driverStandingsHtml).map(cells => {
-    const mapped = driverForStanding(cells[0], drivers);
+    const mapped = driverForStanding(cells[0], mergedDrivers, activeDriverIds);
     const points = parseNumber(cells.at(-1));
     const stats = careerStats(mapped.driver.id, mergedResults);
     return {
       year: YEAR, positionNumber: mapped.position, driverId: mapped.driver.id,
-      constructorId: latestConstructor(mapped.driver.id, entries), points,
+      constructorId: latestConstructor(mapped.driver.id, mergedEntries), points,
       championshipWon: 'False', ...stats
     };
   });
@@ -430,6 +571,8 @@ async function main() {
   console.log(`Official driver standings: ${driverStandings.length} drivers, ${officialDriverPoints} points.`);
   console.log(`Session-result awards: ${importedPoints} points (differences can be post-event standings adjustments).`);
   console.log(`Official constructor standings: ${constructorStandings.length} teams.`);
+  console.log(`Added ${newDrivers.length} newly classified drivers.`);
+  console.log(`Repaired ${newEntries.length} missing round entries.`);
 
   if (!APPLY) {
     console.log('Dry run complete. Re-run with --apply to update the F3 CSV files and database.');
@@ -442,10 +585,14 @@ async function main() {
   fs.writeFileSync(backupPath, `${JSON.stringify({
     sessions: existingSessions.filter(row => row.year === String(YEAR)),
     results: existingResults.filter(row => row.year === String(YEAR)),
+    entries: entries.filter(row => row.year === String(YEAR)),
+    newDrivers,
     driverStandings: existingDriverStandings.filter(row => row.year === String(YEAR)),
     constructorStandings: existingConstructorStandings.filter(row => row.year === String(YEAR))
   }, null, 2)}\n`);
 
+  writeCsv(FILES.drivers, DRIVER_COLUMNS, mergedDrivers);
+  writeCsv(FILES.entries, ENTRY_COLUMNS, mergedEntries);
   writeCsv(FILES.sessions, SESSION_COLUMNS, mergedSessions);
   writeCsv(FILES.results, RESULT_COLUMNS, mergedResults);
   writeCsv(
@@ -458,7 +605,7 @@ async function main() {
     CONSTRUCTOR_STANDING_COLUMNS,
     existingConstructorStandings.filter(row => row.year !== String(YEAR)).concat(constructorStandings)
   );
-  if (!CSV_ONLY) await updateDatabase(importedSessions, importedResults, driverStandings, constructorStandings);
+  if (!CSV_ONLY) await updateDatabase(importedSessions, importedResults, newDrivers, newEntries, driverStandings, constructorStandings);
   console.log(`Updated F3 CSV data${CSV_ONLY ? '' : ' and database'}. Backup: ${backupPath}`);
 }
 
@@ -474,11 +621,16 @@ if (require.main === module) {
 }
 
 module.exports = {
+  classificationRows,
+  classificationUrl,
   databaseValue,
+  driverIdForClassification,
+  newDriverFromClassification,
   fetchText,
   gapLaps,
   gapToMilliseconds,
   markFastestLap,
+  mergeGroupedQualifying,
   normalized,
   parseClassificationTables,
   parseNumber,

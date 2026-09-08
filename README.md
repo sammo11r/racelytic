@@ -123,6 +123,30 @@ loads every CSV into staging tables, and publishes all staging tables with one a
 entire replacement is ready. An import is rejected if a table unexpectedly loses more than 10%
 of its rows. Set `DATA_SYNC_MIN_ROW_RATIO` to adjust that guard.
 
+After publishing the selected championships, the sync rebuilds their driver ratings before the
+run is marked successful. A rating failure therefore fails the data-sync run instead of leaving a
+successful update with stale ratings. For local/manual full imports, use `npm run import`; its
+`postimport` lifecycle automatically rebuilds ratings for every championship. Avoid invoking
+`node backend/import/all.js` directly, because that low-level importer intentionally skips
+follow-up jobs.
+
+Rating research commands are read-only unless `--save` is supplied. Use
+`npm run audit:ratings -- --strict` to validate source event ordering and formats,
+`npm run evaluate:ratings -- --inactivity --summary` to test return-from-absence K changes, and
+`npm run evaluate:ratings -- --teammate --summary` to evaluate the isolated teammate-only prototype.
+The teammate report compares that prototype with the published competitive model on the same
+teammate matchups; it does not create published ratings.
+Use `npm run audit:rating-identities -- --summary` to inspect cross-series linkage and driver–team
+network connectivity. The joint driver–constructor prototype is available through
+`npm run evaluate:ratings -- --joint --summary`; add `--joint-validate` instead of `--joint` to
+select the allocation chronologically and score it on the locked holdout seasons.
+For the F1-first structural and learning-rate search, use
+`npm run evaluate:ratings -- --joint-improve --summary`; it defaults to F1, preserves the holdout,
+and reports a paired weekend-bootstrap interval against the competitive control.
+The selected model can be inspected directly with `--driver-k-multiplier`,
+`--constructor-k-multiplier`, `--constructor-season-retention`, and
+`--constructor-field-normalization`.
+
 Only one synchronization can run at once. Every attempt is recorded in
 `app_data_sync_runs`; inspect recent attempts with:
 

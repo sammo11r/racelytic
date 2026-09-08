@@ -8,6 +8,14 @@ const { inferType, tableNameFromFile } = require('../backend/import/importer');
 const { selectedSeries } = require('../scripts/sync-data');
 const { checksumFor, extractCsvArchive, selectReleaseAssets } = require('../scripts/sync-f1db');
 
+test('supported database update commands also rebuild ratings', () => {
+  const packageJson = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'package.json'), 'utf8'));
+  const syncSource = fs.readFileSync(path.join(__dirname, '..', 'scripts', 'sync-data.js'), 'utf8');
+  assert.equal(packageJson.scripts.postimport, 'npm run rebuild:ratings');
+  assert.match(syncSource, /for \(const name of series\) await run\(process\.execPath, \['scripts\/rebuild-ratings\.js', `--series=\$\{name\}`\]\)/);
+  assert.ok(syncSource.indexOf("scripts/rebuild-ratings.js") < syncSource.indexOf("finishRun(runId, 'succeeded'"));
+});
+
 test('data sync accepts a unique subset of supported series', () => {
   assert.deepEqual(selectedSeries(['--series=f1,f3,f1']), ['f1', 'f3']);
   assert.throws(() => selectedSeries(['--series=f1,unknown']), /Unsupported series/);

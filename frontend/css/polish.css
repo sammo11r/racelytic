@@ -1565,7 +1565,7 @@ table tbody tr:last-child td { border-bottom: 0; }
 .race-results-table-wrap tbody tr.disqualified { background: #fff1f2; }
 .finish-position.retired, .finish-position.did-not-start { background: #eceef1; color: #69707b; }
 .finish-position.disqualified { background: #f6dce0; color: #932f3b; }
-.result-marker { display: inline-grid; min-width: 23px; height: 18px; margin-left: 5px; place-items: center; border-radius: 5px; font-size: 7px; font-weight: 900; vertical-align: middle; }
+.result-marker { display: inline-grid; height: 18px; margin-left: 5px; place-items: center; border-radius: 5px; font-size: 7px; font-weight: 900; vertical-align: middle; }
 .result-marker.pole { background: #23262d; color: #fff; }
 .result-marker.fastest { background: #eadffc; color: #62309b; }
 .grid-movement { display: inline-flex; min-width: 27px; justify-content: center; padding: 3px 5px; border-radius: 5px; font-size: 8px; font-weight: 900; }

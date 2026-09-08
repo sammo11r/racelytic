@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <title>Racelytic Ratings</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/polish.css">
+  <link rel="stylesheet" href="/css/ratings.css">
+</head>
+<body>
+  <div id="header"></div>
+  <main class="ratings-page">
+    <header class="container ratings-hero">
+      <div class="ratings-hero-copy">
+        <div class="eyebrow" id="ratings-hero-eyebrow">RACELYTIC RATINGS</div>
+        <h1 id="ratings-hero-title">Performance,<br>race by race.</h1>
+        <p id="ratings-hero-intro">An Elo-based view of how drivers performed against the strength of the field—tracked through racing history, independently for every series.</p>
+      </div>
+      <div class="ratings-hero-note"><span>THE IDEA</span><p>Beating highly rated rivals matters more. Sprint and reverse-grid races carry half weight, while retirements are softened by distance completed.</p></div>
+    </header>
+
+    <section class="ratings-explorer" id="leaderboard">
+      <div class="container">
+        <div class="ratings-heading"><div><div class="eyebrow">RATINGS EXPLORER</div><h2>Follow the field over time</h2></div><div class="ratings-heading-meta"><label id="ratings-model-control"><span>F1 model</span><select id="ratings-model"><option value="competitive">Competitive</option><option value="team-adjusted">Team-adjusted beta</option></select></label><p id="ratings-updated">Loading the latest calculation…</p></div></div>
+        <form id="ratings-controls" class="ratings-controls">
+          <label class="ratings-year-control"><span id="ratings-year-label">As of</span><select id="ratings-year"><option value="">Latest available</option></select></label>
+          <label class="ratings-min-events-control"><span>Minimum events</span><select id="ratings-min-events"><option value="1">1 event</option><option value="3" selected>3 events</option><option value="10">10 events</option><option value="25">25 events</option></select></label>
+        </form>
+
+        <div id="ratings-timeline" class="ratings-timeline" data-level="season" hidden>
+          <div class="ratings-timeline-heading">
+            <button id="ratings-timeline-back" class="ratings-timeline-back" type="button" hidden>← All seasons</button>
+            <div class="ratings-timeline-copy"><span id="ratings-timeline-label">AS OF SEASON</span><strong id="ratings-timeline-event">Latest season</strong><small id="ratings-timeline-meta"></small></div>
+            <div class="ratings-timeline-actions"><button id="ratings-timeline-zoom" type="button">Explore races</button><button id="ratings-timeline-latest" type="button">Latest</button></div>
+          </div>
+          <div class="ratings-timeline-track"><button id="ratings-timeline-previous" type="button" aria-label="Previous season">←</button><input id="ratings-timeline-range" class="ratings-timeline-range" type="range" min="0" max="0" value="0" step="1" aria-label="Season timeline"><button id="ratings-timeline-next" type="button" aria-label="Next season">→</button></div>
+        </div>
+
+        <div id="ratings-status" class="ratings-status" aria-live="polite">Calculating the order…</div>
+        <div id="ratings-content" class="ratings-content" hidden>
+          <section id="ratings-compare-setup" class="ratings-compare-setup" aria-labelledby="ratings-compare-setup-title">
+            <div class="ratings-compare-setup-heading"><div><span>YOUR COMPARISON</span><h2 id="ratings-compare-setup-title">Choose up to four drivers</h2></div><p>Search the complete rated field. Your selection is saved in the page URL.</p></div>
+            <div id="ratings-compare-slots" class="ratings-compare-slots"></div>
+            <div class="ratings-driver-picker">
+              <label for="ratings-driver-search">Find a driver</label>
+              <input id="ratings-driver-search" type="search" autocomplete="off" placeholder="Search by driver or team…" role="combobox" aria-controls="ratings-driver-results" aria-expanded="false">
+              <div id="ratings-driver-results" class="ratings-driver-results" role="listbox" hidden></div>
+            </div>
+          </section>
+
+          <section id="ratings-profile-selector" class="ratings-profile-selector" aria-labelledby="ratings-profile-name">
+            <div id="ratings-profile-identity" class="ratings-profile-identity"></div>
+            <div class="ratings-profile-picker">
+              <label for="ratings-profile-search">Choose another driver</label>
+              <input id="ratings-profile-search" type="search" autocomplete="off" placeholder="Search by driver or team…" role="combobox" aria-controls="ratings-profile-results" aria-expanded="false">
+              <div id="ratings-profile-results" class="ratings-driver-results" role="listbox" hidden></div>
+            </div>
+            <div id="ratings-profile-summary" class="ratings-profile-summary"></div>
+          </section>
+
+          <section class="ratings-board" id="ratings-board" aria-labelledby="ratings-board-title">
+            <div class="ratings-panel-heading"><div><span>LEADERBOARD</span><h3 id="ratings-board-title">Current order</h3></div><div class="ratings-panel-actions"><p class="ratings-board-hint">Select up to four drivers to compare</p><div class="ratings-order-toggle" role="group" aria-label="Leaderboard order"><button type="button" data-ratings-order="current" aria-pressed="true">Current order</button><button type="button" data-ratings-order="peak" aria-pressed="false">All-time peaks</button></div></div></div>
+            <div class="ratings-table-wrap"><table class="ratings-table"><thead><tr><th>Rank</th><th>Driver</th><th>Rating</th><th class="ratings-uncertainty-column">Uncertainty</th><th>Peak</th><th>Events</th><th>Last change</th></tr></thead><tbody id="ratings-table-body"></tbody></table></div>
+          </section>
+
+          <section class="ratings-chart-panel" id="compare" aria-labelledby="ratings-chart-title">
+            <div class="ratings-panel-heading ratings-chart-heading"><div><span>RATING HISTORY</span><h3 id="ratings-chart-title">Rating trajectories</h3></div><div class="ratings-chart-actions"><div class="ratings-chart-scale" role="group" aria-label="Timeline scale"><button type="button" data-ratings-chart-scale="calendar" aria-pressed="true">Calendar</button><button type="button" data-ratings-chart-scale="career" aria-pressed="false">Career events</button></div><button id="ratings-uncertainty-toggle" class="ratings-uncertainty-toggle" type="button" aria-pressed="false">Uncertainty off</button><button id="ratings-clear" type="button">Clear selection</button></div></div>
+            <div id="ratings-legend" class="ratings-legend"></div>
+            <div id="ratings-compare-summary" class="ratings-compare-summary"></div>
+            <div id="ratings-chart" class="ratings-chart" data-show-uncertainty="false"><p>Choose at least one driver to plot their rating history.</p><div id="ratings-chart-tooltip" class="ratings-chart-tooltip" hidden></div></div>
+          </section>
+
+          <section id="ratings-profile-highlights-panel" class="ratings-profile-highlights-panel" aria-labelledby="ratings-profile-highlights-title">
+            <div class="ratings-panel-heading"><div><span>CAREER HIGHLIGHTS</span><h3 id="ratings-profile-highlights-title">Rating landmarks</h3></div></div>
+            <div id="ratings-profile-highlights" class="ratings-profile-highlights"></div>
+          </section>
+
+          <section class="ratings-events" id="profile" aria-labelledby="ratings-events-title">
+            <div class="ratings-panel-heading ratings-profile-events-heading"><div><span>EVENT-BY-EVENT</span><h3 id="ratings-events-title">Complete rating history</h3></div><div class="ratings-profile-event-filters"><label><span class="visually-hidden">Season</span><select id="ratings-profile-season"><option value="">All seasons</option></select></label><label><span class="visually-hidden">Team</span><select id="ratings-profile-team"><option value="">All teams</option></select></label><label><span class="visually-hidden">Rating movement</span><select id="ratings-profile-impact"><option value="">All changes</option><option value="gain">Gains</option><option value="loss">Losses</option></select></label></div></div>
+            <div id="ratings-driver-summary" class="ratings-driver-summary"></div>
+            <div class="ratings-profile-events-columns" aria-hidden="true"><span>Event</span><span>Result</span><span>Expected</span><span>Change</span><span>Rating</span><span>Weight</span></div>
+            <div class="ratings-events-list" id="ratings-events-list"></div>
+            <nav id="ratings-events-list-pagination" class="pagination ratings-profile-pagination" aria-label="Rating history pages" hidden></nav>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <section class="container ratings-method" id="methodology">
+      <div><div class="eyebrow">HOW IT WORKS</div><h2>A form signal,<br>not a verdict.</h2></div>
+      <div class="ratings-method-grid">
+        <article><span>01</span><h3>Every rival is a matchup</h3><p>Each recorded classification becomes a set of head-to-head results. Non-starters are excluded, and beating a stronger rival produces a larger gain.</p></article>
+        <article><span>02</span><h3>Context changes the weight</h3><p>Full-distance Grands Prix and feature races carry full weight. Sprints and reverse-grid races carry half weight; shortened races and early retirements reduce the signal further.</p></article>
+        <article><span>03</span><h3>Experience steadies the score</h3><p>Ratings react fastest during a driver’s first 10 events, slow after 10 and settle again after 50. Weighted recent evidence independently controls the displayed uncertainty.</p></article>
+        <article><span>04</span><h3>Series stay separate</h3><p>Each championship has an independent 1500-point pool. Published event changes are zero-sum within that pool, and ratings are not compared across series.</p></article>
+      </div>
+      <p class="ratings-caveat"><strong>How to read the profile:</strong> Expected is the model-implied finishing position before the event; Weight reflects format and race distance. The uncertainty range describes available evidence—not the possible error in one result. Car performance, strategy, reliability and luck remain part of the classifications, so the rating is not a pure measure of driver talent.</p>
+    </section>
+  </main>
+  <footer class="footer"><div class="container">Racelytic</div></footer>
+  <script src="/js/utils.js"></script>
+  <script src="/js/header.js"></script>
+  <script src="/js/ratings.js"></script>
+</body>
+</html>

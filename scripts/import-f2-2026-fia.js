@@ -6,6 +6,9 @@ const {
   parseClassificationTables, parseNumber, parseStandingsRows, readCsv,
   timeToMilliseconds, writeCsv
 } = require('./import-f3-2026-fia');
+const {
+  DECISION_DOCUMENTS_URL, fetchClassificationPdf, findClassificationDocument
+} = require('./fia-classification-pdf');
 
 const YEAR = 2026;
 const CSV_ONLY = process.argv.includes('--csv-only');
@@ -44,18 +47,41 @@ const EVENTS = [
   { round:14, sourceSlug:'yas-marina', idSlug:'yas-marina' }
 ];
 const SESSION_DEFINITIONS = [
-  { path:'session-classifications', suffix:'free-practice', number:1, name:'Free Practice', race:false },
-  { path:'qualifying-classification', suffix:'qualifying', number:2, name:'Qualifying', race:false, qualifying:true },
-  { path:'sprint-race-classification', suffix:'race', number:4, name:'Race', race:true },
-  { path:'feature-race-classification', suffix:'race-2', number:6, name:'Race', race:true }
+  { path:'session-classifications', documentKind:'practice', suffix:'free-practice', number:1, name:'Free Practice', race:false },
+  { path:'qualifying-classification', documentKind:'qualifying', suffix:'qualifying', number:2, name:'Qualifying', race:false, qualifying:true },
+  { path:'sprint-race-classification', documentKind:'sprint', suffix:'race', number:4, name:'Race', race:true },
+  { path:'feature-race-classification', documentKind:'feature', suffix:'race-2', number:6, name:'Race', race:true }
 ];
+
+let decisionDocumentsHtml;
 
 function classificationUrl(event, definition) {
   return `https://www.fia.com/events/formula-2-championship/season-${YEAR}/${event.sourceSlug}/${definition.path}`;
 }
 
+async function classificationRows(event, definition) {
+  const url = classificationUrl(event, definition);
+  let pageError;
+  try {
+    const tables = parseClassificationTables(await fetchText(url), url);
+    const rows = tables.reduce((largest, table) => table.rows.length > largest.length ? table.rows : largest, []);
+    if (rows.length >= 18) return { rows, source: url };
+    pageError = new Error(`Suspiciously short classification (${rows.length}) at ${url}`);
+  } catch (error) {
+    pageError = error;
+  }
+
+  decisionDocumentsHtml ||= await fetchText(DECISION_DOCUMENTS_URL);
+  const pdfUrl = findClassificationDocument(decisionDocumentsHtml, event.sourceSlug, definition.documentKind, YEAR);
+  if (!pdfUrl) throw new Error(`${pageError.message}; no matching final classification PDF was found.`);
+  const rows = await fetchClassificationPdf(pdfUrl);
+  if (rows.length < 18) throw new Error(`Suspiciously short classification PDF (${rows.length}) at ${pdfUrl}`);
+  console.log(`FIA event table unavailable; using final classification PDF: ${pdfUrl}`);
+  return { rows, source: pdfUrl };
+}
+
 function resultRow(row, order, session, race, entry) {
-  const positionText = row.Pos || row.Position || '';
+  const positionText = row.Pos || row.Position || row.Status || '';
   const positionNumber = /^\d+$/.test(positionText) ? Number(positionText) : '';
   const bestLapTime = row['Best lap'] || row['Best Lap'] || '';
   const gapFirst = row['Gap first'] || row['Gap First'] || '';
@@ -202,10 +228,7 @@ async function main() {
         code:'', name:definition.name, startTimeUtc:'', endTimeUtc:'',
         isRace:definition.race?'True':'False', cancelled:'False', qualifying:Boolean(definition.qualifying)
       };
-      const url = classificationUrl(event, definition);
-      const tables = parseClassificationTables(await fetchText(url), url);
-      const official = tables.reduce((largest, table)=>table.rows.length>largest.length?table.rows:largest,[]);
-      if (official.length < 18) throw new Error(`Suspiciously short classification (${official.length}) at ${url}`);
+      const { rows: official } = await classificationRows(event, definition);
       const rows = official.map((row,index)=>{
         const number = String(row.Nr || row.No || row.Number || '').replace(/\D/g,'');
         let entry = entriesByRaceNumber.get(`${race.id}:${number}`);
@@ -267,4 +290,8 @@ async function main() {
   console.log(`Updated F2 CSV${CSV_ONLY ? '' : ' and database'} data. Backup: ${backup}`);
 }
 
-main().catch(error=>{console.error(error);process.exitCode=1;}).finally(async()=>pool.end());
+if (require.main === module) {
+  main().catch(error=>{console.error(error);process.exitCode=1;}).finally(async()=>pool.end());
+}
+
+module.exports = { classificationRows, classificationUrl, resultRow };

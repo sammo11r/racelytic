@@ -17,8 +17,9 @@ async function loadHeader() {
         const requestedSeries = new URLSearchParams(window.location.search).get('series');
         let rememberedSeries = '';
         try { rememberedSeries = localStorage.getItem('racelytic-series') || ''; } catch {}
-        const seriesNeutralPages = ['/account', '/privacy', '/terms', '/about', '/community'];
-        const isSeriesNeutralPage = seriesNeutralPages.includes(window.location.pathname);
+        const seriesNeutralPages = ['/account', '/privacy', '/terms', '/about', '/community', '/ratings'];
+        const isSeriesNeutralPage = seriesNeutralPages.includes(window.location.pathname)
+            || window.location.pathname.startsWith('/ratings/');
         const seriesKeys = Object.keys(window.RacelyticSeries.all);
         const pathSeries = window.RacelyticSeries.fromPath().key;
         const neutralSeries = seriesKeys.includes(requestedSeries)
@@ -40,7 +41,10 @@ async function loadHeader() {
             '/race-analysis': '/academy/race-analysis', '/driver-comparison': '/academy/driver-comparison',
             '/driver-form': '/academy/driver-form', '/teammate-battles': '/academy/teammate-battles',
             '/circuit-analysis': '/academy/circuit-analysis', '/records': '/academy/records',
-            '/championship-builder': '/academy/championship-builder', '/points-systems': '/academy/points-systems'
+            '/championship-builder': '/academy/championship-builder', '/points-systems': '/academy/points-systems',
+            '/ratings': '/ratings?series=academy', '/ratings/leaderboard': '/ratings/leaderboard?series=academy',
+            '/ratings/compare': '/ratings/compare?series=academy', '/ratings/driver': '/ratings/driver?series=academy',
+            '/ratings/methodology': '/ratings/methodology?series=academy'
         };
         const contentLinkMap = isAcademyMode ? academyContentLinkMap : activeSeries === 'f3' ? {
             '/analysis': '/f3/analysis', '/season': '/f3/season', '/race': '/f3/race',
@@ -50,15 +54,25 @@ async function loadHeader() {
             '/race-analysis': '/f3/race-analysis', '/driver-comparison': '/f3/driver-comparison',
             '/driver-form': '/f3/driver-form', '/teammate-battles': '/f3/teammate-battles',
             '/circuit-analysis': '/f3/circuit-analysis', '/records': '/f3/records',
-            '/championship-builder': '/f3/championship-builder', '/points-systems': '/f3/points-systems'
+            '/championship-builder': '/f3/championship-builder', '/points-systems': '/f3/points-systems',
+            '/ratings': '/ratings?series=f3', '/ratings/leaderboard': '/ratings/leaderboard?series=f3',
+            '/ratings/compare': '/ratings/compare?series=f3', '/ratings/driver': '/ratings/driver?series=f3',
+            '/ratings/methodology': '/ratings/methodology?series=f3'
         } : activeSeries === 'f2' ? {
             '/analysis': '/f2/analysis', '/season': '/f2/season', '/race': '/f2/race',
-            '/driver': '/f2/driver', '/constructor': '/f2/constructor', '/circuit': '/f2/circuit'
+            '/driver': '/f2/driver', '/constructor': '/f2/constructor', '/circuit': '/f2/circuit',
+            '/ratings': '/ratings?series=f2', '/ratings/leaderboard': '/ratings/leaderboard?series=f2',
+            '/ratings/compare': '/ratings/compare?series=f2', '/ratings/driver': '/ratings/driver?series=f2',
+            '/ratings/methodology': '/ratings/methodology?series=f2'
         } : {};
         const rewriteContentLinks = root => root?.querySelectorAll?.('a[href]').forEach(link => {
             const url = new URL(link.href, window.location.origin);
             if (url.origin !== window.location.origin || !contentLinkMap[url.pathname]) return;
-            link.href = `${contentLinkMap[url.pathname]}${url.search}${url.hash}`;
+            const target = new URL(contentLinkMap[url.pathname], window.location.origin);
+            url.searchParams.forEach((value, key) => {
+                if (!target.searchParams.has(key)) target.searchParams.set(key, value);
+            });
+            link.href = `${target.pathname}${target.search}${url.hash}`;
         });
         const mainContent = document.querySelector('main');
         rewriteContentLinks(mainContent);
@@ -242,6 +256,13 @@ async function loadHeader() {
                     ['/f3/circuit-analysis', 'Circuit analysis', 'Performance by venue'],
                     ['/f3/records', 'Records', 'Formula 3 all-time leaders']
                 ]],
+                ['RACELYTIC RATINGS', [
+                    ['/ratings?series=f3', 'Overview', 'Explore Formula 3 driver ratings'],
+                    ['/ratings/leaderboard?series=f3', 'Leaderboard', 'See the order through Formula 3 history'],
+                    ['/ratings/compare?series=f3', 'Compare drivers', 'Plot up to four rating histories'],
+                    ['/ratings/driver?series=f3', 'Rating profile', 'Inspect race-by-race rating changes'],
+                    ['/ratings/methodology?series=f3', 'Methodology', 'Understand the model and its limits']
+                ]],
                 ['FORMULA 3 SIMULATOR', [
                     ['/f3/simulator', 'Overview', 'Choose a Formula 3 simulation tool'],
                     ['/f3/simulate-season', 'Simulate season', 'Recalculate an F3 championship'],
@@ -259,7 +280,7 @@ async function loadHeader() {
                 ? f3Menus.map(([title, items]) => [
                     title.replace('FORMULA 3', 'F1 ACADEMY'),
                     items.map(([url, label, description]) => [
-                        url.replace('/f3', '/academy'), label,
+                        url.startsWith('/ratings') ? url.replace('series=f3', 'series=academy') : url.replace('/f3', '/academy'), label,
                         description.replace(/Formula 3|F3/g, 'F1 Academy')
                     ])
                 ])
@@ -354,7 +375,23 @@ async function loadHeader() {
                 link.querySelector('small').textContent = item[2];
             });
 
-            const simulatorDropdown = navigationDropdowns[2];
+            const ratingsDropdown = navigationDropdowns[2];
+            const ratingsLinks = [...(ratingsDropdown?.querySelectorAll('.dropdown-menu a') || [])];
+            const f2RatingsRoutes = [
+                ['/ratings?series=f2', 'Overview', 'Explore Formula 2 driver ratings'],
+                ['/ratings/leaderboard?series=f2', 'Leaderboard', 'See the order through Formula 2 history'],
+                ['/ratings/compare?series=f2', 'Compare drivers', 'Plot up to four rating histories'],
+                ['/ratings/driver?series=f2', 'Rating profile', 'Inspect race-by-race rating changes'],
+                ['/ratings/methodology?series=f2', 'Methodology', 'Understand the model and its limits']
+            ];
+            ratingsLinks.forEach((link, index) => {
+                const item = f2RatingsRoutes[index];
+                if (!item) return link.remove();
+                link.href = item[0];
+                link.querySelector('span').textContent = item[1];
+                link.querySelector('small').textContent = item[2];
+            });
+            const simulatorDropdown = navigationDropdowns[3];
             const simulatorLinks = [...(simulatorDropdown?.querySelectorAll('.dropdown-menu a') || [])];
             const f2SimulatorRoutes = [
                 ['/f2/simulator', 'Overview', 'Choose a Formula 2 simulation tool'],
@@ -372,7 +409,7 @@ async function loadHeader() {
             });
             const simulatorTitle = simulatorDropdown?.querySelector('.dropdown-title');
             if (simulatorTitle) simulatorTitle.textContent = 'FORMULA 2 SIMULATOR';
-            const gamesDropdown = navigationDropdowns[3];
+            const gamesDropdown = navigationDropdowns[4];
             const gamesLinks = [...(gamesDropdown?.querySelectorAll('.dropdown-menu a') || [])];
             const f2GamesRoutes = [
                 ['/f2/games', 'Overview', 'Choose a Formula 2 game'],
@@ -520,9 +557,11 @@ async function loadHeader() {
         });
 
         container.querySelectorAll('a[href]').forEach(link => {
-            const linkPath = new URL(link.href, window.location.origin).pathname;
+            const linkUrl = new URL(link.href, window.location.origin);
+            const linkPath = linkUrl.pathname;
             const isSeriesSwitchLink = link.closest('.series-switcher');
-            if (!isSeriesSwitchLink && linkPath === window.location.pathname) {
+            const sectionMatches = !linkPath.startsWith('/ratings') || linkPath === window.location.pathname;
+            if (!isSeriesSwitchLink && linkPath === window.location.pathname && sectionMatches) {
                 link.classList.add('active');
                 link.setAttribute('aria-current', 'page');
                 link.closest('.nav-dropdown')?.querySelector('.dropdown-toggle')?.classList.add('active');

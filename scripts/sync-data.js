@@ -208,6 +208,7 @@ async function main(args = process.argv.slice(2)) {
       return;
     }
     const imported = await importAll();
+    for (const name of series) await run(process.execPath, ['scripts/rebuild-ratings.js', `--series=${name}`]);
     await finishRun(runId, 'succeeded', sourceVersions, imported, null);
     trimBackups();
     console.log(`Data sync ${runId} completed successfully.`);

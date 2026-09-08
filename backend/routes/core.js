@@ -21,6 +21,7 @@ const SEARCH_PAGES = [
     ['Teammate battles', 'Intra-team head-to-heads', '/teammate-battles'],
     ['Circuit analysis', 'Performance by venue', '/circuit-analysis'],
     ['Records', 'Explore all-time rankings', '/records'],
+    ['Racelytic Ratings', 'Follow driver performance over time', '/ratings'],
     ['Simulator', 'Explore Formula 1 simulation tools', '/simulator-overview'],
     ['Simulate season', 'Recalculate a Formula 1 season', '/simulator'],
     ['Points systems', 'Create and manage scoring rules', '/points-systems'],
@@ -55,6 +56,7 @@ const F2_SEARCH_PAGES = [
     ['Teammate battles', 'Formula 2 intra-team head-to-heads', '/f2/teammate-battles'],
     ['Circuit analysis', 'Formula 2 performance by venue', '/f2/circuit-analysis'],
     ['Records', 'Formula 2 all-time rankings', '/f2/records'],
+    ['Racelytic Ratings', 'Formula 2 performance over time', '/ratings?series=f2'],
     ['Simulator', 'Formula 2 simulator overview', '/f2/simulator'],
     ['Simulate season', 'Formula 2 championship simulation', '/f2/simulate-season'],
     ['Scenario calculator', 'Project a Formula 2 championship run-in', '/f2/scenario-calculator'],
@@ -85,6 +87,7 @@ const F3_SEARCH_PAGES = [
     ['Teammate battles', 'Formula 3 intra-team head-to-heads', '/f3/teammate-battles'],
     ['Circuit analysis', 'Formula 3 performance by venue', '/f3/circuit-analysis'],
     ['Records', 'Formula 3 all-time rankings', '/f3/records'],
+    ['Racelytic Ratings', 'Formula 3 performance over time', '/ratings?series=f3'],
     ['Simulator', 'Formula 3 simulator overview', '/f3/simulator'],
     ['Simulate season', 'Formula 3 championship simulation', '/f3/simulate-season'],
     ['Scenario calculator', 'Project a Formula 3 championship run-in', '/f3/scenario-calculator'],
@@ -96,7 +99,7 @@ const F3_SEARCH_PAGES = [
 const ACADEMY_SEARCH_PAGES = F3_SEARCH_PAGES.map(([label, description, url]) => [
     label === 'Formula 3' ? 'F1 Academy' : label,
     description.replace(/Formula 3|FIA Formula 3/g, 'F1 Academy'),
-    url.replace('/f3', '/academy')
+    url.replace('/f3', '/academy').replace('series=f3', 'series=academy')
 ]);
 
 // ============================================================

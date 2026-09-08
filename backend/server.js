@@ -78,7 +78,21 @@ app.use(express.json({ limit: '100kb' }));
 app.get('/monitor', requireMonitorAuth, (req, res, next) => sendSeoPage(req, res, next, 'monitor.html'));
 
 const publicPages = require('node:fs').readdirSync(frontendDirectory)
-    .filter(file => file.endsWith('.html') && !['index.html', 'f2.html', 'f3.html'].includes(file));
+    .filter(file => file.endsWith('.html')
+        && !['index.html', 'f2.html', 'f3.html', 'ratings-methodology.html'].includes(file));
+
+const ratingsPages = {
+    '/ratings/leaderboard': ['templates/ratings-explorer.html', 'leaderboard'],
+    '/ratings/compare': ['templates/ratings-explorer.html', 'compare'],
+    '/ratings/driver': ['templates/ratings-explorer.html', 'driver'],
+    '/ratings/methodology': ['ratings-methodology.html', 'methodology']
+};
+
+for (const [route, [file, view]] of Object.entries(ratingsPages)) {
+    app.get(route, (req, res, next) => sendSeoPage(req, res, next, file,
+        content => content.replace('<body>', `<body data-ratings-view="${view}">`)));
+}
+app.get('/ratings-methodology.html', (req, res) => res.redirect(308, '/ratings/methodology'));
 
 for (const file of publicPages) {
     const route = `/${file.slice(0, -'.html'.length)}`;
@@ -123,6 +137,7 @@ Object.entries(ACADEMY_PAGES).forEach(([slug, file]) => {
 
 const sitemapRoutes = [
     '/', '/f2', '/f3', '/academy',
+    ...Object.keys(ratingsPages),
     ...publicPages.map(file => `/${file.slice(0, -'.html'.length)}`).filter(route => !/^\/f[23]-/.test(route)),
     ...juniorPages.map(({ route }) => route),
     ...Object.keys(ACADEMY_PAGES).filter(Boolean).map(slug => `/academy/${slug}`),
@@ -178,7 +193,7 @@ app.use(express.static(frontendDirectory, {
     }
 }));
 
-for (const route of ['core', 'seasons', 'drivers', 'circuits', 'constructors', 'chassis', 'races', 'records', 'games', 'account', 'points-systems', 'custom-championships', 'community', 'analytics']) {
+for (const route of ['core', 'seasons', 'drivers', 'circuits', 'constructors', 'chassis', 'races', 'records', 'ratings', 'games', 'account', 'points-systems', 'custom-championships', 'community', 'analytics']) {
     const exported = require(`./routes/${route}`);
     app.use(exported.router || exported);
 }

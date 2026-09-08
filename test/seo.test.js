@@ -46,6 +46,13 @@ test('project-level metadata stays series neutral', () => {
     assert.equal(metadataFor('/community').title, 'Community · Racelytic');
 });
 
+test('ratings subpages have distinct canonical metadata', () => {
+    assert.equal(metadataFor('/ratings/leaderboard').title, 'Ratings Leaderboard · Racelytic');
+    assert.equal(metadataFor('/ratings/compare').canonical, 'https://racelytic.com/ratings/compare');
+    assert.equal(metadataFor('/ratings/driver').title, 'Driver Rating Profile · Racelytic');
+    assert.equal(metadataFor('/ratings/methodology').title, 'Ratings Methodology · Racelytic');
+});
+
 test('unverified shared championships retain their URL but remain noindex', () => {
     const metadata = metadataFor('/championship-builder', { id: '550e8400-e29b-41d4-a716-446655440000' });
     assert.equal(metadata.canonical, 'https://racelytic.com/championship-builder?id=550e8400-e29b-41d4-a716-446655440000');

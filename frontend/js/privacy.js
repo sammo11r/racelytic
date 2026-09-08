@@ -82,6 +82,7 @@ async function loadFooter() {
             simulator: activeSeries === 'f1' ? '/simulator-overview' : `${seriesBase}/simulator`,
             games: `${seriesBase}/games`,
             community: `/community?series=${activeSeries}`,
+            ratings: `/ratings?series=${activeSeries}`,
             about: `/about?series=${activeSeries}`,
             method: `/about?series=${activeSeries}#about-method`,
             account: `/account?series=${activeSeries}`

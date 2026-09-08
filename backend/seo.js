@@ -26,6 +26,11 @@ const PAGE_META = Object.freeze({
     'teammate-battles': ['Teammate Battles', 'Compare drivers who raced for the same team in equal machinery.'],
     'circuit-analysis': ['Circuit Analysis', 'Discover circuit specialists, trends, reliability and grid movement.'],
     records: ['Records', 'Explore all-time driver, team, race and championship records.'],
+    ratings: ['Racelytic Ratings', 'Explore Elo-based driver performance ratings, historical leaderboards and race-by-race changes.'],
+    'ratings-leaderboard': ['Ratings Leaderboard', 'Explore driver performance ratings at any point in racing history.'],
+    'ratings-compare': ['Ratings Comparison', 'Compare driver rating trajectories across seasons and racing history.'],
+    'ratings-driver': ['Driver Rating Profile', 'Inspect a driver rating history, evidence level and race-by-race changes.'],
+    'ratings-methodology': ['Ratings Methodology', 'Learn how Racelytic Ratings are calculated, validated and interpreted.'],
     simulator: ['Simulator', 'Rewrite championships with alternative points, results, calendars and fields.'],
     'simulator-overview': ['Simulator', 'Explore championship simulations, scenario tools and custom scoring systems.'],
     'simulate-season': ['Season Simulator', 'Recalculate a championship with alternative scoring and result rules.'],
@@ -52,7 +57,8 @@ const PAGE_META = Object.freeze({
 });
 
 const NOINDEX_PAGES = new Set(['404', 'account', 'monitor', 'search']);
-const NEUTRAL_PAGES = new Set(['404', 'about', 'community', 'data-sources', 'privacy', 'terms', 'account', 'monitor', 'search']);
+const NEUTRAL_PAGES = new Set(['404', 'about', 'community', 'ratings', 'ratings-leaderboard', 'ratings-compare',
+    'ratings-driver', 'ratings-methodology', 'data-sources', 'privacy', 'terms', 'account', 'monitor', 'search']);
 const DETAIL_PARAMS = Object.freeze({ season: 'year', race: 'id', driver: 'id', constructor: 'id', team: 'id', circuit: 'id', chassis: 'id', 'championship-builder': 'id' });
 
 function esc(value) {
@@ -67,7 +73,8 @@ function routeContext(pathname) {
     const cleanPath = pathname === '/' ? '/' : String(pathname || '/').replace(/\/+$/, '');
     const match = cleanPath.match(/^\/(f2|f3|academy)(?:\/(.*))?$/);
     const seriesKey = match?.[1] || 'f1';
-    const page = match ? match[2] || 'home' : cleanPath.slice(1) || 'home';
+    const ratingMatch = cleanPath.match(/^\/ratings\/(leaderboard|compare|driver|methodology)$/);
+    const page = ratingMatch ? `ratings-${ratingMatch[1]}` : match ? match[2] || 'home' : cleanPath.slice(1) || 'home';
     return { cleanPath, page, series: SERIES[seriesKey] };
 }
 

@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <title>Ratings Methodology</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/polish.css">
+  <link rel="stylesheet" href="/css/ratings.css">
+</head>
+<body data-ratings-view="methodology">
+  <div id="header"></div>
+  <main class="ratings-page ratings-method-page">
+    <header class="container ratings-hero">
+      <div class="ratings-hero-copy">
+        <div class="eyebrow">RATINGS METHODOLOGY</div>
+        <h1>What the score<br>does—and does not—say.</h1>
+        <p>A transparent guide to the evidence, assumptions and validation behind Racelytic Ratings.</p>
+      </div>
+      <div class="ratings-hero-note"><span>MODEL VERSION</span><p>Ratings currently use Elo 1.4. Each championship has an independent rating pool and the published settings are retained unless historical validation supports a change.</p></div>
+    </header>
+
+    <section class="container ratings-method ratings-method-detail">
+      <div><div class="eyebrow">THE MODEL</div><h2>A form signal,<br>not a verdict.</h2></div>
+      <div class="ratings-method-grid">
+        <article><span>01</span><h3>Every rival is a matchup</h3><p>Each recorded classification becomes a set of head-to-head results. Non-starters are excluded. Finishing ahead of a stronger rival creates a larger gain; an expected result creates less movement.</p></article>
+        <article><span>02</span><h3>Context changes the weight</h3><p>Full-distance Grands Prix and feature races carry full weight. Sprints and reverse-grid races carry half weight. Shortened races are scaled by completed distance, while retirement matchups are softened by laps completed. Disqualifications retain full effect.</p></article>
+        <article><span>03</span><h3>Experience controls movement</h3><p>The K-factor uses three stages: 140 for the first 10 rated events, 98 through event 50 and 70 thereafter. New drivers can therefore move quickly while established careers react more steadily.</p></article>
+        <article><span>04</span><h3>Series stay separate</h3><p>Formula 1, Formula 2, Formula 3 and F1 Academy each begin from an independent 1500-point pool. The published setup keeps every event zero-sum within its pool, so ratings do not inflate through normal updates and cannot be compared directly across series.</p></article>
+      </div>
+
+      <div class="ratings-method-copy">
+        <article><div class="eyebrow">UNCERTAINTY</div><h3>Evidence, not an error bar</h3><p>Everyone begins at 1500 with uncertainty of ±260. Weighted evidence narrows that range towards a ±45 floor, while inactive evidence halves every three years and displayed uncertainty is recalculated for the selected date. Evidence labels reflect each championship’s calendar: Stable begins at 50 weighted events in F1, 30 in F2, 24 in F3 and 16 in Academy. These labels describe how established the evidence is—not the possible error in a race prediction.</p></article>
+        <article><div class="eyebrow">READING A PROFILE</div><h3>Current form and career context</h3><p>Current rating is the score after the latest rated event; peak is the highest score reached at any point. Expected converts the pre-event pairwise probabilities into an implied finishing position. Change is that event’s rating movement, while Weight reports the format and distance multiplier applied before retirement-specific matchup adjustments.</p></article>
+        <article><div class="eyebrow">VALIDATION</div><h3>Changes have to earn their place</h3><p>Candidate settings are tested chronologically: the model learns from earlier races and is scored on later, unseen periods. Pairwise and equal-event accuracy, Brier score, log loss, finishing-position error and active-field rating movement are monitored. Confidence intervals resample complete race weekends so the many comparisons from one event are not treated as independent evidence. Promotion also requires consistent folds, a minimum improvement and agreement with the later-period holdout. A more complex setting is not published merely because it fits one series or era better.</p></article>
+        <article><div class="eyebrow">LIMITS</div><h3>Results include more than the driver</h3><p>Car performance, qualifying pace, strategy, reliability and mechanical luck cannot be fully separated from classifications. Racelytic Ratings describe competitive outcomes against the field. They are not a pure measure of driver talent and should not be read as one.</p></article>
+      </div>
+
+      <p class="ratings-caveat"><strong>Current interpretation:</strong> use the rating to follow competitive form, the rank to understand position within a series, and the evidence label to judge how established that estimate is. Cross-series rating comparisons are not supported.</p>
+      <p class="ratings-caveat"><strong>F1 team-adjusted beta:</strong> the optional beta separates a persistent driver component from a constructor component and ranks the combined pre-race estimate. It is validated for prediction, but the components remain model estimates rather than direct measurements of driver talent or car performance. Competitive remains the default rating.</p>
+    </section>
+  </main>
+  <footer class="footer"><div class="container">Racelytic</div></footer>
+  <script src="/js/utils.js"></script>
+  <script src="/js/header.js"></script>
+</body>
+</html>
