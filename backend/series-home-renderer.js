@@ -192,6 +192,11 @@ function renderSeriesHome(seriesKey) {
 
     ${renderQuestions(config)}
 
+    ${config.key === 'f1' ? `<section class="container home-ask-entry" aria-labelledby="home-ask-title">
+      <div><div class="eyebrow">ASK RACELYTIC</div><h2 id="home-ask-title">What would you like to know?</h2><p>Describe an alternate Formula 1 history. Racelytic calculates the answer from recorded results.</p></div>
+      <form action="/ask" method="get"><label class="visually-hidden" for="home-ask-query">Ask a Formula 1 history question</label><input id="home-ask-query" name="q" type="search" maxlength="300" placeholder="Who has the most titles using the 1982 points system?" required><button type="submit">Calculate <span aria-hidden="true">→</span></button></form>
+    </section>` : ''}
+
     <section class="container home-archive" id="series-archive">
       <div class="home-archive-copy">
         <div class="eyebrow">THE ARCHIVE BENEATH IT ALL</div>

@@ -193,7 +193,7 @@ app.use(express.static(frontendDirectory, {
     }
 }));
 
-for (const route of ['core', 'seasons', 'drivers', 'circuits', 'constructors', 'chassis', 'races', 'records', 'ratings', 'games', 'account', 'points-systems', 'custom-championships', 'community', 'analytics']) {
+for (const route of ['core', 'seasons', 'drivers', 'circuits', 'constructors', 'chassis', 'races', 'records', 'ratings', 'games', 'account', 'points-systems', 'custom-championships', 'community', 'analytics', 'ask']) {
     const exported = require(`./routes/${route}`);
     app.use(exported.router || exported);
 }

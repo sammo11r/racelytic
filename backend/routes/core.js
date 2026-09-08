@@ -13,6 +13,7 @@ const SEARCH_PAGES = [
     ['Circuits', 'Tracks and venues', '/circuits'],
     ['Chassis', 'Cars, engines and manufacturers', '/chassis'],
     ['Analysis', 'Formula 1 data lab', '/analysis'],
+    ['Ask Racelytic', 'Calculate an answer from Formula 1 history', '/ask'],
     ['Season analysis', 'Championship trends and progression', '/season-analysis'],
     ['Season comparison', 'Compare championships across eras', '/season-comparison'],
     ['Race analysis', 'Explore a Grand Prix in detail', '/race-analysis'],

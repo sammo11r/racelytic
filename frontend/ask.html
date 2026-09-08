@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Ask a Formula 1 history question and let Racelytic calculate the answer from its archive.">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <title>Ask Racelytic</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/polish.css">
+  <link rel="stylesheet" href="/css/ask.css">
+</head>
+<body class="ask-page">
+  <div id="header"></div>
+  <main class="container page ask-workspace">
+    <header class="ask-heading">
+      <div class="eyebrow">ASK RACELYTIC</div>
+      <h1>Start with a question.</h1>
+      <p>Describe the Formula 1 history you want to recalculate or compare. Racelytic interprets the question, then explains the answer from recorded results.</p>
+    </header>
+
+    <form class="ask-form" id="ask-form">
+      <label for="ask-query">Your question</label>
+      <div class="ask-input-row">
+        <textarea id="ask-query" name="q" rows="3" maxlength="300" placeholder="Who has the most world championships if every season uses the 1982 points system?" required></textarea>
+        <button class="button primary" type="submit">Calculate answer</button>
+      </div>
+      <p class="ask-privacy-note">Questions are interpreted on Racelytic’s server and are not sent to an external AI service.</p>
+    </form>
+
+    <section class="ask-examples" aria-labelledby="ask-examples-title">
+      <h2 id="ask-examples-title">Try an example</h2>
+      <div class="ask-example-list">
+        <button type="button" data-ask-example="Who wins the 2008 championship under 1991 rules?">2008 under 1991 rules</button>
+        <button type="button" data-ask-example="How many titles would Alonso have under 1982 rules?">Alonso with 1982 rules</button>
+        <button type="button" data-ask-example="Which championships change under 1991 rules?">Championships that change</button>
+        <button type="button" data-ask-example="Compare the 1982 and 1991 points systems.">1982 versus 1991 rules</button>
+        <button type="button" data-ask-example="How does Ferrari perform under current rules versus 2003 rules?">Compare Ferrari across rules</button>
+        <button type="button" data-ask-example="Who has the most world championships if every season uses the 1982 points system?">Most titles with 1982 rules</button>
+        <button type="button" data-ask-example="Which constructor would have the most championships using the 1991 points system?">Constructor titles with 1991 rules</button>
+      </div>
+    </section>
+
+    <section class="ask-result" id="ask-result" aria-live="polite" aria-busy="false">
+      <div class="ask-empty">
+        <span aria-hidden="true">?</span>
+        <div><strong>One question, every completed season.</strong><p>Recalculate or compare Formula 1 Drivers’ or Constructors’ Championships under official historical points systems.</p></div>
+      </div>
+    </section>
+  </main>
+  <footer class="footer"><div class="container">Racelytic</div></footer>
+  <script src="/js/utils.js"></script>
+  <script src="/js/header.js"></script>
+  <script src="/js/ask.js"></script>
+</body>
+</html>
