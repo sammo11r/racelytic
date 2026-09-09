@@ -69,8 +69,6 @@ test('local question corpus maps fifty realistic phrasings to stable slots', () 
 });
 
 const clarifications = [
-    ['Who has the most Drivers Championships?', 'pointsSystemYear'],
-    ['Rank constructors by titles', 'pointsSystemYear'],
     ['Who has the most WDCs under 1949 rules?', 'pointsSystemYear'],
     ['Compare drivers and constructors by titles with 2010 rules', 'entity'],
     ['Rank teams and drivers by championships under 1991 scoring', 'entity']
@@ -83,6 +81,15 @@ test('incomplete or ambiguous title questions request the missing slot', () => {
         assert.ok(result.missingFields.includes(field) || result.ambiguousFields.includes(field), query);
         assert.equal(result.confidence, 'low', query);
     });
+});
+
+test('title questions without a rulebook use official archive championships', () => {
+    const drivers = interpretLocally('Who has the most Drivers Championships?');
+    assert.equal(drivers.intent, 'record_leader');
+    assert.equal(drivers.recordCategory, 'championships');
+    const constructors = interpretLocally('Rank constructors by titles');
+    assert.equal(constructors.intent, 'record_leader');
+    assert.equal(constructors.entity, 'constructors');
 });
 
 const extended = [

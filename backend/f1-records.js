@@ -6,11 +6,16 @@ function configuration(input = {}) {
     const type = input.type === 'constructors' ? 'constructors' : 'drivers';
     const fromYear = integer(input.fromYear, null, 1950, 2200), toYear = integer(input.toYear, null, 1950, 2200);
     if (fromYear && toYear && fromYear > toYear) throw Object.assign(new Error('The end season must be the same as or after the start season.'), { status: 400 });
+    const requestedFormat = ['all', 'F', 'S'].includes(input.raceFormat) ? input.raceFormat : null;
+    const raceFormat = ['championships', 'poles'].includes(category) ? 'F'
+        : requestedFormat || ([true, 'true'].includes(input.includeSprints) ? 'all' : 'F');
     return { series: 'f1', type, category, fromYear, toYear,
+        entityId: String(input.entityId || '').trim().slice(0, 100),
         circuitId: category === 'championships' ? '' : String(input.circuitId || '').trim().slice(0, 100),
         constructorId: type === 'drivers' ? String(input.constructorId || '').trim().slice(0, 100) : '',
         nationality: String(input.nationality || '').trim().slice(0, 100),
-        includeSprints: ['wins', 'podiums', 'points', 'starts', 'gridGain'].includes(category) && [true, 'true'].includes(input.includeSprints),
+        raceFormat,
+        includeSprints: raceFormat === 'all',
         minStarts: category === 'gridGain' ? integer(input.minStarts, 10, 1, 1000) : 1 };
 }
 
@@ -29,16 +34,19 @@ function rankEntries(rows) {
 }
 
 async function explore(connection, input) {
-    const config = configuration(input), { type, category, fromYear, toYear, circuitId, constructorId, nationality, includeSprints } = config;
+    const config = configuration(input), { type, category, entityId, fromYear, toYear, circuitId, constructorId, nationality, includeSprints, raceFormat } = config;
     const parameters = [], filters = [];
     if (fromYear) { filters.push('source.year >= ?'); parameters.push(fromYear); }
     if (toYear) { filters.push('source.year <= ?'); parameters.push(toYear); }
     if (circuitId) { filters.push('source.circuitId = ?'); parameters.push(circuitId); }
     if (constructorId) { filters.push('source.constructorId = ?'); parameters.push(constructorId); }
     const entity = type === 'drivers' ? 'd' : 'k', country = type === 'drivers' ? 'd.nationalityCountryId' : 'k.countryId';
+    if (entityId) { filters.push(`${entity}.id = ?`); parameters.push(entityId); }
     if (nationality) { filters.push(`${country} = ?`); parameters.push(nationality); }
     const sourceQuery = (table, format) => `SELECT rr.*, r.circuitId, CONCAT(rr.raceId, '-${format}') AS eventId FROM ${table} rr JOIN races r ON r.id = rr.raceId`;
-    const source = sourceQuery('races_race_results', 'gp') + (includeSprints ? ` UNION ALL ${sourceQuery('races_sprint_race_results', 'sprint')}` : '');
+    const grandPrixSource = sourceQuery('races_race_results', 'gp');
+    const sprintSource = sourceQuery('races_sprint_race_results', 'sprint');
+    const source = raceFormat === 'S' ? sprintSource : raceFormat === 'all' ? `${grandPrixSource} UNION ALL ${sprintSource}` : grandPrixSource;
     const status = "UPPER(TRIM(COALESCE(source.positionText, '')))";
     const started = `${status} NOT IN ('DNS','DNQ','DNPQ','WD','W','DNP','DNA','DNE','EX','WITHDRAWN','DID NOT START','DID NOT QUALIFY','DID NOT PREQUALIFY')`;
     const classified = `${started} AND ${status} NOT IN ('DSQ','DISQ','DQ','DISQUALIFIED','EXCLUDED','EXC') AND source.positionNumber BETWEEN 1 AND 99`;
@@ -70,7 +78,9 @@ async function explore(connection, input) {
         ${filters.length ? `WHERE ${filters.join(' AND ')}` : ''} GROUP BY ${entity}.id, ${entity}.name, ${country}
         HAVING value IS NOT NULL AND ${category === 'gridGain' ? `sample >= ${config.minStarts}` : 'value > 0'}`, [...valueParameters, ...parameters]);
     const entries = rankEntries(rows), limit = integer(input.limit, entries.length, 1, 1000);
-    return { type, category, label: CATEGORIES[category], includeSprints, configuration: config, total: entries.length, entries: entries.slice(0, limit) };
+    const years = entries.flatMap(entry => [entry.firstYear, entry.lastYear]).filter(Number.isFinite);
+    const coverage = { fromYear: years.length ? Math.min(...years) : null, toYear: years.length ? Math.max(...years) : null };
+    return { type, category, label: CATEGORIES[category], raceFormat, includeSprints, configuration: config, total: entries.length, entries: entries.slice(0, limit), coverage };
 }
 
 module.exports = { configuration, rankEntries, explore };

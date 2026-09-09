@@ -37,11 +37,6 @@
 
     <h2 class="eyebrow database-navigation-title" id="analysis-navigation-title">CHOOSE AN ANALYSIS</h2>
     <nav class="database-category-grid" aria-labelledby="analysis-navigation-title">
-      <a class="database-category" href="/ask">
-        <div class="database-category-heading"><h3>Ask Racelytic</h3></div>
-        <p>Describe an alternate Formula 1 history and calculate the answer from recorded results.</p>
-        <strong class="database-category-action">Ask a question <span aria-hidden="true">→</span></strong>
-      </a>
       <a class="database-category" href="/season-analysis">
         <div class="database-category-heading"><h3>Season analysis</h3></div>
         <p>Championship progression, title margins and race-by-race results.</p>
@@ -83,6 +78,19 @@
         <strong class="database-category-action">View records <span aria-hidden="true">→</span></strong>
       </a>
     </nav>
+
+    <section class="analysis-ask-entry" aria-labelledby="analysis-ask-title">
+      <div>
+        <div class="eyebrow">ASK RACELYTIC</div>
+        <h2 id="analysis-ask-title">Ask the Formula 1 archive</h2>
+        <p>Start with a records question or recalculate championship history.</p>
+      </div>
+      <form action="/ask" method="get">
+        <label class="visually-hidden" for="analysis-ask-query">Ask a Formula 1 history question</label>
+        <input id="analysis-ask-query" name="q" type="search" minlength="8" maxlength="300" placeholder="Who has the most Formula 1 race wins?" required>
+        <button class="button primary" type="submit">Ask</button>
+      </form>
+    </section>
   </main>
   <footer class="footer"><div class="container">Racelytic</div></footer>
   <script src="/js/header.js"></script>

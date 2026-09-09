@@ -18,7 +18,7 @@ const PAGE_META = Object.freeze({
     circuit: ['Circuit', 'Explore circuit details, characteristics and complete race history.'],
     chassis: ['Chassis', 'Explore racing chassis, technical specifications and championship usage.'],
     analysis: ['Analysis', 'Compare eras, follow championship progression and uncover patterns in racing history.'],
-    ask: ['Ask Racelytic', 'Ask a Formula 1 history question and calculate the answer from recorded results.'],
+    ask: ['Ask Racelytic', 'Ask a racing history question and calculate the answer from recorded results.'],
     'season-analysis': ['Season Analysis', 'Visualise championship progression, title margins and race-by-race performance.'],
     'season-comparison': ['Season Comparison', 'Compare two championships across competition, reliability and driver performance.'],
     'race-analysis': ['Race Analysis', 'Analyse grid movement, results, attrition and team performance for a race.'],
@@ -58,7 +58,7 @@ const PAGE_META = Object.freeze({
 });
 
 const NOINDEX_PAGES = new Set(['404', 'account', 'ask', 'monitor', 'search']);
-const NEUTRAL_PAGES = new Set(['404', 'about', 'ask', 'community', 'ratings', 'ratings-leaderboard', 'ratings-compare',
+const NEUTRAL_PAGES = new Set(['404', 'about', 'community', 'ratings', 'ratings-leaderboard', 'ratings-compare',
     'ratings-driver', 'ratings-methodology', 'data-sources', 'privacy', 'terms', 'account', 'monitor', 'search']);
 const DETAIL_PARAMS = Object.freeze({ season: 'year', race: 'id', driver: 'id', constructor: 'id', team: 'id', circuit: 'id', chassis: 'id', 'championship-builder': 'id' });
 

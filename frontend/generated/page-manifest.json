@@ -42,6 +42,7 @@
     "driver-form": "driver-form.html",
     "teammate-battles": "teammate-battles.html",
     "circuit-analysis": "circuit-analysis.html",
+    "ask": "ask.html",
     "records": "records.html",
     "points-systems": "points-systems.html"
   },
@@ -171,6 +172,12 @@
       "slug": "circuit-analysis",
       "route": "/f2/circuit-analysis",
       "template": "circuit-analysis.html"
+    },
+    {
+      "series": "f2",
+      "slug": "ask",
+      "route": "/f2/ask",
+      "template": "ask.html"
     },
     {
       "series": "f2",
@@ -366,6 +373,12 @@
     },
     {
       "series": "f3",
+      "slug": "ask",
+      "route": "/f3/ask",
+      "template": "ask.html"
+    },
+    {
+      "series": "f3",
       "slug": "records",
       "route": "/f3/records",
       "template": "records.html"
@@ -549,6 +562,12 @@
       "slug": "circuit-analysis",
       "route": "/academy/circuit-analysis",
       "template": "circuit-analysis.html"
+    },
+    {
+      "series": "academy",
+      "slug": "ask",
+      "route": "/academy/ask",
+      "template": "ask.html"
     },
     {
       "series": "academy",

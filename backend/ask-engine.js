@@ -1,9 +1,27 @@
 const POINT_SYSTEMS = require('../frontend/js/f1-points-systems');
 const { pointsFor, simulateConstructors, simulateDrivers } = require('./championship-simulator');
 const { editDistance } = require('./search-results');
+const f1Records = require('./f1-records');
+const { isJuniorSeries, minimumSeasonYear, normaliseSeries, seriesPrefix } = require('./series-config');
+const { all: SERIES } = require('../frontend/js/series-config');
 
 const cache = new Map();
+const recordCacheByConnection = new WeakMap();
+const sharedRecordCache = new Map();
 const CACHE_MS = 5 * 60 * 1000;
+
+const NATIONALITIES = Object.freeze({
+    british: ['united-kingdom', 'GB'], dutch: ['netherlands', 'NL'], german: ['germany', 'DE'], french: ['france', 'FR'],
+    italian: ['italy', 'IT'], spanish: ['spain', 'ES'], brazilian: ['brazil', 'BR'], australian: ['australia', 'AU'],
+    american: ['united-states-of-america', 'US'], argentine: ['argentina', 'AR'], austrian: ['austria', 'AT'],
+    belgian: ['belgium', 'BE'], canadian: ['canada', 'CA'], finnish: ['finland', 'FI'], japanese: ['japan', 'JP'],
+    mexican: ['mexico', 'MX'], monegasque: ['monaco', 'MC'], 'new zealand': ['new-zealand', 'NZ'],
+    'new zealander': ['new-zealand', 'NZ'], 'south african': ['south-africa', 'ZA'], swedish: ['sweden', 'SE'],
+    swiss: ['switzerland', 'CH'], thai: ['thailand', 'TH'], chinese: ['china', 'CN'], indian: ['india', 'IN'],
+    indonesian: ['indonesia', 'ID'], danish: ['denmark', 'DK'], norwegian: ['norway', 'NO'], irish: ['ireland', 'IE'], polish: ['poland', 'PL'],
+    portuguese: ['portugal', 'PT'], colombian: ['colombia', 'CO'], russian: ['russia', 'RU'], venezuelan: ['venezuela', 'VE'],
+    chilean: ['chile', 'CL'], czech: ['czech-republic', 'CZ'], hungarian: ['hungary', 'HU'], romanian: ['romania', 'RO']
+});
 
 function resolvePointsSystem(year) {
     const numericYear = Number(year);
@@ -23,6 +41,10 @@ function availablePointsSystems() {
         name: system.name,
         constructorsAvailable: system.constructorsAvailable !== false
     }));
+}
+
+function nationalityOptions() {
+    return Object.keys(NATIONALITIES).map(name => name.replace(/\b\w/g, letter => letter.toUpperCase())).sort();
 }
 
 function isTrue(value) {
@@ -146,6 +168,221 @@ function entityLabels(entity) {
         : { singular: 'driver', plural: 'drivers', championship: 'Drivers’ Championships' };
 }
 
+function recordValueLabel(category, value) {
+    const labels = {
+        wins: value === 1 ? 'race win' : 'race wins',
+        podiums: value === 1 ? 'podium' : 'podiums',
+        poles: value === 1 ? 'pole position' : 'pole positions',
+        fastestLaps: value === 1 ? 'fastest lap' : 'fastest laps',
+        starts: value === 1 ? 'race start' : 'race starts',
+        points: 'points',
+        championships: value === 1 ? 'championship' : 'championships'
+    };
+    return labels[category] || category;
+}
+
+function joinedNames(entries) {
+    const names = entries.map(entry => entry.name);
+    if (names.length < 2) return names[0] || 'No one';
+    if (names.length === 2) return `${names[0]} and ${names[1]}`;
+    return `${names.slice(0, -1).join(', ')}, and ${names.at(-1)}`;
+}
+
+function seriesDetails(value) {
+    const key = normaliseSeries(value);
+    return SERIES[key];
+}
+
+function entityHref(series, entity, id) {
+    const config = seriesDetails(series);
+    const slug = entity === 'constructors' && config.entity === 'team' ? 'team' : entity === 'constructors' ? 'constructor' : 'driver';
+    return `${config.path}/${slug}?id=${encodeURIComponent(id)}`;
+}
+
+function recordRangeLabel(interpretation) {
+    if (interpretation.fromYear && interpretation.fromYear === interpretation.toYear) return ` in ${interpretation.fromYear}`;
+    return interpretation.fromYear || interpretation.toYear
+        ? ` from ${interpretation.fromYear || minimumSeasonYear(interpretation.series)} to ${interpretation.toYear || 'the latest completed race'}`
+        : '';
+}
+
+function raceFormatLabel(format, series) {
+    if (format === 'all') return 'All race formats';
+    if (format === 'S') return series === 'academy' ? 'Reverse-grid races only' : 'Sprint races only';
+    if (series === 'f1') return 'Grands Prix only';
+    return series === 'academy' ? 'Standard races only' : 'Feature races only';
+}
+
+function recordAssumptions(constructor, series, scope = {}) {
+    const config = seriesDetails(series);
+    return [
+        scope.category === 'championships'
+            ? 'Only seasons marked as championship wins in the archive count.'
+            : `${raceFormatLabel(scope.raceFormat || (isJuniorSeries(config.key) ? 'all' : 'F'), config.key)} are included.`,
+        'Disqualified and non-starting entries do not count as classified starts, wins or podiums.',
+        ...(constructor ? [scope.category === 'championships'
+            ? `A title counts when the champion scored points for ${constructor.name} during that title season.`
+            : `Only results recorded with ${constructor.name} count toward this answer.`] : []),
+        ...(scope.circuit ? [`Only races recorded at ${scope.circuit.name} count.`] : []),
+        ...(scope.nationality ? [`Only ${scope.nationality.name} ${scope.entity === 'constructors' ? 'teams or constructors' : 'drivers'} count.`] : []),
+        `Figures reflect the ${config.name} results currently available in the Racelytic archive.`
+    ];
+}
+
+async function resolveNamedCircuit(connection, name, series) {
+    if (!name) return null;
+    const prefix = seriesPrefix(series);
+    const rows = await connection.query(`SELECT id, name FROM ${prefix}circuits ORDER BY name`);
+    const ranked = rows.map(row => ({ id: String(row.id), name: row.name, score: Math.max(nameMatchScore(name, row.name), nameMatchScore(name, row.id)) }))
+        .filter(row => row.score > 0).sort((a, b) => b.score - a.score || a.name.localeCompare(b.name));
+    if (!ranked.length) {
+        const error = new Error(`Racelytic could not find a ${seriesDetails(series).name} circuit matching “${name}”.`);
+        error.statusCode = 422;
+        throw error;
+    }
+    return ranked[0];
+}
+
+function resolveNationality(name, series) {
+    if (!name) return null;
+    const normalized = normalizedName(name);
+    const values = NATIONALITIES[normalized];
+    if (!values) {
+        const error = new Error(`Racelytic does not recognise the nationality “${name}”.`);
+        error.statusCode = 422;
+        throw error;
+    }
+    return { id: values[isJuniorSeries(series) ? 1 : 0], name: name.replace(/\b\w/g, letter => letter.toUpperCase()) };
+}
+
+async function exploreRecords(connection, records, input) {
+    const shareAcrossPool = Number.isInteger(Number(connection?.threadId));
+    let cacheForConnection = shareAcrossPool ? sharedRecordCache : recordCacheByConnection.get(connection);
+    if (!cacheForConnection) {
+        cacheForConnection = new Map();
+        recordCacheByConnection.set(connection, cacheForConnection);
+    }
+    const key = JSON.stringify(input);
+    const cached = cacheForConnection.get(key);
+    if (cached && cached.savedAt > Date.now() - CACHE_MS) return cached.value;
+    const value = await records.explore(connection, input);
+    if (shareAcrossPool && cacheForConnection.size >= 500) {
+        for (const [cachedKey, entry] of cacheForConnection) {
+            if (entry.savedAt <= Date.now() - CACHE_MS) cacheForConnection.delete(cachedKey);
+        }
+        if (cacheForConnection.size >= 500) cacheForConnection.delete(cacheForConnection.keys().next().value);
+    }
+    cacheForConnection.set(key, { savedAt: Date.now(), value });
+    return value;
+}
+
+async function resolveRecordConstructor(connection, interpretation, entity) {
+    if (!interpretation.constructorName) return null;
+    if (entity !== 'drivers') {
+        const error = new Error('A constructor filter can only be applied to driver record questions.');
+        error.statusCode = 422;
+        throw error;
+    }
+    return resolveNamedSubject(connection, interpretation.constructorName, 'constructors', interpretation.series);
+}
+
+async function calculateRecordLeader(connection, interpretation) {
+    const series = normaliseSeries(interpretation.series);
+    const seriesConfig = seriesDetails(series);
+    const type = interpretation.entity === 'constructors' ? 'constructors' : 'drivers';
+    const constructor = await resolveRecordConstructor(connection, interpretation, type);
+    const circuit = interpretation.recordCategory === 'championships' ? null : await resolveNamedCircuit(connection, interpretation.circuitName, series);
+    const nationality = resolveNationality(interpretation.nationalityName, series);
+    const records = isJuniorSeries(series) ? require('./junior-records') : f1Records;
+    const resultLimit = Math.max(1, Math.min(50, Number(interpretation.resultLimit) || 10));
+    const fullRecord = await exploreRecords(connection, records, {
+        series,
+        type,
+        constructorId: constructor?.id,
+        circuitId: circuit?.id,
+        nationality: nationality?.id,
+        raceFormat: interpretation.raceFormat || undefined,
+        category: interpretation.recordCategory,
+        fromYear: interpretation.fromYear,
+        toYear: interpretation.toYear,
+        limit: 1000
+    });
+    const leadingValue = Number(fullRecord.entries[0]?.value || 0);
+    const leaders = fullRecord.entries.filter(entry => Number(entry.value) === leadingValue);
+    const range = recordRangeLabel(interpretation);
+    const teamScope = constructor ? ` with ${constructor.name}` : '';
+    const circuitScope = circuit ? ` at ${circuit.name}` : '';
+    const nationalityScope = nationality ? ` among ${nationality.name} ${type === 'constructors' ? 'teams' : 'drivers'}` : '';
+    const leaderNames = leaders.length > 3
+        ? `${leaders.length} ${type === 'constructors' ? (seriesConfig.entity === 'team' ? 'teams' : 'constructors') : 'drivers'}`
+        : joinedNames(leaders);
+    const verb = leaders.length === 1 ? 'has' : 'are tied with';
+    const singleSeasonTitle = fullRecord.category === 'championships' && interpretation.fromYear && interpretation.fromYear === interpretation.toYear && leaders.length === 1;
+    const answer = singleSeasonTitle
+        ? `${leaders[0].name} won the ${interpretation.fromYear} ${seriesConfig.name} ${type === 'constructors' ? (seriesConfig.entity === 'team' ? 'Teams’' : 'Constructors’') : 'Drivers’'} Championship.`
+        : leaders.length
+        ? `${leaderNames} ${verb} the most ${seriesConfig.name} ${recordValueLabel(fullRecord.category, leadingValue)}${teamScope}${circuitScope}${nationalityScope}${range}: ${leadingValue}.`
+        : `No ${type === 'constructors' ? (seriesConfig.entity === 'team' ? 'teams' : 'constructors') : 'drivers'} have recorded any ${seriesConfig.name} ${recordValueLabel(fullRecord.category, 0)}${teamScope}${circuitScope}${nationalityScope}${range}.`;
+    const record = { ...fullRecord, entries: fullRecord.entries.slice(0, resultLimit) };
+    const scope = { category: record.category, raceFormat: record.configuration.raceFormat, circuit, nationality, entity: type };
+    return {
+        intent: 'record_leader',
+        entity: type,
+        entityLabel: type === 'constructors' ? (seriesConfig.entity === 'team' ? 'Teams' : 'Constructors') : 'Drivers',
+        constructorFilter: constructor ? { id: constructor.id, name: constructor.name, href: entityHref(series, 'constructors', constructor.id) } : null,
+        scope,
+        answer,
+        record,
+        assumptions: recordAssumptions(constructor, series, scope)
+    };
+}
+
+async function calculateRecordSubjectTotal(connection, interpretation) {
+    const series = normaliseSeries(interpretation.series);
+    const seriesConfig = seriesDetails(series);
+    const subject = await resolveNamedSubject(connection, interpretation.subjectName, interpretation.entity, series);
+    const constructor = await resolveRecordConstructor(connection, interpretation, subject.entity);
+    const circuit = interpretation.recordCategory === 'championships' ? null : await resolveNamedCircuit(connection, interpretation.circuitName, series);
+    const nationality = resolveNationality(interpretation.nationalityName, series);
+    const records = isJuniorSeries(series) ? require('./junior-records') : f1Records;
+    const record = await exploreRecords(connection, records, {
+        series,
+        type: subject.entity,
+        entityId: subject.id,
+        constructorId: constructor?.id,
+        circuitId: circuit?.id,
+        nationality: nationality?.id,
+        raceFormat: interpretation.raceFormat || undefined,
+        category: interpretation.recordCategory,
+        fromYear: interpretation.fromYear,
+        toYear: interpretation.toYear,
+        limit: 1
+    });
+    const entry = record.entries[0] || null;
+    const value = Number(entry?.value || 0);
+    const range = recordRangeLabel(interpretation);
+    const teamScope = constructor ? ` with ${constructor.name}` : '';
+    const circuitScope = circuit ? ` at ${circuit.name}` : '';
+    const nationalityScope = nationality ? ` among ${nationality.name} ${subject.entity === 'constructors' ? 'teams' : 'drivers'}` : '';
+    const scope = { category: record.category, raceFormat: record.configuration.raceFormat, circuit, nationality, entity: subject.entity };
+    return {
+        intent: 'record_subject_total',
+        entity: subject.entity,
+        entityLabel: subject.entity === 'constructors' ? (seriesConfig.entity === 'team' ? 'Teams' : 'Constructors') : 'Drivers',
+        answer: `${subject.name} has ${value} ${seriesConfig.name} ${recordValueLabel(record.category, value)}${teamScope}${circuitScope}${nationalityScope}${range}.`,
+        constructorFilter: constructor ? { id: constructor.id, name: constructor.name, href: entityHref(series, 'constructors', constructor.id) } : null,
+        scope,
+        subject: {
+            id: subject.id,
+            name: subject.name,
+            value,
+            href: entityHref(series, subject.entity, subject.id)
+        },
+        record,
+        assumptions: recordAssumptions(constructor, series, scope)
+    };
+}
+
 function leaderAnswer(leaders, pointsSystemName, seasonsEvaluated, entity) {
     const labels = entityLabels(entity);
     const titles = leaders[0]?.titles || 0;
@@ -187,20 +424,21 @@ function nameMatchScore(query, candidate) {
     return 0;
 }
 
-async function resolveNamedSubject(connection, subjectName, entityHint) {
+async function resolveNamedSubject(connection, subjectName, entityHint, series = 'f1') {
+    const prefix = seriesPrefix(normaliseSeries(series));
     const entityQueries = entityHint === 'drivers' || entityHint === 'constructors'
         ? [entityHint]
         : ['drivers', 'constructors'];
     const groups = await Promise.all(entityQueries.map(async entity => {
         const rows = await connection.query(entity === 'constructors'
-            ? 'SELECT id, name FROM constructors ORDER BY name'
-            : 'SELECT id, name FROM drivers ORDER BY name');
+            ? `SELECT id, name FROM ${prefix}constructors ORDER BY name`
+            : `SELECT id, name FROM ${prefix}drivers ORDER BY name`);
         return rows.map(row => ({ id: String(row.id), name: row.name, entity }));
     }));
     const candidates = groups.flat();
     const matches = candidates.map(entry => ({
         ...entry,
-        score: nameMatchScore(subjectName, entry.name)
+        score: Math.max(nameMatchScore(subjectName, entry.name), nameMatchScore(subjectName, entry.id))
     })).filter(entry => entry.score > 0)
         .sort((first, second) => second.score - first.score || first.name.localeCompare(second.name));
     const bestScore = matches[0]?.score || 0;
@@ -599,6 +837,8 @@ async function comparePointsSystems(connection, interpretation) {
 
 async function executeAskQuery(connection, interpretation) {
     const intent = interpretation.intent;
+    if (intent === 'record_leader') return calculateRecordLeader(connection, interpretation);
+    if (intent === 'record_subject_total') return calculateRecordSubjectTotal(connection, interpretation);
     if (intent === 'compare_points_systems') return comparePointsSystems(connection, interpretation);
     if (intent === 'recalculate_entity_titles') {
         const subject = await resolveNamedSubject(connection, interpretation.subjectName, interpretation.entity);
@@ -629,6 +869,9 @@ async function executeAskQuery(connection, interpretation) {
 
 module.exports = {
     availablePointsSystems,
+    nationalityOptions,
+    calculateRecordLeader,
+    calculateRecordSubjectTotal,
     calculateTitleCounts,
     comparePointsSystems,
     executeAskQuery,

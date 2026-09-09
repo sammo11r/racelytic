@@ -8,6 +8,7 @@ const SHARED_PAGE_TEMPLATES = Object.freeze({
     'driver-form': 'driver-form.html',
     'teammate-battles': 'teammate-battles.html',
     'circuit-analysis': 'circuit-analysis.html',
+    ask: 'ask.html',
     records: 'records.html',
     'points-systems': 'points-systems.html',
 });

@@ -59,6 +59,12 @@ test('nationality filters and ties apply within the selected championship', () =
     assert.deepEqual(entries.map(row => [row.id, row.rank]), [['a', 1], ['b', 1]]);
 });
 
+test('junior records can be scoped to one named entity for Ask answers', () => {
+    const races = [race('r', 2024, 'F', [driver('a', 1), driver('b', 2)])];
+    const entries = aggregate(races, [], configuration({ series: 'f3', category: 'wins', entityId: 'a' })).entries;
+    assert.deepEqual(entries.map(entry => entry.id), ['a']);
+});
+
 test('all records pages use the shared layout with series-specific labels and season ranges', () => {
     for (const [series, name, start, team] of [['f2', 'F2', 2017, 'Constructor'], ['f3', 'F3', 2019, 'Team'], ['academy', 'F1 Academy', 2023, 'Team']]) {
         const html = renderRecordsHtml(`/${series}/records`);

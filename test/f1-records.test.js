@@ -16,7 +16,17 @@ test('average definitions retain the sample requirement in saved and shared conf
   assert.equal(configuration({ category: 'gridGain', minStarts: -1 }).minStarts, 10);
   assert.equal(configuration({ category: 'poles', includeSprints: 'true' }).includeSprints, false);
   assert.equal(configuration({ category: 'wins', includeSprints: 'true' }).includeSprints, true);
+  assert.equal(configuration({ category: 'wins', raceFormat: 'S' }).raceFormat, 'S');
   assert.equal(configuration({ nationality: 'united-states-of-america' }).nationality, 'united-states-of-america');
+});
+
+test('internal entity filters constrain a record calculation to one driver or constructor', async () => {
+  assert.equal(configuration({ entityId: 'fernando-alonso' }).entityId, 'fernando-alonso');
+  let captured;
+  const connection = { async query(sql, parameters) { captured = { sql, parameters }; return []; } };
+  await explore(connection, { type: 'constructors', category: 'wins', entityId: 'ferrari' });
+  assert.match(captured.sql, /k\.id = \?/);
+  assert.ok(captured.parameters.includes('ferrari'));
 });
 
 test('inverted year ranges fail with a useful validation error', () => {

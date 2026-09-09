@@ -99,10 +99,9 @@ test('season ranges accept natural variants without mistaking a rules era for a 
 test('local interpretation keeps unsupported questions out of the executor', () => {
     assert.equal(interpretLocally('Who won the 1982 Monaco Grand Prix?').intent, 'unsupported');
     assert.equal(interpretLocally('Which constructor has the most titles using 1982 rules?').entity, 'constructors');
-    const missingRules = interpretLocally('Who has the most Drivers’ Championships?');
-    assert.equal(missingRules.intent, 'unsupported');
-    assert.deepEqual(missingRules.missingFields, ['pointsSystemYear']);
-    assert.match(missingRules.reason, /Include a year/);
+    const officialTitles = interpretLocally('Who has the most Drivers’ Championships?');
+    assert.equal(officialTitles.intent, 'record_leader');
+    assert.equal(officialTitles.recordCategory, 'championships');
     assert.equal(pointsSystemExists(1949), false);
     assert.match(interpretLocally('Most WDCs under the 1949 points system?').reason, /does not have/);
 });

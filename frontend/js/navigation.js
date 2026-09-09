@@ -41,6 +41,7 @@ async function loadHeader() {
             '/race-analysis': '/academy/race-analysis', '/driver-comparison': '/academy/driver-comparison',
             '/driver-form': '/academy/driver-form', '/teammate-battles': '/academy/teammate-battles',
             '/circuit-analysis': '/academy/circuit-analysis', '/records': '/academy/records',
+            '/ask': '/academy/ask',
             '/championship-builder': '/academy/championship-builder', '/points-systems': '/academy/points-systems',
             '/ratings': '/ratings?series=academy', '/ratings/leaderboard': '/ratings/leaderboard?series=academy',
             '/ratings/compare': '/ratings/compare?series=academy', '/ratings/driver': '/ratings/driver?series=academy',
@@ -54,6 +55,7 @@ async function loadHeader() {
             '/race-analysis': '/f3/race-analysis', '/driver-comparison': '/f3/driver-comparison',
             '/driver-form': '/f3/driver-form', '/teammate-battles': '/f3/teammate-battles',
             '/circuit-analysis': '/f3/circuit-analysis', '/records': '/f3/records',
+            '/ask': '/f3/ask',
             '/championship-builder': '/f3/championship-builder', '/points-systems': '/f3/points-systems',
             '/ratings': '/ratings?series=f3', '/ratings/leaderboard': '/ratings/leaderboard?series=f3',
             '/ratings/compare': '/ratings/compare?series=f3', '/ratings/driver': '/ratings/driver?series=f3',
@@ -105,7 +107,7 @@ async function loadHeader() {
             '/season-comparison': '/f2/season-comparison', '/race-analysis': '/f2/race-analysis',
             '/driver-comparison': '/f2/driver-comparison', '/driver-form': '/f2/driver-form',
             '/teammate-battles': '/f2/teammate-battles', '/circuit-analysis': '/f2/circuit-analysis',
-            '/records': '/f2/records', '/simulator-overview': '/f2/simulator', '/simulator': '/f2/simulate-season',
+            '/records': '/f2/records', '/ask': '/f2/ask', '/simulator-overview': '/f2/simulator', '/simulator': '/f2/simulate-season',
             '/scenario-calculator': '/f2/scenario-calculator', '/championship-builder': '/f2/championship-builder',
             '/points-systems': '/f2/points-systems', '/games': '/f2/games', '/quizzes': '/f2/quizzes',
             '/idle-racing-manager': '/f2/idle-racing-manager',
@@ -122,7 +124,7 @@ async function loadHeader() {
             '/season-comparison': '/f3/season-comparison', '/race-analysis': '/f3/race-analysis',
             '/driver-comparison': '/f3/driver-comparison', '/driver-form': '/f3/driver-form',
             '/teammate-battles': '/f3/teammate-battles', '/circuit-analysis': '/f3/circuit-analysis',
-            '/records': '/f3/records',
+            '/records': '/f3/records', '/ask': '/f3/ask',
             '/simulator-overview': '/f3/simulator', '/simulator': '/f3/simulate-season',
             '/scenario-calculator': '/f3/scenario-calculator', '/championship-builder': '/f3/championship-builder',
             '/points-systems': '/f3/points-systems',
@@ -247,6 +249,7 @@ async function loadHeader() {
                 ]],
                 ['FORMULA 3 ANALYSIS', [
                     ['/f3/analysis', 'Overview', 'Choose a Formula 3 analysis'],
+                    ['/f3/ask', 'Ask Racelytic', 'Calculate an answer from the Formula 3 archive'],
                     ['/f3/season-analysis', 'Season analysis', 'Championship progression and results'],
                     ['/f3/season-comparison', 'Season comparison', 'Compare two championships'],
                     ['/f3/race-analysis', 'Race analysis', 'Explore a Formula 3 race'],
@@ -354,11 +357,12 @@ async function loadHeader() {
                 analysisLinks[0].querySelector('small').textContent = 'Choose a Formula 2 analysis';
             }
             if (analysisLinks[1]) {
-                analysisLinks[1].href = '/f2/season-analysis';
-                analysisLinks[1].querySelector('span').textContent = 'Season analysis';
-                analysisLinks[1].querySelector('small').textContent = 'Championship progression and results';
+                analysisLinks[1].href = '/f2/ask';
+                analysisLinks[1].querySelector('span').textContent = 'Ask Racelytic';
+                analysisLinks[1].querySelector('small').textContent = 'Calculate an answer from the Formula 2 archive';
             }
             const f2AnalysisRoutes = [
+                ['/f2/season-analysis', 'Season analysis', 'Championship progression and results'],
                 ['/f2/season-comparison', 'Season comparison', 'Compare two championships'],
                 ['/f2/race-analysis', 'Race analysis', 'Explore a Formula 2 weekend'],
                 ['/f2/driver-comparison', 'Driver comparison', 'Career and teammate battles'],

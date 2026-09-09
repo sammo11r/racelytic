@@ -14,6 +14,7 @@ const { renderSeasonAnalysisHtml } = require('./season-analysis-renderer');
 const { renderSeasonComparisonHtml } = require('./season-comparison-renderer');
 const { renderCircuitAnalysisHtml } = require('./circuit-analysis-renderer');
 const { renderRecordsHtml } = require('./records-renderer');
+const { renderAskHtml } = require('./ask-renderer');
 
 const app = express();
 const PORT = Number(process.env.PORT || 3000);
@@ -26,7 +27,8 @@ function sendSeoPage(req, res, next, file, transform = content => content) {
             const rendered = file === 'season-analysis.html' ? renderSeasonAnalysisHtml(content, req.path)
                 : file === 'season-comparison.html' ? renderSeasonComparisonHtml(content, req.path)
                 : file === 'circuit-analysis.html' ? renderCircuitAnalysisHtml(transform(content), req.path)
-                : file === 'records.html' ? renderRecordsHtml(req.path) : transform(content);
+                : file === 'records.html' ? renderRecordsHtml(req.path)
+                : file === 'ask.html' ? renderAskHtml(req.path) : transform(content);
             const seoOverrides = await resolveSeoMetadata(req);
             res.type('html').send(applySeo(renderPageShell(rendered), req.path, req.query, seoOverrides));
         } catch (renderError) {

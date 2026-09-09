@@ -24,7 +24,8 @@ function aggregate(races, titles, config, countries = new Map()) {
     for (const race of selected) {
         for (const result of race.results) {
             const id = String(team ? result.constructorId || '' : result.driverId || '');
-            if (!id || (config.constructorId && String(result.constructorId) !== config.constructorId)) continue;
+            if (!id || (config.entityId && id !== config.entityId)
+                || (config.constructorId && String(result.constructorId) !== config.constructorId)) continue;
             const country = countries.get(id) || '';
             if (config.nationality && country.toLowerCase() !== config.nationality.toLowerCase()) continue;
             if (!entities.has(id)) entities.set(id, { id, name: (team ? result.constructorName : result.driverName) || id,
@@ -61,7 +62,12 @@ function aggregate(races, titles, config, countries = new Map()) {
             starts: values.starts, wins: values.wins, podiums: values.podiums, points: values.points,
             carStarts: row.carStarts, sample: row.gains.length, firstYear: row.firstYear, lastYear: row.lastYear });
     }
-    return { entries: f1Records.rankEntries(entries), coverage: { sessions: selected.length, starters, measured, derived } };
+    const years = selected.map(race => Number(race.year)).filter(Number.isFinite);
+    return { entries: f1Records.rankEntries(entries), coverage: {
+        sessions: selected.length, starters, measured, derived,
+        fromYear: years.length ? Math.min(...years) : null,
+        toYear: years.length ? Math.max(...years) : null
+    } };
 }
 
 async function explore(connection, input) {
