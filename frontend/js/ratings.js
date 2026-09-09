@@ -4,7 +4,10 @@ const defaultComparisonDrivers = ['max-verstappen', 'charles-leclerc', 'lando-no
 const ratingViews = { '/ratings/leaderboard': 'leaderboard', '/ratings/compare': 'compare', '/ratings/driver': 'driver' };
 const ratingView = ratingViews[location.pathname] || 'overview';
 const ratingPagePath = ratingView === 'overview' ? '/ratings' : location.pathname;
-const ratingState = { series: 'f1', model: 'competitive', year: '', eventId: '', ratingEvents: [], timelineLevel: 'season', minEvents: 3, order: 'current', latestYear: null, leaderboardPage: 1, leaderboardPageSize: 50, chartScale: 'calendar', showUncertainty: false, profileSeason: '', profileTeam: '', profileImpact: '', profilePage: 1, profilePageSize: 25, profileHistory: null, leaderboard: [], selected: [], histories: new Map(), active: '', request: 0 };
+const ratingState = { series: 'f1', model: 'competitive', year: '', eventId: '', ratingEvents: [], timelineLevel: 'season', minEvents: 3, order: 'current', latestYear: null, leaderboardPage: 1, leaderboardPageSize: 50, chartScale: 'calendar', showUncertainty: false, profileSeason: '', profileTeam: '', profileImpact: '', profilePage: 1, profilePageSize: 10, profileHistory: null, leaderboard: [], selected: [], histories: new Map(), active: '', request: 0 };
+if (window.matchMedia('(max-width: 680px)').matches) {
+  ratingState.leaderboardPageSize = 10;
+}
 const ratingElements = {
   year: document.getElementById('ratings-year'), minEvents: document.getElementById('ratings-min-events'),
   order: [...document.querySelectorAll('[data-ratings-order]')], status: document.getElementById('ratings-status'),
@@ -13,6 +16,7 @@ const ratingElements = {
   summary: document.getElementById('ratings-driver-summary'),
   events: document.getElementById('ratings-events-list'), updated: document.getElementById('ratings-updated'),
   timeline: document.getElementById('ratings-timeline'), timelineRange: document.getElementById('ratings-timeline-range'),
+  timelineStart: document.getElementById('ratings-timeline-start'), timelineSpan: document.getElementById('ratings-timeline-span'), timelineEnd: document.getElementById('ratings-timeline-end'),
   timelineEvent: document.getElementById('ratings-timeline-event'), timelineMeta: document.getElementById('ratings-timeline-meta'),
   timelinePrevious: document.getElementById('ratings-timeline-previous'), timelineNext: document.getElementById('ratings-timeline-next'),
   timelineLatest: document.getElementById('ratings-timeline-latest'), timelineBack: document.getElementById('ratings-timeline-back'),
@@ -35,6 +39,20 @@ function ratingChange(value) {
 function ratingDate(value) {
   const date = new Date(value);
   return Number.isNaN(date.getTime()) ? '' : new Intl.DateTimeFormat(undefined, { day: 'numeric', month: 'short', year: 'numeric' }).format(date);
+}
+
+function ratingDestination(path, extra = {}) {
+  const query = new URLSearchParams({ series: ratingState.series });
+  if (ratingState.model === 'team-adjusted') query.set('model', ratingState.model);
+  Object.entries(extra).forEach(([key, value]) => { if (value) query.set(key, value); });
+  return `${path}?${query}`;
+}
+
+function ratingBoardTitle(data) {
+  if (ratingState.order === 'peak') return ratingState.year ? `Peaks through ${ratingState.year}` : 'All-time peaks';
+  if (ratingState.timelineLevel === 'event' && data.selectedEvent?.name) return `Order after ${data.selectedEvent.name}`;
+  if (ratingState.year && !isLatestRatingEvent()) return `Order after the ${ratingState.year} season`;
+  return 'Current order';
 }
 
 function ratingUrl() {
@@ -73,6 +91,9 @@ function readRatingUrl() {
   ratingState.order = ratingView === 'leaderboard' && query.get('order') === 'peak' ? 'peak' : 'current';
   const selected = ratingView === 'driver' ? query.get('driver') || '' : query.get('drivers') || '';
   ratingState.selected = selected.split(',').filter(Boolean).slice(0, ratingView === 'driver' ? 1 : 4);
+  if (ratingView === 'compare' && ratingState.series === 'f1' && !ratingState.selected.length) {
+    ratingState.selected = [...defaultComparisonDrivers];
+  }
   ratingElements.minEvents.value = String(ratingState.minEvents);
   if (ratingElements.model) ratingElements.model.value = ratingState.model;
 }
@@ -85,6 +106,10 @@ function applyRatingSeriesTheme() {
   document.body.classList.toggle('f3-mode', ratingState.series === 'f3');
   document.body.classList.toggle('academy-mode', ratingState.series === 'academy');
   document.body.dataset.series = ratingState.series;
+  const help = document.getElementById('ratings-model-help');
+  if (help) help.textContent = ratingState.model === 'team-adjusted'
+    ? 'Beta model combining persistent driver and constructor estimates; it is not a pure talent score.'
+    : 'Competitive measures recorded results against the field, including car, strategy and reliability.';
 }
 
 function configureRatingView() {
@@ -128,7 +153,9 @@ function renderRatingTable() {
     const ratingClass = ratingView !== 'leaderboard' || ratingState.order === 'current' ? ' class="ratings-value"' : '';
     const peakClass = ratingView === 'leaderboard' && ratingState.order === 'peak' ? ' class="ratings-value"' : '';
     const context = driver.components ? `${driver.constructorName || 'Team'} · driver ${Math.round(driver.components.driverRating)} · team ${ratingChange(driver.components.constructorRating)}` : driver.constructorName || driver.lastEvent.name;
-    return `<tr${rowAttributes}><td>${driver.rank}</td><td><span class="ratings-driver">${marker}<span><strong>${esc(driver.driverName)}</strong><small>${esc(context)}</small></span></span></td><td${ratingClass}>${Math.round(driver.rating)}</td><td class="ratings-uncertainty-column"><span class="ratings-uncertainty"><strong>±${Math.round(driver.uncertainty)}</strong><small>${esc(driver.uncertaintyLabel)}</small></span></td><td${peakClass}>${Math.round(driver.peakRating)}</td><td>${driver.events}</td><td class="ratings-change ${changeClass}">${ratingChange(driver.change)}</td></tr>`;
+    const profileUrl = ratingDestination('/ratings/driver', { driver: driver.driverId });
+    const compareUrl = ratingDestination('/ratings/compare', { drivers: driver.driverId });
+    return `<tr${rowAttributes}><td data-label="Rank">${driver.rank}</td><td data-label="Driver"><span class="ratings-driver">${marker}<span><a class="ratings-driver-link" href="${profileUrl}">${esc(driver.driverName)}</a><small>${esc(context)}</small><span class="ratings-row-actions"><a href="${profileUrl}">Profile</a><a href="${compareUrl}">Compare</a></span></span></span></td><td data-label="Rating"${ratingClass}>${Math.round(driver.rating)}</td><td data-label="Evidence" class="ratings-uncertainty-column"><span class="ratings-uncertainty"><strong>${esc(driver.uncertaintyLabel)}</strong><small>±${Math.round(driver.uncertainty)}</small></span></td><td data-label="Peak"${peakClass}>${Math.round(driver.peakRating)}</td><td data-label="Events">${driver.events}</td><td data-label="Last change" class="ratings-change ${changeClass}">${ratingChange(driver.change)}</td></tr>`;
   }).join('');
   if (ratingView === 'leaderboard') {
     renderPagination('ratings-board', ratingState.leaderboard.length, paged.page, ratingState.leaderboardPageSize, nextPage => {
@@ -159,7 +186,7 @@ function currentRatingOrder() {
 function renderComparePicker() {
   if (ratingView !== 'compare') return;
   const selectedDrivers = ratingState.selected
-    .map(id => ratingState.leaderboard.find(driver => driver.driverId === id))
+    .map(id => ratingState.leaderboard.find(driver => driver.driverId === id) || cachedRatingDriver(id))
     .filter(Boolean);
   const slotCount = Math.min(4, Math.max(2, selectedDrivers.length + (selectedDrivers.length < 4 ? 1 : 0)));
   ratingElements.compareSlots.innerHTML = Array.from({ length: slotCount }, (_, index) => {
@@ -175,6 +202,17 @@ function renderComparePicker() {
   ratingElements.driverSearch.disabled = selectedDrivers.length >= 4;
   ratingElements.driverSearch.placeholder = selectedDrivers.length >= 4 ? 'Four drivers selected' : 'Search by driver or team…';
   if (selectedDrivers.length >= 4) closeDriverResults();
+}
+
+function cachedRatingDriver(driverId) {
+  const history = [...ratingState.histories.values()].find(item => item?.driver?.id === driverId);
+  const latest = history?.timeline?.at(-1);
+  if (!history || !latest) return null;
+  return {
+    driverId, driverName: history.driver.name, constructorName: latest.constructorName,
+    rating: history.summary.currentRating, peakRating: history.summary.peakRating,
+    lastEvent: { name: latest.eventName }
+  };
 }
 
 function closeDriverResults() {
@@ -198,6 +236,18 @@ function renderDriverResults() {
     ratingElements.driverSearch.value = '';
     closeDriverResults();
     await toggleRatingDriver(button.dataset.pickDriver);
+  }));
+  wireResultKeyboard(ratingElements.driverResults, ratingElements.driverSearch);
+}
+
+function wireResultKeyboard(results, search) {
+  const buttons = [...results.querySelectorAll('button')];
+  buttons.forEach((button, index) => button.addEventListener('keydown', event => {
+    if (event.key === 'Escape') { event.preventDefault(); search.focus(); results.hidden = true; search.setAttribute('aria-expanded', 'false'); }
+    if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+      event.preventDefault();
+      buttons[(index + (event.key === 'ArrowDown' ? 1 : -1) + buttons.length) % buttons.length]?.focus();
+    }
   }));
 }
 
@@ -230,6 +280,7 @@ function renderProfileResults() {
     ratingUrl();
     await renderRatingDetails();
   }));
+  wireResultKeyboard(ratingElements.profileResults, ratingElements.profileSearch);
 }
 
 async function ratingHistory(driverId) {
@@ -238,7 +289,7 @@ async function ratingHistory(driverId) {
   const query = new URLSearchParams({ series: ratingState.series });
   if (ratingState.model === 'team-adjusted') query.set('model', ratingState.model);
   if (ratingState.year) query.set('toYear', ratingState.year);
-  const response = await fetch(`/api/ratings/${encodeURIComponent(driverId)}?${query}`);
+  const response = await fetch(`/api/ratings/${encodeURIComponent(driverId)}?${query}`, { cache: 'no-store' });
   if (!response.ok) throw new Error('Rating history unavailable');
   const data = await response.json();
   ratingState.histories.set(key, data);
@@ -299,10 +350,11 @@ function chartSvg(histories) {
     const markerStep = Math.max(1, Math.ceil(item.points.length / 48));
     const dots = item.points.filter((point, index) => index % markerStep === 0 || index === item.points.length - 1)
       .map(point => `<circle class="rating-event-point" aria-hidden="true" focusable="false" fill="${ratingColours[seriesIndex]}" cx="${x(point.xValue).toFixed(1)}" cy="${y(point.event.rating).toFixed(1)}" r="3"></circle>`).join('');
+    const sourcePoints = item.points.map((point, pointIndex) => `<circle class="rating-source-point" aria-hidden="true" focusable="false" data-series-index="${seriesIndex}" data-point-index="${pointIndex}" cx="${x(point.xValue).toFixed(1)}" cy="${y(point.event.rating).toFixed(1)}" r="0"></circle>`).join('');
     const profileAnnotations = ratingView === 'driver' ? `<circle class="ratings-peak-point" cx="${x(peak.xValue)}" cy="${y(peak.event.rating)}" r="5"><title>Peak rating ${Math.round(peak.event.rating)} · ${esc(peak.event.eventName)}</title></circle><text class="ratings-peak-label" x="${x(peak.xValue) + 8}" y="${y(peak.event.rating) - 9}">Peak ${Math.round(peak.event.rating)}</text>${item.points.filter((point, index) => index && point.event.constructorName && point.event.constructorName !== item.points[index - 1].event.constructorName).map(point => `<rect class="ratings-team-change" x="${x(point.xValue) - 3}" y="${y(point.event.rating) - 3}" width="6" height="6" transform="rotate(45 ${x(point.xValue)} ${y(point.event.rating)})"><title>Joined ${esc(point.event.constructorName)} · ${point.event.year}</title></rect>`).join('')}` : '';
-    return `<path class="rating-band" fill="${ratingColours[seriesIndex]}" d="${upper}${lower}Z"></path><path class="rating-line" stroke="${ratingColours[seriesIndex]}" d="${path}"></path>${dots}<circle class="rating-point" fill="${ratingColours[seriesIndex]}" cx="${x(last.xValue)}" cy="${y(last.event.rating)}" r="4"></circle><text class="ratings-line-label" fill="${ratingColours[seriesIndex]}" x="${x(last.xValue) + 8}" y="${y(last.event.rating) + 3}">${esc(item.history.driver.name)}</text>${profileAnnotations}<circle class="ratings-hover-point" data-hover-series="${seriesIndex}" fill="${ratingColours[seriesIndex]}" r="5" hidden></circle>`;
+    return `<path class="rating-band" fill="${ratingColours[seriesIndex]}" d="${upper}${lower}Z"></path><path class="rating-line" stroke="${ratingColours[seriesIndex]}" d="${path}"></path>${sourcePoints}${dots}<circle class="rating-point" fill="${ratingColours[seriesIndex]}" cx="${x(last.xValue)}" cy="${y(last.event.rating)}" r="4"></circle><text class="ratings-line-label" fill="${ratingColours[seriesIndex]}" x="${x(last.xValue) + 8}" y="${y(last.event.rating) + 3}">${esc(item.history.driver.name)}</text>${profileAnnotations}<circle class="ratings-hover-point" data-hover-series="${seriesIndex}" fill="${ratingColours[seriesIndex]}" r="5" hidden></circle>`;
   }).join('');
-  return `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Rating history for selected drivers" data-chart-min-x="${minX}" data-chart-max-x="${maxX}" data-chart-left="${left}" data-chart-right="${plotRight}">${grid}${seasonGuides}${axes}${lines}<line class="ratings-chart-crosshair" x1="${left}" x2="${left}" y1="${top}" y2="${height - bottom}" hidden></line><rect class="ratings-chart-overlay" x="${left}" y="${top}" width="${plotRight - left}" height="${height - top - bottom}"></rect></svg><div id="ratings-chart-tooltip" class="ratings-chart-tooltip" hidden></div>`;
+  return `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Rating history for selected drivers" data-chart-min-x="${minX}" data-chart-max-x="${maxX}" data-chart-left="${left}" data-chart-right="${plotRight}"><title>Rating history</title><desc>Use the interactive chart area and its arrow keys to inspect ratings at each point.</desc>${grid}${seasonGuides}${axes}${lines}<line class="ratings-chart-crosshair" x1="${left}" x2="${left}" y1="${top}" y2="${height - bottom}" hidden></line><rect class="ratings-chart-overlay" tabindex="0" role="button" aria-label="Inspect rating history. Use left and right arrow keys to move through the timeline." x="${left}" y="${top}" width="${plotRight - left}" height="${height - top - bottom}"></rect></svg><div id="ratings-chart-tooltip" class="ratings-chart-tooltip" role="status" aria-live="polite" hidden></div>`;
 }
 
 function renderCompareSummary(histories) {
@@ -334,11 +386,8 @@ function wireRatingChart(histories) {
     tooltip.hidden = true;
     svg.querySelectorAll('.ratings-hover-point').forEach(point => { point.hidden = true; });
   };
-  overlay.addEventListener('pointerleave', hideHover);
-  overlay.addEventListener('pointermove', event => {
-    const bounds = svg.getBoundingClientRect();
-    const viewX = Math.max(plotLeft, Math.min(plotRight, (event.clientX - bounds.left) / bounds.width * svg.viewBox.baseVal.width));
-    const target = minX + (viewX - plotLeft) / (plotRight - plotLeft) * (maxX - minX);
+  const inspectTarget = (target, localX = null) => {
+    const viewX = positionX(target);
     crosshair.setAttribute('x1', viewX);
     crosshair.setAttribute('x2', viewX);
     crosshair.hidden = false;
@@ -366,9 +415,30 @@ function wireRatingChart(histories) {
     tooltip.innerHTML = `<strong>${esc(heading)}</strong>${nearest.map(({ item, point, index, pointIndex }) => `<div><i style="--driver-color:${ratingColours[index]}"></i><span><b>${esc(item.history.driver.name)}</b><small>${point ? `${esc(point.eventName)} · ${careerScale ? `event ${pointIndex + 1}` : ratingDate(point.date)}` : 'Not active at this point'}</small></span><b>${point ? Math.round(point.rating) : '—'}</b></div>`).join('')}`;
     tooltip.hidden = false;
     const chartBounds = ratingElements.chart.getBoundingClientRect();
-    const localX = event.clientX - chartBounds.left;
-    tooltip.style.left = `${Math.max(12, Math.min(chartBounds.width - 12, localX))}px`;
-    tooltip.classList.toggle('align-right', localX > chartBounds.width * .62);
+    const tooltipX = localX == null ? (viewX / svg.viewBox.baseVal.width) * chartBounds.width : localX;
+    tooltip.style.left = `${Math.max(12, Math.min(chartBounds.width - 12, tooltipX))}px`;
+    tooltip.classList.toggle('align-right', tooltipX > chartBounds.width * .62);
+    overlay.setAttribute('aria-label', `${heading}. ${nearest.map(({ item, point }) => `${item.history.driver.name} ${point ? Math.round(point.rating) : 'not active'}`).join(', ')}. Use left and right arrow keys to move.`);
+  };
+  const inspectPointer = event => {
+    const bounds = svg.getBoundingClientRect();
+    const viewX = Math.max(plotLeft, Math.min(plotRight, (event.clientX - bounds.left) / bounds.width * svg.viewBox.baseVal.width));
+    inspectTarget(minX + (viewX - plotLeft) / (plotRight - plotLeft) * (maxX - minX), event.clientX - ratingElements.chart.getBoundingClientRect().left);
+  };
+  overlay.addEventListener('pointerleave', event => { if (document.activeElement !== overlay && event.pointerType !== 'touch') hideHover(); });
+  overlay.addEventListener('pointermove', inspectPointer);
+  overlay.addEventListener('click', inspectPointer);
+  const inspectionPoints = [...new Set(histories.flatMap(item => item.history.timeline.map((event, index) => careerScale ? index : new Date(event.date).getTime())))].sort((a, b) => a - b);
+  let inspectionIndex = Math.max(0, inspectionPoints.length - 1);
+  overlay.addEventListener('focus', () => inspectTarget(inspectionPoints[inspectionIndex] ?? maxX));
+  overlay.addEventListener('blur', hideHover);
+  overlay.addEventListener('keydown', event => {
+    if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+    event.preventDefault();
+    if (event.key === 'Home') inspectionIndex = 0;
+    else if (event.key === 'End') inspectionIndex = inspectionPoints.length - 1;
+    else inspectionIndex = Math.max(0, Math.min(inspectionPoints.length - 1, inspectionIndex + (event.key === 'ArrowRight' ? 1 : -1)));
+    inspectTarget(inspectionPoints[inspectionIndex] ?? maxX);
   });
 }
 
@@ -407,7 +477,7 @@ function renderProfileEvents(history) {
     const expected = Number.isFinite(event.expectedPosition) ? `P${event.expectedPosition.toFixed(1)}` : '—';
     const evidence = Number.isFinite(event.evidence) ? event.evidence.toFixed(1) : '—';
     const fieldStrength = Number.isFinite(context.fieldStrength) ? Math.round(context.fieldStrength) : '—';
-    return `<details class="ratings-event ratings-profile-event"><summary><span class="ratings-profile-event-name"><strong>${esc(event.eventName)}</strong><small>${ratingDate(event.date)} · ${esc(event.constructorName || ratingSessionLabel(event.sessionType))}</small></span><span>${esc(result)}</span><span>${expected}</span><span class="ratings-change ${changeClass}">${ratingChange(event.change)}</span><span>${Math.round(event.rating)}</span><span>${Math.round(eventWeight * 100)}%</span></summary><div class="ratings-event-explanation"><p class="ratings-event-reason">${esc(context.summary || 'This event contributed to the driver’s rating history.')}</p><div class="ratings-event-facts"><p><strong>Field</strong><span>${event.fieldSize || '—'} starters · average ${fieldStrength}</span></p><p><strong>Matchups won</strong><span>${context.opponentsBeaten ?? '—'} of ${Math.max(0, Number(event.fieldSize || 1) - 1)} · ${context.higherRatedBeaten ?? '—'} higher-rated</span></p><p><strong>Recent evidence</strong><span>${evidence} weighted events</span></p>${rival}${reduced}</div></div></details>`;
+    return `<details class="ratings-event ratings-profile-event"><summary><span class="ratings-profile-event-name"><strong>${esc(event.eventName)}</strong><small>${ratingDate(event.date)} · ${esc(event.constructorName || ratingSessionLabel(event.sessionType))}</small></span><span data-label="Result">${esc(result)}</span><span data-label="Expected">${expected}</span><span data-label="Change" class="ratings-change ${changeClass}">${ratingChange(event.change)}</span><span data-label="Rating">${Math.round(event.rating)}</span><span data-label="Weight">${Math.round(eventWeight * 100)}%</span></summary><div class="ratings-event-explanation"><p class="ratings-event-reason">${esc(context.summary || 'This event contributed to the driver’s rating history.')}</p><div class="ratings-event-facts"><p><strong>Field</strong><span>${event.fieldSize || '—'} starters · average ${fieldStrength}</span></p><p><strong>Matchups won</strong><span>${context.opponentsBeaten ?? '—'} of ${Math.max(0, Number(event.fieldSize || 1) - 1)} · ${context.higherRatedBeaten ?? '—'} higher-rated</span></p><p><strong>Recent evidence</strong><span>${evidence} weighted events</span></p>${rival}${reduced}</div></div></details>`;
   }).join('') || '<p class="ratings-profile-no-events">No events match these filters.</p>';
   renderPagination('ratings-events-list', filtered.length, paged.page, ratingState.profilePageSize, nextPage => {
     ratingState.profilePage = nextPage;
@@ -487,6 +557,7 @@ async function renderRatingDetails() {
     ratingElements.chart.querySelector('svg')?.setAttribute('aria-label', ratingView === 'driver' ? `Career rating history for ${histories[0].history.driver.name}` : 'Rating history for selected drivers');
     wireRatingChart(histories);
     if (ratingView === 'compare') {
+      renderComparePicker();
       renderCompareSummary(histories);
       document.getElementById('ratings-chart-title').textContent = ratingState.chartScale === 'career' ? 'Career progression' : 'Rating trajectories';
       return;
@@ -537,6 +608,7 @@ function renderRatingTimeline() {
   ratingElements.timelineRange.max = String(items.length - 1);
   ratingElements.timelineRange.value = String(index);
   ratingElements.timelineRange.style.setProperty('--timeline-progress', `${items.length === 1 ? 100 : index / (items.length - 1) * 100}%`);
+  ratingElements.timelineRange.style.setProperty('--timeline-steps', String(Math.max(1, Math.min(items.length - 1, 12))));
   ratingElements.timelinePrevious.disabled = index === 0;
   ratingElements.timelineNext.disabled = index === items.length - 1;
   ratingElements.timelineBack.hidden = !eventLevel;
@@ -546,6 +618,9 @@ function renderRatingTimeline() {
   if (!eventLevel) {
     const year = items[index];
     const events = ratingState.ratingEvents.filter(event => Number(event.year) === year);
+    ratingElements.timelineStart.textContent = String(items[0]);
+    ratingElements.timelineSpan.textContent = `${items.length} seasons`;
+    ratingElements.timelineEnd.textContent = String(items.at(-1));
     ratingState.year = String(year);
     if (!events.some(event => event.id === ratingState.eventId)) ratingState.eventId = events.at(-1)?.id || '';
     ratingElements.timelineLabel.textContent = 'AS OF SEASON';
@@ -561,6 +636,9 @@ function renderRatingTimeline() {
 
   const event = items[index];
   ratingState.eventId = event.id;
+  ratingElements.timelineStart.textContent = 'Round 1';
+  ratingElements.timelineSpan.textContent = `${items.length} rated events`;
+  ratingElements.timelineEnd.textContent = `Round ${items.length}`;
   ratingElements.timelineLabel.textContent = `${ratingState.year} SEASON`;
   ratingElements.timelineEvent.textContent = `${event.name} · ${ratingSessionLabel(event.sessionType)}`;
   ratingElements.timelineMeta.textContent = `${ratingDate(event.date)} · event ${index + 1} of ${items.length}`;
@@ -573,7 +651,7 @@ function renderRatingTimeline() {
 async function loadRatingTimeline() {
   const query = new URLSearchParams({ series: ratingState.series });
   if (ratingState.model === 'team-adjusted') query.set('model', ratingState.model);
-  const response = await fetch(`/api/ratings/events?${query}`);
+  const response = await fetch(`/api/ratings/events?${query}`, { cache: 'no-store' });
   if (!response.ok) throw new Error('Rating timeline unavailable');
   const data = await response.json();
   ratingState.ratingEvents = data.events || [];
@@ -629,9 +707,10 @@ function zoomOutOfRatingSeason() {
 
 async function loadRatings() {
   const request = ++ratingState.request;
-  ratingElements.status.hidden = false;
+  const progressiveCompare = ratingView === 'compare';
+  ratingElements.status.hidden = progressiveCompare;
   ratingElements.status.textContent = 'Calculating the order…';
-  ratingElements.content.hidden = true;
+  ratingElements.content.hidden = !progressiveCompare;
   const query = new URLSearchParams({ series: ratingState.series, minEvents: ratingState.minEvents, limit: 1000 });
   if (ratingState.model === 'team-adjusted') query.set('model', ratingState.model);
   if (ratingView === 'leaderboard') query.set('order', ratingState.order);
@@ -639,7 +718,7 @@ async function loadRatings() {
   if (ratingView === 'leaderboard' && ratingState.eventId) query.set('event', ratingState.eventId);
   else if (ratingState.year) query.set('year', ratingState.year);
   try {
-    const response = await fetch(`/api/ratings?${query}`);
+    const response = await fetch(`/api/ratings?${query}`, { cache: 'no-store' });
     if (!response.ok) throw new Error('Ratings unavailable');
     const data = await response.json();
     if (request !== ratingState.request) return;
@@ -649,7 +728,9 @@ async function loadRatings() {
     ratingState.latestYear = Number.isFinite(latestAvailableYear) && latestAvailableYear > 0 ? latestAvailableYear : latestDriverYear;
     if (ratingView === 'leaderboard') ratingState.order = data.order === 'peak' ? 'peak' : 'current';
     ratingElements.order.forEach(button => button.setAttribute('aria-pressed', String(button.dataset.ratingsOrder === ratingState.order)));
-    document.getElementById('ratings-board-title').textContent = ratingState.order === 'peak' ? 'All-time peaks' : 'Current order';
+    document.getElementById('ratings-board-title').textContent = ratingBoardTitle(data);
+    const boardHint = document.querySelector('.ratings-board-hint');
+    if (boardHint && ratingView === 'leaderboard') boardHint.textContent = `Minimum events counts rated career events accumulated by this point. Evidence reflects recency and experience.`;
     ratingState.selected = ratingState.selected.filter(id => data.leaderboard.some(driver => driver.driverId === id)).slice(0, 4);
     if (ratingView === 'compare' && !ratingState.selected.length) {
       const byRating = [...data.leaderboard].sort((a, b) => b.rating - a.rating || a.driverName.localeCompare(b.driverName));
@@ -673,9 +754,15 @@ async function loadRatings() {
           : 'No drivers meet these filters yet. Try another season.';
       return;
     }
-    ratingElements.updated.textContent = (ratingView !== 'leaderboard' ? !ratingState.year : isLatestRatingEvent()) && data.freshness?.isCurrent === false
-      ? `Update pending · results through ${ratingDate(data.freshness.latestSourceEvent)}`
+    const freshnessPending = (ratingView !== 'leaderboard' ? !ratingState.year : isLatestRatingEvent())
+      && data.freshness?.isCurrent === false;
+    const freshnessMessage = freshnessPending
+      ? `Update pending · ratings through ${ratingDate(data.freshness.latestRatedEvent)} · source results through ${ratingDate(data.freshness.latestSourceEvent)}`
       : data.generatedAt ? `${data.modelLabel || `Model ${data.modelVersion}`} · ${data.beta ? 'beta · ' : ''}recalculated ${ratingDate(data.generatedAt)}` : `${data.modelLabel || `Model ${data.modelVersion}`}`;
+    ratingElements.updated.dataset.state = freshnessPending ? 'pending' : 'current';
+    ratingElements.updated.textContent = freshnessMessage;
+    const viewUpdated = document.getElementById('ratings-view-updated');
+    if (viewUpdated) { viewUpdated.dataset.state = ratingElements.updated.dataset.state; viewUpdated.textContent = freshnessMessage; }
     ratingElements.status.hidden = true;
     ratingElements.content.hidden = false;
     renderRatingTable();
@@ -700,6 +787,10 @@ ratingElements.year.addEventListener('change', () => {
 ratingElements.minEvents.addEventListener('change', () => { ratingState.minEvents = Number(ratingElements.minEvents.value); ratingState.leaderboardPage = 1; loadRatings(); });
 ratingElements.model?.addEventListener('change', async () => {
   ratingState.model = ratingState.series === 'f1' && ratingElements.model.value === 'team-adjusted' ? 'team-adjusted' : 'competitive';
+  const help = document.getElementById('ratings-model-help');
+  if (help) help.textContent = ratingState.model === 'team-adjusted'
+    ? 'Beta model combining persistent driver and constructor estimates; it is not a pure talent score.'
+    : 'Competitive measures recorded results against the field, including car, strategy and reliability.';
   ratingState.eventId = '';
   ratingState.selected = [];
   ratingState.active = '';
@@ -830,6 +921,14 @@ applyRatingSeriesTheme();
 configureRatingView();
 (async () => {
   try {
+    if (ratingView === 'compare') {
+      ratingElements.status.hidden = true;
+      ratingElements.content.hidden = false;
+      renderComparePicker();
+      ratingElements.driverSearch.disabled = true;
+      ratingElements.driverSearch.placeholder = 'Loading driver directory…';
+      if (ratingState.selected.length) renderRatingDetails();
+    }
     if (ratingView === 'leaderboard') await loadRatingTimeline();
     await loadRatings();
   } catch {

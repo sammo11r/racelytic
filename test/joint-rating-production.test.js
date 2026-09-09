@@ -32,3 +32,15 @@ test('ratings explorer exposes an explicit F1 beta without changing the default'
   assert.match(script, /model: 'competitive'/);
   assert.match(script, /query\.set\('model', ratingState\.model\)/);
 });
+
+test('rating freshness compares database timestamps without transport timezone shifts', () => {
+  assert.match(ratingsRouter.latestSourceEventSql('f2'), /CAST\(MAX\(COALESCE\(sessions\.startTimeUtc, races\.date\)\) AS CHAR\)/);
+  assert.equal(ratingsRouter.comparableEventTimestamp('2026-09-04'), '2026-09-04 00:00:00');
+  assert.equal(ratingsRouter.comparableEventTimestamp('2026-08-23T08:30:00Z'), '2026-08-23 08:30:00');
+  assert.equal(ratingsRouter.comparableEventTimestamp('2026-08-23 08:30:00'), '2026-08-23 08:30:00');
+});
+
+test('rating freshness responses must revalidate after a rebuild', () => {
+  const source = fs.readFileSync(path.join(__dirname, '../backend/routes/ratings.js'), 'utf8');
+  assert.equal(source.match(/res\.set\('Cache-Control', 'no-cache, max-age=0, must-revalidate'\)/g)?.length, 3);
+});

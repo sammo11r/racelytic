@@ -51,8 +51,14 @@ function number(value, digits = 1) {
     return Number(Number(value || 0).toFixed(digits));
 }
 
+function comparableEventTimestamp(value) {
+    const text = String(value || '').trim().replace('T', ' ').replace(/Z$/i, '');
+    if (/^\d{4}-\d{2}-\d{2}$/.test(text)) return `${text} 00:00:00`;
+    return /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}/.test(text) ? text.slice(0, 19) : '';
+}
+
 function latestSourceEventSql(series) {
-    if (series === 'f1') return `SELECT MAX(event_date) AS latest_event FROM (
+    if (series === 'f1') return `SELECT CAST(MAX(event_date) AS CHAR) AS latest_event FROM (
         SELECT MAX(races.date) AS event_date FROM races
         JOIN races_race_results results ON results.raceId = races.id
         UNION ALL
@@ -60,7 +66,7 @@ function latestSourceEventSql(series) {
         JOIN races_sprint_race_results results ON results.raceId = races.id
     ) source_events`;
     const prefix = seriesPrefix(series);
-    return `SELECT MAX(COALESCE(sessions.startTimeUtc, races.date)) AS latest_event
+    return `SELECT CAST(MAX(COALESCE(sessions.startTimeUtc, races.date)) AS CHAR) AS latest_event
         FROM ${prefix}sessions sessions
         JOIN ${prefix}races races ON races.id = sessions.raceId
         JOIN ${prefix}session_results results ON results.sessionId = sessions.id
@@ -97,7 +103,7 @@ router.get('/api/ratings/events', async (req, res) => {
             WHERE model_version = ? AND series = ?
             GROUP BY event_id, event_date, year, round_number, event_sequence, event_name, session_type
             ORDER BY event_date, event_sequence, event_id`, [source.version, series]);
-        res.set('Cache-Control', 'public, max-age=300, stale-while-revalidate=900');
+        res.set('Cache-Control', 'no-cache, max-age=0, must-revalidate');
         res.json({ modelVersion: source.version, model: source.key, modelLabel: source.label, beta: source.beta,
             series, events: rows.map(row => ({
             id: row.event_id, date: row.event_date, year: Number(row.year), round: Number(row.round_number),
@@ -186,7 +192,7 @@ router.get('/api/ratings', async (req, res) => {
                 WHERE model_version = ? AND series = ? ORDER BY year DESC`, [source.version, series]),
             pool.query('SELECT * FROM app_rating_runs WHERE model_version = ? AND series = ? LIMIT 1', [source.version, series]),
             pool.query(latestSourceEventSql(series)),
-            pool.query(`SELECT MAX(event_date) AS latest_event FROM ${source.table}
+            pool.query(`SELECT CAST(MAX(event_date) AS CHAR) AS latest_event FROM ${source.table}
                 WHERE model_version = ? AND series = ?`, [source.version, series])
         ]);
         const run = runRows[0];
@@ -213,9 +219,11 @@ router.get('/api/ratings', async (req, res) => {
         });
         const latestSourceEvent = sourceRows[0]?.latest_event || null;
         const latestRatedEvent = ratedRows[0]?.latest_event || null;
-        const ratingsCurrent = !latestSourceEvent || Boolean(latestRatedEvent
-            && new Date(latestRatedEvent).getTime() >= new Date(latestSourceEvent).getTime());
-        res.set('Cache-Control', 'public, max-age=300, stale-while-revalidate=900');
+        const comparableSourceEvent = comparableEventTimestamp(latestSourceEvent);
+        const comparableRatedEvent = comparableEventTimestamp(latestRatedEvent);
+        const ratingsCurrent = !comparableSourceEvent || Boolean(comparableRatedEvent
+            && comparableRatedEvent >= comparableSourceEvent);
+        res.set('Cache-Control', 'no-cache, max-age=0, must-revalidate');
         res.json({ modelVersion: source.version, model: source.key, modelLabel: source.label, beta: source.beta,
             startingRating: START_RATING, series, order, cutoff,
             uncertaintyAsOf, evidenceThresholds: evidenceThresholds(series),
@@ -266,7 +274,7 @@ router.get('/api/ratings/:driverId', async (req, res) => {
         const currentRating = timeline.at(-1).rating;
         const currentRange = { low: number(currentRating - currentState.uncertainty),
             high: number(currentRating + currentState.uncertainty) };
-        res.set('Cache-Control', 'public, max-age=300, stale-while-revalidate=900');
+        res.set('Cache-Control', 'no-cache, max-age=0, must-revalidate');
         res.json({ modelVersion: source.version, model: source.key, modelLabel: source.label, beta: source.beta,
             series, driver: { id: driverId, name: rows[0].driver_name },
             uncertaintyAsOf, evidenceThresholds: evidenceThresholds(series), configuration: config,
@@ -280,3 +288,5 @@ router.get('/api/ratings/:driverId', async (req, res) => {
 
 module.exports = router;
 module.exports.ratingSource = ratingSource;
+module.exports.latestSourceEventSql = latestSourceEventSql;
+module.exports.comparableEventTimestamp = comparableEventTimestamp;
