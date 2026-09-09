@@ -21,8 +21,25 @@ function insertSql(count) {
         VALUES ${Array(count).fill(row).join(',')}`;
 }
 
+function databaseDateTime(value) {
+    if (value instanceof Date) {
+        if (Number.isNaN(value.getTime())) throw new TypeError('Invalid rating event date.');
+        return value.toISOString().slice(0, 19).replace('T', ' ');
+    }
+    const text = String(value || '').trim();
+    if (/^\d{4}-\d{2}-\d{2}$/.test(text)) return `${text} 00:00:00`;
+    if (/^\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}:\d{2}(?:\.\d+)?Z?$/.test(text)) {
+        return text.slice(0, 19).replace('T', ' ');
+    }
+    if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?[+-]\d{2}:\d{2}$/.test(text)) {
+        const date = new Date(text);
+        if (!Number.isNaN(date.getTime())) return date.toISOString().slice(0, 19).replace('T', ' ');
+    }
+    throw new TypeError(`Invalid rating event date: ${text || '(empty)'}`);
+}
+
 function values(row) {
-    return [row.modelVersion, row.series, row.eventId, row.eventDate, row.year, row.round, row.eventSequence,
+    return [row.modelVersion, row.series, row.eventId, databaseDateTime(row.eventDate), row.year, row.round, row.eventSequence,
         row.eventName, row.sessionType, row.driverId, row.driverName, row.constructorName,
         row.positionNumber, row.positionText, row.ratingBefore, row.ratingAfter, row.ratingChange,
         row.expectedScore, row.actualScore, row.expectedPosition, row.fieldSize, row.completion,
@@ -46,7 +63,7 @@ function jointInsertSql(count) {
 }
 
 function jointValues(row) {
-    return [row.modelVersion, row.series, row.eventId, row.eventDate, row.year, row.round, row.eventSequence,
+    return [row.modelVersion, row.series, row.eventId, databaseDateTime(row.eventDate), row.year, row.round, row.eventSequence,
         row.eventName, row.sessionType, row.driverId, row.driverName, row.constructorId, row.constructorName,
         row.positionNumber, row.positionText, row.ratingBefore, row.ratingAfter, row.ratingChange,
         row.driverRatingBefore, row.driverRatingAfter, row.driverRatingChange, row.constructorRatingBefore,
@@ -133,4 +150,4 @@ if (require.main === module) main().catch(async error => {
     process.exitCode = 1;
 });
 
-module.exports = { JOINT_COLUMNS, jointInsertSql, jointValues, rebuild, rebuildJointF1 };
+module.exports = { JOINT_COLUMNS, databaseDateTime, insertSql, jointInsertSql, jointValues, rebuild, rebuildJointF1, values };

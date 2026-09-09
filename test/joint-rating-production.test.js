@@ -4,16 +4,25 @@ const path = require('node:path');
 const test = require('node:test');
 const { after } = require('node:test');
 const root = path.join(__dirname, '..');
-const { JOINT_COLUMNS, jointValues } = require('../scripts/rebuild-ratings');
+const { JOINT_COLUMNS, databaseDateTime, jointValues, values } = require('../scripts/rebuild-ratings');
 const ratingsRouter = require('../backend/routes/ratings');
 after(() => require('../backend/db').end());
 
 test('joint rating persistence columns and row serialization stay aligned', () => {
-  assert.equal(jointValues({}).length, JOINT_COLUMNS.length);
+  assert.equal(jointValues({ eventDate: '2026-09-04' }).length, JOINT_COLUMNS.length);
   const schema = fs.readFileSync(path.join(root, 'database/ratings.sql'), 'utf8');
   assert.match(schema, /CREATE TABLE IF NOT EXISTS app_joint_rating_events/);
   for (const column of ['driver_rating_after', 'constructor_rating_after', 'driver_uncertainty_after',
     'constructor_uncertainty_after']) assert.ok(JOINT_COLUMNS.includes(column));
+});
+
+test('rating rebuild serializes ISO event timestamps for MariaDB DATETIME columns', () => {
+  assert.equal(databaseDateTime('2017-04-15T10:10:00Z'), '2017-04-15 10:10:00');
+  assert.equal(databaseDateTime('2026-09-04'), '2026-09-04 00:00:00');
+  assert.equal(databaseDateTime('2026-09-04T12:30:00+02:00'), '2026-09-04 10:30:00');
+  assert.equal(values({ eventDate: '2017-04-15T10:10:00Z' })[3], '2017-04-15 10:10:00');
+  assert.equal(jointValues({ eventDate: '2017-04-15T10:10:00Z' })[3], '2017-04-15 10:10:00');
+  assert.throws(() => databaseDateTime('not-a-date'), /Invalid rating event date/);
 });
 
 test('team-adjusted API source is allow-listed to F1', () => {
