@@ -4,7 +4,7 @@
   const seriesKey = activeSeriesKey();
   const junior = seriesKey !== 'f1';
   const seriesQuery = junior ? '?series=' + seriesKey : '';
-  const driverBase = junior ? '/' + seriesKey + '/driver?id=' : '/driver?id=';
+  const driverBase = junior ? '/' + seriesKey + '/drivers/' : '/drivers/';
   const $ = id => document.getElementById(id);
   const initial = model.readState(location.search);
   let data, state, styles, selected = new Set(), view = initial.view, scoring = initial.scoring;

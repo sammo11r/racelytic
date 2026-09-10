@@ -3,6 +3,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
+const { resourceUrl, resourceIdFrom } = require('./frontend-resource-routes');
 const { buildCircuitDetail, buildJuniorCircuitDetail } = require('../backend/circuit-detail');
 const read = file => fs.readFileSync(path.join(__dirname, '..', file), 'utf8');
 const source = read('frontend/js/circuit.js');
@@ -16,7 +17,7 @@ function fixture(query = 'id=silverstone', series = 'f1') {
         return nodes.get(id);
     };
     const context = vm.createContext({ document: { getElementById: node, createElement: () => ({}) }, window: { addEventListener: (key, fn) => { events[key] = fn; }, location: { pathname: series === 'f1' ? '/circuit' : `/${series}/circuit`, reload() {} } },
-        params: () => new URLSearchParams(query), URLSearchParams, Date,
+        params: () => new URLSearchParams(query), resourceUrl, resourceId: resourceIdFrom(() => query), URLSearchParams, Date,
         esc: value => String(value ?? '').replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('"', '&quot;'), fmtNumber: String, fmtDate: value => value || '—', displayRaceName: row => row.name,
         history: { replaceState(_a, _b, url) { context.url = url; query = url.split('?')[1]; } },
         sessionStorage: { getItem: key => storage.get(key) || null, setItem: (key, value) => storage.set(key, value) },
@@ -97,8 +98,8 @@ test('hero starts with the name and renders safe location, layout and record lin
     assert.equal(node('circuit-back-link').href, '/circuits');
     assert.equal(context.circuitLocationLink({ latitude: null, longitude: null }), '');
     assert.equal(context.circuitLocationLink({ latitude: 200, longitude: 5 }), '');
-    assert.match(node('circuit-records').innerHTML, /\/driver\?id=a/);
-    assert.match(node('circuit-records').innerHTML, /\/constructor\?id=team/);
+    assert.match(node('circuit-records').innerHTML, /\/drivers\/a/);
+    assert.match(node('circuit-records').innerHTML, /\/constructors\/team/);
     assert.equal(node('circuit-analysis-link').href, '/circuit-analysis?id=silverstone');
     assert.match(node('circuit-layout-note').textContent, /Historical races/);
     assert.equal(context.circuitDate('2026-09-06'), '2026-09-06T12:00:00');
@@ -177,10 +178,10 @@ for (const series of ['f2', 'f3', 'academy']) {
         assert.equal(context.pagination.page, 2);
         assert.equal((node('circuit-races').innerHTML.match(/<tr>/g) || []).length, 6);
         assert.equal(node('circuit-back-link').href, `/${series}/circuits?view=all`);
-        assert.ok(context.url.startsWith(`/${series}/circuit?`));
-        assert.match(node('circuit-races').innerHTML, new RegExp(`/${series}/race\\?id=weekend&amp;session=s`));
-        assert.ok(node('circuit-races').innerHTML.includes(`/${series}/driver?id=a`));
-        assert.ok(node('circuit-records').innerHTML.includes(`/${series}/${series === 'f2' ? 'constructor' : 'team'}?id=team`));
+        assert.ok(context.url.startsWith(`/${series}/circuits/silverstone?`));
+        assert.match(node('circuit-races').innerHTML, new RegExp(`/${series}/races/weekend/british-grand-prix\\?session=s`));
+        assert.ok(node('circuit-races').innerHTML.includes(`/${series}/drivers/a`));
+        assert.ok(node('circuit-records').innerHTML.includes(`/${series}/${series === 'f2' ? 'constructors' : 'teams'}/team`));
         assert.equal(node('circuit-analysis-link').href, `/${series}/circuit-analysis?id=silverstone`);
         node('circuit-history-search').events.input({ target: { value: 'jose' } });
         assert.equal(context.pagination.page, 1);

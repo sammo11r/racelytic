@@ -330,9 +330,8 @@ function renderSimulation() {
   const originalMargin = originalRunnerUp ? Number(originalChampion.points) - Number(originalRunnerUp.points) : 0;
   const championPointsChange = champion.points - champion.originalPoints;
   const label = isDrivers ? 'Driver' : (isF3Simulator || isAcademySimulator) ? 'Team' : 'Constructor';
-  const link = isDrivers
-    ? isAcademySimulator ? 'academy/driver' : isF3Simulator ? 'f3/driver' : isF2Simulator ? 'f2/driver' : 'driver'
-    : isAcademySimulator ? 'academy/team' : isF3Simulator ? 'f3/team' : isF2Simulator ? 'f2/constructor' : 'constructor';
+  const resource = isDrivers ? 'driver' : (isF3Simulator || isAcademySimulator) ? 'team' : 'constructor';
+  const resourceBase = isAcademySimulator ? '/academy' : isF3Simulator ? '/f3' : isF2Simulator ? '/f2' : '';
   document.getElementById('simulation-championship-title').textContent = `${label} championship`;
   const changedCount = standings.filter(entry => entry.change).length;
   const changesOnly = document.getElementById('simulation-changes-only').checked;
@@ -355,7 +354,7 @@ function renderSimulation() {
       <thead><tr><th>Pos.</th><th>${label}</th><th>Simulated</th><th>Official</th><th>Difference</th></tr></thead>
       <tbody>${displayedStandings.map(entry => `<tr${entry.simulatedPosition === 1 ? ' class="simulated-leader"' : entry.change ? ' class="simulation-changed"' : ''}>
         <td class="simulation-position" data-label="Simulated position">${entry.simulatedPosition}</td>
-        <td data-label="${label}"><a href="/${link}?id=${encodeURIComponent(entry.id)}"><strong>${esc(entry.name)}</strong>${entry.abbreviation ? `<small>${esc(entry.abbreviation)}</small>` : ''}</a></td>
+        <td data-label="${label}"><a href="${resourceUrl(resource,entry.id,{base:resourceBase})}"><strong>${esc(entry.name)}</strong>${entry.abbreviation ? `<small>${esc(entry.abbreviation)}</small>` : ''}</a></td>
         <td class="simulated-points" data-label="Simulated">${fmtNumber(entry.points)} pts${entry.droppedPoints ? `<small>${fmtNumber(entry.droppedPoints)} dropped</small>` : ''}</td>
         <td data-label="Official"><span class="original-result">P${entry.originalPosition}</span><small>${fmtNumber(entry.originalPoints)} pts</small></td>
         <td data-label="Difference">${movement(entry.change)}<small class="simulation-points-change">${signedNumber(entry.points - entry.originalPoints)} pts</small></td>

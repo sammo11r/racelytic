@@ -5,6 +5,12 @@ const RECORD_CATEGORIES = Object.freeze([
     ['fastestLaps', 'Fastest laps'],
     ['starts', 'Race starts'],
     ['points', 'Points'],
+    ['gridGain', 'Average positions gained'],
+    ['averageFinish', 'Average finish'],
+    ['finishRate', 'Finish rate'],
+    ['winRate', 'Win rate'],
+    ['podiumRate', 'Podium rate'],
+    ['dnfs', 'DNFs'],
     ['championships', 'Championships']
 ].map(([id, name]) => Object.freeze({ id, name })));
 
@@ -15,15 +21,52 @@ const INTENT_CATALOG = Object.freeze([
         id: 'record_leader',
         family: 'archive_records',
         requiredSlots: ['recordCategory'],
-        optionalSlots: ['entity', 'constructorName', 'circuitName', 'nationalityName', 'raceFormat', 'resultLimit', 'fromYear', 'toYear'],
+        optionalSlots: ['entity', 'constructorName', 'circuitName', 'venueCountryName', 'nationalityName', 'raceFormat', 'resultLimit', 'minStarts', 'fromYear', 'toYear'],
         description: 'Rank drivers or constructors by an official career record.'
     },
     {
         id: 'record_subject_total',
         family: 'archive_records',
         requiredSlots: ['recordCategory', 'subjectName'],
-        optionalSlots: ['entity', 'constructorName', 'circuitName', 'nationalityName', 'raceFormat', 'resultLimit', 'fromYear', 'toYear'],
+        optionalSlots: ['entity', 'constructorName', 'circuitName', 'venueCountryName', 'nationalityName', 'raceFormat', 'resultLimit', 'minStarts', 'fromYear', 'toYear'],
         description: 'Calculate one driver or constructor’s official record total.'
+    },
+    {
+        id: 'race_result',
+        family: 'archive_facts',
+        requiredSlots: ['targetSeason', 'eventName'],
+        optionalSlots: ['targetSeason', 'eventName', 'raceId', 'subjectName', 'subjectId', 'resultView', 'raceFormat'],
+        description: 'Look up a race winner, podium, classification, or one driver’s result.'
+    },
+    {
+        id: 'season_standings',
+        family: 'archive_facts',
+        requiredSlots: ['targetSeason'],
+        optionalSlots: ['entity', 'standingRound', 'resultLimit'],
+        description: 'Show a season championship table, including standings after a round.'
+    },
+    {
+        id: 'driver_head_to_head',
+        family: 'comparisons',
+        requiredSlots: ['subjectNames'],
+        minimumItems: { subjectNames: 2 },
+        optionalSlots: ['subjectIds', 'comparisonScope', 'comparisonMetric', 'pointsSystemYear', 'constructorName', 'circuitName', 'venueCountryName', 'fromYear', 'toYear'],
+        description: 'Compare two drivers across shared starts or their teammate races.'
+    },
+    {
+        id: 'constructor_head_to_head',
+        family: 'comparisons',
+        requiredSlots: ['subjectNames'],
+        minimumItems: { subjectNames: 2 },
+        optionalSlots: ['comparisonMetric', 'circuitName', 'venueCountryName', 'fromYear', 'toYear'],
+        description: 'Compare two constructors or teams using official archive totals.'
+    },
+    {
+        id: 'streak_leader',
+        family: 'archive_streaks',
+        requiredSlots: ['streakCategory'],
+        optionalSlots: ['fromYear', 'toYear', 'resultLimit'],
+        description: 'Rank the longest consecutive win, podium, points or classified-finish streaks.'
     },
     {
         id: 'recalculate_title_counts',

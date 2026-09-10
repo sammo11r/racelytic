@@ -1,7 +1,7 @@
 let circuitData = null;
 let circuitHistoryPage = 1, circuitHistorySeason = '', circuitHistorySearch = '', circuitHistorySort = 'newest';
 const CIRCUIT_HISTORY_PAGE_SIZE = 25;
-const circuitDetailId = params().get('id');
+const circuitDetailId = resourceId('circuit');
 const circuitDetailSeries = ['f2', 'f3', 'academy'].find(series => String(window.location?.pathname || '').startsWith(`/${series}/`)) || 'f1';
 const circuitDetailBase = circuitDetailSeries === 'f1' ? '' : `/${circuitDetailSeries}`;
 const circuitDetailSeriesName = { f1: 'Formula 1', f2: 'Formula 2', f3: 'Formula 3', academy: 'F1 Academy' }[circuitDetailSeries];
@@ -39,18 +39,18 @@ function readCircuitHistoryState() {
   circuitHistorySort = query.get('sort') === 'oldest' ? 'oldest' : 'newest';
 }
 function saveCircuitHistoryState() {
-  const query = new URLSearchParams({ id: circuitDetailId });
+  const query = new URLSearchParams();
   if (circuitReturnPath() !== `${circuitDetailBase}/circuits`) query.set('return', circuitReturnPath());
   if (circuitHistorySeason) query.set('season', circuitHistorySeason);
   if (circuitHistorySearch.trim()) query.set('q', circuitHistorySearch.trim());
   if (circuitHistorySort === 'oldest') query.set('sort', 'oldest');
   if (circuitHistoryPage > 1) query.set('page', circuitHistoryPage);
-  history.replaceState(null, '', `${circuitDetailBase}/circuit?${query}`);
+  history.replaceState(null, '', resourceUrl('circuit', circuitDetailId, { base: circuitDetailBase, query }));
 }
 function circuitRaceLink(race) {
-  const query = new URLSearchParams({ id: race.raceId || race.id });
+  const query = new URLSearchParams();
   if (race.sessionId) query.set('session', race.sessionId);
-  return `${circuitDetailBase}/race?${query}`;
+  return resourceUrl('race', race.raceId || race.id, { base: circuitDetailBase, label: displayRaceName(race), query });
 }
 function circuitRaceStatus(race, now = new Date()) {
   if (race.cancelled) return 'cancelled';
@@ -75,7 +75,7 @@ function circuitWinnerLinks(race, team = false) {
     const name = team ? winner.constructorName : winner.name;
     if (!id || !name || seen.has(id)) return [];
     seen.add(id);
-    return [`<a href="${circuitDetailBase}/${team ? circuitTeamPage : 'driver'}?id=${encodeURIComponent(id)}">${esc(name)}</a>`];
+    return [`<a href="${resourceUrl(team ? circuitTeamPage : 'driver', id, { base: circuitDetailBase })}">${esc(name)}</a>`];
   });
   return links.join(' / ') || (team ? '—' : '<span class="section-note">Result unavailable</span>');
 }
@@ -90,7 +90,7 @@ function renderCircuitHistory() {
   saveCircuitHistoryState();
   const container = circuitNode('circuit-races');
   container.setAttribute('aria-busy', 'false');
-  container.innerHTML = rows.length ? `<div class="circuit-history-scroll" tabindex="0" role="region" aria-label="Race history table"><table class="circuit-history-table"><caption class="sr-only">Race history at ${esc(circuitData.circuit.name)}</caption><thead><tr><th scope="col">Season</th><th scope="col">Race</th><th scope="col">Date</th><th scope="col">Winner</th><th scope="col">${circuitTeamPage === 'team' ? 'Team' : 'Constructor'}</th><th scope="col">Laps</th></tr></thead><tbody>${paged.items.map(race => `<tr><td><a href="${circuitDetailBase}/season?year=${encodeURIComponent(race.year)}">${esc(race.year)}</a></td><td><a href="${esc(circuitRaceLink(race))}">${esc(displayRaceName(race))}</a><small>Round ${esc(race.round)}</small></td><td>${esc(circuitRaceDate(race))}</td><td>${circuitWinnerLinks(race)}</td><td>${circuitWinnerLinks(race, true)}</td><td>${Number(race.laps) > 0 ? fmtNumber(race.laps) : '—'}</td></tr>`).join('')}</tbody></table></div>` : '<div class="circuit-history-empty"><p>No races match this selection.</p><button type="button" class="button secondary" id="circuit-empty-clear">Clear filters</button></div>';
+  container.innerHTML = rows.length ? `<div class="circuit-history-scroll" tabindex="0" role="region" aria-label="Race history table"><table class="circuit-history-table"><caption class="sr-only">Race history at ${esc(circuitData.circuit.name)}</caption><thead><tr><th scope="col">Season</th><th scope="col">Race</th><th scope="col">Date</th><th scope="col">Winner</th><th scope="col">${circuitTeamPage === 'team' ? 'Team' : 'Constructor'}</th><th scope="col">Laps</th></tr></thead><tbody>${paged.items.map(race => `<tr><td><a href="${circuitDetailBase}/seasons/${encodeURIComponent(race.year)}">${esc(race.year)}</a></td><td><a href="${esc(circuitRaceLink(race))}">${esc(displayRaceName(race))}</a><small>Round ${esc(race.round)}</small></td><td>${esc(circuitRaceDate(race))}</td><td>${circuitWinnerLinks(race)}</td><td>${circuitWinnerLinks(race, true)}</td><td>${Number(race.laps) > 0 ? fmtNumber(race.laps) : '—'}</td></tr>`).join('')}</tbody></table></div>` : '<div class="circuit-history-empty"><p>No races match this selection.</p><button type="button" class="button secondary" id="circuit-empty-clear">Clear filters</button></div>';
   if (!rows.length) circuitNode('circuit-empty-clear').addEventListener('click', clearCircuitHistory);
   circuitNode('circuit-years').textContent = `${fmtNumber(rows.length)} race${rows.length === 1 ? '' : 's'} · ${fmtNumber(circuitData.circuit.totalRacesHeld)} completed in total`;
   renderPagination('circuit-races', rows.length, circuitHistoryPage, CIRCUIT_HISTORY_PAGE_SIZE, page => {
@@ -108,7 +108,7 @@ function circuitLocationLink(circuit) {
 }
 function renderCircuitRecords(records) {
   return [['drivers', 'Most successful drivers', 'driver'], ['constructors', circuitTeamPage === 'team' ? 'Most successful teams' : 'Most successful constructors', circuitTeamPage]].map(([key, title, page]) =>
-    `<div><h3>${title}</h3>${records[key]?.length ? `<ol>${records[key].map(row => `<li><a href="${circuitDetailBase}/${page}?id=${encodeURIComponent(row.id)}">${esc(row.name)}</a><span>${fmtNumber(row.wins)} win${row.wins === 1 ? '' : 's'}</span></li>`).join('')}</ol>` : '<p class="section-note">No recorded winners yet.</p>'}</div>`
+    `<div><h3>${title}</h3>${records[key]?.length ? `<ol>${records[key].map(row => `<li><a href="${resourceUrl(page, row.id, { base: circuitDetailBase })}">${esc(row.name)}</a><span>${fmtNumber(row.wins)} win${row.wins === 1 ? '' : 's'}</span></li>`).join('')}</ol>` : '<p class="section-note">No recorded winners yet.</p>'}</div>`
   ).join('');
 }
 function applyCircuitDetail(data) {
@@ -177,7 +177,7 @@ function bindCircuitHistory() {
   Object.entries(controls).forEach(([id, change]) => circuitNode(id).addEventListener(id.endsWith('search') ? 'input' : 'change', event => { change(event.target.value); circuitHistoryPage = 1; renderCircuitHistory(); }));
   circuitNode('circuit-history-clear').addEventListener('click', clearCircuitHistory);
   window.addEventListener('popstate', () => {
-    if (params().get('id') !== circuitDetailId) { window.location.reload(); return; }
+    if (resourceId('circuit') !== circuitDetailId) { window.location.reload(); return; }
     readCircuitHistoryState(); renderCircuitHistory();
   });
 }

@@ -5,6 +5,7 @@ const path = require('node:path');
 const test = require('node:test');
 
 const { inferType, tableNameFromFile } = require('../backend/import/importer');
+const { canonicalizeConstructorChronology } = require('../backend/constructor-lineage-data');
 const { selectedSeries } = require('../scripts/sync-data');
 const { checksumFor, extractCsvArchive, selectReleaseAssets } = require('../scripts/sync-f1db');
 
@@ -61,4 +62,14 @@ test('safe importer maps series names and retains stable inferred types', () => 
   assert.equal(tableNameFromFile('fadb-drivers.csv'), 'fa_drivers');
   assert.equal(inferType('year', ['2025', '2026']), 'BIGINT');
   assert.equal(inferType('points', ['1.5', '2']), 'DECIMAL(20,6)');
+});
+
+test('constructor chronology import collapses repeated parent copies into one chain', () => {
+  const rows = ['a', 'b'].flatMap(parentConstructorId => [
+    { parentConstructorId, positionDisplayOrder: '1', constructorId: 'a', yearFrom: '2000', yearTo: '2001' },
+    { parentConstructorId, positionDisplayOrder: '2', constructorId: 'b', yearFrom: '2002', yearTo: '' }
+  ]);
+  const normalized = canonicalizeConstructorChronology(rows);
+  assert.equal(normalized.length, 2);
+  assert.deepEqual(normalized.map(row => row.id), ['b-1', 'b-2']);
 });

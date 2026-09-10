@@ -16,7 +16,12 @@ test('Ask intent catalogue declares execution requirements centrally', () => {
     assert.ok(supportedIntentIds().has('compare_points_systems'));
     assert.ok(supportedIntentIds().has('record_leader'));
     assert.ok(supportedIntentIds().has('record_subject_total'));
-    assert.deepEqual(RECORD_CATEGORIES.map(category => category.id), ['wins', 'podiums', 'poles', 'fastestLaps', 'starts', 'points', 'championships']);
+    assert.deepEqual(RECORD_CATEGORIES.map(category => category.id), [
+        'wins', 'podiums', 'poles', 'fastestLaps', 'starts', 'points', 'gridGain',
+        'averageFinish', 'finishRate', 'winRate', 'podiumRate', 'dnfs', 'championships'
+    ]);
+    assert.deepEqual(intentDefinition('race_result').requiredSlots, ['targetSeason', 'eventName']);
+    assert.deepEqual(intentDefinition('season_standings').requiredSlots, ['targetSeason']);
     assert.deepEqual(missingRequiredSlots('record_subject_total', { recordCategory: 'wins' }), ['subjectName']);
     assert.deepEqual(missingRequiredSlots('compare_points_systems', { comparisonPointsSystemYears: [1982] }), ['comparisonPointsSystemYears']);
 });
@@ -30,6 +35,15 @@ test('record questions understand season, circuit, nationality and race-format f
     const circuit = interpretLocally('Who has the most wins at Monaco?');
     assert.equal(circuit.intent, 'record_leader');
     assert.equal(circuit.circuitName, 'Monaco');
+    const circuitWithIn = interpretLocally('Who has scored the most points in Silverstone?');
+    assert.equal(circuitWithIn.intent, 'record_leader');
+    assert.equal(circuitWithIn.recordCategory, 'points');
+    assert.equal(circuitWithIn.circuitName, null);
+    assert.equal(circuitWithIn.venueCountryName, 'Silverstone');
+    const hostCountry = interpretLocally('Who has scored the most points in England?');
+    assert.equal(hostCountry.intent, 'record_leader');
+    assert.equal(hostCountry.circuitName, null);
+    assert.equal(hostCountry.venueCountryName, 'England');
     const nationality = interpretLocally('Which British driver has the most wins?');
     assert.equal(nationality.intent, 'record_leader');
     assert.equal(nationality.nationalityName, 'british');
@@ -111,6 +125,52 @@ test('record execution resolves circuit and nationality filters and discloses ra
     assert.ok(calls.at(-1).parameters.includes('monaco'));
     assert.ok(calls.at(-1).parameters.includes('united-kingdom'));
     assert.match(result.assumptions.join(' '), /Sprint races only/);
+});
+
+test('record execution aggregates every circuit in a named host country', async () => {
+    const calls = [];
+    const connection = { async query(sql, parameters = []) {
+        calls.push({ sql, parameters });
+        if (sql === 'SELECT id, name FROM circuits ORDER BY name') return [
+            { id: 'aintree', name: 'Aintree' },
+            { id: 'silverstone', name: 'Silverstone' }
+        ];
+        if (sql.includes('JOIN countries ON countries.id = circuits.countryId')) return [
+            { circuitId: 'aintree', countryId: 'united-kingdom', countryName: 'United Kingdom' },
+            { circuitId: 'silverstone', countryId: 'united-kingdom', countryName: 'United Kingdom' }
+        ];
+        return [{ id: 'lewis-hamilton', name: 'Lewis Hamilton', value: 400, starts: 24, firstYear: 2007, lastYear: 2026 }];
+    } };
+    const result = await calculateRecordLeader(connection, {
+        intent: 'record_leader', series: 'f1', entity: 'drivers', recordCategory: 'points', venueCountryName: 'England'
+    });
+    assert.match(result.answer, /points in England: 400/);
+    assert.deepEqual(result.scope.venueCountry.circuitIds, ['aintree', 'silverstone']);
+    assert.ok(calls.at(-1).parameters.includes('aintree'));
+    assert.ok(calls.at(-1).parameters.includes('silverstone'));
+    assert.match(result.assumptions.join(' '), /circuits in England/);
+});
+
+test('junior record execution resolves a country stored in a compound circuit place', async () => {
+    const connection = { async query(sql) {
+        if (sql.includes('SELECT id AS circuitId, placeName FROM f2_circuits')) return [
+            { circuitId: 'silverstone', placeName: 'Silverstone, Great Britain' }
+        ];
+        if (sql.includes('FROM f2_sessions sessions')) return [{
+            sessionId: 'feature', raceId: 'silverstone-2024', sessionNumber: 3, sessionName: 'Feature Race',
+            isRace: 1, cancelled: 0, raceName: 'Silverstone', year: 2024, round: 8
+        }];
+        if (sql.includes('FROM f2_session_results results')) return [{
+            sessionId: 'feature', driverId: 'driver-a', driverName: 'Driver A', constructorId: 'team-a',
+            constructorName: 'Team A', positionNumber: 1, positionText: '1', laps: 29, points: 25
+        }];
+        return [];
+    } };
+    const result = await calculateRecordLeader(connection, {
+        intent: 'record_leader', series: 'f2', entity: 'drivers', recordCategory: 'points', venueCountryName: 'Britain'
+    });
+    assert.match(result.answer, /points in Britain: 25/);
+    assert.deepEqual(result.scope.venueCountry.circuitIds, ['silverstone']);
 });
 
 test('record execution rejects an unknown nationality instead of dropping the filter', async () => {
@@ -261,7 +321,7 @@ test('Ask record execution reads the selected junior championship archive', asyn
         intent: 'record_subject_total', series: 'f2', entity: 'drivers', subjectName: 'Leclerc', recordCategory: 'wins', fromYear: null, toYear: null
     });
     assert.equal(result.answer, 'Charles Leclerc has 1 Formula 2 race win.');
-    assert.equal(result.subject.href, '/f2/driver?id=charles-leclerc');
+    assert.equal(result.subject.href, '/f2/drivers/charles-leclerc');
     assert.ok(calls.some(sql => sql.includes('f2_session_results')));
     assert.match(result.assumptions.join(' '), /All race formats/);
 });

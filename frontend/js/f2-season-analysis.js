@@ -169,7 +169,7 @@ function f2HeatClass(result) {
 function renderF2Heatmap() {
   const drivers = f2AnalysisData.championship.slice(0, 15);
   const container = document.getElementById('f2-results-heatmap');
-  container.innerHTML = `<div class="results-heatmap" style="--rounds:${f2AnalysisSessions.length}"><div class="heatmap-corner">Driver</div>${f2AnalysisSessions.map(session => `<div class="heatmap-round" ${chartTooltipAttributes({ title: session.label, detail: session.race.name, value: session.cancelled ? 'Cancelled' : session.name })}>${esc(session.label)}</div>`).join('')}${drivers.map(driver => `<a class="heatmap-driver" href="${JUNIOR_ANALYSIS_BASE}/driver?id=${encodeURIComponent(driver.driverId)}">${esc(driver.name)}</a>${f2AnalysisSessions.map(session => {
+  container.innerHTML = `<div class="results-heatmap" style="--rounds:${f2AnalysisSessions.length}"><div class="heatmap-corner">Driver</div>${f2AnalysisSessions.map(session => `<div class="heatmap-round" ${chartTooltipAttributes({ title: session.label, detail: session.race.name, value: session.cancelled ? 'Cancelled' : session.name })}>${esc(session.label)}</div>`).join('')}${drivers.map(driver => `<a class="heatmap-driver" href="${JUNIOR_ANALYSIS_BASE}/drivers/${encodeURIComponent(driver.driverId)}">${esc(driver.name)}</a>${f2AnalysisSessions.map(session => {
     const result = driver.raceResults?.[session.id];
     const display = result?.positionText || result?.position || '';
     return `<div tabindex="0" class="heatmap-cell ${f2HeatClass(result)}" ${chartTooltipAttributes({ title: driver.name, detail: `${session.label} · ${session.race.name}`, value: session.cancelled ? 'Cancelled' : display ? `Finished ${display} · ${fmtNumber(result.points)} pts` : 'Did not participate' })}>${session.cancelled ? 'C' : esc(display)}</div>`;
@@ -192,7 +192,7 @@ function renderF2Averages() {
     });
     return { ...driver, sprintAverage: f2Average(sprint), featureAverage: f2Average(feature), starts: sprint.length + feature.length };
   }).sort((first, second) => (f2Average([first.sprintAverage, first.featureAverage].filter(Number.isFinite)) ?? 99) - (f2Average([second.sprintAverage, second.featureAverage].filter(Number.isFinite)) ?? 99));
-  document.getElementById('f2-average-table').innerHTML = `<table class="average-position-table"><thead><tr><th>Driver</th><th>${firstRaceLabel}</th><th>${secondRaceLabel}</th><th>Classified results</th><th>Final standing</th></tr></thead><tbody>${rows.map(driver => `<tr><td><a href="${JUNIOR_ANALYSIS_BASE}/driver?id=${encodeURIComponent(driver.driverId)}">${esc(driver.name)}</a></td><td>${driver.sprintAverage?.toFixed(2) ?? '—'}</td><td>${driver.featureAverage?.toFixed(2) ?? '—'}</td><td>${fmtNumber(driver.starts)}</td><td>P${esc(driver.position)}</td></tr>`).join('')}</tbody></table>`;
+  document.getElementById('f2-average-table').innerHTML = `<table class="average-position-table"><thead><tr><th>Driver</th><th>${firstRaceLabel}</th><th>${secondRaceLabel}</th><th>Classified results</th><th>Final standing</th></tr></thead><tbody>${rows.map(driver => `<tr><td><a href="${JUNIOR_ANALYSIS_BASE}/drivers/${encodeURIComponent(driver.driverId)}">${esc(driver.name)}</a></td><td>${driver.sprintAverage?.toFixed(2) ?? '—'}</td><td>${driver.featureAverage?.toFixed(2) ?? '—'}</td><td>${fmtNumber(driver.starts)}</td><td>P${esc(driver.position)}</td></tr>`).join('')}</tbody></table>`;
 }
 
 async function renderF2SeasonAnalysis() {

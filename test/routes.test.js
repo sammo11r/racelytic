@@ -129,8 +129,11 @@ test('public pages use extensionless URLs and preserve legacy query strings', as
 
     try {
         const { port } = server.address();
-        const clean = await request(port, '/driver?id=max-verstappen');
+        const clean = await request(port, '/drivers/max-verstappen');
+        const legacyQuery = await request(port, '/driver?id=max-verstappen');
         const legacy = await request(port, '/driver.html?id=max-verstappen');
+        const missingDriver = await request(port, '/drivers/not-a-real-driver');
+        const raceWithoutSlug = await request(port, '/races/1139');
         const f2Legacy = await request(port, '/f2-driver.html?id=gabriele-mini');
         const f2RawRoute = await request(port, '/f2-driver?id=gabriele-mini');
         const f3Legacy = await request(port, '/f3-team.html?id=campos-racing');
@@ -157,7 +160,7 @@ test('public pages use extensionless URLs and preserve legacy query strings', as
         const f3ChampionshipBuilder = await request(port, '/f3/championship-builder');
         const f3PointsSystems = await request(port, '/f3/points-systems');
         const academyHome = await request(port, '/academy');
-        const academySeason = await request(port, '/academy/season?year=2025');
+        const academySeason = await request(port, '/academy/seasons/2025');
         const academySimulator = await request(port, '/academy/simulate-season');
         const academyScenario = await request(port, '/academy/scenario-calculator');
         const academyBuilder = await request(port, '/academy/championship-builder');
@@ -168,17 +171,25 @@ test('public pages use extensionless URLs and preserve legacy query strings', as
         const pitwallPack = await request(port, '/pitwall-build/index.pck');
 
         assert.equal(clean.statusCode, 200);
+        assert.equal(legacyQuery.statusCode, 308);
+        assert.equal(legacyQuery.headers.location, '/drivers/max-verstappen');
         assert.equal(legacy.statusCode, 308);
-        assert.equal(legacy.headers.location, '/driver?id=max-verstappen');
+        assert.equal(legacy.headers.location, '/drivers/max-verstappen');
+        assert.equal(missingDriver.statusCode, 404);
+        assert.equal(raceWithoutSlug.statusCode, 308);
+        assert.match(raceWithoutSlug.headers.location, /^\/races\/1139\/[a-z0-9-]+$/);
         assert.equal(f2Legacy.statusCode, 308);
-        assert.equal(f2Legacy.headers.location, '/f2/driver?id=gabriele-mini');
+        assert.equal(f2Legacy.headers.location, '/f2/drivers/gabriele-mini');
         assert.equal(f2RawRoute.statusCode, 308);
-        assert.equal(f2RawRoute.headers.location, '/f2/driver?id=gabriele-mini');
+        assert.equal(f2RawRoute.headers.location, '/f2/drivers/gabriele-mini');
         assert.equal(f3Legacy.statusCode, 308);
-        assert.equal(f3Legacy.headers.location, '/f3/team?id=campos-racing');
+        assert.equal(f3Legacy.headers.location, '/f3/teams/campos-racing');
         assert.equal(f3RawRoute.statusCode, 308);
-        assert.equal(f3RawRoute.headers.location, '/f3/team?id=campos-racing');
+        assert.equal(f3RawRoute.headers.location, '/f3/teams/campos-racing');
         assert.equal(privacy.statusCode, 200);
+        assert.match(privacy.body, /<div id="header">\s*<header class="site-header">/);
+        assert.match(privacy.body, /<footer class="footer">\s*<div class="container footer-content">/);
+        assert.doesNotMatch(privacy.body, /<div id="header"><\/div>/);
         assert.equal(terms.statusCode, 200);
         assert.equal(dataSources.statusCode, 200);
         assert.match(dataSources.body, /Data Sources &amp; Licences/);

@@ -9,7 +9,7 @@ async function loadSeriesHome() {
       element.textContent = fmtNumber(values[index]);
     });
 
-    const seasonUrl = `${base}/season?year=${encodeURIComponent(data.latestSeason)}`;
+    const seasonUrl = `${base}/seasons/${encodeURIComponent(data.latestSeason)}`;
     const latestSeasonLink = document.getElementById('latest-season-link');
     const snapshotSeasonLink = document.getElementById('snapshot-season-link');
     if (latestSeasonLink) {
@@ -33,7 +33,7 @@ async function loadSeriesHome() {
       document.getElementById('snapshot-event-label').textContent = isNext ? 'Next event' : 'Latest event';
       document.getElementById('snapshot-event').textContent = event.name;
       document.getElementById('snapshot-event-meta').textContent = `Round ${fmtNumber(event.round)} · ${fmtDate(event.date)}`;
-      document.getElementById('snapshot-event-link').href = `${base}/race?id=${encodeURIComponent(event.id)}`;
+      document.getElementById('snapshot-event-link').href = resourceUrl('race', event.id, { base, label: displayRaceName(event) });
     }
   } catch (error) {
     console.error('Series landing page error:', error);

@@ -19,7 +19,7 @@ function renderF2Seasons(seasons) {
   container.innerHTML = paged.items.map(season => {
     const championName = season.champion?.name;
     return `
-    <a class="season-card" href="/f2/season?year=${encodeURIComponent(season.year)}">
+    <a class="season-card" href="/f2/seasons/${encodeURIComponent(season.year)}">
       <div class="season-card-heading">
         <div class="season-year">${esc(season.year)}</div>
         <div class="season-card-champion${championName ? ' has-champion' : ''}">

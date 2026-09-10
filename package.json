@@ -30,11 +30,15 @@
     "audit:f3": "node scripts/audit-f3-data.js --series=f3",
     "audit:f2": "node scripts/audit-f3-data.js --series=f2",
     "audit:academy": "node scripts/audit-f3-data.js --series=academy",
+    "audit:accessibility": "node scripts/audit-accessibility.js",
     "repair:data": "node scripts/repair-f1-2026-calendar.js && node scripts/repair-junior-data.js",
-    "check": "node scripts/build-frontend.js --check && node scripts/consolidate-css.js --check && node scripts/check-replays.js && node scripts/check.js",
+    "check": "node scripts/build-frontend.js --check && node scripts/consolidate-css.js --check && node scripts/check-replays.js && node scripts/audit-constructor-lineage.js && node scripts/check.js",
+    "audit:constructor-lineage": "node scripts/audit-constructor-lineage.js",
+    "audit:constructor-lineage:report": "node scripts/audit-constructor-lineage.js --json",
     "test": "node --test"
   },
   "dependencies": {
+    "compression": "^1.8.1",
     "csv-parser": "^3.2.1",
     "d3": "^7.9.0",
     "dotenv": "^16.4.7",
@@ -44,5 +48,8 @@
     "playwright-core": "^1.62.1",
     "topojson-client": "^3.1.0",
     "world-atlas": "^2.0.2"
+  },
+  "devDependencies": {
+    "axe-core": "^4.10.3"
   }
 }

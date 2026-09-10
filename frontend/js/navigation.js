@@ -1,18 +1,9 @@
-async function loadHeader() {
+function loadHeader() {
     const container = document.getElementById('header');
 
     if (!container) {
         return;
     }
-
-    try {
-        const response = await fetch('/components/header.html');
-
-        if (!response.ok) {
-            throw new Error('Failed to load header');
-        }
-
-        container.innerHTML = await response.text();
 
         const requestedSeries = new URLSearchParams(window.location.search).get('series');
         let rememberedSeries = '';
@@ -147,6 +138,10 @@ async function loadHeader() {
             '/academy/driver': ['driver', '/drivers'], '/academy/team': ['constructor', '/constructors'],
             '/academy/circuit': ['circuit', '/circuits']
         };
+        const pathDetailMatch = window.location.pathname.match(/^\/(?:f2\/|f3\/|academy\/)?(seasons|races|drivers|constructors|teams|circuits)\/([^/]+)/);
+        const pathDetailTypes = { seasons: 'season', races: 'race', drivers: 'driver', constructors: 'constructor', teams: 'constructor', circuits: 'circuit' };
+        const currentDetail = detailPages[window.location.pathname]
+            || (pathDetailMatch ? [pathDetailTypes[pathDetailMatch[1]], '', decodeURIComponent(pathDetailMatch[2])] : null);
         const seriesDetailParents = {
             f1: { season: '/seasons', race: '/races', driver: '/drivers', constructor: '/constructors', circuit: '/circuits' },
             f2: { season: '/f2/seasons', race: '/f2/races', driver: '/f2/drivers', constructor: '/f2/constructors', circuit: '/f2/circuits' },
@@ -168,10 +163,10 @@ async function loadHeader() {
             if (topLevelTarget) return `${topLevelTarget}${window.location.search}${window.location.hash}`;
             if (['f3', 'academy'].includes(targetSeries)) {
                 const targetBase = targetSeries === 'academy' ? '/academy' : '/f3';
-                const detail = detailPages[window.location.pathname];
+                const detail = currentDetail;
                 if (detail) {
                     const parameter = detail[0] === 'season' ? 'year' : 'id';
-                    const id = new URLSearchParams(window.location.search).get(parameter);
+                    const id = detail[2] || new URLSearchParams(window.location.search).get(parameter);
                     if (id) {
                         try {
                             const equivalent = await fetch(`/api/series-equivalent?target=${targetSeries}&type=${detail[0]}&id=${encodeURIComponent(id)}&source=${activeSeries}`);
@@ -190,10 +185,10 @@ async function loadHeader() {
             const targetF2 = targetSeries === 'f2';
             const pair = targetF2 ? pagePairs[window.location.pathname] : reversePagePairs[window.location.pathname];
             if (pair) return `${pair}${window.location.search}${window.location.hash}`;
-            const detail = detailPages[window.location.pathname];
+            const detail = currentDetail;
             if (detail) {
                 const parameter = detail[0] === 'season' ? 'year' : 'id';
-                const id = new URLSearchParams(window.location.search).get(parameter);
+                const id = detail[2] || new URLSearchParams(window.location.search).get(parameter);
                 const detailParent = seriesDetailParents[targetSeries]?.[detail[0]] || detail[1];
                 if (!id) return detailParent;
                 try {
@@ -212,7 +207,7 @@ async function loadHeader() {
             if (active) {
                 link.href = `${window.location.pathname}${window.location.search}${window.location.hash}`;
             } else {
-                const detail = detailPages[window.location.pathname];
+                const detail = currentDetail;
                 const fallback = (detail && seriesDetailParents[link.dataset.series]?.[detail[0]])
                     || (isSeriesNeutralPage ? `${window.location.pathname}?series=${link.dataset.series}` : link.href);
                 link.href = fallback;
@@ -557,7 +552,7 @@ async function loadHeader() {
         });
 
         window.addEventListener('resize', () => {
-            if (window.innerWidth > 800) closeMobileNavigation();
+            if (window.innerWidth > 1120) closeMobileNavigation();
         });
 
         container.querySelectorAll('a[href]').forEach(link => {
@@ -584,9 +579,6 @@ async function loadHeader() {
             .catch(() => updateAccountLink(null));
         window.addEventListener('account-changed', event => updateAccountLink(event.detail));
 
-    } catch (error) {
-        console.error('Header error:', error);
-    }
 }
 
 loadHeader();

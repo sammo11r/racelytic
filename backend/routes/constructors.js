@@ -1,6 +1,7 @@
 const express = require('express');
 const { withConnection, sendError } = require('../route-helpers');
 const { constructorDetail, constructorResults, juniorConstructorDetail, juniorConstructorResults } = require('../constructor-detail');
+const { constructorLineageContexts } = require('../constructor-lineage');
 
 const router = express.Router();
 const { isJuniorSeries, seriesPrefix } = require('../series-config');
@@ -105,7 +106,8 @@ router.get('/api/constructors', async (req, res) => {
 
         const search = String(req.query.search || '').trim();
         const q = `%${search}%`;
-        const rows = await withConnection(connection => connection.query(`
+        const rows = await withConnection(async connection => {
+            const archiveRows = await connection.query(`
             SELECT k.*, co.name AS countryName, career.seasonYears, career.firstYear, career.lastYear,
                 current.year AS currentSeason, standings.currentPosition, standings.currentPoints,
                 drivers.currentDrivers
@@ -137,7 +139,10 @@ router.get('/api/constructors', async (req, res) => {
             ) drivers ON drivers.constructorId = k.id
             ${search ? 'WHERE k.name LIKE ? OR k.fullName LIKE ? OR co.name LIKE ?' : ''}
             ORDER BY k.name
-        `, search ? [q, q, q] : []));
+            `, search ? [q, q, q] : []);
+            const contexts = await constructorLineageContexts(connection, archiveRows.map(row => row.id));
+            return archiveRows.map(row => ({ ...row, lineageContext: contexts.get(row.id) || null }));
+        });
         res.json(rows.map(normalizeConstructorArchive));
     } catch (error) {
 

@@ -47,8 +47,8 @@
 }
 .season-detail-page .season-map-controls button {
   display: grid;
-  width: 34px;
-  height: 34px;
+  width: 44px;
+  height: 44px;
   padding: 0;
   place-items: center;
   border: 0;
@@ -62,7 +62,7 @@
 }
 .season-detail-page .season-map-controls button:hover { background: var(--surface-alt); }
 .season-detail-page .season-map-controls button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
-.season-detail-page .season-map-controls .season-map-reset { width: auto; padding: 0 10px; font-size: 11px; }
+.season-detail-page .season-map-controls .season-map-reset { width: auto; min-width: 44px; padding: 0 12px; font-size: 12px; }
 .season-detail-page .season-map-help {
   position: absolute;
   left: 14px;

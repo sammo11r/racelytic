@@ -38,7 +38,7 @@
 .simulator-replay-feature .simulator-tool-meta { color: #ff5361; }
 .simulator-replay-feature .button { flex: 0 0 auto; }
 .simulator-workflow { display: grid; grid-template-columns: minmax(250px, .8fr) minmax(420px, 1.2fr); align-items: center; gap: clamp(28px, 5vw, 70px); margin-top: 34px; padding: 28px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface-alt); }
-.simulator-workflow-heading .eyebrow { margin-bottom: 8px; color: var(--accent); }
+.simulator-workflow-heading .eyebrow { margin-bottom: 8px; color: var(--accent-dark); }
 .simulator-workflow-heading h2 { margin: 0; font-size: 23px; line-height: 1.2; letter-spacing: -.03em; }
 .simulator-workflow-heading p { margin: 9px 0 0; color: var(--text-secondary); font-size: 13px; line-height: 1.55; }
 .simulator-workflow-flow { display: grid; grid-template-columns: minmax(145px, .8fr) auto minmax(190px, 1fr); align-items: center; gap: 14px; }

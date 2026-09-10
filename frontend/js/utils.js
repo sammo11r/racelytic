@@ -20,6 +20,32 @@ function renderChartTooltip(target, source) {
 function params() {
   return new URLSearchParams(window.location.search);
 }
+const resourceCollections = Object.freeze({
+  season: 'seasons', race: 'races', driver: 'drivers', constructor: 'constructors',
+  team: 'teams', circuit: 'circuits', chassis: 'chassis'
+});
+function resourceId(resource) {
+  const collection = resourceCollections[resource];
+  const segments = window.location.pathname.split('/').filter(Boolean);
+  const collectionIndex = segments.indexOf(collection);
+  if (collectionIndex >= 0 && segments[collectionIndex + 1]) {
+    try { return decodeURIComponent(segments[collectionIndex + 1]); } catch { return ''; }
+  }
+  return params().get(resource === 'season' ? 'year' : 'id') || '';
+}
+function resourceSlug(value) {
+  return String(value || '').normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 100);
+}
+function resourceUrl(resource, id, { base = activeSeriesBase(), label = '', query } = {}) {
+  const collection = resourceCollections[resource];
+  if (!collection || id === null || id === undefined || id === '') return `${base}/${collection || ''}`;
+  let url = `${base}/${collection}/${encodeURIComponent(String(id))}`;
+  const slug = resource === 'race' ? resourceSlug(label) : '';
+  if (slug) url += `/${slug}`;
+  const search = query instanceof URLSearchParams ? query.toString() : String(query || '').replace(/^\?/, '');
+  return `${url}${search ? `?${search}` : ''}`;
+}
 function activeSeriesKey() {
   if (window.RacelyticSeries) return window.RacelyticSeries.fromPath().key;
   if (window.location.pathname === '/academy' || window.location.pathname.startsWith('/academy/')) return 'academy';
@@ -49,13 +75,15 @@ function displayCountryName(value) {
   }).join(' ');
 }
 function seriesPageUrl(page, parameter, value) {
+  if (resourceCollections[page] && parameter === (page === 'season' ? 'year' : 'id')) return resourceUrl(page, value);
   const query = parameter ? `?${parameter}=${encodeURIComponent(value)}` : '';
   return `${activeSeriesBase()}/${page}${query}`;
 }
 function adaptActiveSeriesLinks(root = document.querySelector('main')) {
   const base = activeSeriesBase();
   if (!base || !root) return;
-  const sharedPages = new Set(['analysis', 'season', 'driver', 'race', 'circuit', 'constructor', 'team']);
+  const sharedPages = new Set(['analysis', 'season', 'driver', 'race', 'circuit', 'constructor', 'team',
+    'seasons', 'drivers', 'races', 'circuits', 'constructors', 'teams']);
   root.querySelectorAll('a[href^="/"]').forEach(link => {
     const href = link.getAttribute('href');
     if (href.startsWith(`${base}/`)) return;
@@ -118,6 +146,44 @@ function setError(id, message='Unable to load data.') {
   const el = document.getElementById(id);
   if (el) el.innerHTML = `<div class="error">${esc(message)}</div>`;
 }
+
+function initArchiveFilterDisclosure() {
+  const groups = [...document.querySelectorAll('.archive-more-filters')];
+  if (!groups.length || typeof window.matchMedia !== 'function') return;
+  const compact = window.matchMedia('(max-width: 460px)');
+  const sync = () => groups.forEach(group => {
+    if (!compact.matches) group.open = true;
+    else if (!group.dataset.compactReady) {
+      group.open = false;
+      group.dataset.compactReady = 'true';
+    }
+  });
+  sync();
+  compact.addEventListener?.('change', sync);
+}
+
+function initMobileDetailDisclosures() {
+  const groups = [...document.querySelectorAll('.mobile-detail-disclosure')];
+  if (!groups.length || typeof window.matchMedia !== 'function') return;
+  const compact = window.matchMedia('(max-width: 600px)');
+  const sync = () => groups.forEach(group => {
+    if (!compact.matches) group.open = true;
+    else if (!group.dataset.compactReady) {
+      group.open = false;
+      group.dataset.compactReady = 'true';
+    }
+  });
+  sync();
+  compact.addEventListener?.('change', sync);
+}
+
+function initResponsiveDisclosures() {
+  initArchiveFilterDisclosure();
+  initMobileDetailDisclosures();
+}
+
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initResponsiveDisclosures, { once: true });
+else initResponsiveDisclosures();
 
 function pageItems(items, page, pageSize) {
   const pages = Math.max(1, Math.ceil(items.length / pageSize));

@@ -12,10 +12,12 @@
     </div>
     <div class="driver-filter-grid chassis-filter-grid" role="search" aria-label="Filter chassis">
       <label class="driver-search-field"><span>Search</span><input class="search" id="chassis-search" type="search" placeholder="Chassis, constructor or engine…" autocomplete="off"></label>
-      <label><span>Season</span><select id="chassis-season"><option value="">Current season</option></select></label>
-      <label><span>Engine manufacturer</span><select id="chassis-engine"><option value="">All manufacturers</option></select></label>
-      <label><span>Order by</span><select id="chassis-sort"><option value="name">Name A–Z</option><option value="recent">Most recent</option><option value="starts">Most race starts</option><option value="wins">Most race wins</option></select></label>
-      <button type="button" id="chassis-clear" class="button secondary driver-clear">Clear filters</button>
+      <details class="archive-more-filters" open><summary>More filters</summary><div class="archive-more-filter-grid">
+        <label><span>Season</span><select id="chassis-season"><option value="">Current season</option></select></label>
+        <label><span>Engine manufacturer</span><select id="chassis-engine"><option value="">All manufacturers</option></select></label>
+        <label><span>Order by</span><select id="chassis-sort"><option value="name">Name A–Z</option><option value="recent">Most recent</option><option value="starts">Most race starts</option><option value="wins">Most race wins</option></select></label>
+        <button type="button" id="chassis-clear" class="button secondary driver-clear">Clear filters</button>
+      </div></details>
     </div>
   </section>
   <div class="driver-browser-toolbar"><span id="chassis-count" class="browser-count" aria-live="polite">Loading chassis…</span><span id="chassis-load-status" class="section-note" role="status"></span></div>

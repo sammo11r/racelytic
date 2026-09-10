@@ -5,6 +5,7 @@ const { driverRaceGridContexts } = require('./driver-race-grids');
 const { f2SessionType, f3SessionType } = require('./junior-session-types');
 const { academySessionType } = require('./series-config');
 const { juniorClassificationPosition, juniorClassificationStatus } = require('./junior-classification');
+const { optionalConstructorLineage, scopeConstructorLineage } = require('./constructor-lineage');
 
 function juniorCountryName(code) {
     try { return code ? new Intl.DisplayNames(['en'], { type: 'region' }).of(String(code).toUpperCase()) : ''; }
@@ -27,7 +28,7 @@ async function constructorResults(connection, id) {
     `, [id]);
 }
 
-function buildConstructorDetail(constructor, standings, drivers, chassis, results = []) {
+function buildConstructorDetail(constructor, standings, drivers, chassis, results = [], lineage = null) {
     const seasons = standings.map(row => ({ ...row, year: Number(row.year),
         championshipWon: isTrue(row.championshipWon),
         positionNumber: Number(row.positionNumber) > 0 && Number(row.positionNumber) < 100 ? Number(row.positionNumber) : null,
@@ -45,12 +46,12 @@ function buildConstructorDetail(constructor, standings, drivers, chassis, result
         standings: seasons, drivers: normalizedDrivers,
         chassis: chassis.map(row => ({ ...row, seasons: years(row.seasonYears), firstYear: Number(row.firstYear), lastYear: Number(row.lastYear),
             engines: list(row.engines), engineManufacturers: list(row.engineManufacturers) })),
-        results
+        results, lineage: scopeConstructorLineage(lineage, constructor.id, seasons.map(season => season.year))
     };
 }
 
 async function constructorDetail(connection, id, summaryOnly = false) {
-    const [constructors, standings, drivers, chassis, results] = await Promise.all([
+    const [constructors, standings, drivers, chassis, results, lineage] = await Promise.all([
         connection.query(`SELECT k.*, co.name AS countryName, (SELECT MAX(year) FROM races) AS currentSeason
             FROM constructors k LEFT JOIN countries co ON co.id = k.countryId WHERE k.id = ?`, [id]),
         connection.query(`
@@ -108,10 +109,11 @@ async function constructorDetail(connection, id, summaryOnly = false) {
             WHERE sec.constructorId = ? GROUP BY sec.chassisId, ch.name, ch.fullName
             ORDER BY lastYear DESC, firstYear DESC, ch.name
         `, [id]),
-        summaryOnly ? Promise.resolve([]) : constructorResults(connection, id)
+        summaryOnly ? Promise.resolve([]) : constructorResults(connection, id),
+        optionalConstructorLineage(connection, id)
     ]);
     if (!constructors.length) return null;
-    return buildConstructorDetail(constructors[0], standings, drivers, chassis, results);
+    return buildConstructorDetail(constructors[0], standings, drivers, chassis, results, lineage);
 }
 
 async function juniorConstructorResults(connection, prefix, series, id) {

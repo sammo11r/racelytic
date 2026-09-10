@@ -13,11 +13,13 @@
     </div>
     <div class="driver-filter-grid circuit-filter-grid" role="search" aria-label="Filter circuits">
       <label class="driver-search-field"><span>Search</span><input class="search" id="search" type="search" placeholder="Circuit, former name or location…" autocomplete="off"></label>
+      <details class="archive-more-filters" open><summary>More filters</summary><div class="archive-more-filter-grid">
       <label><span>Season</span><select id="circuit-season"><option value="">Current season</option></select></label>
       <label><span>Country</span><select id="circuit-country"><option value="">All countries</option></select></label>
       <label><span>Type</span><select id="circuit-type"><option value="">All types</option></select></label>
       <label><span>Order by</span><select id="circuit-sort"><option value="name">Name A–Z</option><option value="recent">Most recent</option><option value="races">Most races hosted</option></select></label>
       <button type="button" id="circuit-clear" class="button secondary driver-clear">Clear filters</button>
+      </div></details>
     </div>
   </section>
   <div class="driver-browser-toolbar"><span id="circuit-count" class="browser-count" aria-live="polite">Loading circuits…</span><span id="circuit-load-status" class="section-note" role="status"></span></div>

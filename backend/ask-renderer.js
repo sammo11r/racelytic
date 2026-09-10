@@ -36,20 +36,34 @@ function esc(value) {
     return String(value).replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[character]);
 }
 
+function renderExampleGroup(label, examples) {
+    return `<section class="ask-example-group" aria-label="${esc(label)}"><strong>${esc(label)}</strong><div class="ask-example-list">
+                ${examples.map(([question, title]) => `<button type="button" data-ask-example="${esc(question)}">${esc(title)}</button>`).join('\n                ')}
+              </div></section>`;
+}
+
+function renderJuniorExampleGroups(examples) {
+    return `<div class="ask-example-groups">
+              ${renderExampleGroup('Records', examples.slice(0, 4))}
+              ${renderExampleGroup('People & places', examples.slice(4, 6))}
+              ${renderExampleGroup('Race formats', examples.slice(6))}
+            </div>`;
+}
+
 function renderAskHtml(pathname) {
     const series = fromPath(pathname);
     const html = fs.readFileSync(path.join(__dirname, '../frontend/ask.html'), 'utf8');
     if (series.key === 'f1') return html;
-    const examples = EXAMPLES[series.key].map(([question, label]) =>
-        `<button type="button" data-ask-example="${esc(question)}">${esc(label)}</button>`).join('\n          ');
+    const examples = renderJuniorExampleGroups(EXAMPLES[series.key]);
     return html
         .replace('<meta name="description" content="Ask a Formula 1 history question and let Racelytic calculate the answer from its archive.">', `<meta name="description" content="Ask a ${esc(series.name)} history question and let Racelytic calculate the answer from its archive.">`)
         .replace('/assets/favicon.svg', series.favicon)
         .replace('<body class="ask-page">', `<body class="ask-page ${esc(series.modeClass)}" data-ask-series="${esc(series.key)}">`)
         .replace('Describe the Formula 1 history you want to recalculate or compare. Racelytic interprets the question, then explains the answer from recorded results.', `Ask about ${esc(series.name)} records and Racelytic will explain the answer from the recorded results.`)
         .replace('placeholder="Ask a Formula 1 history question…"', `placeholder="Ask a ${esc(series.name)} history question…"`)
-        .replace(/<button type="button" data-ask-example="Who has the most Formula 1 race wins\?">[\s\S]*?<button type="button" data-ask-example="Which constructor would have the most championships using the 1991 points system\?">Constructor titles<\/button>/, examples)
-        .replace('<strong>One question, every completed season.</strong><p>Recalculate or compare Formula 1 Drivers’ or Constructors’ Championships under official historical points systems.</p>', `<strong>One question, the full ${esc(series.shortName)} archive.</strong><p>Explore driver and team records across every season available in Racelytic.</p>`);
+        .replace(/<!-- ask-examples:start -->[\s\S]*?<!-- ask-examples:end -->/, `<!-- ask-examples:start -->\n            ${examples}\n            <!-- ask-examples:end -->`)
+        .replace('One question, every completed season.', `One question, the full ${esc(series.shortName)} archive.`)
+        .replace('Ask for archive records, or recalculate Formula 1 Drivers’ or Constructors’ Championships under historical points systems.', `Explore driver and team records across every season available in Racelytic.`);
 }
 
 module.exports = { EXAMPLES, renderAskHtml };

@@ -136,6 +136,7 @@ test('dashboard adds archive totals only on request, using the selected series t
         require: name => {
             if (name === 'express') return { Router: () => router };
             if (name === '../search-results') return {};
+            if (name === '../resource-routes') return require('../backend/resource-routes');
             if (name === '../route-helpers') return {
                 sendError: (_res, error) => { throw error; },
                 withConnection: callback => callback({ query: async sql => {

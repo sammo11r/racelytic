@@ -1,6 +1,7 @@
 const express = require('express');
 const { withConnection, sendError } = require('../route-helpers');
 const { buildSearchResponse, searchLikePattern } = require('../search-results');
+const { resourcePath } = require('../resource-routes');
 
 const router = express.Router();
 
@@ -235,10 +236,8 @@ router.get('/api/series-equivalent', async (req, res) => {
 
         const parent = SERIES_PARENTS[type][target];
         if (equivalentId === null) return res.json({ matched: false, url: parent });
-        const prefix = target === 'academy' ? '/academy' : target === 'f3' ? '/f3' : target === 'f2' ? '/f2' : '';
-        const parameter = type === 'season' ? 'year' : 'id';
         const targetPath = ['f3', 'academy'].includes(target) && type === 'constructor' ? 'team' : type;
-        res.json({ matched: true, url: `${prefix}/${targetPath}?${parameter}=${encodeURIComponent(equivalentId)}` });
+        res.json({ matched: true, url: resourcePath(target, targetPath, equivalentId) });
     } catch (error) {
         sendError(res, error);
     }
@@ -359,26 +358,26 @@ router.get('/api/search', async (req, res) => {
 
         const rawResults = [
             ...pages,
-            ...databaseResults.seasons.map(row => ({ type: 'F1 Season', label: String(row.year), meta: 'Formula 1 season', url: `/season?year=${row.year}` })),
-            ...databaseResults.f2Seasons.map(row => ({ type: 'F2 Season', label: String(row.year), meta: 'Formula 2 season', url: `/f2/season?year=${row.year}` })),
-            ...databaseResults.f3Seasons.map(row => ({ type: 'F3 Season', label: String(row.year), meta: 'Formula 3 season', url: `/f3/season?year=${row.year}` })),
-            ...databaseResults.academySeasons.map(row => ({ type: 'F1 Academy Season', label: String(row.year), meta: 'F1 Academy season', url: `/academy/season?year=${row.year}` })),
-            ...databaseResults.drivers.map(row => ({ type: 'F1 Driver', label: row.name, meta: row.nationalityCountryId || 'Formula 1 driver', aliases: [row.fullName, row.abbreviation], prominence: row.totalRaceWins, url: `/driver?id=${encodeURIComponent(row.id)}` })),
-            ...databaseResults.f2Drivers.map(row => ({ type: 'F2 Driver', label: row.name, meta: row.countryCode || 'Formula 2 driver', aliases: [row.abbreviation], url: `/f2/driver?id=${encodeURIComponent(row.id)}` })),
-            ...databaseResults.f3Drivers.map(row => ({ type: 'F3 Driver', label: row.name, meta: row.countryCode || 'Formula 3 driver', aliases: [row.abbreviation], url: `/f3/driver?id=${encodeURIComponent(row.id)}` })),
-            ...databaseResults.academyDrivers.map(row => ({ type: 'F1 Academy Driver', label: row.name, meta: row.countryCode || 'F1 Academy driver', aliases: [row.abbreviation], url: `/academy/driver?id=${encodeURIComponent(row.id)}` })),
-            ...databaseResults.constructors.map(row => ({ type: 'F1 Constructor', label: row.name, meta: row.countryId || 'Formula 1 constructor', aliases: [row.fullName], prominence: row.totalRaceWins, url: `/constructor?id=${encodeURIComponent(row.id)}` })),
-            ...databaseResults.f2Constructors.map(row => ({ type: 'F2 Constructor', label: row.name, meta: row.countryCode || 'Formula 2 constructor', aliases: [row.abbreviation], url: `/f2/constructor?id=${encodeURIComponent(row.id)}` })),
-            ...databaseResults.f3Constructors.map(row => ({ type: 'F3 Team', label: row.name, meta: row.countryCode || 'Formula 3 team', aliases: [row.abbreviation], url: `/f3/team?id=${encodeURIComponent(row.id)}` })),
-            ...databaseResults.academyConstructors.map(row => ({ type: 'F1 Academy Team', label: row.name, meta: row.countryCode || 'F1 Academy team', aliases: [row.abbreviation], url: `/academy/team?id=${encodeURIComponent(row.id)}` })),
-            ...databaseResults.circuits.map(row => ({ type: 'F1 Circuit', label: row.name, meta: row.placeName || 'Formula 1 circuit', aliases: [row.shortName, row.fullName], prominence: row.totalRacesHeld, place: row.placeName, url: `/circuit?id=${encodeURIComponent(row.id)}` })),
-            ...databaseResults.f2Circuits.map(row => ({ type: 'F2 Circuit', label: row.name, meta: row.placeName || 'Formula 2 circuit', place: row.placeName, url: `/f2/circuit?id=${encodeURIComponent(row.id)}` })),
-            ...databaseResults.f3Circuits.map(row => ({ type: 'F3 Circuit', label: row.name, meta: row.placeName || 'Formula 3 circuit', place: row.placeName, url: `/f3/circuit?id=${encodeURIComponent(row.id)}` })),
-            ...databaseResults.academyCircuits.map(row => ({ type: 'F1 Academy Circuit', label: row.name, meta: row.placeName || 'F1 Academy circuit', place: row.placeName, url: `/academy/circuit?id=${encodeURIComponent(row.id)}` })),
-            ...databaseResults.races.map(row => ({ type: 'F1 Race', label: row.name, aliases: [row.shortName, row.officialName], meta: `${row.year}${row.placeName ? ` · ${row.placeName}` : ''}`, year: Number(row.year), searchText: `${row.name} ${row.shortName || ''} ${row.officialName} ${row.circuitName || ''} ${row.placeName || ''} ${row.year}`, url: `/race?id=${encodeURIComponent(row.id)}` })),
-            ...databaseResults.f2Races.map(row => ({ type: 'F2 Race', label: row.name, meta: `${row.year}${row.placeName ? ` · ${row.placeName}` : ''}`, year: Number(row.year), searchText: `${row.name} ${row.circuitName || ''} ${row.placeName || ''} ${row.year}`, url: `/f2/race?id=${encodeURIComponent(row.id)}` })),
-            ...databaseResults.f3Races.map(row => ({ type: 'F3 Race', label: row.name, meta: `${row.year}${row.placeName ? ` · ${row.placeName}` : ''}`, year: Number(row.year), searchText: `${row.name} ${row.circuitName || ''} ${row.placeName || ''} ${row.year}`, url: `/f3/race?id=${encodeURIComponent(row.id)}` })),
-            ...databaseResults.academyRaces.map(row => ({ type: 'F1 Academy Race', label: row.name, meta: `${row.year}${row.placeName ? ` · ${row.placeName}` : ''}`, year: Number(row.year), searchText: `${row.name} ${row.circuitName || ''} ${row.placeName || ''} ${row.year}`, url: `/academy/race?id=${encodeURIComponent(row.id)}` })),
+            ...databaseResults.seasons.map(row => ({ type: 'F1 Season', label: String(row.year), meta: 'Formula 1 season', url: resourcePath('f1', 'season', row.year) })),
+            ...databaseResults.f2Seasons.map(row => ({ type: 'F2 Season', label: String(row.year), meta: 'Formula 2 season', url: resourcePath('f2', 'season', row.year) })),
+            ...databaseResults.f3Seasons.map(row => ({ type: 'F3 Season', label: String(row.year), meta: 'Formula 3 season', url: resourcePath('f3', 'season', row.year) })),
+            ...databaseResults.academySeasons.map(row => ({ type: 'F1 Academy Season', label: String(row.year), meta: 'F1 Academy season', url: resourcePath('academy', 'season', row.year) })),
+            ...databaseResults.drivers.map(row => ({ type: 'F1 Driver', label: row.name, meta: row.nationalityCountryId || 'Formula 1 driver', aliases: [row.fullName, row.abbreviation], prominence: row.totalRaceWins, url: `/drivers/${encodeURIComponent(row.id)}` })),
+            ...databaseResults.f2Drivers.map(row => ({ type: 'F2 Driver', label: row.name, meta: row.countryCode || 'Formula 2 driver', aliases: [row.abbreviation], url: `/f2/drivers/${encodeURIComponent(row.id)}` })),
+            ...databaseResults.f3Drivers.map(row => ({ type: 'F3 Driver', label: row.name, meta: row.countryCode || 'Formula 3 driver', aliases: [row.abbreviation], url: `/f3/drivers/${encodeURIComponent(row.id)}` })),
+            ...databaseResults.academyDrivers.map(row => ({ type: 'F1 Academy Driver', label: row.name, meta: row.countryCode || 'F1 Academy driver', aliases: [row.abbreviation], url: `/academy/drivers/${encodeURIComponent(row.id)}` })),
+            ...databaseResults.constructors.map(row => ({ type: 'F1 Constructor', label: row.name, meta: row.countryId || 'Formula 1 constructor', aliases: [row.fullName], prominence: row.totalRaceWins, url: `/constructors/${encodeURIComponent(row.id)}` })),
+            ...databaseResults.f2Constructors.map(row => ({ type: 'F2 Constructor', label: row.name, meta: row.countryCode || 'Formula 2 constructor', aliases: [row.abbreviation], url: `/f2/constructors/${encodeURIComponent(row.id)}` })),
+            ...databaseResults.f3Constructors.map(row => ({ type: 'F3 Team', label: row.name, meta: row.countryCode || 'Formula 3 team', aliases: [row.abbreviation], url: `/f3/teams/${encodeURIComponent(row.id)}` })),
+            ...databaseResults.academyConstructors.map(row => ({ type: 'F1 Academy Team', label: row.name, meta: row.countryCode || 'F1 Academy team', aliases: [row.abbreviation], url: `/academy/teams/${encodeURIComponent(row.id)}` })),
+            ...databaseResults.circuits.map(row => ({ type: 'F1 Circuit', label: row.name, meta: row.placeName || 'Formula 1 circuit', aliases: [row.shortName, row.fullName], prominence: row.totalRacesHeld, place: row.placeName, url: `/circuits/${encodeURIComponent(row.id)}` })),
+            ...databaseResults.f2Circuits.map(row => ({ type: 'F2 Circuit', label: row.name, meta: row.placeName || 'Formula 2 circuit', place: row.placeName, url: `/f2/circuits/${encodeURIComponent(row.id)}` })),
+            ...databaseResults.f3Circuits.map(row => ({ type: 'F3 Circuit', label: row.name, meta: row.placeName || 'Formula 3 circuit', place: row.placeName, url: `/f3/circuits/${encodeURIComponent(row.id)}` })),
+            ...databaseResults.academyCircuits.map(row => ({ type: 'F1 Academy Circuit', label: row.name, meta: row.placeName || 'F1 Academy circuit', place: row.placeName, url: `/academy/circuits/${encodeURIComponent(row.id)}` })),
+            ...databaseResults.races.map(row => ({ type: 'F1 Race', label: row.name, aliases: [row.shortName, row.officialName], meta: `${row.year}${row.placeName ? ` · ${row.placeName}` : ''}`, year: Number(row.year), searchText: `${row.name} ${row.shortName || ''} ${row.officialName} ${row.circuitName || ''} ${row.placeName || ''} ${row.year}`, url: resourcePath('f1', 'race', row.id, row.name) })),
+            ...databaseResults.f2Races.map(row => ({ type: 'F2 Race', label: row.name, meta: `${row.year}${row.placeName ? ` · ${row.placeName}` : ''}`, year: Number(row.year), searchText: `${row.name} ${row.circuitName || ''} ${row.placeName || ''} ${row.year}`, url: resourcePath('f2', 'race', row.id, row.name) })),
+            ...databaseResults.f3Races.map(row => ({ type: 'F3 Race', label: row.name, meta: `${row.year}${row.placeName ? ` · ${row.placeName}` : ''}`, year: Number(row.year), searchText: `${row.name} ${row.circuitName || ''} ${row.placeName || ''} ${row.year}`, url: resourcePath('f3', 'race', row.id, row.name) })),
+            ...databaseResults.academyRaces.map(row => ({ type: 'F1 Academy Race', label: row.name, meta: `${row.year}${row.placeName ? ` · ${row.placeName}` : ''}`, year: Number(row.year), searchText: `${row.name} ${row.circuitName || ''} ${row.placeName || ''} ${row.year}`, url: resourcePath('academy', 'race', row.id, row.name) })),
             ...databaseResults.chassis.map(row => ({ type: 'F1 Chassis', label: row.fullName || row.name, meta: row.constructorName || 'Formula 1 chassis', url: `/chassis?search=${encodeURIComponent(row.fullName || row.name)}` })),
             ...databaseResults.f2Chassis.map(row => ({ type: 'F2 Chassis', label: row.name, meta: 'Formula 2 chassis', url: '/f2/chassis' })),
             ...databaseResults.f3Chassis.map(row => ({ type: 'F3 Chassis', label: row.name, meta: 'Formula 3 chassis', url: '/f3/chassis' })),

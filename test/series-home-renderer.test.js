@@ -91,7 +91,7 @@ test('hero artwork shares a viewport-based anchor, independent of championship c
         assert.doesNotMatch(selector, /data-series-home/);
         assert.doesNotMatch(declarations, /top:\s*[\d.]+%/);
     }
-    assert.match(artworkRules[0][2], /top:\s*calc\(146\.55px \+ clamp\(80\.64px, 9\.36vw, 112\.32px\)\)/);
+    assert.match(artworkRules[0][2], /top:\s*244px/);
 });
 
 test('every series closes with a compact account invitation preserving its championship', () => {
@@ -131,7 +131,8 @@ test('junior preview links use real routes and include the featured season and d
 test('championship snapshot still loads without the removed latest-season button', async () => {
     const fs = require('node:fs');
     const path = require('node:path');
-    const vm = require('node:vm');
+const vm = require('node:vm');
+const { resourceUrl } = require('./frontend-resource-routes');
     const elements = new Map();
     const errors = [];
     const context = {
@@ -145,12 +146,12 @@ test('championship snapshot still loads without the removed latest-season button
             }
         },
         getJSON: async () => ({ latestSeason: 2026, currentSeason: { rounds: 23, leader: { name: 'Test driver', points: 100 } } }),
-        fmtNumber: String,
+        fmtNumber: String, resourceUrl,
         console: { error: (...args) => errors.push(args) }
     };
     await vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../frontend/js/series-home.js'), 'utf8'), context);
     assert.deepEqual(errors, []);
-    assert.equal(elements.get('snapshot-season-link').href, '/season?year=2026');
+    assert.equal(elements.get('snapshot-season-link').href, '/seasons/2026');
     assert.equal(elements.get('snapshot-season').textContent, 2026);
     assert.equal(elements.get('snapshot-leader').textContent, 'Test driver');
 });

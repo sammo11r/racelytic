@@ -92,7 +92,7 @@ function renderDriverProfile(data) {
     const teams = driverSeasonTeams(season);
     const champion = driverIsTrue(season.championshipWon);
     const current = Number(season.year) === Number(driver.currentSeason);
-    return `<a role="listitem" class="career-timeline-item driver-season-item${champion ? ' champion' : ''}${current ? ' current' : ''}" href="${driverDetail.root}/season?year=${encodeURIComponent(season.year)}">
+    return `<a role="listitem" class="career-timeline-item driver-season-item${champion ? ' champion' : ''}${current ? ' current' : ''}" href="${driverDetail.root}/seasons/${encodeURIComponent(season.year)}">
       <div class="timeline-marker"><i></i></div><span class="timeline-year">${esc(season.year)}</span>
       <strong>${champion ? esc(driverDetail.championLabel) : Number(season.positionNumber) > 0 ? `Championship P${esc(season.positionNumber)}` : 'Not classified'}</strong><small>${fmtNumber(season.points)} points</small>
       <div class="timeline-context">${teams.length ? esc(teams.join(' · ')) : 'Constructor unavailable'}</div>
@@ -188,15 +188,15 @@ function renderDriverResults() {
     const rows = paged.items.map(result => {
       const finish = Number(result.positionNumber || 0);
       const movement = driverResultMovement(result);
-      return `<tr><td><a href="${driverDetail.root}/season?year=${encodeURIComponent(result.year)}">${esc(result.year)}</a></td>
-        <td><a href="${driverDetail.root}/race?id=${encodeURIComponent(result.raceId)}">${esc(displayRaceName(result))}</a><small>${esc(fmtDate(result.date))}${result.sessionLabel ? ` · ${esc(result.sessionLabel)}` : ''}${result.circuitName ? ` · ${esc(result.circuitName)}` : ''}</small><div class="driver-result-awards">${driverResultAwards(result)}</div></td>
-        <td>${result.constructorName ? `<a href="${driverDetail.root}/constructor?id=${encodeURIComponent(result.constructorId)}">${esc(result.constructorName)}</a>` : '—'}</td>
+      return `<tr><td><a href="${driverDetail.root}/seasons/${encodeURIComponent(result.year)}">${esc(result.year)}</a></td>
+        <td><a href="${resourceUrl('race',result.raceId,{base:driverDetail.root,label:displayRaceName(result)})}">${esc(displayRaceName(result))}</a><small>${esc(fmtDate(result.date))}${result.sessionLabel ? ` · ${esc(result.sessionLabel)}` : ''}${result.circuitName ? ` · ${esc(result.circuitName)}` : ''}</small><div class="driver-result-awards">${driverResultAwards(result)}</div></td>
+        <td>${result.constructorName ? `<a href="${driverDetail.root}/constructors/${encodeURIComponent(result.constructorId)}">${esc(result.constructorName)}</a>` : '—'}</td>
         <td>${driverResultGridMarkup(result)}</td><td><span class="finish-position${finish > 0 && finish <= 3 ? ' podium' : ''}${driverResultIsRetirement(result) ? ' retired' : ''}">${esc(driverResultFinish(result))}</span>${driverResultIsRetirement(result) ? `<small>${esc(result.reasonRetired)}</small>` : ''}</td>
         <td class="driver-result-movement ${movement > 0 ? 'gain' : movement < 0 ? 'loss' : ''}">${esc(driverResultMovementText(movement))}</td><td class="result-points-total">${fmtNumber(result.points)}</td></tr>`;
     }).join('');
     const cards = paged.items.map(result => {
       const finish = Number(result.positionNumber || 0), movement = driverResultMovement(result);
-      return `<article class="driver-result-card"><div><span>${esc(result.year)} · Round ${esc(result.round)}${result.sessionLabel ? ` · ${esc(result.sessionLabel)}` : ''}</span><strong><a href="${driverDetail.root}/race?id=${encodeURIComponent(result.raceId)}">${esc(displayRaceName(result))}</a></strong><small>${esc(fmtDate(result.date))}${result.constructorName ? ` · ${esc(result.constructorName)}` : ''}</small></div><b class="finish-position${finish > 0 && finish <= 3 ? ' podium' : ''}${driverResultIsRetirement(result) ? ' retired' : ''}">${esc(driverResultFinish(result))}</b><div class="driver-result-card-meta"><span>Grid ${driverResultGridMarkup(result)}</span><span>${esc(driverResultMovementText(movement))} positions</span><span>${fmtNumber(result.points)} pts</span>${driverResultIsRetirement(result) ? `<span>${esc(result.reasonRetired)}</span>` : ''}</div><div class="driver-result-awards">${driverResultAwards(result)}</div></article>`;
+      return `<article class="driver-result-card"><div><span>${esc(result.year)} · Round ${esc(result.round)}${result.sessionLabel ? ` · ${esc(result.sessionLabel)}` : ''}</span><strong><a href="${resourceUrl('race',result.raceId,{base:driverDetail.root,label:displayRaceName(result)})}">${esc(displayRaceName(result))}</a></strong><small>${esc(fmtDate(result.date))}${result.constructorName ? ` · ${esc(result.constructorName)}` : ''}</small></div><b class="finish-position${finish > 0 && finish <= 3 ? ' podium' : ''}${driverResultIsRetirement(result) ? ' retired' : ''}">${esc(driverResultFinish(result))}</b><div class="driver-result-card-meta"><span>Grid ${driverResultGridMarkup(result)}</span><span>${esc(driverResultMovementText(movement))} positions</span><span>${fmtNumber(result.points)} pts</span>${driverResultIsRetirement(result) ? `<span>${esc(result.reasonRetired)}</span>` : ''}</div><div class="driver-result-awards">${driverResultAwards(result)}</div></article>`;
     }).join('');
     results.innerHTML = `<table><caption>${esc(driverDetail.name)} race results</caption><thead><tr><th>Season</th><th>Race</th><th>Constructor</th><th>Grid</th><th>Finish</th><th>Change</th><th>Points</th></tr></thead><tbody>${rows}</tbody></table><div class="driver-result-cards">${cards}</div>`;
   }
@@ -230,7 +230,7 @@ async function loadDriverResults(id) {
 }
 
 async function loadDriver() {
-  const id = params().get('id');
+  const id = resourceId('driver');
   const returnPath = params().get('return');
   const archivePath = `${driverDetail.root}/drivers`;
   if (returnPath && (returnPath === archivePath || returnPath.startsWith(`${archivePath}?`))) document.getElementById('driver-back-link').href = returnPath;

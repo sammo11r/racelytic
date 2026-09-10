@@ -63,6 +63,14 @@ function baseConstructorColor(constructorId) {
   return hslToHex(hash % 360, 58 + hash % 18, 42 + hash % 12);
 }
 
+function constructorTextColor(color) {
+  const value = String(color || '').replace('#', '');
+  if (!/^[0-9a-f]{6}$/i.test(value)) return '#ffffff';
+  const channels = [0, 2, 4].map(index => parseInt(value.slice(index, index + 2), 16) / 255)
+    .map(channel => channel <= .03928 ? channel / 12.92 : ((channel + .055) / 1.055) ** 2.4);
+  return channels[0] * .2126 + channels[1] * .7152 + channels[2] * .0722 > .42 ? '#15171c' : '#ffffff';
+}
+
 function variantColor(base, teammateIndex) {
   if (!teammateIndex) return base;
   const [hue, saturation, lightness] = hexToHsl(base);
@@ -94,3 +102,7 @@ function assignDriverTeamStyles(drivers) {
   }));
   return styles;
 }
+
+const TEAM_COLOR_API = { baseConstructorColor, constructorTextColor };
+if (typeof module === 'object' && module.exports) module.exports = TEAM_COLOR_API;
+else globalThis.teamColors = TEAM_COLOR_API;

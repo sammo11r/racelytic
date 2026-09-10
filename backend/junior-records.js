@@ -30,7 +30,7 @@ function aggregate(races, titles, config, countries = new Map()) {
             if (config.nationality && country.toLowerCase() !== config.nationality.toLowerCase()) continue;
             if (!entities.has(id)) entities.set(id, { id, name: (team ? result.constructorName : result.driverName) || id,
                 nationalityCountryId: country, events: new Set(), wins: new Set(), podiums: new Set(), poles: new Set(), fastestLaps: new Set(),
-                contributions: new Set(), carStarts: 0, points: 0, gains: [], firstYear: race.year, lastYear: race.year });
+                contributions: new Set(), carStarts: 0, classifiedCount: 0, dnfs: 0, points: 0, gains: [], finishes: [], firstYear: race.year, lastYear: race.year });
             const row = entities.get(id), event = String(race.sessionId);
             row.firstYear = Math.min(row.firstYear, race.year); row.lastYear = Math.max(row.lastYear, race.year);
             row.points += Number(result.points) || 0;
@@ -39,7 +39,12 @@ function aggregate(races, titles, config, countries = new Map()) {
             if (result.fastestLap) row.fastestLaps.add(event);
             if (!starter(result)) continue;
             row.events.add(event); row.carStarts++; starters++;
-            if (!classified(result)) continue;
+            if (!classified(result)) {
+                if (!/DSQ|DQ|DISQ|DISQUALIFIED|EXC/i.test(String(result.status || result.positionText || ''))) row.dnfs++;
+                continue;
+            }
+            row.classifiedCount++;
+            row.finishes.push(Number(result.position));
             if (result.position === 1) row.wins.add(event);
             if (result.position <= 3) row.podiums.add(`${event}-${result.position}`);
             if (Number(result.grid) > 0 && Number(result.grid) < 999) {
@@ -55,15 +60,22 @@ function aggregate(races, titles, config, countries = new Map()) {
             && (!config.constructorId || row.contributions.has(Number(title.year)))).map(title => Number(title.year))).size;
         const values = { starts: row.events.size, wins: row.wins.size, podiums: row.podiums.size, poles: row.poles.size,
             fastestLaps: row.fastestLaps.size, points: row.points, championships,
-            gridGain: row.gains.length ? row.gains.reduce((sum, gain) => sum + gain, 0) / row.gains.length : null };
+            gridGain: row.gains.length ? row.gains.reduce((sum, gain) => sum + gain, 0) / row.gains.length : null,
+            averageFinish: row.finishes.length ? row.finishes.reduce((sum, finish) => sum + finish, 0) / row.finishes.length : null,
+            finishRate: row.carStarts ? row.classifiedCount / row.carStarts * 100 : null,
+            winRate: row.events.size ? row.wins.size / row.events.size * 100 : null,
+            podiumRate: (team ? row.carStarts : row.events.size) ? row.podiums.size / (team ? row.carStarts : row.events.size) * 100 : null,
+            dnfs: row.dnfs };
         const value = values[config.category];
-        if (value == null || (config.category === 'gridGain' ? row.gains.length < config.minStarts : value <= 0)) continue;
+        const sample = config.category === 'gridGain' ? row.gains.length
+            : config.category === 'averageFinish' ? row.finishes.length : row.carStarts;
+        if (value == null || (f1Records.SAMPLE_CATEGORIES.has(config.category) ? sample < config.minStarts : value <= 0)) continue;
         entries.push({ id: row.id, name: row.name, nationalityCountryId: row.nationalityCountryId, value,
             starts: values.starts, wins: values.wins, podiums: values.podiums, points: values.points,
-            carStarts: row.carStarts, sample: row.gains.length, firstYear: row.firstYear, lastYear: row.lastYear });
+            carStarts: row.carStarts, sample, firstYear: row.firstYear, lastYear: row.lastYear });
     }
     const years = selected.map(race => Number(race.year)).filter(Number.isFinite);
-    return { entries: f1Records.rankEntries(entries), coverage: {
+    return { entries: f1Records.rankEntries(entries, { lowerIsBetter: config.category === 'averageFinish' }), coverage: {
         sessions: selected.length, starters, measured, derived,
         fromYear: years.length ? Math.min(...years) : null,
         toYear: years.length ? Math.max(...years) : null
@@ -75,6 +87,10 @@ async function explore(connection, input) {
     if (config.fromYear) { filters.push('races.year >= ?'); params.push(config.fromYear); }
     if (config.toYear) { filters.push('races.year <= ?'); params.push(config.toYear); }
     if (config.circuitId) { filters.push('races.circuitId = ?'); params.push(config.circuitId); }
+    if (!config.circuitId && config.circuitIds.length) {
+        filters.push(`races.circuitId IN (${config.circuitIds.map(() => '?').join(', ')})`);
+        params.push(...config.circuitIds);
+    }
     const sessions = await connection.query(`SELECT sessions.id AS sessionId, races.id AS raceId,
         sessions.sessionNumber, sessions.name AS sessionName, sessions.isRace, sessions.cancelled, sessions.startTimeUtc,
         races.name AS raceName, races.year, races.round, races.date
@@ -109,8 +125,8 @@ async function explore(connection, input) {
     const countries = new Map(rows.map(row => [String(team ? row.constructorId : row.driverId), team ? row.constructorCountry : row.driverCountry]));
     const { entries, coverage } = aggregate(races, titles, config, countries);
     const limit = /^\d+$/.test(String(input.limit || '')) ? Math.max(1, Math.min(1000, Number(input.limit))) : entries.length;
-    const labels = { wins: 'Wins', championships: 'Championships', podiums: 'Podiums', poles: 'Pole positions', fastestLaps: 'Fastest laps', points: 'Points', starts: 'Starts', gridGain: 'Average positions gained' };
-    return { type: config.type, category: config.category, label: labels[config.category], includeSprints: config.includeSprints,
+    const labels = f1Records.CATEGORIES;
+    return { type: config.type, category: config.category, label: labels[config.category], unit: ['finishRate', 'winRate', 'podiumRate'].includes(config.category) ? '%' : '', lowerIsBetter: config.category === 'averageFinish', includeSprints: config.includeSprints,
         configuration: config, total: entries.length, entries: entries.slice(0, limit), coverage };
 }
 

@@ -74,9 +74,9 @@ function driverAchievements(driver) {
 
 function renderDriverCard(driver) {
   const memorial = F1_DRIVER_MEMORIALS.has(String(driver.id));
-  const query = new URLSearchParams({ id: driver.id, return: `${location.pathname}${location.search}` });
+  const query = new URLSearchParams({ return: `${location.pathname}${location.search}` });
   const number = driver.permanentNumber ? `<span class="driver-permanent-number">#${esc(driver.permanentNumber)}</span>` : '';
-  return `<a class="entity-card driver-browser-card f1-driver-archive-card f1-achievement-card${memorial ? ' f2-driver-card-memorial' : ''}" href="/driver?${query}">
+  return `<a class="entity-card driver-browser-card f1-driver-archive-card f1-achievement-card${memorial ? ' f2-driver-card-memorial' : ''}" href="${resourceUrl('driver', driver.id, { base: '', query })}">
     ${f1DriverMemorial(driver)}${f1DriverTitle(driver)}
     <div class="driver-card-name"><h3>${esc(driver.name)}</h3>${COUNTRY_CODES[driver.nationalityCountryId] ? `<img class="driver-card-flag" src="/assets/flags/${COUNTRY_CODES[driver.nationalityCountryId].toLowerCase()}.svg" alt="${esc(countryName(driver.nationalityCountryId))} flag" loading="lazy">` : ''}</div>
     <p>${esc(driver.abbreviation || '')}${driver.nationalityCountryId ? ` · ${esc(countryName(driver.nationalityCountryId))}` : ''}</p>

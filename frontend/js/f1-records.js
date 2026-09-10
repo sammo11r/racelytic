@@ -10,7 +10,7 @@
   let type = 'drivers', data = null, page = 1, request = 0, controller, saveConfiguration = null;
   const pickers = {};
   const valueText = (value, category) => category === 'gridGain' ? `${value > 0 ? '+' : ''}${Number(value).toFixed(2)}` : fmtNumber(value);
-  const link = entry => `${activeSeriesBase()}/${data.type === 'drivers' ? 'driver' : teamLabel.toLowerCase()}?id=${encodeURIComponent(entry.id)}`;
+  const link = entry => resourceUrl(data.type === 'drivers' ? 'driver' : teamLabel.toLowerCase(), entry.id);
   const normalize = text => String(text).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
 
   function picker(key, rows) {

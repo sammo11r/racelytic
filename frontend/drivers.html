@@ -14,11 +14,13 @@
     </div>
     <div class="driver-filter-grid" role="search" aria-label="Filter drivers">
       <label class="driver-search-field"><span>Search</span><input class="search" id="search" type="search" placeholder="Name, code, number, country or season…" autocomplete="off"></label>
-      <label><span>Season</span><select id="driver-season"><option value="">All seasons</option></select></label>
-      <label><span>Nationality</span><select id="driver-country"><option value="">All nationalities</option></select></label>
-      <label><span>Achievement</span><select id="driver-achievement"><option value="all">All drivers</option><option value="champions">World champions</option><option value="winners">Race winners</option><option value="podiums">Podium finishers</option></select></label>
-      <label><span>Order by</span><select id="driver-sort"><option value="recent">Most recent season</option><option value="name-asc">Name A–Z</option><option value="name-desc">Name Z–A</option><option value="best-finish">Best championship finish</option><option value="wins-desc">Most wins</option><option value="starts-desc">Most starts</option></select></label>
-      <button type="button" id="driver-clear" class="button secondary driver-clear">Clear filters</button>
+      <details class="archive-more-filters" open><summary>More filters</summary><div class="archive-more-filter-grid">
+        <label><span>Season</span><select id="driver-season"><option value="">All seasons</option></select></label>
+        <label><span>Nationality</span><select id="driver-country"><option value="">All nationalities</option></select></label>
+        <label><span>Achievement</span><select id="driver-achievement"><option value="all">All drivers</option><option value="champions">World champions</option><option value="winners">Race winners</option><option value="podiums">Podium finishers</option></select></label>
+        <label><span>Order by</span><select id="driver-sort"><option value="recent">Most recent season</option><option value="name-asc">Name A–Z</option><option value="name-desc">Name Z–A</option><option value="best-finish">Best championship finish</option><option value="wins-desc">Most wins</option><option value="starts-desc">Most starts</option></select></label>
+        <button type="button" id="driver-clear" class="button secondary driver-clear">Clear filters</button>
+      </div></details>
     </div>
   </section>
   <div class="driver-browser-toolbar">

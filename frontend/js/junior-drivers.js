@@ -64,8 +64,8 @@ function juniorDriverAchievements(driver) {
 
 function renderJuniorDriverCard(driver) {
   const code = juniorCountryCode(driver), memorial = Boolean(juniorDriverArchive.memorials[String(driver.id)]);
-  const query = new URLSearchParams({ id: driver.id, return: `${location.pathname}${location.search}` });
-  return `<a class="entity-card driver-browser-card f1-driver-archive-card junior-driver-archive-card f2-driver-card${memorial ? ' f2-driver-card-memorial' : ''}" href="${juniorDriverArchive.root}/driver?${query}">
+  const query = new URLSearchParams({ return: `${location.pathname}${location.search}` });
+  return `<a class="entity-card driver-browser-card f1-driver-archive-card junior-driver-archive-card f2-driver-card${memorial ? ' f2-driver-card-memorial' : ''}" href="${resourceUrl('driver', driver.id, { base: juniorDriverArchive.root, query })}">
     ${juniorDriverMemorial(driver)}${juniorDriverTitle(driver)}
     <div class="driver-card-name"><h3>${esc(driver.name)}</h3>${code ? `<img class="driver-card-flag" src="/assets/flags/${encodeURIComponent(code)}.svg" alt="${esc(juniorCountryName(code))} flag" loading="lazy">` : ''}</div>
     <p>${esc(driver.abbreviation || juniorDriverArchive.shortName + ' driver')}${code ? ` · ${esc(juniorCountryName(code))}` : ''}</p>

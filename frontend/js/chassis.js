@@ -81,7 +81,7 @@ function renderChassisCard(chassis) {
   const coverage = performance && performance < chassis.seasons.length ? `<small>${performance} of ${chassis.seasons.length} seasons attributable</small>` : '';
   return `<article class="entity-card chassis-archive-card">
     <div class="chassis-card-heading"><span>${esc(years || 'Participation not recorded')}${years ? ` · ${chassis.seasons.length} season${chassis.seasons.length === 1 ? '' : 's'}` : ''}</span><h3>${esc(chassisName(chassis))}</h3></div>
-    <div class="chassis-archive-constructor">${chassis.constructorId ? `<a href="/constructor?id=${encodeURIComponent(chassis.constructorId)}">${esc(chassis.constructorName)}</a>` : 'Constructor not recorded'}</div>
+    <div class="chassis-archive-constructor">${chassis.constructorId ? `<a href="/constructors/${encodeURIComponent(chassis.constructorId)}">${esc(chassis.constructorName)}</a>` : 'Constructor not recorded'}</div>
     <div class="chassis-archive-engine"><span class="constructor-card-label">Power unit</span><p>${esc(chassisEngineSummary(chassis))}</p></div>
     <div class="chassis-archive-performance" title="Performance totals include only seasons in which this was the constructor’s sole recorded chassis."><span class="constructor-card-label">Recorded performance</span><div class="constructor-card-record">${stats}</div>${coverage}</div>
   </article>`;

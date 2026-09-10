@@ -64,9 +64,28 @@ test('race detail includes summaries, responsive cards and shareable session sta
     assert.match(script, /class="race-summary-grid"/);
     assert.doesNotMatch(script, /race-schedule|weekend-schedule|scheduleEntries|renderSchedule/);
     assert.match(script, /class="session-result-cards"/);
-    assert.match(script, /history\.replaceState\(null, '', `\/race\?\$\{query\}`\)/);
+    assert.match(script, /history\.replaceState\(null, '', resourceUrl\('race', id/);
     assert.match(script, /event\.key === 'ArrowRight'/);
     assert.match(script, /event\.key === 'Home'/);
+});
+
+test('mobile race cards format missing grid and lap values instead of rendering null', () => {
+    setRaceData({ raceResults: [] });
+    context.__raceResultRows = [{
+        positionNumber: 1,
+        positionText: '1',
+        driverId: 'driver',
+        driverName: 'Driver',
+        constructorId: 'team',
+        constructorName: 'Team',
+        gridPositionNumber: null,
+        laps: null,
+        points: 0,
+    }];
+    const output = vm.runInContext("activeSession = 'race'; renderMobileResults(__raceResultRows)", context);
+    assert.doesNotMatch(output, />null</);
+    assert.match(output, /<dt>Grid<\/dt><dd>—<\/dd>/);
+    assert.match(output, /<dt>Laps<\/dt><dd>—<\/dd>/);
 });
 
 test('race detail API exposes driver numbers used by classifications', () => {

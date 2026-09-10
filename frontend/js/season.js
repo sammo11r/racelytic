@@ -10,7 +10,7 @@
         new URLSearchParams(window.location.search);
 
     const year =
-        Number(query.get('year'));
+        Number(resourceId('season'));
 
     let standingsMode = 'points';
 
@@ -531,7 +531,7 @@
                     <td class="name-column">
 
                         <a
-                            href="/driver?id=${encodeURIComponent(
+                            href="/drivers/${encodeURIComponent(
                                 driver.driverId
                             )}"
                         >
@@ -692,7 +692,7 @@
                     <td class="name-column">
 
                         <a
-                            href="/constructor?id=${encodeURIComponent(
+                            href="/constructors/${encodeURIComponent(
                                 constructor.constructorId
                             )}"
                         >
@@ -776,9 +776,7 @@
                 <a
                     class="calendar-race"
                     data-round="${escapeHtml(race.round)}"
-                    href="/race?id=${encodeURIComponent(
-                        race.id
-                    )}"
+                    href="${resourceUrl('race', race.id, { base: '', label: displayRaceName(race) })}"
                 >
 
                     <div class="calendar-round">

@@ -17,7 +17,7 @@ function renderF2Circuits() {
   document.getElementById('f2-circuit-count').textContent = `${fmtNumber(circuits.length)} circuit${circuits.length === 1 ? '' : 's'}`;
   document.getElementById('f2-circuits').innerHTML = paged.items.map(circuit => {
     const imageId = f2CircuitImageId(circuit.id);
-    return `<a class="entity-card" href="/f2/circuit?id=${encodeURIComponent(circuit.id)}">
+    return `<a class="entity-card" href="/f2/circuits/${encodeURIComponent(circuit.id)}">
       ${imageId ? `<img class="circuit-card-map" src="/assets/circuits/${encodeURIComponent(imageId)}.svg" alt="" loading="lazy">` : ''}
       <div class="circuit-card-copy">
         <h3>${esc(circuit.name)}</h3>

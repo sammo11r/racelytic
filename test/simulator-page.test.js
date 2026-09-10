@@ -43,7 +43,7 @@ test('simulation state is shareable and comparison rows retain both point totals
   assert.match(script, /data-label="Simulated"/);
   assert.match(script, /data-label="Official"/);
   assert.match(script, /simulation-points-change/);
-  assert.match(script, /isF2Simulator \? 'f2\/driver'/);
+  assert.match(script, /resourceUrl\(resource,entry\.id,\{base:resourceBase\}\)/);
 });
 
 test('mobile result cards keep official comparison data visible', () => {

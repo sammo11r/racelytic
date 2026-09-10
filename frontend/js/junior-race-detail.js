@@ -81,12 +81,12 @@ function juniorGridMovement(result) {
 function juniorTeamLink(result) {
   const name = esc(result.constructorName || '—');
   return result.constructorId
-    ? `<a href="${juniorRaceConfig.path}/${juniorRaceConfig.teamPage}?id=${encodeURIComponent(result.constructorId)}">${name}</a>`
+    ? `<a href="${resourceUrl(juniorRaceConfig.teamPage, result.constructorId, { base: juniorRaceConfig.path })}">${name}</a>`
     : name;
 }
 
 function juniorDriverLink(result) {
-  return `<a href="${juniorRaceConfig.path}/driver?id=${encodeURIComponent(result.driverId)}"><strong>${esc(result.driverName || 'Unknown driver')}</strong></a>`;
+  return `<a href="${juniorRaceConfig.path}/drivers/${encodeURIComponent(result.driverId)}"><strong>${esc(result.driverName || 'Unknown driver')}</strong></a>`;
 }
 
 function juniorRaceStatus() {
@@ -141,9 +141,9 @@ function renderJuniorRaceHero(status) {
   document.title = `${race.year} ${race.name} · ${juniorRaceConfig.name} · Racelytic`;
   const head = document.getElementById('junior-race-head');
   head.innerHTML = `<div class="detail-hero race-detail-hero" data-status="${status}">
-    <div class="race-detail-hero-copy"><div class="race-detail-kicker"><span class="race-status-badge ${status}">${juniorRaceStatusLabel(status)}</span><a href="${juniorRaceConfig.path}/season?year=${encodeURIComponent(race.year)}">Round ${esc(race.round)} · ${esc(race.year)}</a></div>
+    <div class="race-detail-hero-copy"><div class="race-detail-kicker"><span class="race-status-badge ${status}">${juniorRaceStatusLabel(status)}</span><a href="${juniorRaceConfig.path}/seasons/${encodeURIComponent(race.year)}">Round ${esc(race.round)} · ${esc(race.year)}</a></div>
       <h1>${esc(race.name)}</h1>
-      <div class="detail-sub"><a href="${juniorRaceConfig.path}/circuit?id=${encodeURIComponent(race.circuitId)}">${esc(race.circuitName || 'Circuit')}</a>${race.placeName ? ` · ${esc(race.placeName)}` : ''} · ${esc(fmtDate(race.date))}</div>
+      <div class="detail-sub"><a href="${juniorRaceConfig.path}/circuits/${encodeURIComponent(race.circuitId)}">${esc(race.circuitName || 'Circuit')}</a>${race.placeName ? ` · ${esc(race.placeName)}` : ''} · ${esc(fmtDate(race.date))}</div>
       <div class="race-hero-facts">${facts.map(fact => `<span>${esc(fact)}</span>`).join('')}</div>
     </div>
     <aside class="race-hero-highlight">${highlight}</aside>
@@ -210,9 +210,10 @@ function renderJuniorMobileResults(session) {
 }
 
 function syncJuniorRaceUrl() {
-  const id = params().get('id');
+  const id = resourceId('race');
   if (!id || !activeJuniorSessionId) return;
-  history.replaceState(null, '', `${juniorRaceConfig.path}/race?id=${encodeURIComponent(id)}&session=${encodeURIComponent(activeJuniorSessionId)}`);
+  history.replaceState(null, '', resourceUrl('race', id, { base: juniorRaceConfig.path, label: juniorRaceData?.race?.name,
+    query: new URLSearchParams({ session: activeJuniorSessionId }) }));
 }
 
 function renderJuniorSessionResults() {
@@ -265,11 +266,11 @@ function renderJuniorRoundNavigation(races, race) {
   const index = sorted.findIndex(item => String(item.id) === String(race.id));
   const previous = index > 0 ? sorted[index - 1] : null;
   const next = index >= 0 && index < sorted.length - 1 ? sorted[index + 1] : null;
-  document.getElementById('junior-race-round-navigation').innerHTML = `${previous ? `<a href="${juniorRaceConfig.path}/race?id=${encodeURIComponent(previous.id)}"><span>← Previous</span><strong>R${esc(previous.round)} · ${esc(previous.name)}</strong></a>` : '<span></span>'}${next ? `<a href="${juniorRaceConfig.path}/race?id=${encodeURIComponent(next.id)}"><span>Next →</span><strong>R${esc(next.round)} · ${esc(next.name)}</strong></a>` : ''}`;
+  document.getElementById('junior-race-round-navigation').innerHTML = `${previous ? `<a href="${resourceUrl('race',previous.id,{base:juniorRaceConfig.path,label:previous.name})}"><span>← Previous</span><strong>R${esc(previous.round)} · ${esc(previous.name)}</strong></a>` : '<span></span>'}${next ? `<a href="${resourceUrl('race',next.id,{base:juniorRaceConfig.path,label:next.name})}"><span>Next →</span><strong>R${esc(next.round)} · ${esc(next.name)}</strong></a>` : ''}`;
 }
 
 async function loadJuniorRaceDetail() {
-  const id = params().get('id');
+  const id = resourceId('race');
   if (!id) {
     document.getElementById('junior-race-head').setAttribute('aria-busy', 'false');
     return setError('junior-race-head', `Choose a ${juniorRaceConfig.shortName} race from the archive.`);

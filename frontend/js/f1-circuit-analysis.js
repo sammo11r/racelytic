@@ -7,7 +7,7 @@ const caPoleLabel = caJunior ? 'Grid P1 conversion' : 'Pole conversion';
 const caPoleSample = caJunior ? 'known P1 starts' : 'recorded poles';
 const caMetrics = races => caModel.metrics(races, caJunior);
 const caGetJSON = (url, options) => getJSON(caJunior ? `${url}${url.includes('?') ? '&' : '?'}series=${caSeries}` : url, options);
-const caEntityLink = (type, id) => `${caBase}/${type}?id=${encodeURIComponent(id)}`;
+const caEntityLink = (type, id) => resourceUrl(type, id, { base: caBase });
 const caNode = id => document.getElementById(`ca-${id}`);
 const caViews = ['specialists', 'trends', 'movement', 'reliability'];
 const caMetricNames = { wins: 'Wins', podiums: 'Podiums', winRate: 'Win percentage', averageFinish: 'Average finish' };
@@ -18,7 +18,10 @@ let caFormat = 'all';
 const caCache = new Map();
 const caPercent = value => value === null ? '—' : `${value.toFixed(1)}%`;
 const caNumber = value => value === null ? '—' : value.toFixed(2);
-const caRaceLink = race => `${caEntityLink('race', race.id)}${race.sessionId ? `&session=${encodeURIComponent(race.sessionId)}` : ''}`;
+const caRaceLink = race => resourceUrl('race', race.id, {
+  base: caBase,
+  query: race.sessionId ? new URLSearchParams({ session: race.sessionId }) : ''
+});
 const caCircuitLabel = circuit => `${circuit.name}${circuit.countryName ? ` · ${circuit.countryName}` : ''}`;
 const caNormalize = text => String(text || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
 const caCount = (value, noun) => `${value} ${noun}${value === 1 ? '' : 's'}`;

@@ -1,4 +1,4 @@
-const constructorId = params().get('id');
+const constructorId = resourceId(activeSeriesKey() === 'f3' || activeSeriesKey() === 'academy' ? 'team' : 'constructor');
 const CONSTRUCTOR_SERIES = ['f2', 'f3', 'academy'].find(series => String(window.location?.pathname || '').startsWith(`/${series}/`)) || 'f1';
 const CONSTRUCTOR_BASE = CONSTRUCTOR_SERIES === 'f1' ? '' : `/${CONSTRUCTOR_SERIES}`;
 const CONSTRUCTOR_ENTITY = ['f3', 'academy'].includes(CONSTRUCTOR_SERIES) ? 'team' : 'constructor';
@@ -6,6 +6,23 @@ const CONSTRUCTOR_ARCHIVE = `${CONSTRUCTOR_BASE}/${CONSTRUCTOR_ENTITY}s`;
 const CONSTRUCTOR_SERIES_NAME = { f1: 'Formula 1', f2: 'Formula 2', f3: 'Formula 3', academy: 'F1 Academy' }[CONSTRUCTOR_SERIES];
 const CONSTRUCTOR_HAS_CHASSIS = CONSTRUCTOR_SERIES === 'f1';
 const CONSTRUCTOR_DETAIL_CACHE = `racelytic:${CONSTRUCTOR_SERIES}:constructor:${constructorId}:v2`;
+function constructorLineageChart(segments, currentYear = new Date().getFullYear()) {
+  const valid = (segments || []).filter(segment => Number(segment?.fromYear) > 0);
+  if (!valid.length) return { totalYears: 0, items: [], ticks: [] };
+  const startYear = Math.min(...valid.map(segment => Number(segment.fromYear)));
+  const endYear = Math.max(...valid.map(segment => Number(segment.toYear) || Number(currentYear) || Number(segment.fromYear)));
+  const totalYears = Math.max(1, endYear - startYear + 1);
+  const items = valid.map(segment => ({ ...segment, column: Number(segment.fromYear) - startYear + 1, span: Math.max(1, (Number(segment.toYear) || endYear) - Number(segment.fromYear) + 1) }));
+  const ticks = [...new Set(items.map(segment => segment.fromYear))].map((year, index) => ({ year, change: index > 0, position: (year - startYear) / totalYears * 100 }));
+  return { startYear, endYear, totalYears, items, ticks };
+}
+const CONSTRUCTOR_LINEAGE_VIEW = globalThis.constructorLineageView || {
+  years: segment => !segment?.fromYear ? 'Years not recorded' : !segment.toYear ? `${segment.fromYear}–present` : Number(segment.fromYear) === Number(segment.toYear) ? String(segment.fromYear) : `${segment.fromYear}–${segment.toYear}`,
+  transition: segment => segment?.transition?.label || 'Operational continuation',
+  action: segment => ({ 'works-partnership': 'Partnered', 'ownership-change': 'Acquired', 'title-partnership': 'Partnered', 'works-takeover': 'Acquired', rebrand: 'Renamed', 'title-identity': 'Renamed', 'identity-restored': 'Restored', 'assets-acquired': 'Assets acquired', 'management-buyout': 'Bought out', 'identity-change': 'Renamed', restructure: 'Restructured', 'operational-continuation': 'Continued' })[segment?.transition?.type || String(segment?.transition?.label || 'operational-continuation').toLowerCase().replace(/\s+/g, '-')] || 'Continued',
+  chart: constructorLineageChart,
+  continuity: () => ''
+};
 let constructorData = null, constructorResults = null, constructorState = {};
 const constructorNode = id => document.getElementById(id);
 const constructorText = value => String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
@@ -31,19 +48,50 @@ function readConstructorDetailState() {
   }
 }
 function saveConstructorDetailState() {
-  const query = new URLSearchParams({ id: constructorId });
+  const query = new URLSearchParams();
   if (constructorReturnPath() !== CONSTRUCTOR_ARCHIVE) query.set('return', constructorReturnPath());
   Object.entries(constructorState).forEach(([key, value]) => {
     if (!value || (['page', 'driverPage', 'chassisPage'].includes(key) && value === 1) || (key === 'driverSort' && value === 'recent')) return;
     query.set(key, value);
   });
-  history.replaceState(null, '', `${CONSTRUCTOR_BASE}/${CONSTRUCTOR_ENTITY}?${query}${window.location.hash || ''}`);
+  history.replaceState(null, '', `${resourceUrl(CONSTRUCTOR_ENTITY, constructorId, { base: CONSTRUCTOR_BASE, query })}${window.location.hash || ''}`);
 }
 function constructorOptions(id, years, label = 'All seasons') {
   constructorNode(id).innerHTML = `<option value="">${label}</option>` + [...new Set(years)].sort((a, b) => b - a).map(year => `<option value="${esc(year)}">${esc(year)}</option>`).join('');
 }
 function constructorStat(label, value) {
   return `<div><dt>${esc(label)}</dt><dd>${value == null ? '—' : fmtNumber(value)}</dd></div>`;
+}
+function renderConstructorLineage(lineage) {
+  const section = document.getElementById('constructor-lineage');
+  const link = document.getElementById('constructor-lineage-link');
+  if (!section || !link) return;
+  const segments = Array.isArray(lineage?.segments) ? lineage.segments : [];
+  const visible = CONSTRUCTOR_SERIES === 'f1' && segments.length > 1;
+  section.hidden = !visible; link.hidden = !visible;
+  if (!visible) return;
+  const teamColor = segment => globalThis.teamColors?.baseConstructorColor(segment.constructorId) || '#6b7280';
+  const textColor = color => globalThis.teamColors?.constructorTextColor(color) || '#ffffff';
+  const chart = CONSTRUCTOR_LINEAGE_VIEW.chart(segments);
+  const minimumWidth = Math.max(620, chart.items.length * 104);
+  const scopeNote = lineage?.identityScope?.note ? `<p class="constructor-lineage-scope">${esc(lineage.identityScope.note)}</p>` : '';
+  constructorNode('constructor-lineage-timeline').innerHTML = `<div class="constructor-lineage-scroll"><div class="constructor-lineage-chart" style="min-width:${minimumWidth}px">
+    <div class="constructor-lineage-bar" role="list" aria-label="Constructor identity by year">${chart.items.map(segment => {
+      const color = teamColor(segment), label = `${segment.name}, ${CONSTRUCTOR_LINEAGE_VIEW.years(segment)}`;
+      const content = `<span class="constructor-lineage-years">${esc(CONSTRUCTOR_LINEAGE_VIEW.years(segment))}</span><span class="constructor-lineage-name">${esc(segment.name)}</span>`;
+      return segment.current
+        ? `<span class="constructor-lineage-segment current" data-lineage-segment role="listitem" aria-current="page" aria-label="${esc(label)}" style="--team-color:${esc(color)};--team-ink:${esc(textColor(color))};--lineage-weight:${segment.span}">${content}</span>`
+        : `<a class="constructor-lineage-segment" data-lineage-segment role="listitem" href="/constructors/${encodeURIComponent(segment.constructorId)}" aria-label="${esc(label)}" style="--team-color:${esc(color)};--team-ink:${esc(textColor(color))};--lineage-weight:${segment.span}">${content}</a>`;
+    }).join('')}</div>
+  </div></div>${scopeNote}`;
+  if (typeof requestAnimationFrame === 'function') requestAnimationFrame(() => {
+    const timeline = constructorNode('constructor-lineage-timeline');
+    timeline.querySelector?.('[aria-current="page"]')?.scrollIntoView?.({ behavior: 'auto', block: 'nearest', inline: 'center' });
+    timeline.querySelectorAll?.('[data-lineage-segment]').forEach(segment => {
+      const name = segment.querySelector('.constructor-lineage-name');
+      if (name && name.scrollWidth > name.clientWidth) segment.title = segment.getAttribute('aria-label');
+    });
+  });
 }
 function renderConstructorProfile(data) {
   constructorData = data;
@@ -55,16 +103,17 @@ function renderConstructorProfile(data) {
     ${subtitle ? `<p class="detail-sub">${esc(subtitle)}</p>` : ''}
     <div class="driver-profile-badges">${titles ? `<strong>${fmtNumber(titles)}× ${CONSTRUCTOR_SERIES === 'f1' ? 'Constructors’' : 'Teams’'} champion</strong>` : ''}</div>
     <div class="profile-meta"><span>${esc(constructorYears(c.firstYear, c.lastYear))}</span><span>${data.standings.length} recorded season${data.standings.length === 1 ? '' : 's'}</span></div></div>
-    ${current ? `<aside class="constructor-current-season"><span class="eyebrow">${c.currentSeason} SEASON</span><strong>${current.positionNumber ? `P${current.positionNumber}` : 'Not classified'}${current.points != null ? ` · ${fmtNumber(current.points)} points` : ''}</strong><span>Season drivers</span><div>${c.currentDrivers.map(driver => `<a href="${CONSTRUCTOR_BASE}/driver?id=${encodeURIComponent(driver.id)}">${esc(driver.name)}</a>`).join(' · ') || 'Drivers not yet recorded'}</div></aside>` : ''}</section>`;
+    ${current ? `<aside class="constructor-current-season"><span class="eyebrow">${c.currentSeason} SEASON</span><strong>${current.positionNumber ? `P${current.positionNumber}` : 'Not classified'}${current.points != null ? ` · ${fmtNumber(current.points)} points` : ''}</strong><span>Season drivers</span><div>${c.currentDrivers.map(driver => `<a href="${CONSTRUCTOR_BASE}/drivers/${encodeURIComponent(driver.id)}">${esc(driver.name)}</a>`).join(' · ') || 'Drivers not yet recorded'}</div></aside>` : ''}</section>`;
   constructorNode('constructor-stats').innerHTML = `<dl class="constructor-stat-strip">${[
     [CONSTRUCTOR_SERIES === 'f1' ? 'Constructors’ titles' : 'Teams’ titles', c.totalChampionshipWins], ['Race starts', c.totalRaceStarts], ['Race wins', c.totalRaceWins],
     ['Podiums', c.totalPodiums], ['Pole positions', c.totalPolePositions], ['Career points', c.totalPoints]
   ].map(([label, value]) => constructorStat(label, value)).join('')}</dl>`;
+  renderConstructorLineage(data.lineage);
   constructorNode('constructor-career-span').textContent = `${constructorYears(c.firstYear, c.lastYear)} · ${data.standings.length} seasons`;
   constructorNode('constructor-seasons').innerHTML = data.standings.length ? `<div class="career-timeline constructor-career-timeline" role="list" aria-label="Constructor career by season">${[...data.standings].reverse().map(season => {
     const won = constructorTrue(season.championshipWon);
     const label = won ? `${CONSTRUCTOR_SERIES === 'f1' ? 'Constructors’' : 'Teams’'} champion` : season.positionNumber ? `Championship P${season.positionNumber}` : CONSTRUCTOR_SERIES === 'f1' && season.year < 1958 ? 'Before constructors’ championship' : 'No standings recorded';
-    return `<a id="constructor-season-${season.year}" class="career-timeline-item${won ? ' champion' : ''}" role="listitem" href="${CONSTRUCTOR_BASE}/season?year=${season.year}"><div class="timeline-marker"><i></i></div><span class="timeline-year">${season.year}</span><strong>${label}</strong><small>${season.points == null ? 'Participation recorded' : `${fmtNumber(season.points)} points`}</small>${CONSTRUCTOR_HAS_CHASSIS && season.chassis.length ? `<div class="timeline-context">${esc(season.chassis.join(' · '))}</div>` : ''}${season.drivers.length ? `<div class="timeline-people">${esc(season.drivers.join(', '))}</div>` : ''}</a>`;
+    return `<a id="constructor-season-${season.year}" class="career-timeline-item${won ? ' champion' : ''}" role="listitem" href="${resourceUrl('season', season.year, { base: CONSTRUCTOR_BASE })}"><div class="timeline-marker"><i></i></div><span class="timeline-year">${season.year}</span><strong>${label}</strong><small>${season.points == null ? 'Participation recorded' : `${fmtNumber(season.points)} points`}</small>${CONSTRUCTOR_HAS_CHASSIS && season.chassis.length ? `<div class="timeline-context">${esc(season.chassis.join(' · '))}</div>` : ''}${season.drivers.length ? `<div class="timeline-people">${esc(season.drivers.join(', '))}</div>` : ''}</a>`;
   }).join('')}</div>` : '<p class="empty-state">No participation history recorded.</p>';
   constructorOptions('constructor-timeline-year', data.standings.map(row => row.year), 'Latest season');
   constructorOptions('constructor-driver-season', data.drivers.flatMap(row => row.seasons));
@@ -96,7 +145,7 @@ function renderConstructorDrivers() {
   constructorState.driverPage = paged.page;
   constructorNode('constructor-driver-count').textContent = `${visible.length} driver${visible.length === 1 ? '' : 's'}`;
   constructorNode('constructor-drivers').setAttribute('aria-busy', 'false');
-  constructorNode('constructor-drivers').innerHTML = visible.length ? paged.items.map(driver => `<a class="constructor-driver-card" href="${CONSTRUCTOR_BASE}/driver?id=${encodeURIComponent(driver.driverId)}"><div class="constructor-driver-years">${esc(constructorYears(driver.firstYear, driver.lastYear))}</div><strong>${esc(driver.driverName)}</strong><span>${fmtNumber(driver.starts)} starts · ${fmtNumber(driver.points)} points</span><div class="constructor-driver-record">${driver.wins > 0 ? `<small>${fmtNumber(driver.wins)} wins</small>` : ''}${driver.podiums > 0 ? `<small>${fmtNumber(driver.podiums)} podiums</small>` : ''}<small>${driver.seasons.length} season${driver.seasons.length === 1 ? '' : 's'}</small></div></a>`).join('') : '<p class="empty-state">No drivers match these filters.</p>';
+  constructorNode('constructor-drivers').innerHTML = visible.length ? paged.items.map(driver => `<a class="constructor-driver-card" href="${CONSTRUCTOR_BASE}/drivers/${encodeURIComponent(driver.driverId)}"><div class="constructor-driver-years">${esc(constructorYears(driver.firstYear, driver.lastYear))}</div><strong>${esc(driver.driverName)}</strong><span>${fmtNumber(driver.starts)} starts · ${fmtNumber(driver.points)} points</span><div class="constructor-driver-record">${driver.wins > 0 ? `<small>${fmtNumber(driver.wins)} wins</small>` : ''}${driver.podiums > 0 ? `<small>${fmtNumber(driver.podiums)} podiums</small>` : ''}<small>${driver.seasons.length} season${driver.seasons.length === 1 ? '' : 's'}</small></div></a>`).join('') : '<p class="empty-state">No drivers match these filters.</p>';
   renderPagination('constructor-drivers', visible.length, paged.page, 24, page => { constructorState.driverPage = page; renderConstructorDrivers(); constructorNode('constructor-people').scrollIntoView({ behavior: 'smooth' }); });
   saveConstructorDetailState();
 }
@@ -147,12 +196,12 @@ function renderConstructorResults() {
   constructorNode('constructor-results').setAttribute('aria-busy', 'false');
   constructorNode('constructor-results').innerHTML = races.length ? `<div class="constructor-history-table-wrap"><table class="constructor-history-table"><caption class="sr-only">Constructor race history</caption><thead><tr><th scope="col">Season</th><th scope="col">Race</th><th scope="col">Constructor results</th><th scope="col">Points</th></tr></thead><tbody>${paged.items.map(race => {
     const totalPoints = race.entries.reduce((total, result) => total + Number(result.points || 0), 0);
-    const raceQuery = new URLSearchParams({ id: race.raceId });
+    const raceQuery = new URLSearchParams();
     if (race.sessionId) raceQuery.set('session', race.sessionId);
     const raceLabel = `${displayRaceName(race)}${race.sessionName ? ` · ${race.sessionName}` : ''}`;
-    return `<tr><td><a href="${CONSTRUCTOR_BASE}/season?year=${esc(race.year)}">${esc(race.year)}</a><small>Round ${esc(race.round)}</small></td><th scope="row"><a href="${CONSTRUCTOR_BASE}/race?${esc(raceQuery.toString())}">${esc(raceLabel)}</a><small>${esc(fmtDate(race.date))}${race.circuitName ? ` · ${esc(race.circuitName)}` : ''}</small></th><td><div class="constructor-race-results">${race.entries.map(result => {
+    return `<tr><td><a href="${resourceUrl('season', race.year, { base: CONSTRUCTOR_BASE })}">${esc(race.year)}</a><small>Round ${esc(race.round)}</small></td><th scope="row"><a href="${resourceUrl('race', race.raceId, { base: CONSTRUCTOR_BASE, label: displayRaceName(race), query: raceQuery })}">${esc(raceLabel)}</a><small>${esc(fmtDate(race.date))}${race.circuitName ? ` · ${esc(race.circuitName)}` : ''}</small></th><td><div class="constructor-race-results">${race.entries.map(result => {
     const finish = constructorResultFinish(result), podium = Number(finish) > 0 && Number(finish) <= 3;
-    return `<div class="constructor-race-result"><a href="${CONSTRUCTOR_BASE}/driver?id=${encodeURIComponent(result.driverId)}">${esc(result.driverName)}</a><span>Grid ${esc(constructorResultGrid(result))}</span><strong class="finish-position${podium ? ' podium' : ''}">${esc(finish)}</strong><b>${fmtNumber(result.points)} pts</b>${result.reasonRetired ? `<small title="${esc(result.reasonRetired)}">${esc(result.reasonRetired)}</small>` : ''}</div>`;
+    return `<div class="constructor-race-result"><a href="${CONSTRUCTOR_BASE}/drivers/${encodeURIComponent(result.driverId)}">${esc(result.driverName)}</a><span>Grid ${esc(constructorResultGrid(result))}</span><strong class="finish-position${podium ? ' podium' : ''}">${esc(finish)}</strong><b>${fmtNumber(result.points)} pts</b>${result.reasonRetired ? `<small title="${esc(result.reasonRetired)}">${esc(result.reasonRetired)}</small>` : ''}</div>`;
   }).join('')}</div></td><td class="result-points-total">${fmtNumber(totalPoints)}</td></tr>`;
   }).join('')}</tbody></table></div>` : '<p class="empty-state">No races match these filters.</p>';
   renderPagination('constructor-results', races.length, paged.page, 25, page => { constructorState.page = page; renderConstructorResults(); constructorNode('constructor-history').scrollIntoView({ behavior: 'smooth' }); });
@@ -216,7 +265,7 @@ function bindConstructorDetail() {
   constructorNode('constructor-timeline-year').addEventListener('change', event => { constructorState.timeline = event.target.value; focusConstructorSeason(); });
   constructorNode('constructor-timeline-latest').addEventListener('click', () => { constructorState.timeline = ''; focusConstructorSeason(); });
   window.addEventListener('popstate', () => {
-    if (params().get('id') !== constructorId) { window.location.reload(); return; }
+    if (resourceId(activeSeriesKey() === 'f3' || activeSeriesKey() === 'academy' ? 'team' : 'constructor') !== constructorId) { window.location.reload(); return; }
     readConstructorDetailState(); renderConstructorDrivers(); if (CONSTRUCTOR_HAS_CHASSIS) renderConstructorChassis(); renderConstructorResults(); focusConstructorSeason(false);
   });
 }

@@ -1,6 +1,7 @@
 const DEFAULT_SITE_ORIGIN = 'https://racelytic.com';
 const SOCIAL_IMAGE_PATH = '/assets/social-card.png';
 const { all: SERIES } = require('../frontend/js/series-config');
+const { matchResourcePath, resourcePath } = require('./resource-routes');
 
 const PAGE_META = Object.freeze({
     database: ['Database', 'Browse seasons, races, drivers, teams, circuits and championship history.'],
@@ -61,6 +62,21 @@ const NOINDEX_PAGES = new Set(['404', 'account', 'ask', 'monitor', 'search']);
 const NEUTRAL_PAGES = new Set(['404', 'about', 'community', 'ratings', 'ratings-leaderboard', 'ratings-compare',
     'ratings-driver', 'ratings-methodology', 'data-sources', 'privacy', 'terms', 'account', 'monitor', 'search']);
 const DETAIL_PARAMS = Object.freeze({ season: 'year', race: 'id', driver: 'id', constructor: 'id', team: 'id', circuit: 'id', chassis: 'id', 'championship-builder': 'id' });
+const DETAIL_PARENTS = Object.freeze({
+    season: ['seasons', 'Seasons'], race: ['races', 'Races'], driver: ['drivers', 'Drivers'],
+    constructor: ['constructors', 'Constructors'], team: ['teams', 'Teams'], circuit: ['circuits', 'Circuits']
+});
+
+const JUNIOR_ANALYSIS_DESCRIPTIONS = Object.freeze({
+    analysis: series => `Explore ${series} season and race analysis, driver comparisons, circuit trends, records and teammate battles.`,
+    'season-analysis': series => `Follow ${series} championship progression race by race, including points, title margins, reliability and driver performance.`,
+    'season-comparison': series => `Compare two ${series} seasons across results, competition, reliability, teams and driver performance.`,
+    'race-analysis': series => `Break down a ${series} race session by grid movement, finishing positions, attrition and team performance.`,
+    'driver-comparison': series => `Compare two ${series} drivers across career totals, shared races, teammate results and performance trends.`,
+    'driver-form': series => `Track recent ${series} race and qualifying form, reliability, results and teammate performance.`,
+    'teammate-battles': series => `Compare ${series} teammates across equal-team starts, qualifying sessions and race results.`,
+    'circuit-analysis': series => `Discover ${series} circuit specialists, winner trends, reliability, grid movement and race-format patterns.`
+});
 
 function esc(value) {
     return String(value).replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[character]);
@@ -72,6 +88,8 @@ function siteOrigin() {
 
 function routeContext(pathname) {
     const cleanPath = pathname === '/' ? '/' : String(pathname || '/').replace(/\/+$/, '');
+    const resource = matchResourcePath(cleanPath);
+    if (resource) return { cleanPath, page: resource.resource, resourceId: resource.id, resourceSlug: resource.slug, series: SERIES[resource.series] };
     const match = cleanPath.match(/^\/(f2|f3|academy)(?:\/(.*))?$/);
     const seriesKey = match?.[1] || 'f1';
     const ratingMatch = cleanPath.match(/^\/ratings\/(leaderboard|compare|driver|methodology)$/);
@@ -90,9 +108,18 @@ function humanizeSlug(value) {
     return value.split(/[-_]+/).filter(Boolean).map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 }
 
+function publicEntityName(entity) {
+    return String(entity?.name || entity?.fullName || '').trim();
+}
+
+function entityPageTitle(name, seriesName, entityLabel) {
+    return `${name} — ${seriesName} ${entityLabel} · Racelytic`;
+}
+
 function canonicalPath(pathname, query) {
     const context = routeContext(pathname);
     if (context.page === 'about') return '/about';
+    if (context.resourceId) return context.cleanPath;
     const parameter = DETAIL_PARAMS[context.page];
     const value = parameter ? queryValue(query, parameter) : '';
     return `${context.cleanPath}${value ? `?${parameter}=${encodeURIComponent(value)}` : ''}`;
@@ -103,7 +130,7 @@ function metadataFor(pathname, query = {}, overrides = {}) {
     const canonical = `${siteOrigin()}${canonicalPath(context.cleanPath, query)}`;
     const image = `${siteOrigin()}${SOCIAL_IMAGE_PATH}`;
     const detailParameter = DETAIL_PARAMS[context.page];
-    const detailValue = detailParameter ? queryValue(query, detailParameter) : '';
+    const detailValue = context.resourceId || (detailParameter ? queryValue(query, detailParameter) : '');
     const detailName = detailParameter === 'year' ? detailValue : humanizeSlug(detailValue);
     const pageMeta = PAGE_META[context.page] || [humanizeSlug(context.page) || 'Racing History', 'Explore racing history, statistics, analysis and simulation tools.'];
 
@@ -116,9 +143,18 @@ function metadataFor(pathname, query = {}, overrides = {}) {
         title = `${context.series.name} History, Statistics & Analysis · Racelytic`;
         description = `Explore ${context.series.name} history, results, drivers, teams, circuits, analysis, simulators and games with Racelytic.`;
     } else {
-        const subject = detailName ? `${detailName} ${pageMeta[0]}` : pageMeta[0];
-        title = `${subject} · ${context.series.name} · Racelytic`;
-        description = `${pageMeta[1].replace(/\.$/, '')} across the ${context.series.name} archive.`;
+        if (detailName && ['driver', 'constructor', 'team', 'circuit'].includes(context.page)) {
+            const entityLabel = context.page === 'constructor' ? 'Constructor' : context.page === 'team' ? 'Team'
+                : context.page === 'circuit' ? 'Circuit' : 'Driver';
+            title = `${detailName} — ${context.series.name} ${entityLabel} · Racelytic`;
+        } else {
+            const subject = detailName ? `${detailName} ${pageMeta[0]}` : pageMeta[0];
+            title = `${subject} · ${context.series.name} · Racelytic`;
+        }
+        const juniorDescription = context.series.key !== 'f1' ? JUNIOR_ANALYSIS_DESCRIPTIONS[context.page] : null;
+        description = juniorDescription
+            ? juniorDescription(context.series.name)
+            : `${pageMeta[1].replace(/\.$/, '')} across the ${context.series.name} archive.`;
     }
 
     const optionalDetailPage = context.page === 'championship-builder' || context.page === 'chassis';
@@ -151,14 +187,103 @@ function renderSeoTags(metadata) {
     ].join('\n  ');
 }
 
+function jsonForHtml(value) {
+    return JSON.stringify(value)
+        .replace(/&/g, '\\u0026')
+        .replace(/</g, '\\u003c')
+        .replace(/>/g, '\\u003e')
+        .replace(/\u2028/g, '\\u2028')
+        .replace(/\u2029/g, '\\u2029');
+}
+
+function breadcrumbItems(metadata) {
+    const context = routeContext(new URL(metadata.canonical).pathname);
+    const prefix = context.series.key === 'f1' ? '' : `/${context.series.key}`;
+    const items = [{ '@type': 'ListItem', position: 1, name: 'Racelytic', item: siteOrigin() }];
+    if (context.series.key !== 'f1') {
+        items.push({ '@type': 'ListItem', position: items.length + 1, name: context.series.name, item: `${siteOrigin()}${prefix}` });
+    }
+    const parent = DETAIL_PARENTS[context.page];
+    if (parent) {
+        items.push({ '@type': 'ListItem', position: items.length + 1, name: parent[1], item: `${siteOrigin()}${prefix}/${parent[0]}` });
+    }
+    items.push({ '@type': 'ListItem', position: items.length + 1, name: metadata.title.split(' · ')[0], item: metadata.canonical });
+    return items.filter((item, index, all) => index === 0 || item.item !== all[index - 1].item);
+}
+
+function entitySchema(metadata) {
+    const initial = metadata.initialContent;
+    if (!initial) return null;
+    if (initial.kind === 'driver') {
+        const driver = initial.driver;
+        return {
+            '@type': 'Person', '@id': `${metadata.canonical}#driver`, url: metadata.canonical,
+            name: driver.fullName || driver.name,
+            ...(driver.nationalityCountryName ? { nationality: { '@type': 'Country', name: driver.nationalityCountryName } } : {}),
+            ...(driver.dateOfBirth ? { birthDate: String(driver.dateOfBirth).slice(0, 10) } : {}),
+            ...(driver.dateOfDeath ? { deathDate: String(driver.dateOfDeath).slice(0, 10) } : {})
+        };
+    }
+    if (initial.kind === 'constructor') {
+        const constructor = initial.constructor;
+        return {
+            '@type': 'SportsOrganization', '@id': `${metadata.canonical}#team`, url: metadata.canonical,
+            name: constructor.fullName || constructor.name,
+            sport: 'Motorsport',
+            ...(constructor.countryName ? { location: { '@type': 'Country', name: constructor.countryName } } : {})
+        };
+    }
+    if (initial.kind === 'circuit') {
+        const circuit = initial.circuit;
+        const address = [circuit.placeName, circuit.countryName].filter(Boolean).join(', ');
+        return {
+            '@type': 'Place', '@id': `${metadata.canonical}#circuit`, url: metadata.canonical, name: circuit.name,
+            ...(address ? { address } : {})
+        };
+    }
+    if (initial.kind === 'race') {
+        const race = initial.race;
+        return {
+            '@type': 'SportsEvent', '@id': `${metadata.canonical}#event`, url: metadata.canonical,
+            name: `${race.year} ${race.displayName || race.name || race.officialName}`,
+            sport: 'Motorsport',
+            ...(race.date ? { startDate: String(race.date).slice(0, 10) } : {}),
+            ...(race.circuitName ? { location: { '@type': 'Place', name: race.circuitName,
+                ...((race.countryName || race.placeName) ? { address: race.countryName || race.placeName } : {}) } } : {})
+        };
+    }
+    return null;
+}
+
+function renderStructuredData(metadata) {
+    const entity = entitySchema(metadata);
+    const pageType = ['driver', 'constructor'].includes(metadata.initialContent?.kind) ? 'ProfilePage'
+        : metadata.initialContent?.kind === 'season' ? 'CollectionPage' : 'WebPage';
+    const webpage = {
+        '@type': pageType, '@id': `${metadata.canonical}#webpage`, url: metadata.canonical,
+        name: metadata.title, description: metadata.description,
+        isPartOf: { '@id': `${siteOrigin()}/#website` },
+        breadcrumb: { '@id': `${metadata.canonical}#breadcrumb` },
+        ...(entity ? { mainEntity: { '@id': entity['@id'] } } : {})
+    };
+    const graph = [
+        { '@type': 'WebSite', '@id': `${siteOrigin()}/#website`, url: `${siteOrigin()}/`, name: 'Racelytic' },
+        webpage,
+        { '@type': 'BreadcrumbList', '@id': `${metadata.canonical}#breadcrumb`, itemListElement: breadcrumbItems(metadata) }
+    ];
+    if (entity) graph.push(entity);
+    return `<script type="application/ld+json" data-racelytic-seo>${jsonForHtml({ '@context': 'https://schema.org', '@graph': graph })}</script>`;
+}
+
 function applySeo(html, pathname, query = {}, overrides = {}) {
     const metadata = metadataFor(pathname, query, overrides);
     const stripped = html
         .replace(/\s*<meta\s+name=["'](?:description|robots)["'][^>]*>/gi, '')
         .replace(/\s*<meta\s+(?:property|name)=["'](?:og:[^"']+|twitter:[^"']+)["'][^>]*>/gi, '')
         .replace(/\s*<link\s+rel=["']canonical["'][^>]*>/gi, '')
+        .replace(/\s*<script\s+type=["']application\/ld\+json["']\s+data-racelytic-seo[^>]*>[\s\S]*?<\/script>/gi, '')
         .replace(/<title>[\s\S]*?<\/title>/i, `<title>${esc(metadata.title)}</title>`);
-    const tags = renderSeoTags(metadata);
+    const tags = `${renderSeoTags(metadata)}\n  ${renderStructuredData(metadata)}`;
     if (/<meta\s+name=["']viewport["'][^>]*>/i.test(stripped)) {
         return stripped.replace(/(<meta\s+name=["']viewport["'][^>]*>)/i, `$1\n  ${tags}`);
     }
@@ -182,4 +307,4 @@ function renderSitemap(routes) {
     return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map(route => `  <url><loc>${esc(`${siteOrigin()}${route}`)}</loc></url>`).join('\n')}\n</urlset>\n`;
 }
 
-module.exports = { applySeo, canonicalPath, metadataFor, renderRobots, renderSitemap, routeContext };
+module.exports = { applySeo, canonicalPath, entityPageTitle, metadataFor, publicEntityName, renderRobots, renderSitemap, renderStructuredData, routeContext };

@@ -81,7 +81,7 @@
   function positionChangeText(change) { return change == null ? '—' : `${change > 0 ? '+' : ''}${change}`; }
   function entityUrl(type, id) {
     const page = type === 'team' ? (['f3', 'academy'].includes(series) ? 'team' : 'constructor') : 'driver';
-    return `${series === 'f1' ? '' : `/${series}`}/${page}?id=${encodeURIComponent(id)}`;
+    return resourceUrl(page, id, { base: series === 'f1' ? '' : `/${series}` });
   }
   function driverShortName(name) { const parts = String(name || '').replace(/\s+(Jr\.?|Sr\.?)$/i, '').split(/\s+/); return parts[parts.length - 1] || name; }
   function recordedRace(race) { return junior ? race.raceSessionCount === undefined || Number(race.raceSessionCount) > 0 : Boolean(race.winnerDriverId || race.winnerName || race.winnerConstructorId || race.winnerConstructorName); }

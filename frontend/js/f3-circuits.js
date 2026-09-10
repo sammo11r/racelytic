@@ -17,7 +17,7 @@ function renderF3Circuits() {
   document.getElementById('f3-circuit-count').textContent = `${fmtNumber(circuits.length)} circuit${circuits.length === 1 ? '' : 's'}`;
   document.getElementById('f3-circuits').innerHTML = paged.items.map(circuit => {
     const imageId = f2CircuitImageId(circuit.id);
-    return `<a class="entity-card" href="/f3/circuit?id=${encodeURIComponent(circuit.id)}">${imageId ? `<img class="circuit-card-map" src="/assets/circuits/${encodeURIComponent(imageId)}.svg" alt="" loading="lazy">` : ''}<div class="circuit-card-copy"><h3>${esc(circuit.name)}</h3><p>${esc(circuit.placeName || 'Location not recorded')}</p><span class="number">${fmtNumber(circuit.totalRacesHeld)} weekends · ${esc(circuit.firstYear || '—')}${circuit.lastYear && circuit.lastYear !== circuit.firstYear ? `–${esc(circuit.lastYear)}` : ''}</span></div></a>`;
+    return `<a class="entity-card" href="/f3/circuits/${encodeURIComponent(circuit.id)}">${imageId ? `<img class="circuit-card-map" src="/assets/circuits/${encodeURIComponent(imageId)}.svg" alt="" loading="lazy">` : ''}<div class="circuit-card-copy"><h3>${esc(circuit.name)}</h3><p>${esc(circuit.placeName || 'Location not recorded')}</p><span class="number">${fmtNumber(circuit.totalRacesHeld)} weekends · ${esc(circuit.firstYear || '—')}${circuit.lastYear && circuit.lastYear !== circuit.firstYear ? `–${esc(circuit.lastYear)}` : ''}</span></div></a>`;
   }).join('');
   renderPagination('f3-circuits', circuits.length, f3CircuitPage, F3_CIRCUIT_PAGE_SIZE, page => { f3CircuitPage = page; renderF3Circuits(); document.getElementById('f3-circuits').scrollIntoView({ behavior: 'smooth', block: 'start' }); });
 }

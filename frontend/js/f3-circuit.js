@@ -23,14 +23,14 @@ function f3CircuitRaceSummary(race) {
     const name = f3CircuitSessionName(session, race);
     if (session.cancelled) return `<small><strong>${esc(name)}:</strong> Cancelled</small>`;
     if (!session.winnerName) return `<small><strong>${esc(name)}:</strong> No result</small>`;
-    return `<small><strong>${esc(name)}:</strong> <a href="/f3/driver?id=${encodeURIComponent(session.winnerDriverId)}">${esc(session.winnerName)}</a>${session.winnerConstructorName ? ` · ${esc(session.winnerConstructorName)}` : ''}</small>`;
+    return `<small><strong>${esc(name)}:</strong> <a href="/f3/drivers/${encodeURIComponent(session.winnerDriverId)}">${esc(session.winnerName)}</a>${session.winnerConstructorName ? ` · ${esc(session.winnerConstructorName)}` : ''}</small>`;
   }).join('');
 }
 
 async function loadF3Circuit() {
   const returnPath = params().get('return');
   if (returnPath === '/f3/circuits' || returnPath?.startsWith('/f3/circuits?')) document.getElementById('circuit-back-link').href = returnPath;
-  const id = params().get('id');
+  const id = resourceId('circuit');
   if (!id) return setError('f3-circuit-head', 'No Formula 3 circuit selected.');
   try {
     const data = await getJSON(`/api/circuits/${encodeURIComponent(id)}?series=f3`);
@@ -44,7 +44,7 @@ async function loadF3Circuit() {
     const renderRaces = () => {
       const paged = pageItems(data.races, racePage, 20);
       racePage = paged.page;
-      document.getElementById('f3-circuit-races').innerHTML = paged.items.length ? paged.items.map(race => `<article class="circuit-race-card"><div class="circuit-race-year">${esc(race.year)}</div><div class="circuit-race-copy"><a href="/f3/race?id=${encodeURIComponent(race.id)}"><strong>${esc(race.name)}</strong></a><span>Round ${esc(race.round)} · ${esc(fmtDate(race.date))}</span>${f3CircuitRaceSummary(race)}</div><a class="text-link" href="/f3/season?year=${encodeURIComponent(race.year)}">Season <span aria-hidden="true">→</span></a></article>`).join('') : '<div class="empty-state">No Formula 3 weekends found for this circuit.</div>';
+      document.getElementById('f3-circuit-races').innerHTML = paged.items.length ? paged.items.map(race => `<article class="circuit-race-card"><div class="circuit-race-year">${esc(race.year)}</div><div class="circuit-race-copy"><a href="${resourceUrl('race',race.id,{base:activeSeriesBase(),label:race.name})}"><strong>${esc(race.name)}</strong></a><span>Round ${esc(race.round)} · ${esc(fmtDate(race.date))}</span>${f3CircuitRaceSummary(race)}</div><a class="text-link" href="${resourceUrl('season',race.year,{base:activeSeriesBase()})}">Season <span aria-hidden="true">→</span></a></article>`).join('') : '<div class="empty-state">No Formula 3 weekends found for this circuit.</div>';
       renderPagination('f3-circuit-races', data.races.length, racePage, 20, page => { racePage = page; renderRaces(); document.getElementById('f3-circuit-races').scrollIntoView({ behavior: 'smooth', block: 'start' }); });
     };
     renderRaces();

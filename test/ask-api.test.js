@@ -67,7 +67,10 @@ test('Ask API returns a stable record response and applies confirmed edits', asy
         assert.equal(executed.fromYear, 2024);
         assert.equal(response.body.interpretation.entity, 'drivers');
         assert.equal(response.body.interpretation.constructorName, 'Ferrari');
-        assert.deepEqual(response.body.options.recordCategories.map(category => category.id), ['wins', 'podiums', 'poles', 'fastestLaps', 'starts', 'points', 'championships']);
+        assert.deepEqual(response.body.options.recordCategories.map(category => category.id), [
+            'wins', 'podiums', 'poles', 'fastestLaps', 'starts', 'points', 'gridGain',
+            'averageFinish', 'finishRate', 'winRate', 'podiumRate', 'dnfs', 'championships'
+        ]);
 
         const preserved = await post(server, '/api/ask', {
             query: 'Who has the most wins since 2010?',
@@ -169,5 +172,87 @@ test('Ask API detects series mismatches and carries follow-up context', async ()
         });
         assert.equal(unrelated.status, 422);
         assert.equal(executions, 2);
+    });
+});
+
+test('Ask API accepts editable comparison slots and returns slot-aware suggestions', async () => {
+    let executed;
+    await withAskApi({ execute: async (connection, interpretation) => {
+        executed = interpretation;
+        return {
+            intent: 'driver_head_to_head', entity: 'drivers', entityLabel: 'Drivers', answer: 'Alonso leads.', assumptions: [],
+            comparison: { drivers: [], meetings: null, scope: interpretation.comparisonScope, metric: interpretation.comparisonMetric, details: [] }
+        };
+    } }, async server => {
+        const response = await post(server, '/api/ask', {
+            query: 'Who has more podiums, Alonso or Vettel?',
+            interpretation: {
+                intent: 'driver_head_to_head', subjectNames: ['Fernando Alonso', 'Sebastian Vettel'],
+                comparisonMetric: 'podiums', comparisonScope: 'career', fromYear: 2010, toYear: 2020
+            }
+        });
+        assert.equal(response.status, 200);
+        assert.deepEqual(executed.subjectNames, ['Fernando Alonso', 'Sebastian Vettel']);
+        assert.equal(executed.comparisonMetric, 'podiums');
+        assert.equal(executed.comparisonScope, 'career');
+        assert.deepEqual([executed.fromYear, executed.toYear], [2010, 2020]);
+    });
+
+    const ambiguous = new Error('“Smith” matches more than one name.');
+    ambiguous.statusCode = 422;
+    ambiguous.suggestions = [{ id: 'a-smith', name: 'Alex Smith', entity: 'drivers' }];
+    ambiguous.suggestionField = 'subjectNames';
+    ambiguous.suggestionIndex = 1;
+    ambiguous.originalName = 'Smith';
+    await withAskApi({ execute: async () => { throw ambiguous; } }, async server => {
+        const response = await post(server, '/api/ask', { query: 'Compare Jones and Smith' });
+        assert.equal(response.status, 422);
+        assert.deepEqual(response.body.suggestionContext, { field: 'subjectNames', index: 1, originalName: 'Smith' });
+    });
+});
+
+test('Ask API carries comparison context through natural follow-up refinements', async () => {
+    let executed;
+    await withAskApi({ execute: async (connection, interpretation) => {
+        executed = interpretation;
+        return {
+            intent: 'driver_head_to_head', entity: 'drivers', entityLabel: 'Drivers', answer: 'Answer', assumptions: [],
+            comparison: {
+                drivers: [], meetings: 0, scope: interpretation.comparisonScope, metric: interpretation.comparisonMetric, details: [],
+                filters: {
+                    circuit: interpretation.circuitName ? { name: interpretation.circuitName } : null,
+                    venueCountry: interpretation.venueCountryName ? { name: interpretation.venueCountryName } : null
+                }
+            }
+        };
+    } }, async server => {
+        const context = {
+            intent: 'driver_head_to_head', entity: 'drivers', subjectNames: ['Lewis Hamilton', 'Max Verstappen'],
+            comparisonMetric: 'wins', comparisonScope: 'career', fromYear: null, toYear: null
+        };
+        const qualifying = await post(server, '/api/ask', { query: 'Now compare qualifying', context });
+        assert.equal(qualifying.status, 200);
+        assert.deepEqual(executed.subjectNames, context.subjectNames);
+        assert.equal(executed.comparisonMetric, 'qualifying');
+
+        const circuit = await post(server, '/api/ask', { query: 'At Monaco', context });
+        assert.equal(circuit.status, 200);
+        assert.equal(executed.circuitName, 'Monaco');
+
+        const replacement = await post(server, '/api/ask', { query: 'What about Fernando Alonso?', context });
+        assert.equal(replacement.status, 200);
+        assert.deepEqual(executed.subjectNames, ['Lewis Hamilton', 'Fernando Alonso']);
+    });
+});
+
+test('Ask API refuses a broader answer when execution drops a requested scope', async () => {
+    await withAskApi({ execute: async () => ({
+        intent: 'record_leader', entity: 'drivers', entityLabel: 'Drivers', answer: 'Unscoped answer',
+        scope: {}, assumptions: [], record: { entries: [] }
+    }) }, async server => {
+        const response = await post(server, '/api/ask', { query: 'Who has the most wins at Monaco?' });
+        assert.equal(response.status, 422);
+        assert.match(response.body.error, /requested circuit scope/);
+        assert.match(response.body.error, /broader answer was not returned/);
     });
 });

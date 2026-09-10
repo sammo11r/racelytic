@@ -81,7 +81,7 @@ function renderJuniorRaceCard(race) {
   const winner = race.winnerName
     ? `<div class="race-archive-winner"><span>${completed > 1 ? 'Winners' : 'Winner'}</span><strong>${esc(race.winnerName)}</strong><small>${esc(race.winnerConstructorName || '')}</small></div>`
     : `<div class="race-archive-winner race-archive-pending"><span>Status</span><strong>${esc(juniorWeekendStatusLabel(status, race))}</strong><small>${status === 'upcoming' ? 'Results pending' : 'Classification unavailable'}</small></div>`;
-  return `<a class="race-archive-card series-race-archive-card ${juniorArchive.series === 'f2' ? 'f2-race-archive-card' : 'junior-race-archive-card'}" data-status="${status}" href="${activeSeriesBase()}/race?id=${encodeURIComponent(race.id)}">
+  return `<a class="race-archive-card series-race-archive-card ${juniorArchive.series === 'f2' ? 'f2-race-archive-card' : 'junior-race-archive-card'}" data-status="${status}" href="${resourceUrl('race',race.id,{label:displayRaceName(race)})}">
     <div class="race-archive-date"><strong>${String(race.round).padStart(2, '0')}</strong><span>Round</span></div>
     <div class="race-archive-copy"><h3>${esc(race.name)}</h3><p>${esc(race.circuitName || '')}${race.placeName ? ` · ${esc(race.placeName)}` : ''}</p></div>
     ${winner}

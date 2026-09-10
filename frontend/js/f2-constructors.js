@@ -22,7 +22,7 @@ function renderF2Constructors() {
   f2ConstructorPage = paged.page;
   document.getElementById('f2-constructor-count').textContent = `${fmtNumber(constructors.length)} constructor${constructors.length === 1 ? '' : 's'}`;
   document.getElementById('f2-constructors').innerHTML = paged.items.map(constructor => `
-    <a class="entity-card f2-driver-card" href="/f2/constructor?id=${encodeURIComponent(constructor.id)}">
+    <a class="entity-card f2-driver-card" href="/f2/constructors/${encodeURIComponent(constructor.id)}">
       <div class="driver-card-name"><h3>${esc(constructor.name)}</h3>${f2ConstructorFlag(constructor)}</div>
       <p>${esc(constructor.abbreviation || 'F2 team')} · ${constructor.firstYear ? `${esc(constructor.firstYear)}${constructor.lastYear !== constructor.firstYear ? `–${esc(constructor.lastYear)}` : ''}` : 'Seasons unavailable'}</p>
       <div class="f2-driver-card-record"><span><strong>${fmtNumber(constructor.totalRaceWins)}</strong> wins</span><span><strong>${fmtNumber(constructor.totalPodiums)}</strong> podiums</span><span><strong>${fmtNumber(constructor.totalChampionshipWins)}</strong> titles</span></div>

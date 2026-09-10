@@ -96,7 +96,7 @@ function f3ConstructorResultClass(result) {
 function renderF3ConstructorTable(constructors, raceSessions) {
   document.getElementById('f3-constructor-head').innerHTML = `<tr><th class="position-column">Pos.</th><th class="name-column">Constructor</th>${raceSessions.map(session => `<th class="race-column${session.cancelled ? ' cancelled-session' : ''}" title="${esc(session.race.name)} · ${esc(session.name)}${session.cancelled ? ' · Cancelled' : ''}">${f3SessionHeading(session)}</th>`).join('')}<th class="points-column">Points</th></tr>`;
   document.getElementById('f3-constructor-body').innerHTML = constructors.map(constructor => `
-    <tr><td class="position-column">${esc(constructor.position)}</td><td class="name-column"><a href="/f3/team?id=${encodeURIComponent(constructor.constructorId)}">${esc(constructor.name)}</a></td>${raceSessions.map(session => {
+    <tr><td class="position-column">${esc(constructor.position)}</td><td class="name-column"><a href="/f3/teams/${encodeURIComponent(constructor.constructorId)}">${esc(constructor.name)}</a></td>${raceSessions.map(session => {
       const result = constructor.raceResults?.[session.id];
       const points = Number(result?.points ?? result ?? 0);
       return `<td class="race-point constructor-points ${f3ConstructorResultClass(result)}"><span>${points > 0 ? fmtNumber(points) : ''}</span></td>`;
@@ -128,7 +128,7 @@ function renderF3Season(data) {
   })));
   document.getElementById('f3-standings-head').innerHTML = `<tr><th class="position-column">Pos.</th><th class="name-column">Driver</th>${raceSessions.map(session => `<th class="race-column${session.cancelled ? ' cancelled-session' : ''}" title="${esc(session.race.name)} · ${esc(session.name)}${session.cancelled ? ' · Cancelled' : ''}">${f3SessionHeading(session)}</th>`).join('')}<th class="points-column">Points</th></tr>`;
   document.getElementById('f3-standings-body').innerHTML = data.championship.map(driver => `
-    <tr><td class="position-column">${esc(driver.position)}</td><td class="name-column"><a href="/f3/driver?id=${encodeURIComponent(driver.driverId)}"><span class="driver-name">${esc(driver.name)}<small>${esc(driver.constructor || 'Independent entry')}</small></span></a></td>${raceSessions.map(session => {
+    <tr><td class="position-column">${esc(driver.position)}</td><td class="name-column"><a href="/f3/drivers/${encodeURIComponent(driver.driverId)}"><span class="driver-name">${esc(driver.name)}<small>${esc(driver.constructor || 'Independent entry')}</small></span></a></td>${raceSessions.map(session => {
       const result = driver.raceResults?.[session.id];
       if (result) {
         const position = Number(result.position || 0);
@@ -155,7 +155,7 @@ function renderF3Season(data) {
 }
 
 async function loadF3Season() {
-  const year = new URLSearchParams(window.location.search).get('year');
+  const year = resourceId('season');
   if (!/^\d{4}$/.test(year || '')) return setError('f3-season-error', 'Choose a valid Formula 3 season.');
   try {
     renderF3Season(await getJSON(`/api/seasons/${encodeURIComponent(year)}?series=f3`));

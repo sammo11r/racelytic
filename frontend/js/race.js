@@ -106,8 +106,8 @@ function renderDesktopResults(rows) {
     <thead><tr>${headers}</tr></thead>
     <tbody>${rows.map(result => `<tr class="${resultStatusClass(result).trim()}">
       <td><span class="finish-position${resultStatusClass(result)}">${resultCell(result.positionText || result.positionNumber)}</span></td>
-      <td><a href="/driver?id=${encodeURIComponent(result.driverId)}"><strong>${esc(result.driverName)}</strong></a>${result.driverNumber ? `<small>#${esc(result.driverNumber)}</small>` : ''}${resultMarkers(result)}</td>
-      <td><a href="/constructor?id=${encodeURIComponent(result.constructorId)}">${esc(result.constructorName || '—')}</a></td>
+      <td><a href="/drivers/${encodeURIComponent(result.driverId)}"><strong>${esc(result.driverName)}</strong></a>${result.driverNumber ? `<small>#${esc(result.driverNumber)}</small>` : ''}${resultMarkers(result)}</td>
+      <td><a href="/constructors/${encodeURIComponent(result.constructorId)}">${esc(result.constructorName || '—')}</a></td>
       ${isRace
         ? `<td>${resultCell(result.gridPositionNumber)}</td><td>${gridMovement(result)}</td><td>${resultCell(result.laps)}</td><td>${resultCell(raceResultValue(result))}</td><td class="result-points-total">${fmtNumber(result.points)}</td>`
         : segmented
@@ -123,24 +123,24 @@ function renderMobileResults(rows) {
   const segmented = isQualifying && qualifyingHasSegments(rows);
   return `<div class="session-result-cards">${rows.map(result => {
     const details = isRace
-      ? [['Grid', result.gridPositionNumber], ['Change', gridMovement(result)], ['Laps', result.laps], ['Status', resultCell(raceResultValue(result))], ['Points', fmtNumber(result.points)]]
+      ? [['Grid', resultCell(result.gridPositionNumber)], ['Change', gridMovement(result)], ['Laps', resultCell(result.laps)], ['Status', resultCell(raceResultValue(result))], ['Points', fmtNumber(result.points)]]
       : segmented
         ? [['Q1', resultCell(result.q1)], ['Q2', resultCell(result.q2)], ['Q3', resultCell(result.q3)], ['Laps', resultCell(result.laps)]]
         : [['Time', resultCell(result.time)], ['Gap', resultCell(result.gap || result.interval)], ['Laps', resultCell(result.laps)]];
     return `<article class="session-result-card${resultStatusClass(result)}">
-      <div class="session-result-card-head"><span class="finish-position${resultStatusClass(result)}">${resultCell(result.positionText || result.positionNumber)}</span><div><a href="/driver?id=${encodeURIComponent(result.driverId)}">${esc(result.driverName)}</a><small>${esc(result.constructorName || '—')}${result.driverNumber ? ` · #${esc(result.driverNumber)}` : ''}</small></div><div class="result-card-markers">${resultMarkers(result)}</div></div>
+      <div class="session-result-card-head"><span class="finish-position${resultStatusClass(result)}">${resultCell(result.positionText || result.positionNumber)}</span><div><a href="/drivers/${encodeURIComponent(result.driverId)}">${esc(result.driverName)}</a><small>${esc(result.constructorName || '—')}${result.driverNumber ? ` · #${esc(result.driverNumber)}` : ''}</small></div><div class="result-card-markers">${resultMarkers(result)}</div></div>
       <dl>${details.map(([label, value]) => `<div><dt>${label}</dt><dd>${label === 'Change' ? value || '—' : value}</dd></div>`).join('')}</dl>
     </article>`;
   }).join('')}</div>`;
 }
 
 function syncRaceSessionUrl() {
-  const id = params().get('id');
+  const id = resourceId('race');
   if (!id || !activeSession) return;
-  const query = new URLSearchParams({ id, session: activeSession });
+  const query = new URLSearchParams({ session: activeSession });
   const variant = activeVariants[activeSession];
   if (variant) query.set('variant', variant);
-  history.replaceState(null, '', `/race?${query}`);
+  history.replaceState(null, '', resourceUrl('race', id, { base: '', label: displayRaceName(raceData?.race), query }));
 }
 
 function renderSessionTable() {
@@ -212,7 +212,7 @@ function renderRaceOverview(status) {
   const fastest = results.find(result => result.fastestLap);
   const retirements = results.filter(result => /DNF|DNS|DSQ|DQ|RET|NC|EXC/i.test(String(result.positionText || '')) || (result.reasonRetired && !Number(result.positionNumber))).length;
   overview.innerHTML = `<section class="race-summary-grid">
-    <div class="race-podium-card"><div class="eyebrow">RACE PODIUM</div><ol>${podium.map(result => `<li><span>${result.positionNumber}</span><div><a href="/driver?id=${encodeURIComponent(result.driverId)}">${esc(result.driverName)}</a><small>${esc(result.constructorName || '—')}</small></div></li>`).join('')}</ol></div>
+    <div class="race-podium-card"><div class="eyebrow">RACE PODIUM</div><ol>${podium.map(result => `<li><span>${result.positionNumber}</span><div><a href="/drivers/${encodeURIComponent(result.driverId)}">${esc(result.driverName)}</a><small>${esc(result.constructorName || '—')}</small></div></li>`).join('')}</ol></div>
     <div class="race-summary-facts">
       <div><span>Winner</span><strong>${esc(winner?.driverName || '—')}</strong><small>${winner?.constructorName ? esc(winner.constructorName) : 'Classification pending'}</small></div>
       <div><span>Winning margin</span><strong>${esc(normaliseRaceDuration(runnerUp?.gap || winner?.time || '—'))}</strong><small>${runnerUp?.gap ? 'To second place' : 'Winner’s race time'}</small></div>
@@ -249,9 +249,9 @@ function renderRaceHero(status) {
   document.title = `${race.year} ${name} · Formula 1 · Racelytic`;
   const head = document.getElementById('race-head');
   head.innerHTML = `<div class="detail-hero race-detail-hero" data-status="${status}">
-    <div class="race-detail-hero-copy"><div class="race-detail-kicker"><span class="race-status-badge ${status}">${raceStatusLabel(status)}</span><a href="/season?year=${encodeURIComponent(race.year)}">Round ${esc(race.round)} · ${esc(race.year)}</a></div>
+    <div class="race-detail-hero-copy"><div class="race-detail-kicker"><span class="race-status-badge ${status}">${raceStatusLabel(status)}</span><a href="/seasons/${encodeURIComponent(race.year)}">Round ${esc(race.round)} · ${esc(race.year)}</a></div>
       <h1>${esc(name)}</h1>
-      <div class="detail-sub"><a href="/circuit?id=${encodeURIComponent(race.circuitId)}">${esc(race.circuitName || 'Circuit')}</a>${race.countryName ? ` · ${esc(race.countryName)}` : ''} · ${esc(fmtDate(race.date))}</div>
+      <div class="detail-sub"><a href="/circuits/${encodeURIComponent(race.circuitId)}">${esc(race.circuitName || 'Circuit')}</a>${race.countryName ? ` · ${esc(race.countryName)}` : ''} · ${esc(fmtDate(race.date))}</div>
       ${showOfficialName ? `<div class="detail-official-name">${esc(race.officialName)}</div>` : ''}
       <div class="race-hero-facts">${facts.map(fact => `<span>${esc(fact)}</span>`).join('')}</div>
     </div>
@@ -265,11 +265,11 @@ function renderRoundNavigation(races, race) {
   const index = sorted.findIndex(item => String(item.id) === String(race.id));
   const previous = index > 0 ? sorted[index - 1] : null;
   const next = index >= 0 && index < sorted.length - 1 ? sorted[index + 1] : null;
-  document.getElementById('race-round-navigation').innerHTML = `${previous ? `<a href="/race?id=${encodeURIComponent(previous.id)}"><span>← Previous</span><strong>R${esc(previous.round)} · ${esc(displayRaceName(previous, true))}</strong></a>` : '<span></span>'}${next ? `<a href="/race?id=${encodeURIComponent(next.id)}"><span>Next →</span><strong>R${esc(next.round)} · ${esc(displayRaceName(next, true))}</strong></a>` : ''}`;
+  document.getElementById('race-round-navigation').innerHTML = `${previous ? `<a href="${resourceUrl('race',previous.id,{base:'',label:displayRaceName(previous)})}"><span>← Previous</span><strong>R${esc(previous.round)} · ${esc(displayRaceName(previous, true))}</strong></a>` : '<span></span>'}${next ? `<a href="${resourceUrl('race',next.id,{base:'',label:displayRaceName(next)})}"><span>Next →</span><strong>R${esc(next.round)} · ${esc(displayRaceName(next, true))}</strong></a>` : ''}`;
 }
 
 async function loadRace() {
-  const id = params().get('id');
+  const id = resourceId('race');
   if (!id) {
     document.getElementById('race-head').setAttribute('aria-busy', 'false');
     return setError('race-head', 'Choose a race from the archive to view its weekend.');

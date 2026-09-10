@@ -26,8 +26,19 @@ test('Ask Racelytic opens directly on its working surface', () => {
     const form = ask.slice(ask.indexOf('<form class="ask-form"'), ask.indexOf('</form>', ask.indexOf('<form class="ask-form"')));
     assert.match(form, /class="ask-examples"/);
     assert.match(styles, /\.ask-workspace \{[^}]*padding-top: 28px;/);
-    assert.match(styles, /\.ask-example-list \{[^}]*flex-wrap: nowrap;[^}]*overflow: hidden;/);
+    assert.match(styles, /\.ask-example-list \{[^}]*flex-wrap: wrap;/);
     assert.equal((ask.match(/data-ask-example=/g) || []).length, 7);
+    assert.match(ask, /class="ask-example-groups"/);
+    assert.match(ask, /Records<\/strong>/);
+    assert.match(ask, /Recalculate<\/strong>/);
+    assert.match(ask, /class="ask-answer-preview"/);
+    assert.match(ask, /Not supported:<\/strong> future predictions/);
+    assert.match(ask, /id="ask-question-help"/);
+    assert.match(ask, /<header class="ask-heading">[\s\S]*?<details class="ask-question-help"/);
+    assert.doesNotMatch(ask, /class="ask-form-help"/);
+    assert.match(ask, /Show supported question types/);
+    assert.match(ask, /class="ask-question-menu" role="region" aria-label="Supported question types" tabindex="0"/);
+    assert.equal((ask.match(/<li><strong>/g) || []).length, 12);
     assert.match(ask, /class="ask-layout"/);
     assert.match(ask, /class="ask-query-panel"/);
     assert.match(ask, /id="ask-refinement"/);
@@ -57,6 +68,12 @@ test('Ask Racelytic renders calculated evidence safely and exposes editable inte
     assert.match(script, /How the result was decided/);
     assert.match(script, /Two systems, side by side/);
     assert.match(script, /data-ask-name/);
+    assert.match(script, /name="subjectNameA"/);
+    assert.match(script, /name="comparisonMetric"/);
+    assert.match(script, /name="comparisonScope"/);
+    assert.match(script, /name="eventName"/);
+    assert.match(script, /name="standingRound"/);
+    assert.match(script, /data-suggestion-index/);
     assert.match(script, /function recordSection/);
     assert.match(script, /name="recordCategory"/);
     assert.match(script, /search\.set\('record', interpretation\.recordCategory\)/);
@@ -71,6 +88,11 @@ test('Ask Racelytic renders calculated evidence safely and exposes editable inte
     assert.match(script, /return `\$\{askSeries\.path\}\/ask/);
     assert.match(script, /seriesMismatch\.url/);
     assert.match(script, /context: askContext/);
+    assert.match(script, /function conversationTrail/);
+    assert.match(script, /data-ask-history-query/);
+    assert.match(script, /name="streakCategory"/);
+    assert.match(script, /function streakSection/);
+    assert.match(script, /pointsShare/);
     assert.match(script, /function recordScopeSummary/);
     assert.match(script, /name="raceFormat"/);
     assert.match(script, /name="resultLimit"/);
@@ -96,6 +118,8 @@ test('junior Ask pages use their own branding, examples and archive scope', () =
         assert.match(html, new RegExp(`Ask a ${name} history question`));
         assert.equal((html.match(/data-ask-example=/g) || []).length, 7);
         assert.doesNotMatch(html, /1991 points|1982 rules/);
+        assert.match(html, /data-ask-series=/);
+        assert.match(styles, /body\[data-ask-series\] \.ask-question-f1-only \{ display: none; \}/);
     }
 });
 
@@ -131,6 +155,9 @@ test('Ask uses a responsive two-column workspace with refinements separate from 
     assert.match(styles, /\.ask-answer-status \{ order: 2;/);
     assert.match(styles, /\.ask-refinement \{ order: 3;/);
     assert.match(script, /const askRefinement = document\.getElementById\('ask-refinement'\)/);
+    assert.match(script, /if \(askExamples\) askExamples\.hidden = true;/);
+    assert.match(script, /if \(askExamples\) askExamples\.hidden = false;/);
+    assert.match(script, /event\.key !== 'Escape'/);
     assert.match(script, /askRefinement\.innerHTML =/);
     assert.match(script, /class="ask-refinement-details"/);
     assert.match(script, /data-ask-expand/);
@@ -141,7 +168,8 @@ test('Ask uses a responsive two-column workspace with refinements separate from 
 });
 
 test('record tables use descriptive titles instead of category-label fragments', () => {
-    assert.match(script, /`\$\{label\}s with the most \$\{esc\(record\.label\.toLowerCase\(\)\)\}\$\{teamScope\}`/);
+    assert.match(script, /record\.lowerIsBetter \? 'best'/);
+    assert.match(script, /'highest' : 'most'/);
     assert.doesNotMatch(script, /`\$\{esc\(record\.label\)\} leaders\$\{teamScope\}`/);
     assert.match(script, /data\.constructorFilter/);
     assert.doesNotMatch(script, /data\.constructor\?/);
@@ -158,4 +186,12 @@ test('Ask examples expose each extended MVP question type', () => {
     assert.match(ask, /How many titles would Alonso have under 1982 rules/);
     assert.match(ask, /Which championships change under 1991 rules/);
     assert.match(ask, /Compare the 1982 and 1991 points systems/);
+});
+
+test('Ask exposes circuit and host-country scopes independently', () => {
+    assert.match(script, /name="circuitName"/);
+    assert.match(script, /name="venueCountryName"/);
+    assert.match(script, /Host country/);
+    assert.match(script, /ask-country-options/);
+    assert.match(script, /search\.set\('country', interpretation\.venueCountryName\)/);
 });

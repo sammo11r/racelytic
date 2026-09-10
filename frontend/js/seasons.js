@@ -108,7 +108,7 @@ function renderSeasons(seasons) {
         return `
             <a
                 class="season-card"
-                href="${seasonBase}/season?year=${encodeURIComponent(season.year)}"
+                href="${seasonBase}/seasons/${encodeURIComponent(season.year)}"
             >
 
                 <div class="season-card-heading">

@@ -6,9 +6,13 @@
   <a id="constructor-back-link" class="back-link" href="/constructors"><span aria-hidden="true">←</span>All constructors</a>
   <div id="constructor-load-status" role="status"></div>
   <div id="constructor-head" aria-busy="true"><div class="circuit-detail-skeleton circuit-hero-placeholder" aria-hidden="true"></div></div>
-  <nav class="constructor-section-nav" aria-label="Constructor sections"><a href="#constructor-record">Career</a><a href="#constructor-career">Seasons</a><a href="#constructor-people">Drivers</a><a href="#constructor-cars">Chassis</a><a href="#constructor-history">Race history</a></nav>
+  <nav class="constructor-section-nav" aria-label="Constructor sections"><a href="#constructor-record">Career</a><a id="constructor-lineage-link" href="#constructor-lineage" hidden>Team history</a><a href="#constructor-career">Seasons</a><a href="#constructor-people">Drivers</a><a href="#constructor-cars">Chassis</a><a href="#constructor-history">Race history</a></nav>
   <section id="constructor-record" class="constructor-record-section" aria-label="Career statistics">
     <div id="constructor-stats" aria-busy="true"><div class="circuit-detail-skeleton" aria-hidden="true"></div></div>
+  </section>
+  <section id="constructor-lineage" class="constructor-plain-section constructor-lineage-section" aria-labelledby="constructor-lineage-title" hidden>
+    <header class="section-heading"><div><div class="eyebrow">IDENTITY</div><h2 id="constructor-lineage-title">Team history</h2></div></header>
+    <div id="constructor-lineage-timeline"></div>
   </section>
   <section id="constructor-career" class="constructor-plain-section" aria-labelledby="constructor-career-title">
     <header class="section-heading"><div><div class="eyebrow">TIMELINE</div><h2 id="constructor-career-title">Season by season</h2></div><span id="constructor-career-span" class="section-note"></span></header>
@@ -33,18 +37,25 @@
   </section>
   <section id="constructor-history" class="constructor-plain-section" aria-labelledby="constructor-history-title">
     <header class="section-heading"><div><div class="eyebrow">GRAND PRIX RESULTS</div><h2 id="constructor-history-title">Race history</h2></div><span id="constructor-result-count" class="section-note" aria-live="polite">Loading races…</span></header>
-    <div class="constructor-detail-filters" role="search" aria-label="Filter constructor race history">
-      <label><span>Search races</span><input id="constructor-result-search" class="search" type="search" placeholder="Race or circuit…" autocomplete="off"></label>
-      <label><span>Season</span><select id="constructor-result-season"><option value="">All seasons</option></select></label>
-      <label><span>Driver</span><select id="constructor-result-driver"><option value="">All drivers</option></select></label>
-      <button id="constructor-result-clear" type="button" class="button secondary">Clear filters</button>
-    </div>
-    <div id="constructor-results-status" role="status"></div>
-    <div id="constructor-results" aria-busy="true"><div class="circuit-detail-skeleton circuit-history-placeholder" aria-hidden="true"></div></div>
+    <details class="mobile-detail-disclosure" open>
+      <summary><strong>Browse full race history</strong><span>Filters and results</span></summary>
+      <div class="mobile-detail-disclosure-content">
+        <div class="constructor-detail-filters" role="search" aria-label="Filter constructor race history">
+          <label><span>Search races</span><input id="constructor-result-search" class="search" type="search" placeholder="Race or circuit…" autocomplete="off"></label>
+          <label><span>Season</span><select id="constructor-result-season"><option value="">All seasons</option></select></label>
+          <label><span>Driver</span><select id="constructor-result-driver"><option value="">All drivers</option></select></label>
+          <button id="constructor-result-clear" type="button" class="button secondary">Clear filters</button>
+        </div>
+        <div id="constructor-results-status" role="status"></div>
+        <div id="constructor-results" aria-busy="true"><div class="circuit-detail-skeleton circuit-history-placeholder" aria-hidden="true"></div></div>
+      </div>
+    </details>
   </section>
 </main>
 <footer class="footer"><div class="container">Racelytic</div></footer>
 <script src="/js/utils.js"></script>
 <script src="/js/header.js"></script>
+<script src="/js/team-colors.js"></script>
+<script src="/js/constructor-lineage-view.js"></script>
 <script src="/js/constructor.js"></script>
 </body></html>

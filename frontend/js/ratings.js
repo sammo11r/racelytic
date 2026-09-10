@@ -516,7 +516,7 @@ function renderActiveHistory(histories) {
   const bestSeason = [...seasonChanges].sort((a, b) => b[1] - a[1])[0];
   const years = first.year === latest.year ? String(first.year) : `${first.year}–${latest.year}`;
   const seriesBase = ratingState.series === 'f1' ? '' : `/${ratingState.series}`;
-  const driverProfileUrl = `${seriesBase}/driver?id=${encodeURIComponent(item.id)}`;
+  const driverProfileUrl = `${seriesBase}/drivers/${encodeURIComponent(item.id)}`;
   const compareUrl = `/ratings/compare?series=${encodeURIComponent(ratingState.series)}&drivers=${encodeURIComponent(item.id)}`;
 
   ratingElements.profileIdentity.innerHTML = `<div><span>DRIVER PROFILE</span><h2 id="ratings-profile-name">${esc(history.driver.name)}</h2><p>${esc(latest.constructorName || 'Team unavailable')} · ${years} · ${history.summary.events} rated events</p></div><nav><a href="${driverProfileUrl}">Database profile</a><a class="primary" href="${compareUrl}">Compare this driver</a></nav>`;

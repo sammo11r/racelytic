@@ -3,6 +3,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
+const { resourceUrl } = require('./frontend-resource-routes');
 
 const source = fs.readFileSync(path.join(__dirname, '../frontend/js/seasons.js'), 'utf8');
 const esc = value => String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -19,7 +20,7 @@ async function archive(seasons, series = 'f1') {
         window: { location: { href: '' } },
         activeSeriesKey: () => series,
         getJSON: async url => { assert.equal(url, `/api/seasons${series === 'f1' ? '' : `?series=${series}`}`); return seasons; },
-        esc, fmtNumber: String, console,
+        esc, fmtNumber: String, resourceUrl, console,
         setError: (_id, message) => { throw new Error(message); },
         pageItems: (items, page, size) => ({ items: items.slice((page - 1) * size, page * size), page }),
         renderPagination: (id, total, page, size, onPage) => { pagination = { id, total, page, size, onPage }; }
@@ -50,7 +51,7 @@ test('live year filtering resets pagination, handles no matches, and restores th
     input.handlers.input();
     assert.equal(app.pagination().page, 1);
     assert.equal(app.pagination().total, 8);
-    assert.match(app.elements.seasons.innerHTML, /href="\/season\?year=2008"/);
+    assert.match(app.elements.seasons.innerHTML, /href="\/seasons\/2008"/);
     input.value = '9999';
     input.handlers.input();
     assert.equal(app.pagination().total, 0);
@@ -73,7 +74,7 @@ test('year sorting is numeric, resets pagination and preserves the active filter
     const seasons = Array.from({ length: 25 }, (_, i) => ({ year: 2002 + i }));
     const original = seasons.map(season => season.year);
     const app = await archive(seasons);
-    const visibleYears = () => [...app.elements.seasons.innerHTML.matchAll(/href="\/season\?year=(\d+)"/g)].map(match => Number(match[1]));
+    const visibleYears = () => [...app.elements.seasons.innerHTML.matchAll(/href="\/seasons\/(\d+)"/g)].map(match => Number(match[1]));
     assert.equal(visibleYears()[0], 2026);
     app.pagination().onPage(2);
     const sort = app.elements['season-sort'];
@@ -164,9 +165,9 @@ test('junior season cards preserve series links and terms while filtering and so
             { year: 2023, champion: { name: 'Example Driver', firstName: 'Example', lastName: 'Driver' } },
             { year: 2026 }, { year: 2024 }
         ], series);
-        const years = () => [...app.elements.seasons.innerHTML.matchAll(/season\?year=(\d+)/g)].map(match => Number(match[1]));
+        const years = () => [...app.elements.seasons.innerHTML.matchAll(/seasons\/(\d+)/g)].map(match => Number(match[1]));
         assert.deepEqual(years(), [2026, 2024, 2023]);
-        assert.ok(app.elements.seasons.innerHTML.includes(`href="/${series}/season?year=2023"`));
+        assert.ok(app.elements.seasons.innerHTML.includes(`href="/${series}/seasons/2023"`));
         assert.ok(app.elements.seasons.innerHTML.includes(`<span>${label}</span>`));
         assert.match(app.elements.seasons.innerHTML, /<span>Rounds<\/span>/);
         assert.match(app.elements.seasons.innerHTML, /<span>Teams<\/span>/);

@@ -3,6 +3,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
+const { resourceUrl } = require('./frontend-resource-routes');
 
 const read = file => fs.readFileSync(path.join(__dirname, '..', file), 'utf8');
 const source = read('frontend/js/circuits.js');
@@ -17,7 +18,7 @@ function fixture(query = '', series = 'f1') {
     };
     const context = vm.createContext({
         document: { getElementById: node, querySelectorAll: () => [] }, window: { location: { pathname: series === 'f1' ? '/circuits' : `/${series}/circuits` }, addEventListener() {} },
-        params: () => new URLSearchParams(query), URLSearchParams, Date,
+        params: () => new URLSearchParams(query), resourceUrl, URLSearchParams, Date,
         esc: value => String(value ?? '').replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('"', '&quot;'), fmtNumber: String,
         history: { replaceState(_a, _b, url) { context.url = url; } },
         sessionStorage: { getItem: key => storage.get(key) || null, setItem: (key, value) => storage.set(key, value) },
@@ -157,7 +158,7 @@ for (const series of ['f2', 'f3', 'academy']) {
         assert.equal(context.pagination.page, 2);
         assert.equal(context.pagination.size, 24);
         assert.equal(context.url, `/${series}/circuits?view=all&season=2026&country=uk&type=RACE&sort=races&page=2`);
-        assert.match(node('circuits').innerHTML, new RegExp(`href="/${series}/circuit\\?`));
+        assert.match(node('circuits').innerHTML, new RegExp(`href="/${series}/circuits/track-`));
         assert.ok(node('circuits').innerHTML.includes(`return=%2F${series}%2Fcircuits`));
         assert.match(node('circuits').innerHTML, /5.891 km/);
         const current = fixture('', series).context;

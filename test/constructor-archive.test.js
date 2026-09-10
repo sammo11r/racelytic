@@ -68,6 +68,7 @@ test('cards suppress duplicate names and zero achievements while separating curr
     node('constructor-season').events.change({ target: { value: '2026' } });
     assert.match(context.renderConstructorCard(rows[0]), /constructor-season-snapshot/);
     assert.match(context.renderConstructorCard(rows[1]), /constructor-full-name/);
+    assert.match(context.renderConstructorCard({ ...rows[1], lineageContext: { label: 'Later became Alpine' } }), /Later became Alpine/);
 });
 
 test('constructor pagination is bounded, shareable and preserved in detail links', () => {
@@ -116,6 +117,8 @@ test('F1 constructor archive has compact four-column skeletons and identity-pres
     assert.equal((html.match(/constructor-card-skeleton/g) || []).length, 8);
     assert.match(html, /data-constructor-view="current"/); assert.match(html, /data-constructor-view="all"/);
     assert.match(css, /\.constructors-page \.constructor-archive-grid \{ grid-template-columns: repeat\(4,/);
+    assert.doesNotMatch(css, /\.constructor-archive-card \{[^}]*border-top: 3px solid var\(--accent\)/);
+    assert.match(css, /\.constructor-champion-card \{[^}]*border-top: 3px solid var\(--accent\)/);
     assert.match(css, /prefers-reduced-motion: reduce.*constructor-card-skeleton/);
     assert.match(backend, /GROUP_CONCAT\(DISTINCT year ORDER BY year DESC/);
     assert.match(backend, /FROM seasons_entrants_constructors/);

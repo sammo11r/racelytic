@@ -2,6 +2,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
+const { resourceUrl } = require('./frontend-resource-routes');
 
 const root = path.join(__dirname, '..');
 const html = fs.readFileSync(path.join(root, 'frontend', 'race-analysis.html'), 'utf8');
@@ -41,8 +42,8 @@ test('race-analysis entity links use registered detail routes in every champions
   const source = fs.readFileSync(path.join(__dirname, '../frontend/js/race-analysis.js'), 'utf8');
   const functionSource = source.match(/function entityUrl\(type, id\) \{[\s\S]*?\n  \}/)[0];
   for (const [series, base, teamPage] of [['f1', '', 'constructor'], ['f2', '/f2', 'constructor'], ['f3', '/f3', 'team'], ['academy', '/academy', 'team']]) {
-    const entityUrl = require('node:vm').runInNewContext(`(${functionSource})`, { series, encodeURIComponent });
-    assert.equal(entityUrl('team', 'prema-racing'), `${base}/${teamPage}?id=prema-racing`);
-    assert.equal(entityUrl('driver', 'a b'), `${base}/driver?id=a%20b`);
+    const entityUrl = require('node:vm').runInNewContext(`(${functionSource})`, { series, resourceUrl });
+    assert.equal(entityUrl('team', 'prema-racing'), `${base}/${teamPage}s/prema-racing`);
+    assert.equal(entityUrl('driver', 'a b'), `${base}/drivers/a%20b`);
   }
 });

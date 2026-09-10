@@ -19,7 +19,7 @@ function renderF3Seasons(seasons) {
   container.innerHTML = paged.items.map(season => {
     const championName = season.champion?.name;
     return `
-      <a class="season-card f3-season-card" href="/f3/season?year=${encodeURIComponent(season.year)}">
+      <a class="season-card f3-season-card" href="/f3/seasons/${encodeURIComponent(season.year)}">
         <div class="season-card-heading">
           <div class="season-year">${esc(season.year)}</div>
           <div class="season-card-champion${championName ? ' has-champion' : ''}">

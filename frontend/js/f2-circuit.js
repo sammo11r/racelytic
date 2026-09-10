@@ -10,14 +10,14 @@ function f2CircuitRaceSummary(race) {
   return raceSessions.map(session => {
     if (session.cancelled) return `<small><strong>${esc(session.name)}:</strong> Cancelled</small>`;
     if (!session.winnerName) return `<small><strong>${esc(session.name)}:</strong> No result</small>`;
-    return `<small><strong>${esc(session.name)}:</strong> <a href="/f2/driver?id=${encodeURIComponent(session.winnerDriverId)}">${esc(session.winnerName)}</a>${session.winnerConstructorName ? ` · ${esc(session.winnerConstructorName)}` : ''}</small>`;
+    return `<small><strong>${esc(session.name)}:</strong> <a href="/f2/drivers/${encodeURIComponent(session.winnerDriverId)}">${esc(session.winnerName)}</a>${session.winnerConstructorName ? ` · ${esc(session.winnerConstructorName)}` : ''}</small>`;
   }).join('');
 }
 
 async function loadF2Circuit() {
   const returnPath = params().get('return');
   if (returnPath === '/f2/circuits' || returnPath?.startsWith('/f2/circuits?')) document.getElementById('circuit-back-link').href = returnPath;
-  const id = params().get('id');
+  const id = resourceId('circuit');
   if (!id) return setError('f2-circuit-head', 'No Formula 2 circuit selected.');
   try {
     const data = await getJSON(`/api/circuits/${encodeURIComponent(id)}?series=f2`);
@@ -52,11 +52,11 @@ async function loadF2Circuit() {
         <article class="circuit-race-card">
           <div class="circuit-race-year">${esc(race.year)}</div>
           <div class="circuit-race-copy">
-            <a href="/f2/race?id=${encodeURIComponent(race.id)}"><strong>${esc(race.name)}</strong></a>
+            <a href="${resourceUrl('race',race.id,{base:'/f2',label:race.name})}"><strong>${esc(race.name)}</strong></a>
             <span>Round ${esc(race.round)} · ${esc(fmtDate(race.date))}</span>
             ${f2CircuitRaceSummary(race)}
           </div>
-          <a class="text-link" href="/f2/season?year=${encodeURIComponent(race.year)}">Season <span aria-hidden="true">→</span></a>
+          <a class="text-link" href="/f2/seasons/${encodeURIComponent(race.year)}">Season <span aria-hidden="true">→</span></a>
         </article>`).join('') : '<div class="empty-state">No Formula 2 weekends found for this circuit.</div>';
       renderPagination('f2-circuit-races', data.races.length, racePage, 20, page => {
         racePage = page;

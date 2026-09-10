@@ -13,11 +13,13 @@
     </div>
     <div class="driver-filter-grid constructor-filter-grid" role="search" aria-label="Filter constructors">
       <label class="driver-search-field"><span>Search</span><input class="search" id="search" type="search" placeholder="Constructor name or nationality…" autocomplete="off"></label>
-      <label><span>Season</span><select id="constructor-season"><option value="">Current season</option></select></label>
-      <label><span>Nationality</span><select id="constructor-country"><option value="">All nationalities</option></select></label>
-      <label><span>Achievements</span><select id="constructor-type"><option value="">All constructors</option></select></label>
-      <label><span>Order by</span><select id="constructor-sort"><option value="name">Name A–Z</option><option value="recent">Most recent</option><option value="starts">Most race starts</option><option value="wins">Most race wins</option><option value="titles">Most constructors’ titles</option></select></label>
-      <button type="button" id="constructor-clear" class="button secondary driver-clear">Clear filters</button>
+      <details class="archive-more-filters" open><summary>More filters</summary><div class="archive-more-filter-grid">
+        <label><span>Season</span><select id="constructor-season"><option value="">Current season</option></select></label>
+        <label><span>Nationality</span><select id="constructor-country"><option value="">All nationalities</option></select></label>
+        <label><span>Achievements</span><select id="constructor-type"><option value="">All constructors</option></select></label>
+        <label><span>Order by</span><select id="constructor-sort"><option value="name">Name A–Z</option><option value="recent">Most recent</option><option value="starts">Most race starts</option><option value="wins">Most race wins</option><option value="titles">Most constructors’ titles</option></select></label>
+        <button type="button" id="constructor-clear" class="button secondary driver-clear">Clear filters</button>
+      </div></details>
     </div>
   </section>
   <div class="driver-browser-toolbar"><span id="constructor-count" class="browser-count" aria-live="polite">Loading constructors…</span><span id="constructor-load-status" class="section-note" role="status"></span></div>

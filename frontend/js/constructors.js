@@ -95,10 +95,11 @@ function renderConstructorCard(constructor) {
   const position = Number(constructor.currentPosition);
   const snapshot = showCurrent ? `<div class="constructor-season-snapshot"><span class="constructor-card-label">${latestConstructorSeason} season</span><strong>${position > 0 && position < 100 ? `P${position}` : 'Not classified'}${constructor.currentPoints != null ? ` · ${fmtNumber(constructor.currentPoints)} points` : ''}</strong><p>${esc((constructor.currentDrivers || []).join(' · ') || 'Race drivers not yet recorded')}</p></div>` : '';
   const fullName = constructor.fullName && constructorSearchText(constructor.fullName.trim()) !== constructorSearchText(constructor.name.trim()) ? `<p class="constructor-full-name">${esc(constructor.fullName)}</p>` : '';
+  const lineage = CONSTRUCTOR_SERIES === 'f1' && constructor.lineageContext?.label ? `<p class="constructor-lineage-context">${esc(constructor.lineageContext.label)}</p>` : '';
   const champion = Number(constructor.totalChampionshipWins) > 0;
   return `<a class="entity-card constructor-archive-card${champion ? ' constructor-champion-card' : ''}" href="${CONSTRUCTOR_BASE}/${CONSTRUCTOR_ENTITY}?${esc(query.toString())}" title="${esc(constructor.fullName || constructor.name)}">
     ${champion ? `<em class="f2-driver-title constructor-champion-badge">${CONSTRUCTOR_SERIES_LABEL} ${CONSTRUCTOR_SERIES === 'f1' ? 'constructors’' : 'teams’'} champion</em>` : ''}
-    <div class="constructor-card-heading"><h3>${esc(constructor.name)}</h3>${fullName}<p>${esc(constructor.countryName || 'Nationality not recorded')}</p></div>
+    <div class="constructor-card-heading"><h3>${esc(constructor.name)}</h3>${fullName}<p>${esc(constructor.countryName || 'Nationality not recorded')}</p>${lineage}</div>
     <div class="constructor-card-years">${esc(years || 'Participation not recorded')}${years ? ` · ${constructor.seasons.length} season${constructor.seasons.length === 1 ? '' : 's'}` : ''}</div>
     ${snapshot}
     <div class="constructor-career"><span class="constructor-card-label">Career</span><div class="constructor-card-record">${achievements.join('') || '<span>No race starts recorded</span>'}</div></div>

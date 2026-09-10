@@ -55,7 +55,7 @@
 .replay-driver-menu-head { display: flex; justify-content: space-between; align-items: center; padding: 12px 13px; border-bottom: 1px solid rgba(255,255,255,.09); }
 .replay-driver-menu-head > strong { color: #9aa1ab; font-size: 9px; letter-spacing: .1em; text-transform: uppercase; }
 .replay-driver-menu-head div { display: flex; gap: 5px; }
-.replay-driver-menu-head button { padding: 5px 8px; border: 1px solid rgba(255,255,255,.13); border-radius: 6px; background: #252a32; color: #bcc1c8; font-size: 9px; font-weight: 800; }
+.replay-driver-menu-head button { min-height: 44px; padding: 8px 12px; border: 1px solid rgba(255,255,255,.13); border-radius: 6px; background: #252a32; color: #bcc1c8; font-size: 12px; font-weight: 800; }
 .replay-driver-menu-head button:hover { border-color: var(--accent); color: #fff; }
 .replay-driver-options { max-height: min(430px,55vh); padding: 6px; overflow: auto; }
 .replay-driver-option { display: grid; grid-template-columns: 17px 4px minmax(0,1fr); gap: 9px; align-items: center; min-height: 38px; padding: 5px 7px; border-radius: 7px; cursor: pointer; }
@@ -72,7 +72,7 @@
 
 .replay-controls { position: relative; z-index: 2; grid-row: 3; grid-column: 1 / -1; display: grid; grid-template-columns: auto minmax(180px,1fr) auto; gap: 22px; align-items: center; width: 100%; padding: clamp(12px,1.8vh,18px) 22px; border-top: 1px solid rgba(255,255,255,.1); border-bottom: 1px solid rgba(255,255,255,.1); background: #14171d; }
 .replay-transport { display: flex; gap: 7px; }
-.replay-transport button { width: 42px; min-height: 40px; border: 1px solid rgba(255,255,255,.14); border-radius: 10px; background: #20242c; color: #aab0ba; font-size: 13px; font-weight: 800; }
+.replay-transport button { width: 44px; min-width: 44px; min-height: 44px; border: 1px solid rgba(255,255,255,.14); border-radius: 10px; background: #20242c; color: #aab0ba; font-size: 14px; font-weight: 800; }
 .replay-transport button:hover { border-color: rgba(var(--accent-rgb),.8); color: #fff; }
 .replay-transport button.active { border-color: var(--accent); background: var(--accent); color: #fff; box-shadow: 0 0 0 3px rgba(var(--accent-rgb),.13); }
 .replay-progress { min-width: 0; }

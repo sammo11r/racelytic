@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const csv = require('csv-parser');
+const { canonicalizeConstructorChronology } = require('../constructor-lineage-data');
 let pool;
 
 function databasePool() {
@@ -72,19 +73,23 @@ async function loadDatasets(dataDirectory = DATA_DIR) {
   for (const file of files) {
     const table = tableNameFromFile(file);
     if (tables.has(table)) throw new Error(`Multiple CSV files map to ${table}.`);
-    const rows = await readCsv(path.join(dataDirectory, file));
-    if (!rows.length) throw new Error(`${file} contains no data rows.`);
+    const sourceRows = await readCsv(path.join(dataDirectory, file));
+    if (!sourceRows.length) throw new Error(`${file} contains no data rows.`);
+    const rows = table === 'constructors_chronology' ? canonicalizeConstructorChronology(sourceRows) : sourceRows;
     tables.add(table);
-    datasets.push({ file, table, rows });
+    datasets.push({ file, table, rows, sourceRowCount: sourceRows.length });
   }
   return datasets;
 }
 
-async function createTable(connection, table, rows) {
+async function createTable(connection, table, rows, sourceTable = table) {
   const columns = Object.keys(rows[0]);
   if (!columns.length) throw new Error(`${table} has no columns.`);
   const definitions = columns.map(column => `${identifier(column)} ${inferType(column, rows.map(row => row[column]))} NULL`);
   if (columns.includes('id')) definitions.push('PRIMARY KEY (`id`)');
+  if (sourceTable === 'constructors_chronology') {
+    definitions.push('KEY `idx_lineage_id` (`lineageId`)', 'KEY `idx_constructor_id` (`constructorId`)');
+  }
   await connection.query(`CREATE TABLE ${identifier(table)} (${definitions.join(',')}) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`);
 }
 
@@ -145,12 +150,13 @@ async function importAll(options = {}) {
       if (existing.has(dataset.table) && minimumRowRatio > 0) {
         const current = await connection.query(`SELECT COUNT(*) AS count FROM ${identifier(dataset.table)}`);
         const currentCount = Number(current[0].count);
-        if (currentCount && dataset.rows.length / currentCount < minimumRowRatio) {
-          throw new Error(`${dataset.file} shrank from ${currentCount} to ${dataset.rows.length} rows; refusing publication.`);
+        const comparisonCount = dataset.sourceRowCount || dataset.rows.length;
+        if (currentCount && comparisonCount / currentCount < minimumRowRatio) {
+          throw new Error(`${dataset.file} shrank from ${currentCount} to ${comparisonCount} source rows; refusing publication.`);
         }
       }
       const stage = stageName(dataset.table);
-      await createTable(connection, stage, dataset.rows);
+      await createTable(connection, stage, dataset.rows, dataset.table);
       await insertRows(connection, stage, dataset.table, dataset.rows);
       console.log(`Staged ${dataset.file}: ${dataset.rows.length} rows`);
     }
@@ -178,6 +184,7 @@ async function importAll(options = {}) {
     }
 
     await dropTables(connection, datasets.filter(dataset => existing.has(dataset.table)).map(dataset => oldName(dataset.table)));
+    require('../constructor-lineage').clearConstructorLineageCache();
     console.log(`Atomically published ${datasets.length} tables.`);
     return { tables: datasets.length, rows: datasets.reduce((sum, dataset) => sum + dataset.rows.length, 0) };
   } catch (error) {

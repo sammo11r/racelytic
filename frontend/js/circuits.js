@@ -77,11 +77,11 @@ function filteredCircuits() {
 }
 
 function renderCircuitCard(circuit, index) {
-  const query = new URLSearchParams({ id: circuit.id, return: circuitArchivePath() });
+  const query = new URLSearchParams({ return: circuitArchivePath() });
   const years = circuit.firstHeldYear ? (Number(circuit.firstHeldYear) === Number(circuit.lastHeldYear) ? String(circuit.firstHeldYear) : `${circuit.firstHeldYear}–${circuit.lastHeldYear}`) : '';
   const length = Number(circuit.length);
   const facts = [length > 0 ? `${length.toLocaleString('en', { maximumFractionDigits: 3 })} km` : '', Number(circuit.turns) > 0 ? `${circuit.turns} turns` : '', CIRCUIT_TYPES[circuit.type] || ''].filter(Boolean);
-  return `<a class="entity-card circuit-archive-card" href="${CIRCUIT_BASE}/circuit?${esc(query.toString())}" title="${esc(circuit.fullName || circuit.name)}">
+  return `<a class="entity-card circuit-archive-card" href="${resourceUrl('circuit', circuit.id, { base: CIRCUIT_BASE, query })}" title="${esc(circuit.fullName || circuit.name)}">
     <div class="circuit-card-layout">${circuit.layoutId ? `<img class="circuit-card-map" src="/assets/circuits/${encodeURIComponent(circuit.layoutId)}.svg" width="200" height="90" alt="" loading="${index < 4 ? 'eager' : 'lazy'}" decoding="async">` : '<span>Layout unavailable</span>'}</div>
     <div class="circuit-card-heading"><h3>${esc(circuitName(circuit))}</h3><p>${esc([circuit.placeName, circuit.countryName].filter(Boolean).join(' · '))}</p></div>
     <div class="circuit-card-facts">${facts.map(fact => `<span>${esc(fact)}</span>`).join('')}</div>

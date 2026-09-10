@@ -14,8 +14,34 @@
   <div id="header"></div>
   <main class="container page ask-workspace">
     <header class="ask-heading">
-      <h1>Start with a question.</h1>
-      <p>Describe the Formula 1 history you want to recalculate or compare. Racelytic interprets the question, then explains the answer from recorded results.</p>
+      <div class="ask-heading-copy">
+        <h1>Start with a question.</h1>
+        <p>Describe the Formula 1 history you want to recalculate or compare. Racelytic interprets the question, then explains the answer from recorded results.</p>
+      </div>
+      <details class="ask-question-help" id="ask-question-help">
+        <summary aria-label="Show supported question types"><span class="ask-question-mark" aria-hidden="true">?</span><span>Supported questions</span></summary>
+        <div class="ask-question-menu" role="region" aria-label="Supported question types" tabindex="0">
+          <header><strong>What can I ask?</strong><p>Racelytic answers these questions from recorded results.</p></header>
+          <section aria-labelledby="ask-question-records"><h2 id="ask-question-records">Records and results</h2><ul>
+            <li><strong>Career record rankings</strong><span>Rank drivers or constructors by wins, podiums, poles, points and more.</span></li>
+            <li><strong>Individual record totals</strong><span>Calculate one driver or constructor’s total for a selected record.</span></li>
+            <li><strong>Race results</strong><span>Look up a winner, podium, classification or one driver’s result.</span></li>
+            <li><strong>Season standings</strong><span>Show final standings or the championship order after a round.</span></li>
+            <li><strong>Longest streaks</strong><span>Rank consecutive wins, podiums, points finishes or classified finishes.</span></li>
+          </ul></section>
+          <section aria-labelledby="ask-question-comparisons"><h2 id="ask-question-comparisons">Comparisons</h2><ul>
+            <li><strong>Driver head-to-heads</strong><span>Compare two drivers across careers, shared starts or teammate races.</span></li>
+            <li><strong>Constructor head-to-heads</strong><span>Compare two constructors or teams using official archive totals.</span></li>
+          </ul></section>
+          <section class="ask-question-f1-only" aria-labelledby="ask-question-recalculations"><h2 id="ask-question-recalculations">Historical scoring</h2><ul>
+            <li><strong>Recalculated championship totals</strong><span>Rank title totals under a historical Formula 1 rulebook.</span></li>
+            <li><strong>Recalculated season champions</strong><span>Apply another points system to one completed season.</span></li>
+            <li><strong>Recalculated driver or constructor titles</strong><span>Count one competitor’s titles under another rulebook.</span></li>
+            <li><strong>Changed championships</strong><span>Find seasons whose champion changes under another system.</span></li>
+            <li><strong>Points-system comparisons</strong><span>Compare two complete historical Formula 1 rulebooks.</span></li>
+          </ul></section>
+        </div>
+      </details>
     </header>
 
     <div class="ask-layout">
@@ -26,17 +52,25 @@
             <input id="ask-query" name="q" type="search" minlength="8" maxlength="300" autocomplete="off" placeholder="Ask a Formula 1 history question…" required>
             <button class="button primary" type="submit">Ask</button>
           </div>
-          <div class="ask-examples" role="group" aria-labelledby="ask-examples-title">
-            <span id="ask-examples-title">Try</span>
-            <div class="ask-example-list">
-              <button type="button" data-ask-example="Who has the most Formula 1 race wins?">Race win leaders</button>
-              <button type="button" data-ask-example="Which driver has the most pole positions with Ferrari?">Ferrari pole leaders</button>
-              <button type="button" data-ask-example="Who wins the 2008 championship under 1991 rules?">2008 under 1991 rules</button>
-              <button type="button" data-ask-example="How many titles would Alonso have under 1982 rules?">Alonso with 1982 rules</button>
-              <button type="button" data-ask-example="Which championships change under 1991 rules?">Changed championships</button>
-              <button type="button" data-ask-example="Compare the 1982 and 1991 points systems.">Compare 1982 and 1991</button>
-              <button type="button" data-ask-example="Which constructor would have the most championships using the 1991 points system?">Constructor titles</button>
+          <div class="ask-examples" aria-labelledby="ask-examples-title">
+            <span id="ask-examples-title">Start with an example</span>
+            <!-- ask-examples:start -->
+            <div class="ask-example-groups">
+              <section class="ask-example-group" aria-label="Records"><strong>Records</strong><div class="ask-example-list">
+                <button type="button" data-ask-example="Who has the most Formula 1 race wins?">Race win leaders</button>
+                <button type="button" data-ask-example="Which driver has the most pole positions with Ferrari?">Ferrari pole leaders</button>
+              </div></section>
+              <section class="ask-example-group" aria-label="Recalculate history"><strong>Recalculate</strong><div class="ask-example-list">
+                <button type="button" data-ask-example="Who wins the 2008 championship under 1991 rules?">2008 under 1991 rules</button>
+                <button type="button" data-ask-example="How many titles would Alonso have under 1982 rules?">Alonso with 1982 rules</button>
+                <button type="button" data-ask-example="Which championships change under 1991 rules?">Changed championships</button>
+              </div></section>
+              <section class="ask-example-group" aria-label="Compare systems"><strong>Compare</strong><div class="ask-example-list">
+                <button type="button" data-ask-example="Compare the 1982 and 1991 points systems.">1982 vs 1991</button>
+                <button type="button" data-ask-example="Which constructor would have the most championships using the 1991 points system?">Constructor titles</button>
+              </div></section>
             </div>
+            <!-- ask-examples:end -->
           </div>
         </form>
         <div class="ask-refinement" id="ask-refinement"></div>
@@ -45,8 +79,9 @@
       <div class="ask-output">
         <section class="ask-answer-status" id="ask-answer-status" aria-live="polite" aria-atomic="true" aria-busy="false">
           <div class="ask-empty">
-            <span aria-hidden="true">?</span>
-            <div><strong>One question, every completed season.</strong><p>Recalculate or compare Formula 1 Drivers’ or Constructors’ Championships under official historical points systems.</p></div>
+            <div class="ask-empty-intro"><span aria-hidden="true">?</span><div><strong>One question, every completed season.</strong><p>Ask for archive records, or recalculate Formula 1 Drivers’ or Constructors’ Championships under historical points systems.</p></div></div>
+            <div class="ask-answer-preview" aria-label="What an answer includes"><span>WHAT YOU’LL GET</span><strong>A direct answer, backed by the archive.</strong><p>Racelytic shows the leading result, the ranked evidence, and the rules or filters used in the calculation.</p></div>
+            <p class="ask-support-boundary"><strong>Supported:</strong> recorded race and championship history. <strong>Not supported:</strong> future predictions, live timing, or opinion questions.</p>
           </div>
         </section>
         <section class="ask-result" id="ask-result" aria-label="Supporting records and calculations"></section>

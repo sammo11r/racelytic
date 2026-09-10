@@ -31,7 +31,7 @@ function renderF3Teams() {
   f3TeamPage = paged.page;
   document.getElementById('f3-team-count').textContent = `${fmtNumber(teams.length)} team${teams.length === 1 ? '' : 's'}`;
   document.getElementById('f3-teams').innerHTML = paged.items.map(team => `
-    <a class="entity-card f2-driver-card" href="/f3/team?id=${encodeURIComponent(team.id)}">
+    <a class="entity-card f2-driver-card" href="/f3/teams/${encodeURIComponent(team.id)}">
       <div class="driver-card-name"><h3>${esc(team.name)}</h3>${f3TeamFlag(team)}</div>
       <p>${esc(team.abbreviation || 'F3 team')} · ${esc(f3TeamCountryName(team.countryCode))} · ${team.firstYear ? `${esc(team.firstYear)}${team.lastYear !== team.firstYear ? `–${esc(team.lastYear)}` : ''}` : 'Seasons unavailable'}</p>
       <div class="f2-driver-card-record"><span><strong>${fmtNumber(team.totalRaceWins)}</strong> wins</span><span><strong>${fmtNumber(team.totalPodiums)}</strong> podiums</span><span><strong>${fmtNumber(team.totalChampionshipWins)}</strong> titles</span></div>

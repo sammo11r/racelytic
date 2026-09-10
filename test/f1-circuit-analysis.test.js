@@ -3,6 +3,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
+const { resourceUrl } = require('./frontend-resource-routes');
 const model = require('../frontend/js/f1-circuit-analysis-model');
 const { renderCircuitAnalysisHtml } = require('../backend/circuit-analysis-renderer');
 const read = file => fs.readFileSync(path.join(__dirname, '..', file), 'utf8');
@@ -113,7 +114,7 @@ function harness(search = '', pathname = '/circuit-analysis') {
   const context = vm.createContext({ window: { CircuitAnalysisModel: model, addEventListener() {} }, document: { getElementById: node, querySelectorAll() { return []; } },
     params: () => new URLSearchParams(search), URLSearchParams, AbortController, location: { pathname, href: `http://localhost${pathname}` },
     history: { replaceState(a, b, url) { urls.push(url); } }, esc: value => String(value ?? ''), displayRaceName: race => race.name || '',
-    getJSON: (url, options) => new Promise((resolve, reject) => requests.push({ url, options, resolve, reject })) });
+    resourceUrl, getJSON: (url, options) => new Promise((resolve, reject) => requests.push({ url, options, resolve, reject })) });
   vm.runInContext(read('frontend/js/f1-circuit-analysis.js'), context);
   return { node, requests, urls, context, listeners };
 }
@@ -191,9 +192,9 @@ for (const series of ['f2', 'f3', 'academy']) test(`${series} scopes API request
   assert.equal(vm.runInContext('caRaces().length', page.context), 1);
   assert.match(page.urls.at(-1), /format=S/);
   assert.equal(page.node('ca-format-control').hidden, false);
-  assert.equal(page.node('ca-circuit-link').href, `/${series}/circuit?id=monza`);
-  assert.equal(vm.runInContext('caRaceLink(caRaces()[0])', page.context), `/${series}/race?id=2024&session=sprint-1`);
-  assert.equal(vm.runInContext("caEntityLink(caTeamPage, 'team')", page.context), `/${series}/${series === 'f2' ? 'constructor' : 'team'}?id=team`);
+  assert.equal(page.node('ca-circuit-link').href, `/${series}/circuits/monza`);
+  assert.equal(vm.runInContext('caRaceLink(caRaces()[0])', page.context), `/${series}/races/2024?session=sprint-1`);
+  assert.equal(vm.runInContext("caEntityLink(caTeamPage, 'team')", page.context), `/${series}/${series === 'f2' ? 'constructors' : 'teams'}/team`);
   assert.match(page.node('ca-summary').innerHTML, /Grid P1 conversion/);
   page.listeners.get('ca-reset:click')();
   assert.equal(vm.runInContext('caRaces().length', page.context), 2);

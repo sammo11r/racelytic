@@ -3,6 +3,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
+const { resourceUrl, resourceIdFrom } = require('./frontend-resource-routes');
 const { renderAcademyHtml, renderAcademyScript } = require('../backend/academy-renderer');
 
 const read = file => fs.readFileSync(path.join(__dirname, '..', file), 'utf8');
@@ -19,7 +20,7 @@ function fixture(series = 'f2', query = '') {
     const context = vm.createContext({
         window: {}, document: { getElementById: element, querySelector: () => null },
         URLSearchParams, Intl, esc: value => String(value ?? ''), fmtNumber: String, fmtDate: String,
-        displayRaceName: row => row.name, params: () => new URLSearchParams(query),
+        displayRaceName: row => row.name, params: () => new URLSearchParams(query), resourceUrl, resourceId: resourceIdFrom(() => query),
         pageItems(items, page, size) { return { page, items: items.slice((page - 1) * size, page * size) }; },
         renderPagination(id, total, page, size, change) { context.pagination = { id, total, page, size, change }; },
         setError(id, message) { element(id).innerHTML = message; }
@@ -66,7 +67,7 @@ test('junior summaries render the name first, latest constructor, eight stats an
         assert.doesNotMatch(element('driver-head').innerHTML, /World champion|FORMULA .* DRIVER|Active in|flag/);
         assert.equal((element('driver-stats').innerHTML.match(/class="detail-stat/g) || []).length, 8);
         assert.match(element('driver-seasons').innerHTML, /Not classified/);
-        assert.ok(element('driver-seasons').innerHTML.includes(`href="/${series}/season?year=2025"`));
+        assert.ok(element('driver-seasons').innerHTML.includes(`href="/${series}/seasons/2025"`));
         assert.equal(data.driver.totalRaceStarts, 22);
         assert.equal(data.driver.totalChampionshipWins, 1);
     }
@@ -80,8 +81,8 @@ test('complete histories paginate at 25 on desktop and mobile and retain the las
     assert.equal((element('driver-results').innerHTML.match(/class="driver-result-card"/g) || []).length, 25);
     assert.equal(context.pagination.total, 326);
     assert.equal(context.pagination.size, 25);
-    assert.match(element('driver-results').innerHTML, /href="\/f2\/race\?id=0"/);
-    assert.match(element('driver-results').innerHTML, /href="\/f2\/constructor\?id=team"/);
+    assert.match(element('driver-results').innerHTML, /href="\/f2\/races\/0\/event-0"/);
+    assert.match(element('driver-results').innerHTML, /href="\/f2\/constructors\/team"/);
     context.pagination.change(14);
     assert.match(element('driver-results').innerHTML, /Event 325/);
     assert.equal((element('driver-results').innerHTML.match(/class="driver-result-card"/g) || []).length, 1);

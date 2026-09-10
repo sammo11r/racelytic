@@ -57,13 +57,9 @@ function showAnalyticsChoice(settings = false) {
 
     window.RacelyticPrivacy = Object.freeze({ analyticsChoice, setAnalyticsChoice, showAnalyticsChoice });
 
-async function loadFooter() {
+function initialiseFooter() {
     const footer = document.querySelector('.footer');
     if (!footer) return;
-    try {
-        const response = await fetch('/components/footer.html');
-        if (!response.ok) throw new Error('Failed to load footer');
-        footer.innerHTML = (await response.text()).replace('{{year}}', String(new Date().getFullYear()));
         const requestedSeries = new URLSearchParams(window.location.search).get('series');
         const activeSeries = document.body.classList.contains('academy-mode') ? 'academy'
             : document.body.classList.contains('f3-mode') ? 'f3'
@@ -108,12 +104,9 @@ async function loadFooter() {
             if (source) source.innerHTML = 'F1 Academy statistics are compiled from published calendars and classifications, then normalised by Racelytic. See <a href="/data-sources#f1-academy">Data sources &amp; licences</a> for provenance and important reuse information. Data may contain errors and is not an official record.';
         }
         footer.querySelector('[data-privacy-settings]')?.addEventListener('click', () => window.RacelyticPrivacy.showAnalyticsChoice(true));
-    } catch (error) {
-        console.error('Footer error:', error);
-    }
 }
 
-loadFooter();
+initialiseFooter();
 
 
 const storedAnalyticsChoice = analyticsChoice();

@@ -104,7 +104,7 @@ function renderF2ConstructorTable(constructors, raceSessions) {
   document.getElementById('f2-constructor-body').innerHTML = constructors.map(constructor => `
     <tr>
       <td class="position-column">${esc(constructor.position)}</td>
-      <td class="name-column"><a href="/f2/constructor?id=${encodeURIComponent(constructor.constructorId)}">${esc(constructor.name)}</a></td>
+      <td class="name-column"><a href="/f2/constructors/${encodeURIComponent(constructor.constructorId)}">${esc(constructor.name)}</a></td>
       ${raceSessions.map(session => {
         const result = constructor.raceResults?.[session.id];
         const points = Number(result?.points ?? result ?? 0);
@@ -145,7 +145,7 @@ function renderF2Season(data) {
   document.getElementById('f2-standings-body').innerHTML = data.championship.map(driver => `
     <tr>
       <td class="position-column">${esc(driver.position)}</td>
-      <td class="name-column"><a href="/f2/driver?id=${encodeURIComponent(driver.driverId)}"><span class="driver-name">${esc(driver.name)}<small>${esc(driver.constructor || 'Independent entry')}</small></span></a></td>
+      <td class="name-column"><a href="/f2/drivers/${encodeURIComponent(driver.driverId)}"><span class="driver-name">${esc(driver.name)}<small>${esc(driver.constructor || 'Independent entry')}</small></span></a></td>
       ${raceSessions.map(session => {
         const result = driver.raceResults?.[session.id];
         if (result) {
@@ -182,7 +182,7 @@ function renderF2Season(data) {
 }
 
 async function loadF2Season() {
-  const year = new URLSearchParams(window.location.search).get('year');
+  const year = resourceId('season');
   if (!/^\d{4}$/.test(year || '')) {
     setError('f2-season-error', 'Choose a valid Formula 2 season.');
     return;
