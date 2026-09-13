@@ -26,6 +26,8 @@ const SERIES_PAGE_TEMPLATES = Object.freeze({
         games: 'f2-games.html', 'idle-racing-manager': 'idle-racing-manager.html', 'lights-out': 'lights-out.html',
         quizzes: 'f2-quizzes.html', 'champions-quiz': 'f2-champions-quiz.html',
         'race-winners-quiz': 'f2-race-winners-quiz.html',
+        'constructor-champions-quiz': 'f2-constructor-champions-quiz.html',
+        'season-race-winners-quiz': 'f2-season-race-winners-quiz.html',
     }),
     f3: Object.freeze({
         database: 'f3-database.html', seasons: 'f3-seasons.html', season: 'f3-season.html',
@@ -36,7 +38,8 @@ const SERIES_PAGE_TEMPLATES = Object.freeze({
         simulator: 'f3-simulator.html', 'simulate-season': 'f3-simulate-season.html',
         'scenario-calculator': 'f3-scenario-calculator.html', 'championship-builder': 'f3-championship-builder.html',
         games: 'f3-games.html', 'idle-racing-manager': 'idle-racing-manager.html', 'lights-out': 'lights-out.html',
-        about: 'f3-about.html',
+        quizzes: 'f3-quizzes.html', 'constructor-champions-quiz': 'f3-constructor-champions-quiz.html',
+        'season-race-winners-quiz': 'f3-season-race-winners-quiz.html', about: 'f3-about.html',
     }),
     academy: Object.freeze({
         '': 'f3.html', database: 'f3-database.html', seasons: 'f3-seasons.html', season: 'f3-season.html',
@@ -47,7 +50,8 @@ const SERIES_PAGE_TEMPLATES = Object.freeze({
         simulator: 'f3-simulator.html', 'simulate-season': 'f3-simulate-season.html',
         'scenario-calculator': 'f3-scenario-calculator.html', 'championship-builder': 'f3-championship-builder.html',
         games: 'f3-games.html', 'idle-racing-manager': 'idle-racing-manager.html', 'lights-out': 'lights-out.html',
-        about: 'f3-about.html',
+        quizzes: 'f3-quizzes.html', 'constructor-champions-quiz': 'f3-constructor-champions-quiz.html',
+        'season-race-winners-quiz': 'f3-season-race-winners-quiz.html', about: 'f3-about.html',
     }),
 });
 

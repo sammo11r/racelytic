@@ -33,6 +33,8 @@ const SEARCH_PAGES = [
     ['Quizzes', 'Test your Formula 1 knowledge', '/quizzes'],
     ['World champions quiz', 'Name every Formula 1 world champion', '/world-champions-quiz'],
     ['Race winners quiz', 'Name Formula 1 Grand Prix winners', '/race-winners-quiz'],
+    ['Constructors’ champions quiz', 'Name every Formula 1 Constructors’ Champion', '/constructor-champions-quiz'],
+    ['Winners by season quiz', 'Name every Grand Prix winner from a selected season', '/season-race-winners-quiz'],
     ['Community', 'Explore public championships, scoring systems and record views', '/community'],
     ['About', 'About Racelytic and its data', '/about'],
     ['Account', 'Your saved creations and community library', '/account'],
@@ -68,6 +70,8 @@ const F2_SEARCH_PAGES = [
     ['Quizzes', 'Test your Formula 2 knowledge', '/f2/quizzes'],
     ['Champions quiz', 'Name every Formula 2 champion', '/f2/champions-quiz'],
     ['Race winners quiz', 'Name Formula 2 race winners', '/f2/race-winners-quiz'],
+    ['Teams’ champions quiz', 'Name every Formula 2 Teams’ Champion', '/f2/constructor-champions-quiz'],
+    ['Winners by season quiz', 'Name every Formula 2 race winner from a selected season', '/f2/season-race-winners-quiz'],
     ['About', 'About the Formula 2 archive', '/f2/about']
 ];
 
@@ -96,6 +100,9 @@ const F3_SEARCH_PAGES = [
     ['Championship builder', 'Create a custom Formula 3 championship', '/f3/championship-builder'],
     ['Points systems', 'Create and manage Formula 3 scoring rules', '/f3/points-systems'],
     ['Games', 'Games built from Formula 3 history', '/f3/games'],
+    ['Quizzes', 'Test your Formula 3 knowledge', '/f3/quizzes'],
+    ['Teams’ champions quiz', 'Name every Formula 3 Teams’ Champion', '/f3/constructor-champions-quiz'],
+    ['Winners by season quiz', 'Name every Formula 3 race winner from a selected season', '/f3/season-race-winners-quiz'],
     ['About', 'About the Formula 3 archive', '/f3/about']
 ];
 const ACADEMY_SEARCH_PAGES = F3_SEARCH_PAGES.map(([label, description, url]) => [

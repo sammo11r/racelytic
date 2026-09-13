@@ -104,6 +104,7 @@ function loadHeader() {
             '/idle-racing-manager': '/f2/idle-racing-manager',
             '/lights-out': '/f2/lights-out',
             '/world-champions-quiz': '/f2/champions-quiz', '/race-winners-quiz': '/f2/race-winners-quiz',
+            '/constructor-champions-quiz': '/f2/constructor-champions-quiz', '/season-race-winners-quiz': '/f2/season-race-winners-quiz',
             '/about': '/f2/about'
         };
         const reversePagePairs = Object.fromEntries(Object.entries(pagePairs).map(([f1, f2]) => [f2, f1]));
@@ -118,7 +119,8 @@ function loadHeader() {
             '/records': '/f3/records', '/ask': '/f3/ask',
             '/simulator-overview': '/f3/simulator', '/simulator': '/f3/simulate-season',
             '/scenario-calculator': '/f3/scenario-calculator', '/championship-builder': '/f3/championship-builder',
-            '/points-systems': '/f3/points-systems',
+            '/points-systems': '/f3/points-systems', '/quizzes': '/f3/quizzes',
+            '/constructor-champions-quiz': '/f3/constructor-champions-quiz', '/season-race-winners-quiz': '/f3/season-race-winners-quiz',
             '/games': '/f3/games', '/idle-racing-manager': '/f3/idle-racing-manager', '/lights-out': '/f3/lights-out', '/about': '/f3/about'
         };
         const reverseF3PagePairs = Object.fromEntries(Object.entries(f3PagePairs).map(([f1, f3]) => [f3, f1]));
@@ -270,6 +272,7 @@ function loadHeader() {
                 ]],
                 ['FORMULA 3 GAMES', [
                     ['/f3/games', 'Overview', 'Choose a Formula 3 game'],
+                    ['/f3/quizzes', 'Quizzes', 'Test your Formula 3 knowledge'],
                     ['/idle-racing-manager', 'Idle Racing Manager', 'Build a fictional racing team'],
                     ['/f3/lights-out', 'Lights Out!', 'Test your reaction time']
                 ]]

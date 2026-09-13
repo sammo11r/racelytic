@@ -44,6 +44,8 @@ const PAGE_META = Object.freeze({
     quizzes: ['Quizzes', 'Test your knowledge of champions, race winners and racing history.'],
     'world-champions-quiz': ['World Champions Quiz', 'Name every Formula 1 world champion and test your racing knowledge.'],
     'race-winners-quiz': ['Race Winners Quiz', 'Name race winners from championship history.'],
+    'constructor-champions-quiz': ['Constructors’ Champions Quiz', 'Name every Formula 1 Constructors’ Champion and the seasons they won.'],
+    'season-race-winners-quiz': ['Winners by Season Quiz', 'Choose a Formula 1 season and name every Grand Prix winner.'],
     'champions-quiz': ['Champions Quiz', 'Name every champion and test your racing knowledge.'],
     'idle-racing-manager': ['Idle Racing Manager', 'Build a racing team, develop the car and compete across fictional circuits.'],
     'lights-out': ['Lights Out', 'Test your reaction time against the starting lights.'],

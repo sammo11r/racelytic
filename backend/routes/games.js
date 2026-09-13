@@ -1,6 +1,7 @@
 const express = require('express');
 const { pool, sendError } = require('../route-helpers');
 const { isJuniorSeries, seriesPrefix } = require('../series-config');
+const { normalizedName, nameMatchesGuess, matchingChampionAnswers, constructorMatchesGuess } = require('../quiz-name-matcher');
 
 const router = express.Router();
 
@@ -44,22 +45,76 @@ async function getJuniorRaceWinners(series) {
     `);
 }
 
-function normalizedName(value) {
-    return String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-        .toLocaleLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+async function getChampionAnswers(series) {
+    if (isJuniorSeries(series)) {
+        const prefix = seriesPrefix(series);
+        return pool.query(`
+            SELECT standings.year, drivers.name AS driverName
+            FROM ${prefix}season_driver_standings standings
+            JOIN ${prefix}drivers drivers ON drivers.id = standings.driverId
+            WHERE standings.positionNumber = 1
+                AND (
+                    LOWER(CAST(standings.championshipWon AS CHAR)) IN ('1', 'true')
+                    OR standings.year < YEAR(CURRENT_DATE())
+                )
+            ORDER BY standings.year DESC
+        `);
+    }
+    return pool.query(`
+        SELECT standings.year, drivers.name AS driverName
+        FROM seasons_driver_standings standings
+        JOIN drivers ON drivers.id = standings.driverId
+        WHERE standings.championshipWon = 1
+        ORDER BY standings.year DESC
+    `);
 }
 
-function nameMatchesGuess(driverName, guess) {
-    const normalizedDriverName = normalizedName(driverName);
-    const normalizedGuess = normalizedName(guess);
-    const nameParts = normalizedDriverName.split(' ');
-    const surnameParticles = new Set(['da', 'de', 'del', 'della', 'di', 'du', 'la', 'le', 'van', 'von']);
-    let surnameStart = nameParts.length - 1;
-    while (surnameStart > 0 && surnameParticles.has(nameParts[surnameStart - 1])) surnameStart -= 1;
-    const compoundSurname = nameParts.slice(surnameStart).join(' ');
-    return normalizedGuess === normalizedDriverName
-        || normalizedGuess === nameParts.at(-1)
-        || normalizedGuess === compoundSurname;
+async function getConstructorChampionAnswers(series) {
+    if (isJuniorSeries(series)) {
+        const prefix = seriesPrefix(series);
+        return pool.query(`
+            SELECT standings.year, constructors.name AS constructorName
+            FROM ${prefix}season_constructor_standings standings
+            JOIN ${prefix}constructors constructors ON constructors.id = standings.constructorId
+            WHERE standings.positionNumber = 1
+                AND (
+                    LOWER(CAST(standings.championshipWon AS CHAR)) IN ('1', 'true')
+                    OR standings.year < YEAR(CURRENT_DATE())
+                )
+            ORDER BY standings.year DESC
+        `);
+    }
+    return pool.query(`
+        SELECT standings.year, constructors.name AS constructorName
+        FROM seasons_constructor_standings standings
+        JOIN constructors ON constructors.id = standings.constructorId
+        WHERE standings.championshipWon = 1
+        ORDER BY standings.year DESC
+    `);
+}
+
+async function getSeasonRaceWinnerAnswers(year, series) {
+    if (isJuniorSeries(series)) {
+        const prefix = seriesPrefix(series);
+        return pool.query(`
+            SELECT results.sessionId AS raceId, drivers.name AS driverName
+            FROM ${prefix}session_results results
+            JOIN ${prefix}sessions sessions ON sessions.id = results.sessionId
+            JOIN ${prefix}drivers drivers ON drivers.id = results.driverId
+            WHERE results.positionNumber = 1
+                AND sessions.year = ?
+                AND LOWER(CAST(sessions.isRace AS CHAR)) IN ('1', 'true')
+                AND (sessions.cancelled IS NULL OR LOWER(CAST(sessions.cancelled AS CHAR)) NOT IN ('1', 'true'))
+            ORDER BY sessions.round, sessions.sessionNumber
+        `, [year]);
+    }
+    return pool.query(`
+        SELECT results.raceId, drivers.name AS driverName
+        FROM races_race_results results
+        JOIN drivers ON drivers.id = results.driverId
+        WHERE results.positionNumber = 1 AND results.year = ?
+        ORDER BY results.round
+    `, [year]);
 }
 
 router.get('/api/games/world-champions', async (req, res) => {
@@ -138,40 +193,25 @@ router.post('/api/games/world-champions/guess', async (req, res) => {
 
     try {
         const series = String(req.query.series || '').toLowerCase();
-        if (isJuniorSeries(series)) {
-            const prefix = seriesPrefix(series);
-            const rows = await pool.query(`
-                SELECT standings.year, drivers.name AS driverName
-                FROM ${prefix}season_driver_standings standings
-                JOIN ${prefix}drivers drivers ON drivers.id = standings.driverId
-                WHERE standings.positionNumber = 1
-                    AND (
-                        LOWER(CAST(standings.championshipWon AS CHAR)) IN ('1', 'true')
-                        OR standings.year < YEAR(CURRENT_DATE())
-                    )
-                ORDER BY standings.year DESC
-            `);
-            const matches = rows.filter(row => nameMatchesGuess(row.driverName, guess));
-            return res.json({
-                correct: matches.length > 0,
-                driverName: matches[0]?.driverName || null,
-                years: matches.map(row => Number(row.year))
-            });
-        }
-        const rows = await pool.query(`
-            SELECT standings.year, drivers.name AS driverName
-            FROM seasons_driver_standings standings
-            JOIN drivers ON drivers.id = standings.driverId
-            WHERE standings.championshipWon = 1
-            ORDER BY standings.year DESC
-        `);
-        const matches = rows.filter(row => nameMatchesGuess(row.driverName, guess));
+        const rows = await getChampionAnswers(series);
+        const matches = matchingChampionAnswers(rows, guess);
 
         res.json({
             correct: matches.length > 0,
             driverName: matches[0]?.driverName || null,
-            years: matches.map(row => Number(row.year))
+            years: matches.map(match => match.year),
+            matches
         });
+    } catch (error) {
+        sendError(res, error);
+    }
+});
+
+router.post('/api/games/world-champions/reveal', async (req, res) => {
+    try {
+        const series = String(req.query.series || '').toLowerCase();
+        const rows = await getChampionAnswers(series);
+        res.json({ answers: rows.map(row => ({ year: Number(row.year), driverName: row.driverName })) });
     } catch (error) {
         sendError(res, error);
     }
@@ -223,6 +263,181 @@ router.post('/api/games/race-winners/guess', async (req, res) => {
                 countryCode: row.countryCode || null
             }))
         });
+    } catch (error) {
+        sendError(res, error);
+    }
+});
+
+router.post('/api/games/race-winners/reveal', async (req, res) => {
+    try {
+        const series = String(req.query.series || '').toLowerCase();
+        const rows = isJuniorSeries(series) ? await getJuniorRaceWinners(series) : await getRaceWinners();
+        res.json({ answers: rows.map((row, slot) => ({ slot, driverName: row.driverName })) });
+    } catch (error) {
+        sendError(res, error);
+    }
+});
+
+router.get('/api/games/constructor-champions', async (req, res) => {
+    try {
+        const series = String(req.query.series || '').toLowerCase();
+        if (isJuniorSeries(series)) {
+            const prefix = seriesPrefix(series);
+            const rows = await pool.query(`
+                SELECT standings.year,
+                    (SELECT MAX(CHAR_LENGTH(championConstructors.name))
+                     FROM ${prefix}season_constructor_standings championStandings
+                     JOIN ${prefix}constructors championConstructors ON championConstructors.id = championStandings.constructorId
+                     WHERE championStandings.positionNumber = 1
+                        AND (
+                            LOWER(CAST(championStandings.championshipWon AS CHAR)) IN ('1', 'true')
+                            OR championStandings.year < YEAR(CURRENT_DATE())
+                        )) AS constructorNameLength
+                FROM ${prefix}season_constructor_standings standings
+                WHERE standings.positionNumber = 1
+                    AND (
+                        LOWER(CAST(standings.championshipWon AS CHAR)) IN ('1', 'true')
+                        OR standings.year < YEAR(CURRENT_DATE())
+                    )
+                ORDER BY standings.year DESC
+            `);
+            return res.json(rows.map(row => ({
+                year: Number(row.year), constructorNameLength: Number(row.constructorNameLength || 0)
+            })));
+        }
+        const rows = await pool.query(`
+            SELECT standings.year,
+                (SELECT MAX(CHAR_LENGTH(championConstructors.name))
+                 FROM seasons_constructor_standings championStandings
+                 JOIN constructors championConstructors ON championConstructors.id = championStandings.constructorId
+                 WHERE championStandings.championshipWon = 1) AS constructorNameLength
+            FROM seasons_constructor_standings standings
+            WHERE standings.championshipWon = 1
+            ORDER BY standings.year DESC
+        `);
+        res.json(rows.map(row => ({
+            year: Number(row.year),
+            constructorNameLength: Number(row.constructorNameLength || 0)
+        })));
+    } catch (error) {
+        sendError(res, error);
+    }
+});
+
+router.post('/api/games/constructor-champions/guess', async (req, res) => {
+    const guess = String(req.body.guess || '').trim();
+    if (guess.length < 2 || guess.length > 100) return res.status(400).json({ error: 'Enter a constructor name.' });
+    try {
+        const series = String(req.query.series || '').toLowerCase();
+        const rows = await getConstructorChampionAnswers(series);
+        const matches = rows.filter(row => constructorMatchesGuess(row.constructorName, guess)).map(row => ({
+            year: Number(row.year), constructorName: row.constructorName
+        }));
+        res.json({ correct: matches.length > 0, matches });
+    } catch (error) {
+        sendError(res, error);
+    }
+});
+
+router.post('/api/games/constructor-champions/reveal', async (req, res) => {
+    try {
+        const series = String(req.query.series || '').toLowerCase();
+        const rows = await getConstructorChampionAnswers(series);
+        res.json({ answers: rows.map(row => ({ year: Number(row.year), constructorName: row.constructorName })) });
+    } catch (error) {
+        sendError(res, error);
+    }
+});
+
+router.get('/api/games/season-race-winners', async (req, res) => {
+    try {
+        const series = String(req.query.series || '').toLowerCase();
+        if (isJuniorSeries(series)) {
+            const prefix = seriesPrefix(series);
+            const yearRows = await pool.query(`
+                SELECT DISTINCT sessions.year
+                FROM ${prefix}sessions sessions
+                JOIN ${prefix}session_results results ON results.sessionId = sessions.id AND results.positionNumber = 1
+                WHERE LOWER(CAST(sessions.isRace AS CHAR)) IN ('1', 'true')
+                    AND (sessions.cancelled IS NULL OR LOWER(CAST(sessions.cancelled AS CHAR)) NOT IN ('1', 'true'))
+                ORDER BY sessions.year DESC
+            `);
+            const years = yearRows.map(row => Number(row.year));
+            const requestedYear = req.query.year === undefined ? years[0] : Number(req.query.year);
+            if (!Number.isInteger(requestedYear) || !years.includes(requestedYear)) return res.status(400).json({ error: 'Choose an available season.' });
+            const rows = await pool.query(`
+                SELECT sessions.id AS raceId, sessions.round,
+                    CONCAT(races.name, ' · ', sessions.name) AS raceName,
+                    GROUP_CONCAT(DISTINCT constructors.name ORDER BY constructors.name SEPARATOR ' / ') AS constructorNames,
+                    MAX(CHAR_LENGTH(drivers.name)) AS driverNameLength
+                FROM ${prefix}sessions sessions
+                JOIN ${prefix}races races ON races.id = sessions.raceId
+                JOIN ${prefix}session_results results ON results.sessionId = sessions.id AND results.positionNumber = 1
+                JOIN ${prefix}drivers drivers ON drivers.id = results.driverId
+                LEFT JOIN ${prefix}constructors constructors ON constructors.id = results.constructorId
+                WHERE sessions.year = ?
+                    AND LOWER(CAST(sessions.isRace AS CHAR)) IN ('1', 'true')
+                    AND (sessions.cancelled IS NULL OR LOWER(CAST(sessions.cancelled AS CHAR)) NOT IN ('1', 'true'))
+                GROUP BY sessions.id, sessions.round, sessions.sessionNumber, races.name, sessions.name
+                ORDER BY sessions.round, sessions.sessionNumber
+            `, [requestedYear]);
+            return res.json({ years, year: requestedYear, races: rows.map(row => ({
+                raceId: String(row.raceId), round: Number(row.round), raceName: row.raceName,
+                constructors: row.constructorNames ? String(row.constructorNames).split(' / ') : [],
+                driverNameLength: Number(row.driverNameLength || 0)
+            })) });
+        }
+        const yearRows = await pool.query(`SELECT DISTINCT year FROM races_race_results WHERE positionNumber = 1 ORDER BY year DESC`);
+        const years = yearRows.map(row => Number(row.year));
+        const requestedYear = req.query.year === undefined ? years[0] : Number(req.query.year);
+        if (!Number.isInteger(requestedYear) || !years.includes(requestedYear)) return res.status(400).json({ error: 'Choose an available season.' });
+        const rows = await pool.query(`
+            SELECT races.id AS raceId, races.round,
+                COALESCE(NULLIF(grands_prix.shortName, ''), NULLIF(grands_prix.fullName, ''), NULLIF(races.officialName, ''), CONCAT('Round ', races.round)) AS raceName,
+                GROUP_CONCAT(DISTINCT constructors.name ORDER BY constructors.name SEPARATOR ' / ') AS constructorNames,
+                MAX(CHAR_LENGTH(drivers.name)) AS driverNameLength
+            FROM races
+            JOIN races_race_results results ON results.raceId = races.id AND results.positionNumber = 1
+            JOIN drivers ON drivers.id = results.driverId
+            LEFT JOIN constructors ON constructors.id = results.constructorId
+            LEFT JOIN grands_prix ON grands_prix.id = races.grandPrixId
+            WHERE races.year = ?
+            GROUP BY races.id, races.round, raceName
+            ORDER BY races.round
+        `, [requestedYear]);
+        res.json({ years, year: requestedYear, races: rows.map(row => ({
+            raceId: String(row.raceId), round: Number(row.round), raceName: row.raceName,
+            constructors: row.constructorNames ? String(row.constructorNames).split(' / ') : [],
+            driverNameLength: Number(row.driverNameLength || 0)
+        })) });
+    } catch (error) {
+        sendError(res, error);
+    }
+});
+
+router.post('/api/games/season-race-winners/guess', async (req, res) => {
+    const guess = String(req.body.guess || '').trim();
+    const year = Number(req.body.year);
+    if (guess.length < 2 || guess.length > 100 || !Number.isInteger(year)) return res.status(400).json({ error: 'Enter a driver name and choose a season.' });
+    try {
+        const series = String(req.query.series || '').toLowerCase();
+        const rows = await getSeasonRaceWinnerAnswers(year, series);
+        const matches = rows.filter(row => nameMatchesGuess(row.driverName, guess)).map(row => ({
+            raceId: String(row.raceId), driverName: row.driverName
+        }));
+        res.json({ correct: matches.length > 0, matches });
+    } catch (error) {
+        sendError(res, error);
+    }
+});
+
+router.post('/api/games/season-race-winners/reveal', async (req, res) => {
+    const year = Number(req.body.year);
+    if (!Number.isInteger(year)) return res.status(400).json({ error: 'Choose a season.' });
+    try {
+        const series = String(req.query.series || '').toLowerCase();
+        const rows = await getSeasonRaceWinnerAnswers(year, series);
+        res.json({ answers: rows.map(row => ({ raceId: String(row.raceId), driverName: row.driverName })) });
     } catch (error) {
         sendError(res, error);
     }

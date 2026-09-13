@@ -252,6 +252,18 @@
       "template": "f2-race-winners-quiz.html"
     },
     {
+      "series": "f2",
+      "slug": "constructor-champions-quiz",
+      "route": "/f2/constructor-champions-quiz",
+      "template": "f2-constructor-champions-quiz.html"
+    },
+    {
+      "series": "f2",
+      "slug": "season-race-winners-quiz",
+      "route": "/f2/season-race-winners-quiz",
+      "template": "f2-season-race-winners-quiz.html"
+    },
+    {
       "series": "f3",
       "slug": "database",
       "route": "/f3/database",
@@ -430,6 +442,24 @@
       "slug": "lights-out",
       "route": "/f3/lights-out",
       "template": "lights-out.html"
+    },
+    {
+      "series": "f3",
+      "slug": "quizzes",
+      "route": "/f3/quizzes",
+      "template": "f3-quizzes.html"
+    },
+    {
+      "series": "f3",
+      "slug": "constructor-champions-quiz",
+      "route": "/f3/constructor-champions-quiz",
+      "template": "f3-constructor-champions-quiz.html"
+    },
+    {
+      "series": "f3",
+      "slug": "season-race-winners-quiz",
+      "route": "/f3/season-race-winners-quiz",
+      "template": "f3-season-race-winners-quiz.html"
     },
     {
       "series": "f3",
@@ -622,6 +652,24 @@
       "slug": "lights-out",
       "route": "/academy/lights-out",
       "template": "lights-out.html"
+    },
+    {
+      "series": "academy",
+      "slug": "quizzes",
+      "route": "/academy/quizzes",
+      "template": "f3-quizzes.html"
+    },
+    {
+      "series": "academy",
+      "slug": "constructor-champions-quiz",
+      "route": "/academy/constructor-champions-quiz",
+      "template": "f3-constructor-champions-quiz.html"
+    },
+    {
+      "series": "academy",
+      "slug": "season-race-winners-quiz",
+      "route": "/academy/season-race-winners-quiz",
+      "template": "f3-season-race-winners-quiz.html"
     },
     {
       "series": "academy",

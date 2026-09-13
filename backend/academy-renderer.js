@@ -20,6 +20,15 @@ const PAGE_COPY = Object.freeze({
         ['Follow points progression, title margins and results through every sprint and feature race.', 'Follow points progression, title margins and results through every race.'],
         ['Championship progression, title margins and every sprint and feature result.', 'Championship progression, title margins and every race result.']
     ],
+    'f3-games.html': [
+        ['Name every teams’ champion or complete a season’s sprint and feature winners.', 'Name every teams’ champion or complete a season’s race winners.']
+    ],
+    'f3-quizzes.html': [
+        ['Choose a F1 Academy season and name the winner of every sprint and feature race.', 'Choose an F1 Academy season and name the winner of every race.']
+    ],
+    'f3-season-race-winners-quiz.html': [
+        ['Choose a season and name the winner of every completed F1 Academy sprint and feature race.', 'Choose a season and name the winner of every completed F1 Academy race.']
+    ],
     'f3-driver.html': [
         ['Sprint and feature races', 'Race history']
     ],

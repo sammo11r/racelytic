@@ -1,20 +1,17 @@
-<!doctype html>
-<html lang="en">
-<head>
+<!doctype html><html lang="en"><head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="description" content="Choose a Formula 2 quiz from Racelytic.">
-  <link rel="icon" href="/assets/favicon-f2.svg" type="image/svg+xml"><title>Quizzes · Formula 2 · Racelytic</title>
+  <meta name="description" content="Choose a Formula 2 quiz from Racelytic."><link rel="icon" href="/assets/favicon-f2.svg" type="image/svg+xml"><title>Quizzes · Formula 2 · Racelytic</title>
   <link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/polish.css">
-</head>
-<body class="f2-mode"><div id="header"></div>
+</head><body class="f2-mode"><div id="header"></div>
   <main class="container page quizzes-page">
-    <a class="back-link" href="/f2/games">← Games</a>
-    <section class="games-hero quizzes-hero"><div class="eyebrow">FORMULA 2 QUIZ LIBRARY</div><h1>How well do you<br><span>know Formula 2?</span></h1><p>Test your knowledge of the championship era with questions built from Racelytic’s Formula 2 results.</p></section>
-    <section class="games-library" aria-labelledby="f2-quiz-library-title"><div class="section-heading"><div><div class="eyebrow">CHOOSE A QUIZ</div><h2 id="f2-quiz-library-title">Available quizzes</h2></div></div>
+    <section class="games-hero quizzes-hero"><div class="eyebrow">FORMULA 2 QUIZZES</div><h1>Put your F2 knowledge <span>on the grid.</span></h1></section>
+    <section class="games-library" aria-labelledby="quiz-library-title"><div class="quiz-library-heading"><h2 id="quiz-library-title">Choose your challenge</h2></div>
       <div class="quiz-library-grid">
-        <a class="quiz-choice-card" href="/f2/champions-quiz"><span>01 · CHAMPIONS</span><h3>Formula 2 champions</h3><p>Name every drivers’ champion from the modern FIA Formula 2 Championship era.</p><div><small>2017 onwards</small><strong>Play quiz →</strong></div></a>
-        <a class="quiz-choice-card" href="/f2/race-winners-quiz"><span>02 · RACE WINNERS</span><h3>Feature & sprint winners</h3><p>Name every Formula 2 race winner, with feature and sprint victories tracked separately.</p><div><small>All F2 races</small><strong>Play quiz →</strong></div></a>
+        <a class="quiz-choice-card quiz-choice-card--champions" href="/f2/champions-quiz" data-quiz-card="champions"><div class="quiz-card-preview" aria-hidden="true"><i></i><i></i><i></i><strong>WDC</strong></div><div class="quiz-card-copy"><h3>Drivers’ champions</h3><p>Name every champion from the modern FIA Formula 2 era.</p></div><ul class="quiz-card-facts"><li data-quiz-coverage>Since 2017</li><li data-quiz-count>Every season</li><li>3–5 min</li><li>Surnames accepted</li></ul><div class="quiz-card-action"><span class="quiz-status">Not started</span><small>Untimed · Medium</small><strong>Start quiz <span aria-hidden="true">→</span></strong></div></a>
+        <a class="quiz-choice-card quiz-choice-card--winners" href="/f2/race-winners-quiz" data-quiz-card="race-winners"><div class="quiz-card-preview" aria-hidden="true"><i></i><i></i><i></i><strong>P1</strong></div><div class="quiz-card-copy"><h3>Race winners</h3><p>Name every Formula 2 feature and sprint race winner.</p></div><ul class="quiz-card-facts"><li data-quiz-coverage>Since 2017</li><li data-quiz-count>Every winner</li><li>8–12 min</li><li>Surnames accepted</li></ul><div class="quiz-card-action"><span class="quiz-status">Not started</span><small>Untimed · Hard</small><strong>Start quiz <span aria-hidden="true">→</span></strong></div></a>
+        <a class="quiz-choice-card quiz-choice-card--constructors" href="/f2/constructor-champions-quiz" data-quiz-card="constructor-champions"><div class="quiz-card-preview" aria-hidden="true"><i></i><i></i><i></i><strong>WCC</strong></div><div class="quiz-card-copy"><h3>Teams’ champions</h3><p>Name every Formula 2 Teams’ Champion and reveal every season they won.</p></div><ul class="quiz-card-facts"><li data-quiz-coverage>Since 2017</li><li data-quiz-count>Every season</li><li>3–5 min</li><li>Team names accepted</li></ul><div class="quiz-card-action"><span class="quiz-status" data-quiz-status>Not started</span><small>Untimed · Medium</small><strong data-quiz-action>Start quiz <span aria-hidden="true">→</span></strong></div></a>
+        <a class="quiz-choice-card quiz-choice-card--season-winners" href="/f2/season-race-winners-quiz" data-quiz-card="season-race-winners"><div class="quiz-card-preview" aria-hidden="true"><i></i><i></i><i></i><strong>GP</strong></div><div class="quiz-card-copy"><h3>Winners by season</h3><p>Choose a Formula 2 season and name the winner of every feature and sprint race.</p></div><ul class="quiz-card-facts"><li data-quiz-coverage>Choose a season</li><li data-quiz-count>Every race</li><li>3–6 min</li><li>Surnames accepted</li></ul><div class="quiz-card-action"><span class="quiz-status" data-quiz-status>Not started</span><small>Untimed · Medium</small><strong data-quiz-action>Start quiz <span aria-hidden="true">→</span></strong></div></a>
       </div>
     </section>
-  </main><footer class="footer"><div class="container">Racelytic</div></footer><script src="/js/header.js"></script>
+  </main><footer class="footer"><div class="container">Racelytic</div></footer><script src="/js/utils.js"></script><script src="/js/header.js"></script><script src="/js/junior-quizzes.js"></script>
 </body></html>

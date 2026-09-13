@@ -83,11 +83,16 @@ document.getElementById('champion-guess-form').addEventListener('submit', async 
     const response = await fetch('/api/games/world-champions/guess?series=f2', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ guess }) });
     const result = await response.json();
     if (!response.ok) throw new Error(result.error || 'Unable to check that guess.');
-    const newYears = result.correct ? result.years.filter(year => !revealedSeasons.has(year)) : [];
-    result.years?.forEach(year => revealedSeasons.set(year, result.driverName));
-    if (result.correct) guessedDriverNames.add(result.driverName);
+    const matches = result.matches?.length ? result.matches : result.years?.map(year => ({ year, driverName: result.driverName })) || [];
+    const newYears = result.correct ? matches.filter(match => !revealedSeasons.has(match.year)).map(match => match.year) : [];
+    matches.forEach(match => {
+      revealedSeasons.set(match.year, match.driverName);
+      guessedDriverNames.add(match.driverName);
+    });
+    const matchedNames = [...new Set(matches.map(match => match.driverName))];
+    const matchedNameLabel = matchedNames.join(' and ');
     renderQuizTable();
-    feedback.textContent = !result.correct ? `${guess} is not an FIA Formula 2 champion.` : newYears.length ? `Correct: ${result.driverName}.` : `${result.driverName} was already found.`;
+    feedback.textContent = !result.correct ? `${guess} is not an FIA Formula 2 champion.` : newYears.length ? `Correct: ${matchedNameLabel}.` : `${matchedNameLabel} ${matchedNames.length === 1 ? 'was' : 'were'} already found.`;
     feedback.className = result.correct && newYears.length ? 'is-correct' : result.correct ? '' : 'is-incorrect';
     input.value = '';
   } catch (error) {
