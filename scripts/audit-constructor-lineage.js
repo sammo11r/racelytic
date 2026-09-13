@@ -27,23 +27,23 @@ function editorialReport(canonical, results) {
   for (const result of results) {
     const year = Number(result.year);
     if (!result.constructorId || !year) continue;
-    const range = participation.get(result.constructorId) || { first: year, last: year };
-    range.first = Math.min(range.first, year);
-    range.last = Math.max(range.last, year);
-    participation.set(result.constructorId, range);
+    if (!participation.has(result.constructorId)) participation.set(result.constructorId, new Set());
+    participation.get(result.constructorId).add(year);
   }
   const chronology = new Map();
   for (const row of canonical) {
     const from = Number(row.yearFrom), to = Number(row.yearTo) || Infinity;
-    const range = chronology.get(row.constructorId) || { first: from, last: to };
-    range.first = Math.min(range.first, from);
-    range.last = Math.max(range.last, to);
-    chronology.set(row.constructorId, range);
+    if (!chronology.has(row.constructorId)) chronology.set(row.constructorId, []);
+    chronology.get(row.constructorId).push({ from, to });
   }
-  const participationMismatches = [...participation].filter(([id, range]) => {
+  const participationMismatches = [...participation].flatMap(([id, years]) => {
     const recorded = chronology.get(id);
-    return recorded && (range.first < recorded.first || range.last > recorded.last);
-  }).map(([id, range]) => ({ id, ...range, chronology: chronology.get(id) }));
+    if (!recorded) return [];
+    const declaredSeparatePeriods = editorial.separateIdentityPeriods?.[id] || [];
+    const outsideYears = [...years].filter(year => !recorded.some(period => year >= period.from && year <= period.to));
+    const unexplainedYears = outsideYears.filter(year => !declaredSeparatePeriods.some(period => year >= Number(period.from) && year <= Number(period.to)));
+    return unexplainedYears.length ? [{ id, outsideYears: unexplainedYears, chronology: recorded }] : [];
+  });
   return { chains: chains.size, genericTransitions, transitionsWithoutDirectSource, participationMismatches };
 }
 

@@ -21,9 +21,14 @@ function searchLikePattern(value) {
 
 function circuitKey(result) {
     const place = String(result.place || '').split(',')[0];
-    return normalise(place || result.label)
+    const labelKey = normalise(result.label)
+        .replace(/\b(grand prix|international|street|racing|raceway|circuit|track)\b/g, '')
+        .replace(/\b(de|the)\b/g, '')
+        .replace(/\s+/g, ' ').trim();
+    const placeKey = normalise(place)
         .replace(/\b(grand prix|international|street|racing|raceway|circuit|track)\b/g, '')
         .replace(/\s+/g, ' ').trim();
+    return labelKey || placeKey;
 }
 
 function resultAliases(result) {
@@ -92,31 +97,50 @@ function fuzzyTokenMatch(result, query) {
 
 function relevanceDetails(result, query, preferredSeries) {
     const needle = normalise(query);
+    const categoryPatterns = [
+        ['circuit', /\b(circuit|track|venue)\b/],
+        ['race', /\b(race|grand prix|gp|weekend)\b/],
+        ['driver', /\b(driver|racer)\b/],
+        ['team', /\b(team|constructor)\b/],
+        ['season', /\b(season|championship)\b/],
+        ['chassis', /\b(chassis|car)\b/]
+    ];
+    const explicitCategoryEntry = categoryPatterns.find(([, pattern]) => pattern.test(needle));
+    const explicitCategory = explicitCategoryEntry?.[0];
+    const matchNeedle = explicitCategoryEntry && needle.includes(' ')
+        ? (needle.replace(explicitCategoryEntry[1], ' ').replace(/\s+/g, ' ').trim() || needle)
+        : needle;
     const label = normalise(result.label);
     const meta = normalise(result.meta);
     const aliases = resultAliases(result);
     const searchable = normalise(result.searchText || `${result.label} ${result.meta}`);
     let tier = 11;
-    if (label === needle) tier = 0;
-    else if (aliases.includes(needle)) tier = 1;
-    else if (label.startsWith(needle)) tier = 2;
-    else if (orderedTokenPrefixMatch(label, needle)) tier = 3;
-    else if (label.split(' ').some(word => word.startsWith(needle))) tier = 4;
-    else if (aliases.some(alias => alias.startsWith(needle) || orderedTokenPrefixMatch(alias, needle))) tier = 5;
-    else if (label.includes(needle)) tier = 6;
-    else if (aliases.some(alias => alias.includes(needle))) tier = 7;
-    else if (meta === needle || meta.startsWith(needle)) tier = 8;
-    else if (searchable.includes(needle)) tier = 9;
-    else if (fuzzyTokenMatch(result, needle)) tier = 10;
+    if (label === matchNeedle) tier = 0;
+    else if (aliases.includes(matchNeedle)) tier = 1;
+    else if (label.startsWith(matchNeedle)) tier = 2;
+    else if (orderedTokenPrefixMatch(label, matchNeedle)) tier = 3;
+    else if (label.split(' ').some(word => word.startsWith(matchNeedle))) tier = 4;
+    else if (aliases.some(alias => alias.startsWith(matchNeedle) || orderedTokenPrefixMatch(alias, matchNeedle))) tier = 5;
+    else if (label.includes(matchNeedle)) tier = 6;
+    else if (aliases.some(alias => alias.includes(matchNeedle))) tier = 7;
+    else if (meta === matchNeedle || meta.startsWith(matchNeedle)) tier = 8;
+    else if (searchable.includes(matchNeedle)) tier = 9;
+    else if (fuzzyTokenMatch(result, matchNeedle)) tier = 10;
 
     const series = Array.isArray(result.series) ? result.series : [result.series];
-    const contextBonus = series.includes(preferredSeries) ? 45 : 0;
+    const contextBonus = series.includes(preferredSeries) ? 120 : 0;
+    const categoryBonus = explicitCategory === result.category ? 900 : 0;
+    const venueTerms = result.category === 'circuit'
+        ? [result.place, circuitKey(result), label.replace(/\b(grand prix|international|street|racing|raceway|circuit|track)\b/g, '').trim()].map(normalise).filter(Boolean)
+        : [];
+    const venueBonus = venueTerms.some(term => term === matchNeedle) ? 4200
+        : venueTerms.some(term => term.startsWith(matchNeedle) && matchNeedle.length >= 3) ? 2000 : 0;
     const prominence = Number(result.prominence) || 0;
     const prominenceBonus = Math.min(35, Math.log2(Math.max(0, prominence) + 1) * 5);
     const recencyBonus = result.category === 'race' && Number(result.year)
         ? Math.min(20, Math.max(0, Number(result.year) - 1950) / 4) : 0;
-    const lengthPenalty = Math.min(99, Math.max(0, label.length - needle.length));
-    const score = tier * 1000 + lengthPenalty - contextBonus - prominenceBonus - recencyBonus;
+    const lengthPenalty = Math.min(99, Math.max(0, label.length - matchNeedle.length));
+    const score = tier * 1000 + lengthPenalty - contextBonus - categoryBonus - venueBonus - prominenceBonus - recencyBonus;
     const confidence = [1, .98, .95, .91, .88, .8, .7, .62, .48, .35, .28, .05][tier];
     return { score, tier, confidence };
 }
@@ -152,10 +176,13 @@ function dedupeCircuits(results, preferredSeries) {
 }
 
 function diverseSlice(results, limit, preferredSeries) {
-    const selected = [];
-    const remaining = [...results];
+    if (!results.length || limit <= 0) return [];
+    const selected = [results[0]];
+    if (limit === 1) return selected;
+    const remaining = results.slice(1);
     const order = [preferredSeries, ...SERIES_ORDER].filter((series, index, values) => series && values.indexOf(series) === index);
     for (const series of order) {
+        if (selected.some(result => result.series === series)) continue;
         const index = remaining.findIndex(result => result.series === series);
         if (index !== -1) selected.push(...remaining.splice(index, 1));
         if (selected.length === limit) return selected;

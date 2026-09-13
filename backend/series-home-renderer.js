@@ -6,6 +6,7 @@ const SERIES_HOME_CONFIG = Object.freeze({
         favicon: '/assets/favicon.svg', description: 'Explore, analyse, simulate and play with more than seventy years of Formula 1 history.',
         headline: 'More than results.', subheadline: 'A different way to experience F1.',
         introduction: 'Welcome to Racelytic. Discover the statistics and stories behind your favourite Formula 1 drivers, teams and countries. Recalculate championships with historical or custom points systems to compare eras using the same scoring rules. Explore distinctive visualisations, rewrite history in the F1 simulator and put your knowledge and instincts to the test with our games.',
+        askExample: 'Who has the most titles using the 1982 points system?',
         entityLabel: 'Constructors',
         archiveTitle: 'Decades of Formula 1,|ready for your next question.',
         archiveCopy: 'The database powers every part of Racelytic, from all-time comparisons and race replays to championship simulations and games.'
@@ -15,6 +16,7 @@ const SERIES_HOME_CONFIG = Object.freeze({
         description: 'Explore, analyse, simulate and play with the complete Formula 2 archive in Racelytic.',
         headline: 'The proving ground.', subheadline: 'Every story behind the step up.',
         introduction: 'Discover the stories behind Formula 2’s rising stars. Explore drivers, teams and circuits, follow title fights race by race and compare the careers that led to the next step. Recalculate seasons, build your own championship and put your knowledge and reactions to the test with our games.',
+        askExample: 'Who has the most Formula 2 race wins?',
         entityLabel: 'Teams',
         archiveTitle: 'A feeder series.|A history of its own.',
         archiveCopy: 'Every season, driver, team, circuit and session result connects to the tools built on top of the Formula 2 archive.'
@@ -24,6 +26,7 @@ const SERIES_HOME_CONFIG = Object.freeze({
         description: 'Explore, analyse, simulate and play with FIA Formula 3 history in Racelytic.',
         headline: 'The first global stage.', subheadline: 'Where the next generation breaks through.',
         introduction: 'Explore the drivers, teams and breakthrough performances that have shaped FIA Formula 3 since 2019. Trace championship battles, compare careers and uncover the details behind the results. Recalculate seasons, create your own championship or take a break with our racing games.',
+        askExample: 'Who has the most Formula 3 race wins?',
         entityLabel: 'Teams',
         archiveTitle: 'Every campaign.|Full race-by-race detail.',
         archiveCopy: 'The championship calendar, entrants, classifications and standings come together in one connected Formula 3 archive.'
@@ -33,6 +36,7 @@ const SERIES_HOME_CONFIG = Object.freeze({
         description: 'Explore, analyse, simulate and play with the complete F1 Academy archive in Racelytic.',
         headline: 'A new generation.', subheadline: 'Every race, career and title story.',
         introduction: 'Get to know the drivers, teams and title stories shaping F1 Academy. Explore every season, compare careers and follow how each race changes the championship. Take the results further with season simulations and custom championships, then test your reactions or build a racing team of your own.',
+        askExample: 'Who has the most F1 Academy race wins?',
         entityLabel: 'Teams',
         archiveTitle: 'A young championship.|A complete record.',
         archiveCopy: 'Seasons, entrants, sessions and standings connect across a dedicated archive built for the championship’s own race formats.'
@@ -194,7 +198,8 @@ function renderSeriesHome(seriesKey) {
 
     <section class="container home-ask-entry" aria-labelledby="home-ask-title">
       <div><div class="eyebrow">ASK RACELYTIC</div><h2 id="home-ask-title">What would you like to know?</h2><p>${config.key === 'f1' ? 'Describe an alternate Formula 1 history' : `Ask about ${esc(config.name)} records`}. Racelytic calculates the answer from recorded results.</p></div>
-      <form action="${esc(config.path)}/ask" method="get"><label class="visually-hidden" for="home-ask-query">Ask a ${esc(config.name)} history question</label><input id="home-ask-query" name="q" type="search" maxlength="300" placeholder="${config.key === 'f1' ? 'Who has the most titles using the 1982 points system?' : `Who has the most ${esc(config.shortName)} race wins?`}" required><button type="submit">Calculate <span aria-hidden="true">→</span></button></form>
+      <form action="${esc(config.path)}/ask" method="get"><label class="visually-hidden" for="home-ask-query">Ask a ${esc(config.name)} history question</label><input id="home-ask-query" name="q" type="search" maxlength="300" value="${esc(config.askExample)}" aria-describedby="home-ask-example-note" required><button type="submit">Calculate <span aria-hidden="true">→</span></button></form>
+      <span class="visually-hidden" id="home-ask-example-note">Example question. Edit it to ask something else, or calculate it as shown.</span>
     </section>
 
     <section class="container home-archive" id="series-archive">

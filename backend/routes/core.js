@@ -4,6 +4,24 @@ const { buildSearchResponse, searchLikePattern } = require('../search-results');
 const { resourcePath } = require('../resource-routes');
 
 const router = express.Router();
+const searchCache = new Map();
+const SEARCH_CACHE_TTL = 60_000;
+const SEARCH_CACHE_MAX = 120;
+
+function searchCountryName(value) {
+    const country = String(value || '').trim();
+    if (!country) return '';
+    if (!/^[a-z]{2}$/i.test(country)) return country.replaceAll('-', ' ').replace(/\b\w/g, letter => letter.toUpperCase());
+    try {
+        return new Intl.DisplayNames(['en'], { type: 'region' }).of(country.toUpperCase()) || country.toUpperCase();
+    } catch {
+        return country.toUpperCase();
+    }
+}
+
+function searchEntityMeta(country, description) {
+    return [searchCountryName(country), description].filter(Boolean).join(' · ');
+}
 
 const SEARCH_PAGES = [
     ['Database', 'Browse the complete archive', '/database'],
@@ -260,32 +278,55 @@ router.get('/api/search', async (req, res) => {
     };
     if (search.length < 2) return res.json(buildSearchResponse([], searchOptions));
 
+    const cacheKey = JSON.stringify({
+        query: search.toLocaleLowerCase(),
+        context: searchOptions.preferredSeries,
+        series: searchOptions.seriesFilter,
+        mode: searchOptions.mode === 'full' ? 'full' : 'quick'
+    });
+    const cached = searchCache.get(cacheKey);
+    if (cached && Date.now() - cached.createdAt < SEARCH_CACHE_TTL) return res.json(cached.payload);
+    if (cached) searchCache.delete(cacheKey);
+
     try {
         const q = searchLikePattern(search);
         const fuzzySearch = search.length >= 4 && !/\s/.test(search) ? search : null;
         const fuzzyPrefix = fuzzySearch
             ? `${fuzzySearch.slice(0, 3).replace(/[!%_]/g, character => `!${character}`)}%`
             : null;
-        const resultLimit = count => searchOptions.mode === 'full' ? '' : ` LIMIT ${count}`;
+        const resultLimit = count => ` LIMIT ${searchOptions.mode === 'full' ? Math.min(count * 10, 100) : count}`;
+        const validSeries = ['f1', 'f2', 'f3', 'academy'];
+        const requestedSeries = validSeries.includes(searchOptions.seriesFilter)
+            ? [searchOptions.seriesFilter]
+            : validSeries;
         const databaseResults = await withConnection(async connection => {
-            const [seasons, drivers, constructors, circuits, races, chassis,
-                f2Seasons, f2Drivers, f2Constructors, f2Circuits, f2Races, f2Chassis,
-                f3Seasons, f3Drivers, f3Constructors, f3Circuits, f3Races, f3Chassis] = await Promise.all([
+            const results = {
+                seasons: [], drivers: [], constructors: [], circuits: [], races: [], chassis: [],
+                f2Seasons: [], f2Drivers: [], f2Constructors: [], f2Circuits: [], f2Races: [], f2Chassis: [],
+                f3Seasons: [], f3Drivers: [], f3Constructors: [], f3Circuits: [], f3Races: [], f3Chassis: [],
+                academySeasons: [], academyDrivers: [], academyConstructors: [], academyCircuits: [], academyRaces: [], academyChassis: []
+            };
+            const tasks = [];
+            if (requestedSeries.includes('f1')) tasks.push(Promise.all([
               connection.query(`
                 SELECT year FROM seasons
                 WHERE CAST(year AS CHAR) LIKE ? ESCAPE '!'
                 ORDER BY year DESC${resultLimit(6)}
               `, [q]),
               connection.query(`
-                SELECT id, name, fullName, abbreviation, nationalityCountryId, totalRaceWins FROM drivers
-                WHERE name LIKE ? ESCAPE '!' OR fullName LIKE ? ESCAPE '!' OR abbreviation LIKE ? ESCAPE '!'
-                    OR LOWER(SUBSTRING_INDEX(name, ' ', -1)) LIKE LOWER(?) ESCAPE '!'
-                ORDER BY totalRaceWins DESC, name${resultLimit(6)}
+                SELECT drivers.id, drivers.name, drivers.fullName, drivers.abbreviation, drivers.nationalityCountryId,
+                    drivers.totalRaceWins, countries.name AS countryName
+                FROM drivers LEFT JOIN countries ON countries.id = drivers.nationalityCountryId
+                WHERE drivers.name LIKE ? ESCAPE '!' OR drivers.fullName LIKE ? ESCAPE '!' OR drivers.abbreviation LIKE ? ESCAPE '!'
+                    OR LOWER(SUBSTRING_INDEX(drivers.name, ' ', -1)) LIKE LOWER(?) ESCAPE '!'
+                ORDER BY drivers.totalRaceWins DESC, drivers.name${resultLimit(6)}
               `, [q, q, q, fuzzyPrefix]),
               connection.query(`
-                SELECT id, name, fullName, countryId, totalRaceWins FROM constructors
-                WHERE name LIKE ? ESCAPE '!' OR fullName LIKE ? ESCAPE '!'
-                ORDER BY totalRaceWins DESC, name${resultLimit(6)}
+                SELECT constructors.id, constructors.name, constructors.fullName, constructors.countryId,
+                    constructors.totalRaceWins, countries.name AS countryName
+                FROM constructors LEFT JOIN countries ON countries.id = constructors.countryId
+                WHERE constructors.name LIKE ? ESCAPE '!' OR constructors.fullName LIKE ? ESCAPE '!'
+                ORDER BY constructors.totalRaceWins DESC, constructors.name${resultLimit(6)}
               `, [q, q]),
               connection.query(`
                 SELECT id, name AS shortName, fullName, COALESCE(NULLIF(fullName, ''), name) AS name,
@@ -314,6 +355,8 @@ router.get('/api/search', async (req, res) => {
                 WHERE ch.name LIKE ? ESCAPE '!' OR ch.fullName LIKE ? ESCAPE '!' OR constructors.name LIKE ? ESCAPE '!'
                 ORDER BY ch.fullName${resultLimit(6)}
               `, [q, q, q]),
+            ]).then(([seasons, drivers, constructors, circuits, races, chassis]) => Object.assign(results, { seasons, drivers, constructors, circuits, races, chassis })));
+            if (requestedSeries.includes('f2')) tasks.push(Promise.all([
               connection.query(`SELECT year FROM f2_seasons WHERE CAST(year AS CHAR) LIKE ? ESCAPE '!' ORDER BY year DESC${resultLimit(6)}`, [q]),
               connection.query(`SELECT id, name, abbreviation, countryCode FROM f2_drivers WHERE name LIKE ? ESCAPE '!' OR abbreviation LIKE ? ESCAPE '!' OR LOWER(SUBSTRING_INDEX(name, ' ', -1)) LIKE LOWER(?) ESCAPE '!' ORDER BY name${resultLimit(6)}`, [q, q, fuzzyPrefix]),
               connection.query(`SELECT id, name, abbreviation, countryCode FROM f2_constructors WHERE name LIKE ? ESCAPE '!' OR abbreviation LIKE ? ESCAPE '!' ORDER BY name${resultLimit(6)}`, [q, q]),
@@ -322,7 +365,9 @@ router.get('/api/search', async (req, res) => {
                 FROM f2_races races LEFT JOIN f2_circuits circuits ON circuits.id = races.circuitId
                 WHERE races.name LIKE ? ESCAPE '!' OR CAST(races.year AS CHAR) LIKE ? ESCAPE '!' OR circuits.name LIKE ? ESCAPE '!' OR circuits.placeName LIKE ? ESCAPE '!'
                 ORDER BY races.year DESC, races.round DESC${resultLimit(24)}`, [q, q, q, q]),
-              connection.query(`SELECT id, name FROM f2_chassis WHERE name LIKE ? ESCAPE '!' ORDER BY name${resultLimit(6)}`, [q]),
+              connection.query(`SELECT id, name FROM f2_chassis WHERE name LIKE ? ESCAPE '!' ORDER BY name${resultLimit(6)}`, [q])
+            ]).then(([f2Seasons, f2Drivers, f2Constructors, f2Circuits, f2Races, f2Chassis]) => Object.assign(results, { f2Seasons, f2Drivers, f2Constructors, f2Circuits, f2Races, f2Chassis })));
+            if (requestedSeries.includes('f3')) tasks.push(Promise.all([
               connection.query(`SELECT year FROM f3_seasons WHERE CAST(year AS CHAR) LIKE ? ESCAPE '!' ORDER BY year DESC${resultLimit(6)}`, [q]),
               connection.query(`SELECT id, name, abbreviation, countryCode FROM f3_drivers WHERE name LIKE ? ESCAPE '!' OR abbreviation LIKE ? ESCAPE '!' OR LOWER(SUBSTRING_INDEX(name, ' ', -1)) LIKE LOWER(?) ESCAPE '!' ORDER BY name${resultLimit(6)}`, [q, q, fuzzyPrefix]),
               connection.query(`SELECT id, name, abbreviation, countryCode FROM f3_constructors WHERE name LIKE ? ESCAPE '!' OR abbreviation LIKE ? ESCAPE '!' ORDER BY name${resultLimit(6)}`, [q, q]),
@@ -332,8 +377,8 @@ router.get('/api/search', async (req, res) => {
                 WHERE races.name LIKE ? ESCAPE '!' OR CAST(races.year AS CHAR) LIKE ? ESCAPE '!' OR circuits.name LIKE ? ESCAPE '!' OR circuits.placeName LIKE ? ESCAPE '!'
                 ORDER BY races.year DESC, races.round DESC${resultLimit(24)}`, [q, q, q, q]),
               connection.query(`SELECT id, name FROM f3_chassis WHERE id NOT IN ('dallara-f3-2020', 'dallara-f3-2021') AND name LIKE ? ESCAPE '!' ORDER BY name${resultLimit(6)}`, [q])
-            ]);
-            const [academySeasons, academyDrivers, academyConstructors, academyCircuits, academyRaces, academyChassis] = await Promise.all([
+            ]).then(([f3Seasons, f3Drivers, f3Constructors, f3Circuits, f3Races, f3Chassis]) => Object.assign(results, { f3Seasons, f3Drivers, f3Constructors, f3Circuits, f3Races, f3Chassis })));
+            if (requestedSeries.includes('academy')) tasks.push(Promise.all([
                 connection.query(`SELECT year FROM fa_seasons WHERE CAST(year AS CHAR) LIKE ? ESCAPE '!' ORDER BY year DESC${resultLimit(6)}`, [q]),
                 connection.query(`SELECT id, name, abbreviation, countryCode FROM fa_drivers WHERE name LIKE ? ESCAPE '!' OR abbreviation LIKE ? ESCAPE '!' OR LOWER(SUBSTRING_INDEX(name, ' ', -1)) LIKE LOWER(?) ESCAPE '!' ORDER BY name${resultLimit(6)}`, [q, q, fuzzyPrefix]),
                 connection.query(`SELECT id, name, abbreviation, countryCode FROM fa_constructors WHERE name LIKE ? ESCAPE '!' OR abbreviation LIKE ? ESCAPE '!' ORDER BY name${resultLimit(6)}`, [q, q]),
@@ -343,13 +388,9 @@ router.get('/api/search', async (req, res) => {
                     WHERE races.name LIKE ? ESCAPE '!' OR CAST(races.year AS CHAR) LIKE ? ESCAPE '!' OR circuits.name LIKE ? ESCAPE '!' OR circuits.placeName LIKE ? ESCAPE '!'
                     ORDER BY races.year DESC, races.round DESC${resultLimit(24)}`, [q, q, q, q]),
                 connection.query(`SELECT id, name FROM fa_chassis WHERE name LIKE ? ESCAPE '!' ORDER BY name${resultLimit(6)}`, [q])
-            ]);
-            return {
-                seasons, drivers, constructors, circuits, races, chassis,
-                f2Seasons, f2Drivers, f2Constructors, f2Circuits, f2Races, f2Chassis,
-                f3Seasons, f3Drivers, f3Constructors, f3Circuits, f3Races, f3Chassis,
-                academySeasons, academyDrivers, academyConstructors, academyCircuits, academyRaces, academyChassis
-            };
+            ]).then(([academySeasons, academyDrivers, academyConstructors, academyCircuits, academyRaces, academyChassis]) => Object.assign(results, { academySeasons, academyDrivers, academyConstructors, academyCircuits, academyRaces, academyChassis })));
+            await Promise.all(tasks);
+            return results;
         });
 
         const lower = search.toLocaleLowerCase();
@@ -357,10 +398,10 @@ router.get('/api/search', async (req, res) => {
             `${label} ${description}`.toLocaleLowerCase().includes(lower)
         ).slice(0, 4).map(([label, meta, url]) => ({ type: `${series} Page`, label, meta, url }));
         const pages = [
-            ...matchingPages(SEARCH_PAGES, 'F1'),
-            ...matchingPages(F2_SEARCH_PAGES, 'F2'),
-            ...matchingPages(F3_SEARCH_PAGES, 'F3'),
-            ...matchingPages(ACADEMY_SEARCH_PAGES, 'F1 Academy')
+            ...(requestedSeries.includes('f1') ? matchingPages(SEARCH_PAGES, 'F1') : []),
+            ...(requestedSeries.includes('f2') ? matchingPages(F2_SEARCH_PAGES, 'F2') : []),
+            ...(requestedSeries.includes('f3') ? matchingPages(F3_SEARCH_PAGES, 'F3') : []),
+            ...(requestedSeries.includes('academy') ? matchingPages(ACADEMY_SEARCH_PAGES, 'F1 Academy') : [])
         ];
 
         const rawResults = [
@@ -369,18 +410,18 @@ router.get('/api/search', async (req, res) => {
             ...databaseResults.f2Seasons.map(row => ({ type: 'F2 Season', label: String(row.year), meta: 'Formula 2 season', url: resourcePath('f2', 'season', row.year) })),
             ...databaseResults.f3Seasons.map(row => ({ type: 'F3 Season', label: String(row.year), meta: 'Formula 3 season', url: resourcePath('f3', 'season', row.year) })),
             ...databaseResults.academySeasons.map(row => ({ type: 'F1 Academy Season', label: String(row.year), meta: 'F1 Academy season', url: resourcePath('academy', 'season', row.year) })),
-            ...databaseResults.drivers.map(row => ({ type: 'F1 Driver', label: row.name, meta: row.nationalityCountryId || 'Formula 1 driver', aliases: [row.fullName, row.abbreviation], prominence: row.totalRaceWins, url: `/drivers/${encodeURIComponent(row.id)}` })),
-            ...databaseResults.f2Drivers.map(row => ({ type: 'F2 Driver', label: row.name, meta: row.countryCode || 'Formula 2 driver', aliases: [row.abbreviation], url: `/f2/drivers/${encodeURIComponent(row.id)}` })),
-            ...databaseResults.f3Drivers.map(row => ({ type: 'F3 Driver', label: row.name, meta: row.countryCode || 'Formula 3 driver', aliases: [row.abbreviation], url: `/f3/drivers/${encodeURIComponent(row.id)}` })),
-            ...databaseResults.academyDrivers.map(row => ({ type: 'F1 Academy Driver', label: row.name, meta: row.countryCode || 'F1 Academy driver', aliases: [row.abbreviation], url: `/academy/drivers/${encodeURIComponent(row.id)}` })),
-            ...databaseResults.constructors.map(row => ({ type: 'F1 Constructor', label: row.name, meta: row.countryId || 'Formula 1 constructor', aliases: [row.fullName], prominence: row.totalRaceWins, url: `/constructors/${encodeURIComponent(row.id)}` })),
-            ...databaseResults.f2Constructors.map(row => ({ type: 'F2 Constructor', label: row.name, meta: row.countryCode || 'Formula 2 constructor', aliases: [row.abbreviation], url: `/f2/constructors/${encodeURIComponent(row.id)}` })),
-            ...databaseResults.f3Constructors.map(row => ({ type: 'F3 Team', label: row.name, meta: row.countryCode || 'Formula 3 team', aliases: [row.abbreviation], url: `/f3/teams/${encodeURIComponent(row.id)}` })),
-            ...databaseResults.academyConstructors.map(row => ({ type: 'F1 Academy Team', label: row.name, meta: row.countryCode || 'F1 Academy team', aliases: [row.abbreviation], url: `/academy/teams/${encodeURIComponent(row.id)}` })),
-            ...databaseResults.circuits.map(row => ({ type: 'F1 Circuit', label: row.name, meta: row.placeName || 'Formula 1 circuit', aliases: [row.shortName, row.fullName], prominence: row.totalRacesHeld, place: row.placeName, url: `/circuits/${encodeURIComponent(row.id)}` })),
-            ...databaseResults.f2Circuits.map(row => ({ type: 'F2 Circuit', label: row.name, meta: row.placeName || 'Formula 2 circuit', place: row.placeName, url: `/f2/circuits/${encodeURIComponent(row.id)}` })),
-            ...databaseResults.f3Circuits.map(row => ({ type: 'F3 Circuit', label: row.name, meta: row.placeName || 'Formula 3 circuit', place: row.placeName, url: `/f3/circuits/${encodeURIComponent(row.id)}` })),
-            ...databaseResults.academyCircuits.map(row => ({ type: 'F1 Academy Circuit', label: row.name, meta: row.placeName || 'F1 Academy circuit', place: row.placeName, url: `/academy/circuits/${encodeURIComponent(row.id)}` })),
+            ...databaseResults.drivers.map(row => ({ type: 'F1 Driver', label: row.name, meta: searchEntityMeta(row.countryName || row.nationalityCountryId, 'Formula 1 driver'), aliases: [row.fullName, row.abbreviation], prominence: row.totalRaceWins, url: `/drivers/${encodeURIComponent(row.id)}` })),
+            ...databaseResults.f2Drivers.map(row => ({ type: 'F2 Driver', label: row.name, meta: searchEntityMeta(row.countryCode, 'Formula 2 driver'), aliases: [row.abbreviation], url: `/f2/drivers/${encodeURIComponent(row.id)}` })),
+            ...databaseResults.f3Drivers.map(row => ({ type: 'F3 Driver', label: row.name, meta: searchEntityMeta(row.countryCode, 'Formula 3 driver'), aliases: [row.abbreviation], url: `/f3/drivers/${encodeURIComponent(row.id)}` })),
+            ...databaseResults.academyDrivers.map(row => ({ type: 'F1 Academy Driver', label: row.name, meta: searchEntityMeta(row.countryCode, 'F1 Academy driver'), aliases: [row.abbreviation], url: `/academy/drivers/${encodeURIComponent(row.id)}` })),
+            ...databaseResults.constructors.map(row => ({ type: 'F1 Constructor', label: row.name, meta: searchEntityMeta(row.countryName || row.countryId, 'Formula 1 constructor'), aliases: [row.fullName], prominence: row.totalRaceWins, url: `/constructors/${encodeURIComponent(row.id)}` })),
+            ...databaseResults.f2Constructors.map(row => ({ type: 'F2 Constructor', label: row.name, meta: searchEntityMeta(row.countryCode, 'Formula 2 constructor'), aliases: [row.abbreviation], url: `/f2/constructors/${encodeURIComponent(row.id)}` })),
+            ...databaseResults.f3Constructors.map(row => ({ type: 'F3 Team', label: row.name, meta: searchEntityMeta(row.countryCode, 'Formula 3 team'), aliases: [row.abbreviation], url: `/f3/teams/${encodeURIComponent(row.id)}` })),
+            ...databaseResults.academyConstructors.map(row => ({ type: 'F1 Academy Team', label: row.name, meta: searchEntityMeta(row.countryCode, 'F1 Academy team'), aliases: [row.abbreviation], url: `/academy/teams/${encodeURIComponent(row.id)}` })),
+            ...databaseResults.circuits.map(row => ({ type: 'F1 Circuit', label: row.name, meta: row.placeName || 'Formula 1 circuit', aliases: [row.shortName, row.fullName, row.placeName], prominence: row.totalRacesHeld, place: row.placeName, url: `/circuits/${encodeURIComponent(row.id)}` })),
+            ...databaseResults.f2Circuits.map(row => ({ type: 'F2 Circuit', label: row.name, meta: row.placeName || 'Formula 2 circuit', aliases: [row.placeName], place: row.placeName, url: `/f2/circuits/${encodeURIComponent(row.id)}` })),
+            ...databaseResults.f3Circuits.map(row => ({ type: 'F3 Circuit', label: row.name, meta: row.placeName || 'Formula 3 circuit', aliases: [row.placeName], place: row.placeName, url: `/f3/circuits/${encodeURIComponent(row.id)}` })),
+            ...databaseResults.academyCircuits.map(row => ({ type: 'F1 Academy Circuit', label: row.name, meta: row.placeName || 'F1 Academy circuit', aliases: [row.placeName], place: row.placeName, url: `/academy/circuits/${encodeURIComponent(row.id)}` })),
             ...databaseResults.races.map(row => ({ type: 'F1 Race', label: row.name, aliases: [row.shortName, row.officialName], meta: `${row.year}${row.placeName ? ` · ${row.placeName}` : ''}`, year: Number(row.year), searchText: `${row.name} ${row.shortName || ''} ${row.officialName} ${row.circuitName || ''} ${row.placeName || ''} ${row.year}`, url: resourcePath('f1', 'race', row.id, row.name) })),
             ...databaseResults.f2Races.map(row => ({ type: 'F2 Race', label: row.name, meta: `${row.year}${row.placeName ? ` · ${row.placeName}` : ''}`, year: Number(row.year), searchText: `${row.name} ${row.circuitName || ''} ${row.placeName || ''} ${row.year}`, url: resourcePath('f2', 'race', row.id, row.name) })),
             ...databaseResults.f3Races.map(row => ({ type: 'F3 Race', label: row.name, meta: `${row.year}${row.placeName ? ` · ${row.placeName}` : ''}`, year: Number(row.year), searchText: `${row.name} ${row.circuitName || ''} ${row.placeName || ''} ${row.year}`, url: resourcePath('f3', 'race', row.id, row.name) })),
@@ -403,7 +444,10 @@ router.get('/api/search', async (req, res) => {
                                 : / Chassis$/.test(type) ? 'chassis' : 'page';
             return { ...result, series, category };
         };
-        res.json(buildSearchResponse(rawResults.map(tagResult), searchOptions));
+        const payload = buildSearchResponse(rawResults.map(tagResult), searchOptions);
+        searchCache.set(cacheKey, { createdAt: Date.now(), payload });
+        if (searchCache.size > SEARCH_CACHE_MAX) searchCache.delete(searchCache.keys().next().value);
+        res.json(payload);
     } catch (error) {
         sendError(res, error);
     }

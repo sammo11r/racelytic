@@ -18,12 +18,32 @@ function updateCard(quiz, total, validIds, key) {
 }
 
 (async () => {
-  const [champions, winners, constructors, season] = await Promise.allSettled([
-    getJSON(`/api/games/world-champions?series=${QUIZ_SERIES}`), getJSON(`/api/games/race-winners?series=${QUIZ_SERIES}`),
-    getJSON(`/api/games/constructor-champions?series=${QUIZ_SERIES}`), getJSON(`/api/games/season-race-winners?series=${QUIZ_SERIES}`)
-  ]);
-  if (champions.status === 'fulfilled') { const card = document.querySelector('[data-quiz-card="champions"]'), years = champions.value.map(row => Number(row.year)); if (card) { card.querySelector('[data-quiz-coverage]').textContent = `${Math.min(...years)}–${Math.max(...years)}`; card.querySelector('[data-quiz-count]').textContent = `${years.length} seasons`; } }
-  if (winners.status === 'fulfilled') { const card = document.querySelector('[data-quiz-card="race-winners"]'), years = winners.value.map(row => Number(row.firstWinYear)); if (card) { card.querySelector('[data-quiz-coverage]').textContent = `Since ${Math.min(...years)}`; card.querySelector('[data-quiz-count]').textContent = `${winners.value.length} winners`; } }
-  if (constructors.status === 'fulfilled') { const rows = constructors.value, years = rows.map(row => Number(row.year)), card = document.querySelector('[data-quiz-card="constructor-champions"]'); if (card) { card.querySelector('[data-quiz-coverage]').textContent = `${Math.min(...years)}–${Math.max(...years)}`; card.querySelector('[data-quiz-count]').textContent = `${rows.length} seasons`; updateCard('constructor-champions', rows.length, new Set(years.map(String)), `racelytic-quiz-${QUIZ_SERIES}-constructor-champions`); } }
-  if (season.status === 'fulfilled') { const { year, races } = season.value, card = document.querySelector('[data-quiz-card="season-race-winners"]'); if (card) { card.querySelector('[data-quiz-coverage]').textContent = `${year} season`; card.querySelector('[data-quiz-count]').textContent = `${races.length} races`; updateCard('season-race-winners', races.length, new Set(races.map(row => String(row.raceId))), `racelytic-quiz-${QUIZ_SERIES}-season-race-winners-${year}`); } }
+  try {
+    const { quizzes } = await getJSON(`/api/games/quiz-summary?series=${QUIZ_SERIES}`);
+    const cards = [
+      ['champions', quizzes.champions, `racelytic-quiz-${QUIZ_SERIES}-champions`],
+      ['race-winners', quizzes.raceWinners, `racelytic-quiz-${QUIZ_SERIES}-race-winners`],
+      ['constructor-champions', quizzes.constructorChampions, `racelytic-quiz-${QUIZ_SERIES}-constructor-champions`]
+    ];
+
+    cards.forEach(([type, summary, key]) => {
+      const card = document.querySelector(`[data-quiz-card="${type}"]`);
+      if (!card || !summary) return;
+      card.querySelector('[data-quiz-coverage]').textContent = type === 'race-winners'
+        ? `Since ${summary.firstYear}`
+        : `${summary.firstYear}–${summary.lastYear}`;
+      card.querySelector('[data-quiz-count]').textContent = `${summary.total} ${type === 'race-winners' ? 'winners' : 'seasons'}`;
+      updateCard(type, summary.total, new Set(summary.answerIds), key);
+    });
+
+    const season = quizzes.seasonRaceWinners;
+    const seasonCard = document.querySelector('[data-quiz-card="season-race-winners"]');
+    if (seasonCard && season) {
+      seasonCard.querySelector('[data-quiz-coverage]').textContent = `${season.year} season`;
+      seasonCard.querySelector('[data-quiz-count]').textContent = `${season.total} races`;
+      updateCard('season-race-winners', season.total, new Set(season.answerIds), `racelytic-quiz-${QUIZ_SERIES}-season-race-winners-${season.year}`);
+    }
+  } catch (error) {
+    console.error('Quiz summaries could not be loaded.', error);
+  }
 })();

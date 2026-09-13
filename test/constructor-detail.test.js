@@ -7,6 +7,7 @@ const { resourceUrl, resourceIdFrom } = require('./frontend-resource-routes');
 const { buildConstructorDetail, constructorDetail, constructorResults, juniorConstructorDetail, juniorConstructorResults } = require('../backend/constructor-detail');
 const { clearConstructorLineageCache, constructorLineage, normalizeConstructorLineage, optionalConstructorLineage, scopeConstructorLineage } = require('../backend/constructor-lineage');
 const { auditConstructorChronology, canonicalizeConstructorChronology } = require('../backend/constructor-lineage-data');
+const { editorialReport } = require('../scripts/audit-constructor-lineage');
 const read = file => fs.readFileSync(path.join(__dirname, '..', file), 'utf8');
 const profile = () => buildConstructorDetail({ id: 'team', name: 'Team', fullName: 'Team', countryName: 'France', currentSeason: 2026, totalChampionshipWins: 2, totalRaceStarts: 100, totalRaceWins: 20, totalPodiums: 30, totalPolePositions: 5, totalPoints: 500 }, [
     { year: 2026, positionNumber: 2, points: 0, championshipWon: 'false', drivers: 'Alpha||Béta', chassis: 'Car 26' },
@@ -129,6 +130,18 @@ test('constructor chronology normalizes duplicate chains and audits malformed ra
     assert.deepEqual(auditConstructorChronology(rows, ['old', 'new']), { errors: [], warnings: [] });
     const invalid = rows.map(row => ({ ...row })); invalid[1].yearFrom = '2004';
     assert.match(auditConstructorChronology(invalid).errors.join(' '), /overlapping|conflicting/);
+});
+
+test('lineage audit accepts declared separate identities but still flags unexplained participation', () => {
+    const canonical = [{ lineageId: 'modern', constructorId: 'mercedes', yearFrom: 2010, yearTo: '' }];
+    const knownReuse = editorialReport(canonical, [
+        { constructorId: 'mercedes', year: 1954 },
+        { constructorId: 'mercedes', year: 2010 }
+    ]);
+    assert.deepEqual(knownReuse.participationMismatches, []);
+
+    const unexplained = editorialReport(canonical, [{ constructorId: 'mercedes', year: 1999 }]);
+    assert.deepEqual(unexplained.participationMismatches[0].outsideYears, [1999]);
 });
 
 test('optional constructor lineage cannot take down the constructor profile', async () => {

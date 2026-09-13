@@ -1,9 +1,11 @@
 const express = require('express');
 const { pool, sendError } = require('../route-helpers');
-const { isJuniorSeries, seriesPrefix } = require('../series-config');
+const { isJuniorSeries, normaliseSeries, seriesPrefix } = require('../series-config');
 const { normalizedName, nameMatchesGuess, matchingChampionAnswers, constructorMatchesGuess } = require('../quiz-name-matcher');
 
 const router = express.Router();
+const QUIZ_SUMMARY_TTL_MS = 5 * 60 * 1000;
+const quizSummaryCache = new Map();
 
 async function getRaceWinners() {
     return pool.query(`
@@ -116,6 +118,107 @@ async function getSeasonRaceWinnerAnswers(year, series) {
         ORDER BY results.round
     `, [year]);
 }
+
+async function getLatestSeasonRaceIds(series) {
+    if (isJuniorSeries(series)) {
+        const prefix = seriesPrefix(series);
+        const rows = await pool.query(`
+            SELECT sessions.year, sessions.id AS raceId
+            FROM ${prefix}sessions sessions
+            JOIN ${prefix}session_results results
+                ON results.sessionId = sessions.id AND results.positionNumber = 1
+            WHERE LOWER(CAST(sessions.isRace AS CHAR)) IN ('1', 'true')
+                AND (sessions.cancelled IS NULL OR LOWER(CAST(sessions.cancelled AS CHAR)) NOT IN ('1', 'true'))
+            ORDER BY sessions.year DESC, sessions.round, sessions.sessionNumber
+        `);
+        const year = Number(rows[0]?.year);
+        return {
+            year,
+            answerIds: rows.filter(row => Number(row.year) === year).map(row => String(row.raceId))
+        };
+    }
+
+    const rows = await pool.query(`
+        SELECT races.year, races.id AS raceId
+        FROM races
+        JOIN races_race_results results
+            ON results.raceId = races.id AND results.positionNumber = 1
+        ORDER BY races.year DESC, races.round
+    `);
+    const year = Number(rows[0]?.year);
+    return {
+        year,
+        answerIds: rows.filter(row => Number(row.year) === year).map(row => String(row.raceId))
+    };
+}
+
+function answerRange(rows, field) {
+    const values = rows.map(row => Number(row[field])).filter(Number.isFinite);
+    return {
+        firstYear: values.length ? Math.min(...values) : null,
+        lastYear: values.length ? Math.max(...values) : null
+    };
+}
+
+async function buildQuizSummary(series) {
+    const includeDriverHistory = series === 'f1' || series === 'f2';
+    const [champions, winners, constructors, season] = await Promise.all([
+        includeDriverHistory ? getChampionAnswers(series) : Promise.resolve([]),
+        includeDriverHistory ? (isJuniorSeries(series) ? getJuniorRaceWinners(series) : getRaceWinners()) : Promise.resolve([]),
+        getConstructorChampionAnswers(series),
+        getLatestSeasonRaceIds(series)
+    ]);
+    const championRange = answerRange(champions, 'year');
+    const winnerRange = answerRange(winners, 'firstWinYear');
+    const constructorRange = answerRange(constructors, 'year');
+
+    return {
+        series,
+        generatedAt: new Date().toISOString(),
+        quizzes: {
+            ...(includeDriverHistory ? {
+                champions: {
+                    ...championRange,
+                    total: champions.length,
+                    answerIds: champions.map(row => String(row.year))
+                },
+                raceWinners: {
+                    firstYear: winnerRange.firstYear,
+                    total: winners.length,
+                    answerIds: winners.map((_, slot) => String(slot))
+                }
+            } : {}),
+            constructorChampions: {
+                ...constructorRange,
+                total: constructors.length,
+                answerIds: constructors.map(row => String(row.year))
+            },
+            seasonRaceWinners: {
+                year: season.year,
+                total: season.answerIds.length,
+                answerIds: season.answerIds
+            }
+        }
+    };
+}
+
+router.get('/api/games/quiz-summary', async (req, res) => {
+    try {
+        const series = normaliseSeries(req.query.series);
+        const cached = quizSummaryCache.get(series);
+        if (cached && cached.expiresAt > Date.now()) {
+            res.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=300');
+            return res.json(cached.value);
+        }
+
+        const value = await buildQuizSummary(series);
+        quizSummaryCache.set(series, { value, expiresAt: Date.now() + QUIZ_SUMMARY_TTL_MS });
+        res.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=300');
+        res.json(value);
+    } catch (error) {
+        sendError(res, error);
+    }
+});
 
 router.get('/api/games/world-champions', async (req, res) => {
     try {

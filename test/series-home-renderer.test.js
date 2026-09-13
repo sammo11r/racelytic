@@ -8,7 +8,7 @@ test('all championship landing pages use the shared template configuration', () 
 
     for (const [key, config] of Object.entries(SERIES_HOME_CONFIG)) {
         assert.equal(config.key, key);
-        assert.ok(config.headline && config.subheadline && config.introduction);
+        assert.ok(config.headline && config.subheadline && config.introduction && config.askExample);
         assert.ok(SERIES_HOME_PREVIEWS[key].href.startsWith(config.path || '/'));
     }
 });
@@ -44,6 +44,18 @@ test('series-specific capabilities and identity stay distinct', () => {
     assert.match(f3, /href="\/f3\/lights-out"/);
     assert.match(academy, /href="\/academy\/lights-out"/);
     assert.doesNotMatch(f3 + academy, /champions-quiz|home-quiz-preview/);
+});
+
+test('landing page Ask forms submit their visible example questions', () => {
+    for (const [key, config] of Object.entries(SERIES_HOME_CONFIG)) {
+        const html = renderSeriesHome(key);
+        const form = html.match(/<form action="([^"]*\/ask)" method="get">[\s\S]*?<\/form>/)?.[0] || '';
+        assert.match(form, new RegExp(`value="${config.askExample.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}"`));
+        assert.doesNotMatch(form, /placeholder=/);
+        assert.match(form, /name="q"/);
+        assert.match(form, /type="submit">Calculate/);
+        assert.match(form, /aria-describedby="home-ask-example-note"/);
+    }
 });
 
 test('F1 question cards replace the category grid and link directly to their examples', () => {

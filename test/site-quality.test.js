@@ -12,8 +12,8 @@ const packageJson = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 
 const accessibilityAudit = fs.readFileSync(path.join(root, 'scripts/audit-accessibility.js'), 'utf8');
 
 test('desktop navigation collapses before laptop-width links can overflow', () => {
-    assert.match(polish, /@media \(max-width: 1120px\) \{\s*\.site-header \.nav \{ position: relative; \}/);
-    assert.match(polish, /@media \(max-width: 1120px\)[\s\S]*?\.mobile-nav-toggle \{ display: block;/);
+    assert.match(polish, /@media \(max-width: 1280px\) \{\s*\.site-header \.nav \{ position: relative; \}/);
+    assert.match(polish, /@media \(max-width: 1280px\)[\s\S]*?\.mobile-nav-toggle \{ display: block;/);
 });
 
 test('compact interactive controls provide practical touch targets', () => {

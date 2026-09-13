@@ -489,7 +489,19 @@ function loadHeader() {
         const dropdowns = [...container.querySelectorAll('.nav-dropdown')];
         const mainNav = container.querySelector('.main-nav');
         const mobileToggle = container.querySelector('.mobile-nav-toggle');
+        const searchToggle = container.querySelector('.header-search-toggle');
+        const searchClose = container.querySelector('.global-search-close');
+        const searchInput = container.querySelector('#global-search-input');
         const { closeSearch, restoreTypedSearchQuery } = window.RacelyticSearch.init(container, activeSeries);
+
+        const closeSearchOverlay = (returnFocus = false) => {
+            const wasOpen = mainNav?.classList.contains('is-search-open');
+            mainNav?.classList.remove('is-search-open');
+            searchToggle?.setAttribute('aria-expanded', 'false');
+            document.body.classList.remove('global-search-open');
+            closeSearch();
+            if (returnFocus && wasOpen) searchToggle?.focus();
+        };
 
         const closeMobileNavigation = () => {
             mainNav?.classList.remove('is-open');
@@ -502,8 +514,27 @@ function loadHeader() {
             });
         };
 
+        const openHeaderSearch = () => {
+            if (window.innerWidth <= 1280) {
+                closeMobileNavigation();
+                mainNav?.classList.add('is-search-open');
+                searchToggle?.setAttribute('aria-expanded', 'true');
+                document.body.classList.add('global-search-open');
+            }
+            window.requestAnimationFrame(() => searchInput?.focus());
+        };
+
+        searchToggle?.addEventListener('click', event => {
+            event.stopPropagation();
+            if (mainNav?.classList.contains('is-search-open')) closeSearchOverlay(true);
+            else openHeaderSearch();
+        });
+        searchClose?.addEventListener('click', () => closeSearchOverlay(true));
+        container.addEventListener('racelytic-search-escape', () => closeSearchOverlay(true));
+
         mobileToggle?.addEventListener('click', event => {
             event.stopPropagation();
+            closeSearchOverlay();
             const open = mainNav.classList.toggle('is-open');
             mobileToggle.setAttribute('aria-expanded', String(open));
             mobileToggle.setAttribute('aria-label', open ? 'Close navigation' : 'Open navigation');
@@ -539,23 +570,42 @@ function loadHeader() {
         }));
 
         document.addEventListener('click', event => {
-            if (container.contains(event.target)) return;
+            if (container.contains(event.target)) {
+                if (!event.target.closest('.global-search, .header-search-toggle')) {
+                    restoreTypedSearchQuery();
+                    closeSearch();
+                }
+                return;
+            }
             restoreTypedSearchQuery();
             closeMobileNavigation();
+            closeSearchOverlay();
             closeSearch();
         });
 
         document.addEventListener('keydown', event => {
+            const searchShortcut = event.key === '/' || ((event.ctrlKey || event.metaKey) && event.key.toLocaleLowerCase() === 'k');
+            if (searchShortcut && !event.altKey && !event.shiftKey && !/INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagName || '')) {
+                event.preventDefault();
+                openHeaderSearch();
+                return;
+            }
             if (event.key !== 'Escape') return;
             const mobileNavigationWasOpen = mainNav?.classList.contains('is-open');
+            const searchOverlayWasOpen = mainNav?.classList.contains('is-search-open');
             restoreTypedSearchQuery();
             closeMobileNavigation();
+            closeSearchOverlay();
             closeSearch();
-            if (mobileNavigationWasOpen) mobileToggle?.focus();
+            if (searchOverlayWasOpen) searchToggle?.focus();
+            else if (mobileNavigationWasOpen) mobileToggle?.focus();
         });
 
         window.addEventListener('resize', () => {
-            if (window.innerWidth > 1120) closeMobileNavigation();
+            if (window.innerWidth > 1280) {
+                closeMobileNavigation();
+                closeSearchOverlay();
+            }
         });
 
         container.querySelectorAll('a[href]').forEach(link => {

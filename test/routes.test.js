@@ -51,6 +51,7 @@ test('all public API routes remain registered after modularization', () => {
         '/api/games/constructor-champions',
         '/api/games/constructor-champions/guess',
         '/api/games/constructor-champions/reveal',
+        '/api/games/quiz-summary',
         '/api/games/race-winners',
         '/api/games/race-winners/guess',
         '/api/games/race-winners/reveal',

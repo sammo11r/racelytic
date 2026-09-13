@@ -313,7 +313,7 @@
             data.calendar
         );
 
-        renderSeasonMap(
+        renderSeasonMapWhenVisible(
             data.calendar
         );
 
@@ -842,6 +842,31 @@
     // ========================================================
     // Calendar map
     // ========================================================
+
+    function renderSeasonMapWhenVisible(races) {
+        const container = get('season-map');
+        if (!container) return;
+
+        let started = false;
+        const start = () => {
+            if (started) return;
+            started = true;
+            renderSeasonMap(races);
+        };
+
+        if (!('IntersectionObserver' in window)) {
+            start();
+            return;
+        }
+
+        const observer = new IntersectionObserver(entries => {
+            if (!entries.some(entry => entry.isIntersecting)) return;
+            observer.disconnect();
+            start();
+        }, { rootMargin: '350px 0px' });
+
+        observer.observe(container);
+    }
 
     async function renderSeasonMap(races) {
         const container = get('season-map');

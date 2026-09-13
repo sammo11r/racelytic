@@ -22,6 +22,14 @@ function searchBadges(result) {
   return series.filter(Boolean).map(key => `<span>${esc(searchSeriesLabels[key] || key)}</span>`).join('');
 }
 
+function highlightedSearchLabel(value, query) {
+  const text = String(value || '');
+  const needle = String(query || '').trim();
+  const index = text.toLocaleLowerCase().indexOf(needle.toLocaleLowerCase());
+  if (!needle || index < 0) return esc(text);
+  return `${esc(text.slice(0, index))}<mark>${esc(text.slice(index, index + needle.length))}</mark>${esc(text.slice(index + needle.length))}`;
+}
+
 function renderFullSearch(payload) {
   searchPageStatus.textContent = `${fmtNumber(payload.total)} result${payload.total === 1 ? '' : 's'} for “${payload.query}”`;
   searchPageResults.innerHTML = payload.groups.length ? payload.groups.map(group => `
@@ -29,11 +37,11 @@ function renderFullSearch(payload) {
       <div class="search-result-group-head"><h2 id="search-group-${esc(group.key)}">${esc(group.label)}</h2><span>${fmtNumber(group.results.length)}</span></div>
       <div class="search-result-list">${group.results.map(result => `
         <a class="search-result-card" href="${esc(result.url)}">
-          <div><span>${esc(result.type)}</span><h3>${esc(result.label)}</h3><p>${esc(result.meta)}</p></div>
+          <div><span>${esc(result.type)}</span><h3>${highlightedSearchLabel(result.label, payload.query)}</h3><p>${esc(result.meta)}</p></div>
           <div class="search-result-series">${searchBadges(result)}</div>
           <strong aria-hidden="true">→</strong>
         </a>`).join('')}</div>
-    </section>`).join('') : '<div class="empty-state">No matching pages or database entries.</div>';
+    </section>`).join('') : '<div class="empty-state"><strong>No matching results</strong><span>Try another spelling, a shorter name, or a different series.</span></div>';
 }
 
 async function loadFullSearch(pushHistory = false) {
@@ -53,8 +61,9 @@ async function loadFullSearch(pushHistory = false) {
   const context = new URLSearchParams(window.location.search).get('context');
   if (context) params.set('context', context);
   if (pushHistory) window.history.pushState({}, '', `/search?${params}`);
-  searchPageStatus.textContent = 'Searching every series…';
+  searchPageStatus.textContent = series === 'all' ? 'Searching every series…' : `Searching ${searchSeriesLabels[series]}…`;
   searchPageResults.innerHTML = '';
+  searchPageResults.setAttribute('aria-busy', 'true');
   try {
     const payload = await getJSON(`/api/search?${params}&mode=full`, { signal: controller.signal });
     if (fullSearchController !== controller) return;
@@ -65,7 +74,10 @@ async function loadFullSearch(pushHistory = false) {
     console.error('Full search error:', error);
     searchPageStatus.textContent = 'Search is temporarily unavailable.';
   } finally {
-    if (fullSearchController === controller) fullSearchController = undefined;
+    if (fullSearchController === controller) {
+      fullSearchController = undefined;
+      searchPageResults.removeAttribute('aria-busy');
+    }
   }
 }
 

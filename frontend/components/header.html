@@ -12,6 +12,10 @@
             <a href="/academy" data-series="academy">F1 Academy</a>
         </div>
 
+        <button class="header-search-toggle" type="button" aria-label="Search Racelytic" aria-expanded="false" aria-controls="main-navigation">
+            <span aria-hidden="true"></span>
+        </button>
+
         <button class="mobile-nav-toggle" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="main-navigation">
             <span></span><span></span><span></span>
         </button>
@@ -19,10 +23,16 @@
         <nav class="main-nav" id="main-navigation">
 
             <div class="global-search" role="search">
+                <div class="global-search-overlay-head">
+                    <strong>Search Racelytic</strong>
+                    <button class="global-search-close" type="button" aria-label="Close search">Close</button>
+                </div>
                 <label class="visually-hidden" for="global-search-input">Search Formula 1, Formula 2, Formula 3 and F1 Academy</label>
                 <span class="global-search-icon" aria-hidden="true"></span>
-                <input id="global-search-input" type="search" role="combobox" placeholder="Search every series" autocomplete="off" maxlength="80" aria-autocomplete="both" aria-haspopup="listbox" aria-expanded="false" aria-controls="global-search-results">
-                <div id="global-search-results" class="global-search-results" role="listbox" hidden></div>
+                <input id="global-search-input" type="search" role="combobox" placeholder="Search Racelytic" autocomplete="off" maxlength="80" aria-autocomplete="list" aria-haspopup="listbox" aria-expanded="false" aria-controls="global-search-list" aria-describedby="global-search-status">
+                <div id="global-search-results" class="global-search-results" role="region" aria-label="Search results" hidden></div>
+                <span id="global-search-status" class="visually-hidden" role="status" aria-live="polite"></span>
+                <span class="global-search-keyboard-hint" aria-hidden="true">/</span>
             </div>
 
             <!-- DATABASE -->

@@ -104,3 +104,29 @@ test('commercial race titles remain searchable while canonical names are display
     }], { query: 'lenovo' });
     assert.equal(response.bestMatch.label, 'Hungarian Grand Prix');
 });
+
+test('recognisable venue searches prefer the circuit over incidental driver prefixes', () => {
+    const response = buildSearchResponse([
+        { category: 'driver', series: 'f1', label: 'Mike Sparken', meta: 'France', url: '/drivers/sparken' },
+        { category: 'circuit', series: 'f1', label: 'Circuit de Spa-Francorchamps', place: 'Spa', meta: 'Spa, Belgium', prominence: 70, url: '/circuits/spa' }
+    ], { query: 'spa', preferredSeries: 'f1' });
+    assert.equal(response.bestMatch.label, 'Circuit de Spa-Francorchamps');
+    assert.equal(response.groups[0].key, 'circuit');
+});
+
+test('venue intent and active-series context beat a generic junior race label', () => {
+    const response = buildSearchResponse([
+        { category: 'race', series: 'f3', label: 'Monaco', meta: '2026', year: 2026, url: '/f3/races/monaco' },
+        { category: 'circuit', series: 'f1', label: 'Circuit de Monaco', place: 'Monaco', meta: 'Monte Carlo', prominence: 70, url: '/circuits/monaco' }
+    ], { query: 'monaco', preferredSeries: 'f1' });
+    assert.equal(response.bestMatch.label, 'Circuit de Monaco');
+    assert.equal(response.groups[0].results[0].label, response.bestMatch.label);
+});
+
+test('explicit category words lift the requested result type', () => {
+    const response = buildSearchResponse([
+        { category: 'driver', series: 'f1', label: 'Alex Circuit', meta: 'Driver', url: '/drivers/alex' },
+        { category: 'circuit', series: 'f1', label: 'Alex Park', place: 'Alex', meta: 'Circuit', url: '/circuits/alex' }
+    ], { query: 'alex circuit', preferredSeries: 'f1' });
+    assert.equal(response.bestMatch.category, 'circuit');
+});

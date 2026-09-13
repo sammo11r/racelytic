@@ -3,6 +3,13 @@
   "source": { "label": "F1DB constructor chronology", "url": "https://github.com/f1db/f1db" },
   "transitionSource": { "label": "Formula 1 team family tree", "url": "https://www.formula1.com/en/latest/article/the-family-tree-f1-11-teams-and-how-they-came-to-be.2QBA1PPMf0bC8mp2xxqZeq.2QBA1PPMf0bC8mp2xxqZeq" },
   "reviewedAt": "2026-09-10",
+  "separateIdentityPeriods": {
+    "alfa-romeo": [{ "from": 1950, "to": 1985, "note": "The original Alfa Romeo works entries are separate from the Sauber-operated title identity used from 2019." }],
+    "mercedes": [{ "from": 1954, "to": 1955, "note": "The 1950s Mercedes works entry is separate from the Brackley operation that adopted the Mercedes identity in 2010." }],
+    "aston-martin": [{ "from": 1959, "to": 1960, "note": "The original Aston Martin works entry is separate from the Racing Point operation renamed in 2021." }],
+    "honda": [{ "from": 1964, "to": 1968, "note": "Honda's original works entry is separate from the former BAR operation that competed as Honda from 2006." }],
+    "renault": [{ "from": 1977, "to": 1985, "note": "Renault's original works entry is separate from the Enstone operation that adopted the Renault identity in 2002." }]
+  },
   "transitions": {
     "sauber>bmw-sauber": { "type": "works-partnership", "label": "Works partnership", "note": "BMW became the works owner and constructor partner.", "continuity": ["operation", "factory"], "confidence": "high" },
     "bmw-sauber>sauber": { "type": "ownership-change", "label": "Ownership change", "note": "Sauber regained control of the operation after BMW withdrew.", "continuity": ["operation", "factory"], "confidence": "high" },

@@ -5,12 +5,25 @@
         let searchTimer;
         let searchController;
         let activeSearchIndex = -1;
-        let inlineCompletionQuery;
+        let searchAllSeries = false;
         
         const safeText = value => String(value ?? '')
             .replaceAll('&', '&amp;').replaceAll('<', '&lt;')
             .replaceAll('>', '&gt;').replaceAll('"', '&quot;')
             .replaceAll("'", '&#039;');
+
+        const highlightedText = (value, query) => {
+            const text = String(value ?? '');
+            const needle = String(query || '').trim();
+            const index = text.toLocaleLowerCase().indexOf(needle.toLocaleLowerCase());
+            if (!needle || index < 0) return safeText(text);
+            return `${safeText(text.slice(0, index))}<mark>${safeText(text.slice(index, index + needle.length))}</mark>${safeText(text.slice(index + needle.length))}`;
+        };
+
+        const setStatus = message => {
+            const status = container.querySelector('#global-search-status');
+            if (status) status.textContent = message;
+        };
         
         const searchOptions = () => [...(searchResults?.querySelectorAll('[role="option"]') || [])];
         
@@ -38,19 +51,8 @@
         };
         
         const restoreTypedSearchQuery = () => {
-            if (inlineCompletionQuery === undefined || !searchInput) return;
-            searchInput.value = inlineCompletionQuery;
+            if (!searchInput) return;
             searchInput.setSelectionRange(searchInput.value.length, searchInput.value.length);
-            inlineCompletionQuery = undefined;
-        };
-        
-        const applyInlineCompletion = (payload, query) => {
-            if (!searchInput || document.activeElement !== searchInput || searchInput.value.trim() !== query) return;
-            const completion = String(payload?.completion || '');
-            if (!completion || completion.length <= query.length) return;
-            inlineCompletionQuery = query;
-            searchInput.value = completion;
-            searchInput.setSelectionRange(query.length, searchInput.value.length);
         };
         
         const closeSearch = () => {
@@ -61,6 +63,40 @@
             clearActiveSearchResult();
             searchResults.hidden = true;
             searchInput?.setAttribute('aria-expanded', 'false');
+            searchInput?.removeAttribute('aria-busy');
+        };
+
+        const searchUrl = query => {
+            const params = new URLSearchParams({ q: query, context: activeSeries });
+            if (!searchAllSeries) params.set('series', activeSeries);
+            return `/api/search?${params}`;
+        };
+
+        const runSearch = async query => {
+            searchController?.abort();
+            const controller = new AbortController();
+            searchController = controller;
+            searchResults.hidden = false;
+            searchResults.innerHTML = '<div class="global-search-empty">Searching…</div>';
+            searchInput.setAttribute('aria-expanded', 'true');
+            searchInput.setAttribute('aria-busy', 'true');
+            setStatus('Searching');
+            try {
+                const response = await fetch(searchUrl(query), { signal: controller.signal });
+                if (!response.ok) throw new Error('Search failed');
+                const payload = await response.json();
+                if (searchController === controller && searchInput.value.trim() === query) renderSearchResults(payload, query);
+            } catch (error) {
+                if (error.name === 'AbortError' || searchController !== controller) return;
+                console.error('Search error:', error);
+                searchResults.innerHTML = '<div class="global-search-empty"><strong>Search is temporarily unavailable.</strong><button type="button" data-search-retry>Try again</button></div>';
+                setStatus('Search is temporarily unavailable.');
+            } finally {
+                if (searchController === controller) {
+                    searchController = undefined;
+                    searchInput.removeAttribute('aria-busy');
+                }
+            }
         };
         
         const renderSearchResults = (payload, query) => {
@@ -68,57 +104,54 @@
             const groups = payload?.groups || [];
             const seriesLabel = { f1: 'F1', f2: 'F2', f3: 'F3', academy: 'Academy' };
             let resultIndex = 0;
-            searchResults.innerHTML = groups.length ? `${groups.map(group => `
+            const scopeLabel = searchAllSeries ? 'All series' : ({ f1: 'F1', f2: 'F2', f3: 'F3', academy: 'F1 Academy' }[activeSeries] || 'Current series');
+            const scopeControls = `<div class="global-search-scope" aria-label="Search scope">
+                <span>Searching ${safeText(scopeLabel)}</span>
+                <button type="button" data-search-scope="${searchAllSeries ? 'current' : 'all'}">${searchAllSeries ? 'Current series only' : 'Search all series'}</button>
+            </div>`;
+            searchResults.innerHTML = groups.length ? `${scopeControls}<div id="global-search-list" role="listbox">${groups.map(group => `
                 <section class="global-search-group" role="group" aria-label="${safeText(group.label)}">
                     <div class="global-search-group-title">${safeText(group.label)}</div>
                     ${group.results.map(result => {
                         const series = Array.isArray(result.series) ? result.series : [result.series];
                         return `<a id="global-search-option-${resultIndex++}" href="${safeText(result.url)}" class="global-search-result" role="option" aria-selected="false">
                             <span>${safeText(result.type)}</span>
-                            <strong>${safeText(result.label)}</strong>
+                            <strong>${highlightedText(result.label, query)}</strong>
                             <small>${safeText(result.meta)}</small>
                             <em>${series.filter(Boolean).map(key => `<i>${safeText(seriesLabel[key] || key)}</i>`).join('')}</em>
                         </a>`;
                     }).join('')}
                 </section>
-            `).join('')}<a id="global-search-option-${resultIndex}" class="global-search-all" role="option" aria-selected="false" href="/search?q=${encodeURIComponent(query)}&context=${encodeURIComponent(activeSeries)}">View all ${safeText(payload.total)} results <span aria-hidden="true">→</span></a>`
-                : '<div class="global-search-empty">No matching pages or database entries.</div>';
+            `).join('')}<a id="global-search-option-${resultIndex}" class="global-search-all" role="option" aria-selected="false" href="/search?q=${encodeURIComponent(query)}&context=${encodeURIComponent(activeSeries)}${searchAllSeries ? '' : `&series=${encodeURIComponent(activeSeries)}`}">View all ${safeText(payload.total)} results <span aria-hidden="true">→</span></a></div>`
+                : `${scopeControls}<div class="global-search-empty"><strong>No matches in ${safeText(scopeLabel)}.</strong>${searchAllSeries ? '<span>Try another spelling or a broader term.</span>' : '<button type="button" data-search-scope="all">Search all series</button>'}</div>`;
             clearActiveSearchResult();
             searchResults.hidden = false;
             searchInput.setAttribute('aria-expanded', 'true');
-            applyInlineCompletion(payload, query);
+            setStatus(`${payload.total} result${payload.total === 1 ? '' : 's'} available in ${scopeLabel}.`);
         };
+
+        searchResults?.addEventListener('click', event => {
+            const scopeButton = event.target.closest('[data-search-scope]');
+            const retryButton = event.target.closest('[data-search-retry]');
+            if (!scopeButton && !retryButton) return;
+            event.preventDefault();
+            searchAllSeries = scopeButton ? scopeButton.dataset.searchScope === 'all' : searchAllSeries;
+            restoreTypedSearchQuery();
+            const query = searchInput.value.trim();
+            if (query.length >= 2) runSearch(query);
+        });
         
         searchInput?.addEventListener('input', () => {
             window.clearTimeout(searchTimer);
             searchController?.abort();
             searchController = undefined;
-            inlineCompletionQuery = undefined;
             clearActiveSearchResult();
             const query = searchInput.value.trim();
             if (query.length < 2) {
                 closeSearch();
                 return;
             }
-            searchTimer = window.setTimeout(async () => {
-                const controller = new AbortController();
-                searchController = controller;
-                searchResults.hidden = false;
-                searchResults.innerHTML = '<div class="global-search-empty">Searching…</div>';
-                searchInput.setAttribute('aria-expanded', 'true');
-                try {
-                    const response = await fetch(`/api/search?q=${encodeURIComponent(query)}&context=${encodeURIComponent(activeSeries)}`, { signal: controller.signal });
-                    if (!response.ok) throw new Error('Search failed');
-                    const payload = await response.json();
-                    if (searchController === controller && searchInput.value.trim() === query) renderSearchResults(payload, query);
-                } catch (error) {
-                    if (error.name === 'AbortError' || searchController !== controller) return;
-                    console.error('Search error:', error);
-                    searchResults.innerHTML = '<div class="global-search-empty">Search is temporarily unavailable.</div>';
-                } finally {
-                    if (searchController === controller) searchController = undefined;
-                }
-            }, 180);
+            searchTimer = window.setTimeout(() => runSearch(query), 180);
         });
         
         searchInput?.addEventListener('keydown', event => {
@@ -127,15 +160,11 @@
                 event.stopPropagation();
                 restoreTypedSearchQuery();
                 closeSearch();
-                searchInput.focus();
-            }
-            if ((event.key === 'Tab' || event.key === 'ArrowRight')
-                && inlineCompletionQuery !== undefined
-                && searchInput.selectionStart === inlineCompletionQuery.length
-                && searchInput.selectionEnd === searchInput.value.length) {
-                event.preventDefault();
-                searchInput.setSelectionRange(searchInput.value.length, searchInput.value.length);
-                inlineCompletionQuery = undefined;
+                if (container.querySelector('.main-nav')?.classList.contains('is-search-open')) {
+                    container.dispatchEvent(new CustomEvent('racelytic-search-escape'));
+                } else {
+                    searchInput.focus();
+                }
             }
             if (event.key === 'ArrowDown' && !searchResults?.hidden) {
                 event.preventDefault();

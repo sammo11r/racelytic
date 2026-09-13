@@ -86,13 +86,35 @@ test('F1 quizzes persist answers and expose resume state on the library', () => 
   const champions = read('frontend/js/world-champions-quiz.js');
   const winners = read('frontend/js/race-winners-quiz.js');
 
-  assert.match(library, /Promise\.allSettled/);
+  assert.match(library, /\/api\/games\/quiz-summary/);
   assert.match(library, /Continue quiz/);
   assert.match(library, /validAnswerIds\.has/);
   assert.match(champions, /restoreQuizProgress\(\);/);
   assert.match(champions, /saveQuizProgress\(\);/);
   assert.match(winners, /restoreQuizProgress\(\);/);
   assert.match(winners, /saveQuizProgress\(\);/);
+});
+
+test('quiz libraries use one cached summary endpoint instead of full answer datasets', () => {
+  const routes = read('backend/routes/games.js');
+  const f1Library = read('frontend/js/quizzes.js');
+  const juniorLibrary = read('frontend/js/junior-quizzes.js');
+
+  assert.match(routes, /router\.get\('\/api\/games\/quiz-summary'/);
+  assert.match(routes, /QUIZ_SUMMARY_TTL_MS/);
+  assert.match(routes, /stale-while-revalidate=300/);
+  assert.match(f1Library, /getJSON\('\/api\/games\/quiz-summary'\)/);
+  assert.match(juniorLibrary, /getJSON\(`\/api\/games\/quiz-summary\?series=\$\{QUIZ_SERIES\}`\)/);
+  assert.doesNotMatch(juniorLibrary, /Promise\.allSettled/);
+});
+
+test('season detail defers its map and below-the-fold rendering work', () => {
+  const script = read('frontend/js/season.js');
+  const css = read('frontend/css/polish.css');
+
+  assert.match(script, /renderSeasonMapWhenVisible/);
+  assert.match(script, /IntersectionObserver/);
+  assert.match(css, /\.season-detail-page > \.season-section:nth-of-type\(n \+ 3\)[\s\S]*content-visibility: auto/);
 });
 
 test('World Champions quiz provides focused play controls and decade navigation', () => {
@@ -151,4 +173,26 @@ test('Race Winners quiz uses the shared play template and race-specific controls
   assert.match(script, /race-winners\/reveal/);
   assert.match(script, /openQuizConfirmation/);
   assert.match(routes, /router\.post\('\/api\/games\/race-winners\/reveal'/);
+});
+
+test('original F2 quizzes use the shared polished implementation', () => {
+  const championsHtml = read('frontend/f2-champions-quiz.html');
+  const winnersHtml = read('frontend/f2-race-winners-quiz.html');
+  const championsScript = read('frontend/js/world-champions-quiz.js');
+  const winnersScript = read('frontend/js/race-winners-quiz.js');
+
+  for (const html of [championsHtml, winnersHtml]) {
+    assert.match(html, /class="quiz-guess-form quiz-play-bar"/);
+    assert.match(html, /id="quiz-progress-fill"/);
+    assert.match(html, /id="quiz-confirm-dialog"/);
+    assert.match(html, /id="quiz-completion"/);
+    assert.doesNotMatch(html, /class="back-link"/);
+  }
+  assert.match(championsHtml, /src="\/js\/world-champions-quiz\.js"/);
+  assert.match(winnersHtml, /src="\/js\/race-winners-quiz\.js"/);
+  assert.match(championsScript, /\?series=\$\{QUIZ_SERIES\}/);
+  assert.match(winnersScript, /f2-race-winners-table/);
+  assert.match(winnersScript, /guessedWinnerNames/);
+  assert.equal(require('fs').existsSync(require('path').join(root, 'frontend/js/f2-champions-quiz.js')), false);
+  assert.equal(require('fs').existsSync(require('path').join(root, 'frontend/js/f2-race-winners-quiz.js')), false);
 });

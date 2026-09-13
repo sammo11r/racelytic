@@ -1,15 +1,21 @@
 let winnerRows = [];
 const revealedWinners = new Map();
+const guessedWinnerNames = new Set();
 let activeEra = 'all';
 let quizGaveUp = false;
 let renderedColumnCount = 0;
 let measuredTableWidth = 0;
 let newlyRevealedSlots = new Set();
-const QUIZ_PROGRESS_KEY = 'racelytic-quiz-race-winners';
+const QUIZ_SERIES = document.body.classList.contains('f2-mode') ? 'f2' : 'f1';
+const QUIZ_PROGRESS_KEY = QUIZ_SERIES === 'f1' ? 'racelytic-quiz-race-winners' : `racelytic-quiz-${QUIZ_SERIES}-race-winners`;
+const quizApi = path => `${path}${QUIZ_SERIES === 'f1' ? '' : `?series=${QUIZ_SERIES}`}`;
+const CHAMPIONSHIP_NAME = QUIZ_SERIES === 'f1' ? 'Formula 1' : 'Formula 2';
 
 function saveQuizProgress() {
   try {
-    localStorage.setItem(QUIZ_PROGRESS_KEY, JSON.stringify({ version: 2, answers: [...revealedWinners.entries()], gaveUp: quizGaveUp }));
+    localStorage.setItem(QUIZ_PROGRESS_KEY, JSON.stringify({
+      version: 2, answers: [...revealedWinners.entries()], guessedDriverNames: [...guessedWinnerNames], gaveUp: quizGaveUp
+    }));
     document.getElementById('quiz-save-status').textContent = 'Progress saved';
   } catch (_) {
     document.getElementById('quiz-save-status').textContent = 'Progress kept for this visit';
@@ -27,6 +33,9 @@ function restoreQuizProgress() {
     saved?.answers?.forEach(([slot, driver]) => {
       if (validSlots.has(String(slot)) && typeof driver === 'string') revealedWinners.set(Number(slot), driver);
     });
+    saved?.guessedDriverNames?.forEach(name => {
+      if (typeof name === 'string') guessedWinnerNames.add(name);
+    });
     quizGaveUp = Boolean(saved?.gaveUp);
   } catch (_) {}
 }
@@ -41,6 +50,13 @@ function driverCellContent(driver, nameLength) {
   return `<span class="quiz-column-sizer" aria-hidden="true">${'M'.repeat(nameLength)}</span>${driver
     ? `<span class="quiz-answer-overlay">${esc(driver)}</span>`
     : '<span class="quiz-empty-answer quiz-answer-overlay" aria-label="Not yet answered"></span>'}`;
+}
+
+function nationCellContent(row) {
+  if (QUIZ_SERIES === 'f1') return esc(row.countryName || '—');
+  if (!row.countryCode) return '—';
+  const code = String(row.countryCode).toUpperCase();
+  return esc(new Intl.DisplayNames(['en'], { type: 'region' }).of(code) || code);
 }
 
 function preserveMeasuredColumnProportions(board, columnCount) {
@@ -63,7 +79,7 @@ function visibleWinnerRows() {
 function updateQuizStatus() {
   const found = revealedWinners.size;
   const total = winnerRows.length;
-  const names = [...new Set(revealedWinners.values())];
+  const names = [...guessedWinnerNames];
   document.getElementById('quiz-score').textContent = `${found} / ${total}`;
   document.getElementById('quiz-progress-fill').style.width = `${total ? found / total * 100 : 0}%`;
   document.getElementById('guessed-driver-count').textContent = names.length;
@@ -75,8 +91,8 @@ function updateQuizStatus() {
     document.getElementById('quiz-completion-label').textContent = quizGaveUp ? 'Answers revealed' : 'Quiz complete';
     document.getElementById('quiz-completion-title').textContent = quizGaveUp ? 'Winners table completed' : 'Perfect score';
     document.getElementById('quiz-completion-copy').textContent = quizGaveUp
-      ? `You found ${names.length} Grand Prix winners before revealing the remaining drivers.`
-      : `You named all ${total} Formula 1 Grand Prix winners.`;
+      ? `You found ${names.length} ${CHAMPIONSHIP_NAME} race winners before revealing the remaining drivers.`
+      : `You named all ${total} ${CHAMPIONSHIP_NAME} race winners.`;
   }
 }
 
@@ -98,15 +114,15 @@ function renderWinnerBoard() {
 
   board.classList.add('is-measuring');
   board.innerHTML = columns.map(column => `<div class="quiz-column-table table-wrap">
-    <table class="champions-quiz-table race-winners-table">
-      <thead><tr><th>Wins</th><th>Driver</th><th>Nation</th><th>First win</th></tr></thead>
+    <table class="champions-quiz-table race-winners-table${QUIZ_SERIES === 'f2' ? ' f2-race-winners-table' : ''}">
+      <thead><tr><th>Wins</th><th>Driver</th><th>Nation</th>${QUIZ_SERIES === 'f2' ? '<th>Feature</th><th>Sprint</th>' : '<th>First win</th>'}</tr></thead>
       <tbody>${column.map(row => {
         const name = revealedWinners.get(row.slot);
         return `<tr data-slot="${row.slot}" class="${name ? 'is-revealed' : ''}${newlyRevealedSlots.has(row.slot) ? ' is-new-answer' : ''}">
           <td><strong>${fmtNumber(row.wins)}</strong></td>
           <td class="quiz-driver-cell">${driverCellContent(name, row.driverNameLength)}</td>
-          <td>${esc(row.countryName || '—')}</td>
-          <td>${esc(row.firstWinYear)}</td>
+          <td>${nationCellContent(row)}</td>
+          ${QUIZ_SERIES === 'f2' ? `<td>${fmtNumber(row.featureWins)}</td><td>${fmtNumber(row.sprintWins)}</td>` : `<td>${esc(row.firstWinYear)}</td>`}
         </tr>`;
       }).join('')}</tbody>
     </table>
@@ -115,7 +131,7 @@ function renderWinnerBoard() {
   measuredTableWidth = Math.max(measuredTableWidth, ...[...board.querySelectorAll('.quiz-column-table')].map(table => table.getBoundingClientRect().width));
   const fittedColumnCount = responsiveColumnCount(board, rows.length);
   if (fittedColumnCount !== columnCount) return renderWinnerBoard();
-  preserveMeasuredColumnProportions(board, 4);
+  preserveMeasuredColumnProportions(board, QUIZ_SERIES === 'f2' ? 5 : 4);
   board.classList.remove('is-measuring');
   updateQuizStatus();
 }
@@ -132,6 +148,7 @@ function scrollToSlot(slot) {
 
 function resetQuiz() {
   revealedWinners.clear();
+  guessedWinnerNames.clear();
   newlyRevealedSlots.clear();
   quizGaveUp = false;
   try { localStorage.removeItem(QUIZ_PROGRESS_KEY); } catch (_) {}
@@ -146,7 +163,7 @@ async function revealQuiz() {
   const feedback = document.getElementById('quiz-feedback');
   button.disabled = true;
   try {
-    const response = await fetch('/api/games/race-winners/reveal', { method: 'POST' });
+    const response = await fetch(quizApi('/api/games/race-winners/reveal'), { method: 'POST' });
     const result = await response.json();
     if (!response.ok) throw new Error(result.error || 'Unable to reveal the answers.');
     result.answers.forEach(answer => revealedWinners.set(answer.slot, answer.driverName));
@@ -179,7 +196,7 @@ function openQuizConfirmation({ title, copy, confirmLabel, action }) {
 
 async function initialiseRaceWinnersQuiz() {
   try {
-    winnerRows = await getJSON('/api/games/race-winners');
+    winnerRows = await getJSON(quizApi('/api/games/race-winners'));
     restoreQuizProgress();
     if (window.matchMedia('(max-width: 800px)').matches) activeEra = String(Math.max(...winnerRows.map(row => Math.floor(row.firstWinYear / 10) * 10)));
     renderEraFilters();
@@ -207,17 +224,18 @@ document.getElementById('winner-guess-form').addEventListener('submit', async ev
   button.disabled = true;
 
   try {
-    const response = await fetch('/api/games/race-winners/guess', {
+    const response = await fetch(quizApi('/api/games/race-winners/guess'), {
       method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ guess })
     });
     const result = await response.json();
     if (!response.ok) throw new Error(result.error || 'Unable to check that guess.');
     if (!result.correct) {
-      feedback.textContent = `${guess} is not a Formula 1 Grand Prix winner.`;
+      feedback.textContent = `${guess} is not a ${CHAMPIONSHIP_NAME} race winner.`;
       feedback.className = 'is-incorrect';
     } else {
       const newMatches = result.matches.filter(match => !revealedWinners.has(match.slot));
       result.matches.forEach(match => revealedWinners.set(match.slot, match.driverName));
+      result.matches.forEach(match => guessedWinnerNames.add(match.driverName));
       newlyRevealedSlots = new Set(newMatches.map(match => match.slot));
       saveQuizProgress();
       const firstNewRow = winnerRows.find(row => row.slot === newMatches[0]?.slot);

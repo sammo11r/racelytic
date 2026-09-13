@@ -6,7 +6,10 @@ let quizGaveUp = false;
 let renderedColumnCount = 0;
 let measuredTableWidth = 0;
 let newlyRevealedYears = new Set();
-const QUIZ_PROGRESS_KEY = 'racelytic-quiz-world-champions';
+const QUIZ_SERIES = document.body.classList.contains('f2-mode') ? 'f2' : 'f1';
+const QUIZ_PROGRESS_KEY = QUIZ_SERIES === 'f1' ? 'racelytic-quiz-world-champions' : `racelytic-quiz-${QUIZ_SERIES}-champions`;
+const quizApi = path => `${path}${QUIZ_SERIES === 'f1' ? '' : `?series=${QUIZ_SERIES}`}`;
+const CHAMPIONSHIP_NAME = QUIZ_SERIES === 'f1' ? 'Formula 1' : 'Formula 2';
 
 function saveQuizProgress() {
   try {
@@ -152,12 +155,11 @@ async function revealQuiz() {
   const feedback = document.getElementById('quiz-feedback');
   button.disabled = true;
   try {
-    const response = await fetch('/api/games/world-champions/reveal', { method: 'POST' });
+    const response = await fetch(quizApi('/api/games/world-champions/reveal'), { method: 'POST' });
     const result = await response.json();
     if (!response.ok) throw new Error(result.error || 'Unable to reveal the answers.');
     result.answers.forEach(answer => {
       revealedSeasons.set(answer.year, answer.driverName);
-      guessedDriverNames.add(answer.driverName);
     });
     quizGaveUp = true;
     newlyRevealedYears.clear();
@@ -188,7 +190,7 @@ function openQuizConfirmation({ title, copy, confirmLabel, action }) {
 
 async function initialiseChampionsQuiz() {
   try {
-    quizSeasons = await getJSON('/api/games/world-champions');
+    quizSeasons = await getJSON(quizApi('/api/games/world-champions'));
     restoreQuizProgress();
     if (window.matchMedia('(max-width: 800px)').matches) activeDecade = String(Math.max(...quizSeasons.map(season => Math.floor(season.year / 10) * 10)));
     renderDecadeFilters();
@@ -216,13 +218,13 @@ document.getElementById('champion-guess-form').addEventListener('submit', async 
   input.disabled = true;
   button.disabled = true;
   try {
-    const response = await fetch('/api/games/world-champions/guess', {
+    const response = await fetch(quizApi('/api/games/world-champions/guess'), {
       method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ guess })
     });
     const result = await response.json();
     if (!response.ok) throw new Error(result.error || 'Unable to check that guess.');
     if (!result.correct) {
-      feedback.textContent = `${guess} is not a World Drivers’ Champion.`;
+      feedback.textContent = `${guess} is not a ${CHAMPIONSHIP_NAME} Drivers’ Champion.`;
       feedback.className = 'is-incorrect';
     } else {
       const matches = result.matches?.length ? result.matches : result.years.map(year => ({ year, driverName: result.driverName }));
