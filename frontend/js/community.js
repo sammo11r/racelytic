@@ -41,7 +41,7 @@ function recordUrl(configuration = {}) {
 
 function creationUrl(item) {
   const series = creationSeries(item);
-  if (item.type === 'points') return `${communityBase(series, 'points-systems')}?copy=${encodeURIComponent(item.id)}`;
+  if (item.type === 'points') return `${communityBase(series, 'points-systems')}?copy=${encodeURIComponent(item.id)}#your-systems`;
   if (item.type === 'records') return recordUrl(item.configuration);
   return `${communityBase(series, 'championship-builder')}?id=${encodeURIComponent(item.id)}`;
 }
@@ -105,7 +105,7 @@ function setCommunityMode() {
   const series = contextualSeries();
   document.getElementById('community-create-link').href = communityBase(series, 'championship-builder');
   document.getElementById('community-builder-link').href = communityBase(series, 'championship-builder');
-  document.getElementById('community-points-link').href = communityBase(series, 'points-systems');
+  document.getElementById('community-points-link').href = `${communityBase(series, 'points-systems')}#your-systems`;
   document.getElementById('community-account-link').href = `/account?series=${encodeURIComponent(series)}`;
 }
 

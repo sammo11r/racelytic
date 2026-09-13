@@ -245,6 +245,58 @@ test('Ask API carries comparison context through natural follow-up refinements',
     });
 });
 
+test('Ask API follow-ups replace, preserve, and explicitly clear individual slots', async () => {
+    let executed;
+    await withAskApi({ execute: async (connection, interpretation) => {
+        executed = interpretation;
+        return {
+            intent: interpretation.intent,
+            entity: interpretation.entity,
+            entityLabel: interpretation.entity === 'constructors' ? 'Constructors' : 'Drivers',
+            answer: 'Answer', assumptions: [], pointsSystem: interpretation.pointsSystemYear ? { name: 'Historical rules' } : null,
+            record: { label: 'Wins', total: 0, entries: [] },
+            comparison: ['driver_head_to_head', 'constructor_head_to_head'].includes(interpretation.intent)
+                ? { drivers: [], meetings: 0, scope: interpretation.comparisonScope, metric: interpretation.comparisonMetric, details: [], filters: {} }
+                : undefined
+        };
+    } }, async server => {
+        const recordContext = {
+            intent: 'record_leader', entity: 'drivers', recordCategory: 'wins', constructorName: 'Ferrari',
+            fromYear: 2010, toYear: 2020
+        };
+        assert.equal((await post(server, '/api/ask', { query: 'Without the team filter', context: recordContext })).status, 200);
+        assert.equal(executed.constructorName, null);
+        assert.deepEqual([executed.fromYear, executed.toYear], [2010, 2020]);
+
+        assert.equal((await post(server, '/api/ask', { query: 'All seasons', context: recordContext })).status, 200);
+        assert.deepEqual([executed.fromYear, executed.toYear], [null, null]);
+        assert.equal(executed.constructorName, 'Ferrari');
+
+        assert.equal((await post(server, '/api/ask', { query: 'What about constructors?', context: recordContext })).status, 200);
+        assert.equal(executed.intent, 'record_leader');
+        assert.equal(executed.entity, 'constructors');
+        assert.equal(executed.subjectName, null);
+        assert.equal(executed.constructorName, null);
+
+        const comparisonContext = {
+            intent: 'driver_head_to_head', entity: 'drivers', subjectNames: ['Lewis Hamilton', 'Max Verstappen'],
+            comparisonMetric: 'wins', comparisonScope: 'career', pointsSystemYear: null
+        };
+        assert.equal((await post(server, '/api/ask', { query: 'Use 1991 scoring instead', context: comparisonContext })).status, 200);
+        assert.equal(executed.pointsSystemYear, 1991);
+        assert.deepEqual(executed.subjectNames, comparisonContext.subjectNames);
+
+        assert.equal((await post(server, '/api/ask', { query: 'Now compare them as teammates', context: comparisonContext })).status, 200);
+        assert.equal(executed.comparisonScope, 'teammates');
+        assert.deepEqual(executed.subjectNames, comparisonContext.subjectNames);
+
+        assert.equal((await post(server, '/api/ask', {
+            query: 'Use official points', context: { ...comparisonContext, pointsSystemYear: 1991 }
+        })).status, 200);
+        assert.equal(executed.pointsSystemYear, null);
+    });
+});
+
 test('Ask API refuses a broader answer when execution drops a requested scope', async () => {
     await withAskApi({ execute: async () => ({
         intent: 'record_leader', entity: 'drivers', entityLabel: 'Drivers', answer: 'Unscoped answer',

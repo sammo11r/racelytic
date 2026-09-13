@@ -268,7 +268,7 @@ function loadHeader() {
                     ['/f3/simulate-season', 'Simulate season', 'Recalculate an F3 championship'],
                     ['/f3/scenario-calculator', 'Scenario calculator', 'Project a championship run-in'],
                     ['/f3/championship-builder', 'Championship builder', 'Create a custom F3 calendar'],
-                    ['/f3/points-systems', 'Points systems', 'Create and manage scoring rules']
+                    ['/f3/points-systems', 'Points systems', 'Browse official scoring and create rules']
                 ]],
                 ['FORMULA 3 GAMES', [
                     ['/f3/games', 'Overview', 'Choose a Formula 3 game'],
@@ -400,7 +400,7 @@ function loadHeader() {
                 ['/f2/simulate-season', 'Simulate season', 'Recalculate an F2 championship'],
                 ['/f2/scenario-calculator', 'Scenario calculator', 'Project a championship run-in'],
                 ['/f2/championship-builder', 'Championship builder', 'Create a custom F2 calendar'],
-                ['/f2/points-systems', 'Points systems', 'Create and manage scoring rules']
+                ['/f2/points-systems', 'Points systems', 'Browse official scoring and create rules']
             ];
             simulatorLinks.forEach((link, index) => {
                 const item = f2SimulatorRoutes[index];
@@ -457,7 +457,7 @@ function loadHeader() {
                 '/f2/simulate-season': ['FORMULA 2 SIMULATOR', 'Rewrite a Formula 2 championship.', 'Apply a different feature, sprint and bonus-points system to any Formula 2 season.'],
                 '/f2/scenario-calculator': ['FORMULA 2 SCENARIOS', 'Shape the Formula 2 title run-in.', 'Freeze the standings after any round, rewrite the remaining feature results and retain each sprint classification.'],
                 '/f2/championship-builder': ['FORMULA 2 CHAMPIONSHIP BUILDER', 'Your races. Your rules.', 'Combine individual Formula 2 sprint and feature races, choose the field and calculate a custom championship.'],
-                '/f2/points-systems': ['FORMULA 2 CHAMPIONSHIP RULES', 'Formula 2 points systems.', 'Create reusable feature, sprint, qualifying and bonus-point rules.']
+                '/f2/points-systems': ['FORMULA 2 CHAMPIONSHIP RULES', 'Formula 2 points systems.', 'Browse official scoring, compare formats or create reusable rules.']
             }[window.location.pathname];
             if (f2Copy) {
                 document.title = `${f2Copy[0].replace('FORMULA 2 ', '').replaceAll(' ', ' ').toLowerCase().replace(/(^|\s)\S/g, character => character.toUpperCase())} · Formula 2 · Racelytic`;

@@ -5,6 +5,7 @@ const { MemoryRateLimiter } = require('../rate-limit');
 const { withConnection } = require('../route-helpers');
 const { RECORD_CATEGORIES, intentDefinition, isRecordCategory, missingRequiredSlots, supportedIntentIds } = require('../ask-intents');
 const { isJuniorSeries, normaliseSeries, seriesPrefix } = require('../series-config');
+const { extractFollowUpDirectives, mergeFollowUpSlot } = require('../ask-slots');
 const { all: SERIES } = require('../../frontend/js/series-config');
 
 function askOptions(series = 'f1') {
@@ -148,14 +149,15 @@ function mentionedSeries(query) {
 function applyFollowUpInterpretation(interpreted, context, query) {
     if (!context || typeof context !== 'object') return interpreted;
     const text = String(query || '').trim();
-    const followUp = /^(?:and\b|now\b|only\b|instead\b|what\s+about\b|how\s+about\b|show\b|make\s+that\b|at\b|in\b|with\b|without\b|from\b|since\b|through\b|until\b|between\b|as\s+team-?mates?\b|career\b|shared\b)/i.test(text);
-    if (!followUp || !supportedIntentIds().has(context.intent)) return interpreted;
-    const subjectReplacement = text.match(/^(?:what|how)\s+about\s+(.+?)[?.!]*$/i)?.[1]?.trim() || null;
+    const directives = extractFollowUpDirectives(text);
+    if (!directives.isFollowUp || !supportedIntentIds().has(context.intent)) return interpreted;
+    const { clearFields, subjectReplacement } = directives;
     const entityChanged = interpreted.entityExplicit && interpreted.entity && interpreted.entity !== context.entity;
-    const value = (field, fallback = null) => interpreted[field] !== null && interpreted[field] !== undefined && interpreted[field] !== ''
-        ? interpreted[field] : context[field] ?? fallback;
+    const value = (field, fallback = null) => mergeFollowUpSlot(interpreted, context, field, clearFields, fallback);
     let detectedIntent = ['driver_head_to_head', 'constructor_head_to_head'].includes(context.intent) && !(interpreted.subjectNames || []).length
         ? context.intent : interpreted.detectedIntent || context.intent;
+    if (entityChanged && context.intent === 'driver_head_to_head' && interpreted.entity === 'constructors') detectedIntent = 'constructor_head_to_head';
+    if (entityChanged && context.intent === 'constructor_head_to_head' && interpreted.entity === 'drivers') detectedIntent = 'driver_head_to_head';
     if (subjectReplacement && context.intent === 'record_leader') detectedIntent = 'record_subject_total';
     let subjectNames = Array.isArray(interpreted.subjectNames) && interpreted.subjectNames.length
         ? interpreted.subjectNames : context.subjectNames || [];
@@ -163,17 +165,17 @@ function applyFollowUpInterpretation(interpreted, context, query) {
         subjectNames = [...(context.subjectNames || [])];
         subjectNames[1] = subjectReplacement;
     }
-    const requestedScope = /\b(?:as\s+)?team-?mates?\b|\bsame\s+team\b/i.test(text) ? 'teammates'
-        : /\bshared\s+races?\b/i.test(text) ? 'shared'
-        : /\bcareer\b|\ball[- ]time\b/i.test(text) ? 'career' : null;
-    const requestedView = /\bfull\s+classification\b|\bfull\s+results?\b/i.test(text) ? 'classification'
-        : /\bpodium\b/i.test(text) ? 'podium' : null;
+    const requestedScope = directives.comparisonScope;
+    const requestedView = directives.resultView;
     const candidate = {
         ...context,
         ...interpreted,
         intent: detectedIntent,
         detectedIntent,
         entity: interpreted.entityExplicit ? interpreted.entity : context.entity,
+        pointsSystemYear: value('pointsSystemYear'),
+        comparisonPointsSystemYears: interpreted.comparisonPointsSystemYears?.length >= 2
+            ? interpreted.comparisonPointsSystemYears : context.comparisonPointsSystemYears || [],
         recordCategory: value('recordCategory'),
         subjectName: entityChanged ? null : subjectReplacement && ['record_leader', 'record_subject_total', 'race_result'].includes(context.intent)
             ? subjectReplacement : value('subjectName'),
@@ -187,13 +189,13 @@ function applyFollowUpInterpretation(interpreted, context, query) {
         targetSeason: value('targetSeason'),
         eventName: value('eventName'),
         resultView: subjectReplacement && context.intent === 'race_result' ? 'driver' : requestedView || value('resultView'),
-        standingRound: /\bfinal\s+standings?\b/i.test(text) ? null : value('standingRound'),
+        standingRound: value('standingRound'),
         subjectNames,
         comparisonScope: requestedScope || value('comparisonScope'),
         comparisonMetric: value('comparisonMetric'),
         streakCategory: value('streakCategory'),
-        fromYear: /\ball[- ]time\b/i.test(query) ? null : value('fromYear'),
-        toYear: /\ball[- ]time\b/i.test(query) ? null : value('toYear'),
+        fromYear: value('fromYear'),
+        toYear: value('toYear'),
         confidence: 'contextual',
         ambiguousFields: [],
         unsupportedQualifiers: interpreted.unsupportedQualifiers || []
@@ -348,7 +350,8 @@ function createAskRouter({
                 recordCategory: interpretation.recordCategory,
                 fromYear: interpretation.fromYear,
                 toYear: interpretation.toYear,
-                confidence: interpretation.confidence
+                confidence: interpretation.confidence,
+                interpretationSource: interpretation.interpretationSource || 'rules'
             },
             options: askOptions(series),
             ...result

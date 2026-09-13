@@ -109,6 +109,8 @@
   font-size: 14px;
   white-space: nowrap;
 }
+.season-summary-context { display: grid; justify-items: end; gap: 7px; }
+.season-summary-context a { color: var(--text); font-size: 10px; font-weight: 800; text-underline-offset: 3px; }
 .season-summary-grid {
   display: grid;
   grid-template-columns: 2fr 1.25fr 1.25fr 1.5fr .85fr .85fr;
@@ -187,6 +189,7 @@
   .season-detail-page { padding-top: 28px; }
   .season-summary-heading { align-items: start; flex-direction: column; gap: 10px; padding: 24px 22px; }
   .season-summary-heading p { white-space: normal; }
+  .season-summary-context { justify-items: start; }
   .season-summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .season-summary-winner,
   .season-summary-constructor { grid-column: 1 / -1; }

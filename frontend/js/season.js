@@ -12,6 +12,15 @@
     const year =
         Number(resourceId('season'));
 
+    const seasonSeriesBase = window.location.pathname.startsWith('/academy/') ? '/academy'
+        : window.location.pathname.startsWith('/f3/') ? '/f3'
+            : window.location.pathname.startsWith('/f2/') ? '/f2' : '';
+    const seasonPointsLink = document.getElementById('season-points-system-link');
+    if (seasonPointsLink && year) {
+        seasonPointsLink.href = `${seasonSeriesBase}/points-systems?season=${encodeURIComponent(year)}#historical-systems`;
+        seasonPointsLink.textContent = `View the ${year} points system →`;
+    }
+
     let standingsMode = 'points';
 
 

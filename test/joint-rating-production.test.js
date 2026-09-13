@@ -51,5 +51,5 @@ test('rating freshness compares database timestamps without transport timezone s
 
 test('rating freshness responses must revalidate after a rebuild', () => {
   const source = fs.readFileSync(path.join(__dirname, '../backend/routes/ratings.js'), 'utf8');
-  assert.equal(source.match(/res\.set\('Cache-Control', 'no-cache, max-age=0, must-revalidate'\)/g)?.length, 3);
+  assert.equal(source.match(/res\.set\('Cache-Control', 'no-cache, max-age=0, must-revalidate'\)/g)?.length, 4);
 });

@@ -9,6 +9,7 @@ const script = fs.readFileSync(path.join(root, 'frontend/js/ratings.js'), 'utf8'
 const css = fs.readFileSync(path.join(root, 'frontend/css/ratings.css'), 'utf8');
 const header = fs.readFileSync(path.join(root, 'frontend/components/header.html'), 'utf8');
 const methodology = fs.readFileSync(path.join(root, 'frontend/ratings-methodology.html'), 'utf8');
+const ratingRoutes = fs.readFileSync(path.join(root, 'backend/routes/ratings.js'), 'utf8');
 const server = fs.readFileSync(path.join(root, 'backend/server.js'), 'utf8');
 
 test('ratings explorer uses series navigation and exposes date, experience and comparison controls', () => {
@@ -43,7 +44,8 @@ test('leaderboard is compact and switches between current ratings and all-time p
   assert.match(html, /id="ratings-board"/);
   assert.match(html, /class="ratings-command-bar"/);
   assert.match(css, /\.ratings-command-bar \{/);
-  assert.match(css, /body\[data-ratings-view="leaderboard"\] \.ratings-heading,\s*body\[data-ratings-view="leaderboard"\] \.ratings-controls \{ display: none; \}/);
+  assert.match(css, /body\[data-ratings-view="leaderboard"\] \.ratings-heading \{ display: flex; \}/);
+  assert.match(css, /body\[data-ratings-view="leaderboard"\] \.ratings-controls \{ display: grid; \}/);
   assert.match(css, /body\[data-ratings-view="leaderboard"\] \.ratings-command-bar \{[^}]*width: 100%;/);
   assert.match(css, /body\[data-ratings-view="leaderboard"\] \.ratings-content \{ grid-template-columns: 1fr; \}/);
   assert.match(css, /body\[data-ratings-view="leaderboard"\] \{ background: linear-gradient\(180deg, #fafafa 0, var\(--background\) 27rem\); \}/);
@@ -77,7 +79,7 @@ test('driver comparison uses a dedicated searchable workspace', () => {
   assert.match(script, /function wireRatingChart/);
   assert.match(script, /if \(ratingView === 'compare' \|\| ratingView === 'driver'\) query\.set\('order', 'peak'\)/);
   assert.match(script, /ratingView === 'compare' \|\| ratingView === 'driver'[\s\S]*?\? 1[\s\S]*?: \[1, 3, 10, 25\]\.includes/);
-  assert.match(script, /defaultComparisonDrivers = \['max-verstappen', 'charles-leclerc', 'lando-norris', 'george-russell'\]/);
+  assert.match(script, /defaultComparisonDrivers = \['max-verstappen', 'charles-leclerc'\]/);
   assert.match(script, /ratingState\.selected = \[\.\.\.defaultComparisonDrivers\]/);
   assert.match(script, /function cachedRatingDriver\(driverId\)/);
   assert.match(script, /const progressiveCompare = ratingView === 'compare';/);
@@ -86,8 +88,9 @@ test('driver comparison uses a dedicated searchable workspace', () => {
   assert.match(script, /ratingView === 'compare' && !ratingState\.selected\.length/);
   assert.match(css, /body\[data-ratings-view="compare"\] \.ratings-board \{ display: none; \}/);
   assert.match(script, /ratingState\.year = ratingView === 'leaderboard'/);
-  assert.match(script, /if \(ratingView === 'compare'\) document\.getElementById\('ratings-controls'\)\.hidden = true/);
-  assert.match(css, /body\[data-ratings-view="compare"\] \.ratings-heading,[\s\S]*?body\[data-ratings-view="compare"\] \.ratings-controls \{ display: none; \}/);
+  assert.match(css, /body\[data-ratings-view="compare"\] \.ratings-heading,[\s\S]*?body\[data-ratings-view="driver"\] \.ratings-heading \{ display: flex; \}/);
+  assert.match(html, /data-ratings-preset="leaders"/);
+  assert.match(html, /data-ratings-preset="suggested"/);
   assert.match(css, /body\[data-ratings-view="compare"\] \.ratings-hero \{ display: block; min-height: 0;/);
   assert.match(css, /body\[data-ratings-view="compare"\] \{ background: linear-gradient\(180deg, #fafafa 0, var\(--background\) 25rem\); \}/);
   assert.match(css, /body\[data-ratings-view="compare"\] \.ratings-explorer \{ padding-top: 14px; border-top: 0; \}/);
@@ -99,13 +102,16 @@ test('comparison chart supports event inspection, career alignment and uncertain
   assert.match(script, /svg\.viewBox\.baseVal\.width/);
   assert.match(script, /careerScale \? index : new Date\(event\.date\)\.getTime\(\)/);
   assert.match(script, /ratings-chart-overlay/);
+  assert.match(html, /id="ratings-chart-inspector"[^>]*type="range"/);
+  assert.match(script, /chartInspector\.oninput = inspectSlider/);
+  assert.doesNotMatch(script, /class="ratings-chart-overlay" tabindex="0" role="button"/);
   assert.match(script, /Math\.ceil\(item\.points\.length \/ 48\)/);
   assert.match(script, /class="rating-event-point" aria-hidden="true" focusable="false"/);
   assert.match(script, /addEventListener\('pointermove'/);
   assert.match(script, /addEventListener\('keydown'/);
   assert.match(script, /inspectionPoints/);
   assert.match(script, /data-series-index/);
-  assert.match(script, /Use left and right arrow keys/);
+  assert.match(html, /Use the slider or arrow keys to inspect exact ratings/);
   assert.match(script, /Not active at this point/);
   assert.match(css, /\.ratings-chart\[data-show-uncertainty="false"\] \.rating-band \{ opacity: 0; \}/);
   assert.match(css, /\.ratings-chart-tooltip/);
@@ -134,6 +140,7 @@ test('rating profile presents a searchable full-career driver dossier', () => {
   assert.match(script, /const highestRated = currentRatingOrder\(\)\[0\]/);
   assert.match(script, /ratings-peak-point/);
   assert.match(script, /ratings-team-change/);
+  assert.match(script, /ratings-event-disclosure/);
   assert.match(script, /ratingState\.year = ratingView === 'leaderboard'/);
   assert.match(css, /body\[data-ratings-view="driver"\] \.ratings-board \{ display: none; \}/);
   assert.match(css, /body\[data-ratings-view="driver"\] \{ background: linear-gradient\(180deg, #fafafa 0, var\(--background\) 25rem\); \}/);
@@ -160,6 +167,7 @@ test('leaderboard timeline selects seasons and drills into exact rated events', 
   assert.match(script, /addEventListener\('input'/);
   assert.match(script, /addEventListener\('change', \(\) => loadRatings\(\)\)/);
   assert.match(html, /id="ratings-timeline-range" class="ratings-timeline-range"/);
+  assert.match(html, /id="ratings-timeline-season"/);
   assert.match(html, /class="ratings-timeline-scale"/);
   assert.match(script, /timelineSpan\.textContent = `\$\{items\.length\} seasons`/);
   assert.match(script, /function applyRatingSeriesTheme/);
@@ -189,6 +197,8 @@ test('ratings layout collapses cleanly for tablets and phones', () => {
   assert.match(css, /@media \(max-width: 520px\)/);
   assert.match(css, /\.ratings-table tbody \{ display: grid;/);
   assert.match(css, /\.ratings-profile-events-columns \{ display: none; \}/);
+  assert.match(css, /\.ratings-timeline-track \{ display: none; \}/);
+  assert.match(css, /\.ratings-compare-slot\.selected > button \{[^}]*width: 44px; height: 44px;/);
 });
 
 test('ratings explains model context and exposes trustworthy freshness messaging', () => {
@@ -199,6 +209,8 @@ test('ratings explains model context and exposes trustworthy freshness messaging
   assert.match(script, /dataset\.state = freshnessPending \? 'pending' : 'current'/);
   assert.match(script, /Order after the/);
   assert.match(script, /Minimum events counts rated career events/);
+  assert.match(html, /1500 is the starting point/);
+  assert.match(html, /Rating &amp; evidence guide/);
 });
 
 test('ratings is a top-level section while games remains available', () => {
@@ -208,7 +220,7 @@ test('ratings is a top-level section while games remains available', () => {
 });
 
 test('ratings page exposes matching internal destinations', () => {
-  assert.doesNotMatch(html, /ratings-subnav/);
+  assert.match(html, /ratings-local-nav/);
   assert.match(fs.readFileSync(path.join(root, 'frontend/ratings.html'), 'utf8'), /href="\/ratings\/leaderboard"/);
   assert.match(fs.readFileSync(path.join(root, 'frontend/ratings.html'), 'utf8'), /href="\/ratings\/compare"/);
   assert.match(fs.readFileSync(path.join(root, 'frontend/ratings.html'), 'utf8'), /href="\/ratings\/driver"/);
@@ -229,5 +241,30 @@ test('methodology is a dedicated transparent model page', () => {
   assert.match(methodology, /zero-sum within its pool/);
   assert.match(methodology, /tested chronologically/i);
   assert.match(methodology, /not a pure measure of driver talent/i);
-  assert.doesNotMatch(methodology, /ratings-subnav/);
+  assert.match(methodology, /ratings-local-nav/);
+  assert.match(methodology, /id="uncertainty"/);
+  assert.match(methodology, /id="reading-a-profile"/);
+});
+
+test('ratings adds connected navigation, discovery filters and portable analysis', () => {
+  const overview = fs.readFileSync(path.join(root, 'frontend/ratings.html'), 'utf8');
+  const navigation = fs.readFileSync(path.join(root, 'frontend/js/ratings-navigation.js'), 'utf8');
+  const overviewScript = fs.readFileSync(path.join(root, 'frontend/js/ratings-overview.js'), 'utf8');
+  const methodologyScript = fs.readFileSync(path.join(root, 'frontend/js/ratings-methodology.js'), 'utf8');
+  assert.match(overview, /ratings-overview-live/);
+  assert.match(overviewScript, /CURRENT TOP FIVE|ratings-overview-leaders/i);
+  assert.match(navigation, /aria-current/);
+  assert.match(html, /id="ratings-board-search"/);
+  assert.match(html, /id="ratings-board-evidence"/);
+  assert.match(html, /id="ratings-board-status"/);
+  assert.match(script, /function filteredLeaderboard/);
+  assert.match(script, /previousRanks/);
+  assert.match(script, /function renderCompareInsights/);
+  assert.match(script, /function renderModelBreakdown/);
+  assert.match(script, /function downloadRatingsCsv/);
+  assert.match(script, /navigator\.clipboard\.writeText/);
+  assert.match(methodology, /id="validation-results"/);
+  assert.match(methodologyScript, /api\/ratings\/validation/);
+  assert.match(ratingRoutes, /router\.get\('\/api\/ratings\/validation'/);
+  assert.match(ratingRoutes, /previousRating: number\(row\.rating_before\)/);
 });

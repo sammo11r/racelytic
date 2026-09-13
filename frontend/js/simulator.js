@@ -443,7 +443,7 @@ async function initialiseSimulator() {
       option.setAttribute('aria-pressed', String(active));
     });
     document.getElementById('simulation-changes-only').checked = requestedPreview.get('changed') === '1';
-    document.getElementById('manage-points-systems').href = `${simulatorBase()}/points-systems`;
+    document.getElementById('manage-points-systems').href = `${simulatorBase()}/points-systems#your-systems`;
     await loadSimulationSeason();
   } catch (error) {
     setError('simulation-results', error.message);

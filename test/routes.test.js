@@ -71,6 +71,7 @@ test('all public API routes remain registered after modularization', () => {
         '/api/ratings',
         '/api/ratings/:driverId',
         '/api/ratings/events',
+        '/api/ratings/validation',
         '/api/records/explore',
         '/api/records/saved',
         '/api/records/saved',

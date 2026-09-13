@@ -1,23 +1,17 @@
 const POINT_SYSTEMS = require('../frontend/js/f1-points-systems');
-const { intentDefinition, missingRequiredSlots } = require('./ask-intents');
-
-const RECORD_CATEGORIES = Object.freeze({
-    wins: 'wins', victories: 'wins',
-    podiums: 'podiums',
-    poles: 'poles',
-    starts: 'starts',
-    points: 'points',
-    dnfs: 'dnfs', retirements: 'dnfs',
-    'positions gained': 'gridGain', 'places gained': 'gridGain',
-    'average finish': 'averageFinish', 'average finishing position': 'averageFinish',
-    'finish rate': 'finishRate', 'finishing rate': 'finishRate', 'classified rate': 'finishRate',
-    'win rate': 'winRate', 'winning rate': 'winRate',
-    'podium rate': 'podiumRate',
-    championships: 'championships', championship: 'championships', titles: 'championships', title: 'championships'
-});
+const { ASK_LANGUAGE_POLICY, intentDefinition, intentLabel, missingRequiredSlots } = require('./ask-intents');
+const {
+    ENTITY_PATTERNS,
+    RANKING_LANGUAGE_PATTERN,
+    RECORD_METRIC_FRAGMENT,
+    normalizeQuestion,
+    parseResultLimit,
+    recordCategoryFromText
+} = require('./ask-language');
+const { localFallbackCandidates } = require('./ask-local-fallback');
 
 function normalizedQuery(query) {
-    return String(query || '').trim().replace(/[’]/g, "'").replace(/[–—]/g, '-');
+    return normalizeQuestion(query);
 }
 
 function pointsSystemExists(year) {
@@ -105,8 +99,8 @@ function extractRecordSeasonRange(query) {
 
 function extractEntity(query) {
     const text = normalizedQuery(query);
-    const mentionsDrivers = /\b(?:drivers?|racers?|pilots?|wdcs?|world\s+drivers?'?\s+championships?)\b/i.test(text);
-    const mentionsConstructors = /\b(?:constructors?|teams?|manufacturers?|marques?|wccs?|world\s+constructors?'?\s+championships?)\b/i.test(text);
+    const mentionsDrivers = ENTITY_PATTERNS.drivers.test(text);
+    const mentionsConstructors = ENTITY_PATTERNS.constructors.test(text);
     if (mentionsDrivers && mentionsConstructors) return { value: null, explicit: true, ambiguous: true };
     if (mentionsConstructors) return { value: 'constructors', explicit: true, ambiguous: false };
     return { value: 'drivers', explicit: mentionsDrivers, ambiguous: false };
@@ -116,6 +110,7 @@ function extractTargetSeason(query) {
     const text = withoutScoringReference(query);
     const patterns = [
         /\b(?:the\s+)?((?:19|20)\d{2})\s+(?:formula\s+1\s+|f1\s+)?(?:drivers?'?\s+|constructors?'?\s+)?championship\b/i,
+        /\b(?:the\s+)?((?:19|20)\d{2})\s+(?:formula\s+1\s+|f1\s+)?(?:drivers?'?\s+|constructors?'?\s+)?title\b/i,
         /\b(?:in|for|during)\s+(?:the\s+)?((?:19|20)\d{2})(?:\s+season)?\b/i,
         /\b((?:19|20)\d{2})\s+season\b/i
     ];
@@ -164,17 +159,19 @@ function extractComparisonSubjectName(query) {
 
 function extractRecordSubjectName(query) {
     const text = normalizedQuery(query);
-    const metric = '(?:(?:formula\\s+[123]|f[123]|f1\\s+academy)\\s+|grand\\s+prix\\s+|race\\s+)?(?:wins?|victories|podiums?|poles?|pole\\s+positions?|fastest[ -]laps?|starts?|points?|championships?|titles?|dnfs?|retirements?|positions?\\s+gained|places?\\s+gained|average\\s+finish(?:ing\\s+position)?|finish(?:ing)?\\s+rate|classified\\s+rate|win(?:ning)?\\s+rate|podium\\s+rate)';
+    const metric = RECORD_METRIC_FRAGMENT;
     const patterns = [
         new RegExp(`\\bhow\\s+many\\s+${metric}\\s+(?:does|did|has|have)\\s+(.+?)\\s+(?:have|score|scored|record|recorded|achieve|achieved|get|got|take|earn|earned|win|won)\\b`, 'i'),
         new RegExp(`\\bhow\\s+many\\s+${metric}\\s+(?:for|by)\\s+(.+?)(?=\\s+(?:in|during|from|between|since|after|before|through|until|by)\\b|[?.!,]|$)`, 'i'),
-        new RegExp(`\\b(?:what\\s+is|what's)\\s+(.+?)(?:'s|s')\\s+${metric}(?:\\s+(?:total|record))?\\b`, 'i')
+        new RegExp(`\\b(?:what\\s+is|what's)\\s+(.+?)(?:'s|s')\\s+${metric}(?:\\s+(?:total|record))?\\b`, 'i'),
+        new RegExp(`\\b(.+?)(?:'s|s')\\s+(?:total\\s+)?${metric}(?:\\s+(?:total|record))?(?=[?.!,]|$)`, 'i')
     ];
     for (const pattern of patterns) {
         const match = text.match(pattern);
         if (!match) continue;
         const subject = match[1].trim().replace(/^(?:driver|constructor|team)\s+/i, '');
-        if (subject && !/(?:19|20)\d{2}/.test(subject)) return subject;
+        const looksLikeQuestionText = /\b(?:who|which|what|most|highest|greatest|leading|top|rank)\b/i.test(subject);
+        if (subject && !looksLikeQuestionText && !/(?:19|20)\d{2}/.test(subject)) return subject;
     }
     return null;
 }
@@ -225,31 +222,21 @@ function extractComparisonPointsSystemYears(query) {
 function extractRecordCategory(query) {
     const text = normalizedQuery(query);
     if (/\b(?:won|winning)\s+(?:the\s+)?most\s+races?\b|\bmost\s+races?\s+won\b/i.test(text)) return 'wins';
-    if (/\b(?:championships?|titles?)\b/i.test(text) && !/\b(?:under|using|apply|recalculate|(?:points?|scoring)\s+(?:system|rules?))\b/i.test(text)) return 'championships';
-    if (/\b(?:fastest\s+laps?|fastest-lap)\b/i.test(text)) return 'fastestLaps';
-    if (/\b(?:pole\s+positions?|poles?)\b/i.test(text)) return 'poles';
-    if (/\bpodium\s+(?:percentage|rate)\b/i.test(text)) return 'podiumRate';
-    if (/\bpodiums?\b/i.test(text)) return 'podiums';
-    if (/\b(?:dnfs?|did\s+not\s+finish|retirements?)\b/i.test(text)) return 'dnfs';
-    if (/\b(?:average\s+)?(?:positions?|places?)\s+gained\b|\bgrid\s+gain\b/i.test(text)) return 'gridGain';
-    if (/\baverage\s+finish(?:ing\s+position)?\b/i.test(text)) return 'averageFinish';
-    if (/\b(?:finish(?:ing)?|classified)\s+(?:percentage|rate)\b/i.test(text)) return 'finishRate';
-    if (/\bwin(?:ning)?\s+(?:percentage|rate)\b/i.test(text)) return 'winRate';
-    if (/\b(?:race\s+starts?|starts?|grand\s+prix\s+starts?)\b/i.test(text)) return 'starts';
-    if (/\bpoints?\b/i.test(text) && !/\bpoints?\s+(?:system|rules?|format|scheme)\b/i.test(text)) return 'points';
-    const direct = text.match(/\b(wins|victories)\b/i);
-    return direct ? RECORD_CATEGORIES[direct[1].toLowerCase()] : null;
+    if (/\b(?:championships?|titles?)\b/i.test(text) && !/\bchampionship\s+points?\b/i.test(text)
+        && !/\b(?:under|using|apply|recalculate|(?:points?|scoring)\s+(?:system|rules?))\b/i.test(text)) return 'championships';
+    return recordCategoryFromText(text);
 }
 
 function extractRaceResultSlots(query) {
     const text = normalizedQuery(query);
-    const resultLanguage = /\b(?:who\s+(?:won|wins)|winner|podium|classification|race\s+result|results?|where\s+did|finish(?:ed)?|qualif(?:y|ied|ying))\b/i.test(text);
-    if (!resultLanguage || /\b(?:most|greatest|career|all[- ]time|rate|championships?|titles?|crowns?|wdcs?|wccs?)\b/i.test(text)) return null;
+    const resultLanguage = /\b(?:who\s+(?:won|wins)|winner|podium|classification|finishing\s+order|race\s+result|results?|where\s+did|finish(?:ed)?|qualif(?:y|ied|ying))\b/i.test(text);
+    if (!resultLanguage || RANKING_LANGUAGE_PATTERN.test(text)
+        || /\b(?:career|rate|championships?|titles?|crowns?|wdcs?|wccs?)\b/i.test(text)) return null;
     const yearMatch = text.match(/\b((?:19|20)\d{2})\b/);
     const eventPatterns = [
         /\b(?:the\s+)?((?:19|20)\d{2})\s+(.+?)(?:\s+grand\s+prix|\s+gp|\s+race)?(?=[?.!,]|$)/i,
         /\b(?:at|in)\s+(?:the\s+)?(.+?)(?:\s+grand\s+prix|\s+gp)?\s+(?:in\s+)?((?:19|20)\d{2})(?=[?.!,]|$)/i,
-        /\b(?:won|winner\s+(?:of|at)|podium\s+(?:at|in)|classification\s+(?:at|for))\s+(?:the\s+)?(.+?)(?:\s+grand\s+prix|\s+gp)?\s+(?:in\s+)?((?:19|20)\d{2})(?=[?.!,]|$)/i
+        /\b(?:won|winner\s+(?:of|at)|podium\s+(?:at|in)|classification\s+(?:at|for)|(?:finishing\s+order|race\s+results?)\s+(?:from|at|for))\s+(?:the\s+)?(.+?)(?:\s+grand\s+prix|\s+gp)?\s+(?:in\s+)?((?:19|20)\d{2})(?=[?.!,]|$)/i
     ];
     let eventName = null;
     for (const pattern of eventPatterns) {
@@ -294,10 +281,10 @@ function extractComparisonMetric(query) {
 
 function extractHeadToHeadSlots(query) {
     const text = normalizedQuery(query);
-    const comparisonLanguage = /\b(?:head[- ]to[- ]head|compare|versus|vs\.?|who\s+(?:was|is)\s+better|who\s+(?:won|has|had|scored|recorded)\s+(?:more|the\s+(?:better|higher|lower))|which(?:\s+driver)?\s+(?:has|had)\s+(?:more|the\s+(?:better|higher|lower)))\b/i.test(text);
+    const comparisonLanguage = /\b(?:head[- ]to[- ]head|compare|versus|vs\.?|who\s+(?:was|is)\s+better|who\s+(?:won|has|had|scored|recorded)\s+(?:more|the\s+(?:better|higher|lower))|which(?:\s+(?:driver|constructor|team))?\s+(?:has|had)\s+(?:more|the\s+(?:better|higher|lower)))\b/i.test(text);
     if (!comparisonLanguage || extractComparisonPointsSystemYears(text).length >= 2) return null;
     const patterns = [
-        /\b(?:who|which(?:\s+driver)?)\s+(?:won|has|had|scored|recorded)\s+(?:more|the\s+(?:better|higher|lower))\s+(?:races?|race\s+wins?|wins?|podiums?|poles?|pole\s+positions?|points?(?:\s+share)?|starts?|dnfs?|fastest[ -]laps?|average\s+(?:finish(?:ing\s+position)?|qualif(?:y|ied|ying|ication)(?:\s+position)?)|finish(?:ing)?\s+rate|win(?:ning)?\s+rate|podium\s+rate|positions?\s+gained)\s*[,;:]?\s*(.+?)\s+(?:or|than|versus|vs\.?)\s+(.+?)(?=\s+(?:as\s+teammates?|in\s+qualifying|in\s+(?:shared\s+)?races?|between|from|since|at|with)\b|[?.!,]|$)/i,
+        /\b(?:who|which(?:\s+(?:driver|constructor|team))?)\s+(?:won|has|had|scored|recorded)\s+(?:more|the\s+(?:better|higher|lower))\s+(?:races?|race\s+wins?|wins?|podiums?|poles?|pole\s+positions?|points?(?:\s+share)?|starts?|dnfs?|fastest[ -]laps?|average\s+(?:finish(?:ing\s+position)?|qualif(?:y|ied|ying|ication)(?:\s+position)?)|finish(?:ing)?\s+rate|win(?:ning)?\s+rate|podium\s+rate|positions?\s+gained)\s*[,;:]?\s*(.+?)\s+(?:or|than|versus|vs\.?)\s+(.+?)(?=\s+(?:as\s+teammates?|in\s+qualifying|in\s+(?:shared\s+)?races?|between|from|since|at|with)\b|[?.!,]|$)/i,
         /\b(.+?)\s+(?:versus|vs\.?)\s+(.+?)\s+(?:for|on|by)\s+(?:race\s+wins?|wins?|podiums?|poles?|pole\s+positions?|points?(?:\s+share)?|starts?|dnfs?|fastest[ -]laps?|average\s+(?:finish(?:ing\s+position)?|qualif(?:y|ied|ying|ication)(?:\s+position)?)|finish(?:ing)?\s+rate|win(?:ning)?\s+rate|podium\s+rate|positions?\s+gained)(?=[?.!,]|$)/i,
         /\bcompare\s+(.+?)\s+(?:and|with|versus|vs\.?)\s+(.+?)(?=\s+(?:head[- ]to[- ]head|as\s+teammates?|in\s+qualifying|in\s+(?:shared\s+)?races?|between|from|since|at|with|under|using)\b|[?.!,]|$)/i,
         /\b(.+?)\s+(?:versus|vs\.?|or)\s+(.+?)(?=\s+(?:head[- ]to[- ]head|as\s+teammates?|in\s+qualifying|in\s+(?:shared\s+)?races?|between|from|since|at|with)\b|[?.!,]|$)/i,
@@ -311,6 +298,7 @@ function extractHeadToHeadSlots(query) {
     if (!names) return null;
     names = names.map(name => name
         .replace(/^(?:drivers?|constructors?|teams?)\s+/i, '')
+        .replace(/\s+(?:drivers?|constructors?|teams?)$/i, '')
         .replace(/\s+(?:for|on|by)\s+(?:race\s+wins?|wins?|podiums?|poles?|points?(?:\s+share)?|starts?|dnfs?|fastest[ -]laps?|average\s+(?:finish|qualif(?:y|ied|ying|ication)).*)$/i, '')
         .replace(/\s+(?:in|during|only)\s+(?:the\s+)?(?:19|20)\d{2}(?:\s+season)?$/i, '')
         .trim());
@@ -339,7 +327,7 @@ function detectsSeasonStandings(query) {
 function detectRecordIntent(query) {
     const text = normalizedQuery(query);
     const category = extractRecordCategory(text);
-    const rankingLanguage = /\b(?:most|highest|best|lowest|greatest|record|leader|leads?|leading|top|rank|ranking|all-time)\b/i.test(text)
+    const rankingLanguage = RANKING_LANGUAGE_PATTERN.test(text)
         || (category === 'championships' && /\bwho\b.*\b(?:won|champion)\b/i.test(text));
     const counterfactual = extractPointsSystemYear(text) !== null || /\b(?:recalculate|alternative\s+rules?)\b/i.test(text);
     return category && rankingLanguage && !counterfactual ? 'record_leader' : null;
@@ -388,9 +376,9 @@ function extractRaceFormat(query) {
 }
 
 function extractRecordLimit(query) {
-    const match = normalizedQuery(query).match(/\b(?:top|first|show)\s+(\d{1,3})\b/i);
+    const match = normalizedQuery(query).match(/\b(?:top|first|show|leading|list(?:\s+the)?)\s+(\d{1,3}|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|fifteen|twenty|twenty[- ]five|thirty|forty|fifty)\b/i);
     if (!match) return null;
-    return Math.max(1, Math.min(50, Number(match[1])));
+    return Math.max(1, Math.min(50, parseResultLimit(match[1])));
 }
 
 function extractMinimumStarts(query) {
@@ -414,53 +402,110 @@ function unsupportedRecordQualifiers(query, category, circuitName, raceFormat) {
     return [...new Set(unsupported)];
 }
 
-function detectIntent(query) {
+function detectIntentCandidates(query) {
     const text = normalizedQuery(query);
     const comparisonYears = extractComparisonPointsSystemYears(text);
     const comparisonLanguage = /\b(?:compare|comparison|versus|vs\.?|difference\s+between)\b/i.test(text)
         || /\bwhich\s+(?:points?|scoring)\s+(?:system|rules?)\b/i.test(text)
         || /\b(?:more|better|most)\b.*\b(?:under|using)\b.*\b(?:or|and)\b/i.test(text);
-    if (comparisonLanguage && comparisonYears.length >= 2) return 'compare_points_systems';
-    if (extractHeadToHeadSlots(text)) return 'driver_head_to_head';
-    if (extractStreakCategory(text)) return 'streak_leader';
-    if (detectsSeasonStandings(text)) return 'season_standings';
-    if (extractRaceResultSlots(text)) return 'race_result';
+    const headToHead = extractHeadToHeadSlots(text);
+    const streakCategory = extractStreakCategory(text);
+    const seasonStandings = detectsSeasonStandings(text);
+    const raceResult = extractRaceResultSlots(text);
     const recordSubject = extractRecordSubjectName(text);
-    if (recordSubject && extractRecordCategory(text)) return 'record_subject_total';
+    const recordCategory = extractRecordCategory(text);
     const recordIntent = detectRecordIntent(text);
-    if (recordIntent) return recordIntent;
     const titleLanguage = /\b(?:championships?|titles?|wdcs?|wccs?|world\s+(?:drivers?'?\s+|constructors?'?\s+)?championships?|(?:world\s+)?crowns?|champions?)\b/i.test(text);
-    const rankingLanguage = /\b(?:most|highest|best|lowest|greatest|record|leader|leads?|leading|top|winningest|often|rank|ranking)\b/i.test(text);
+    const rankingLanguage = RANKING_LANGUAGE_PATTERN.test(text) || /\boften\b/i.test(text);
     const changedLanguage = /\b(?:change|changes|changed|different|differ|switch|switches|switched|flip|flips|flipped)\b/i.test(text);
     const changedSubject = /\b(?:championships?|seasons?|champions?|winners?)\b/i.test(text);
     const subjectName = extractSubjectName(text);
     const targetSeason = extractTargetSeason(text);
     const winnerLanguage = /\b(?:who|which\s+(?:driver|constructor|team))\b.*\b(?:wins?|won|would\s+win|champion)\b/i.test(text);
+    const candidates = [];
+    const add = (intent, score, evidence) => candidates.push(Object.freeze({ intent, score, evidence }));
 
-    if (comparisonLanguage && (comparisonYears.length || extractComparisonSubjectName(text))) return 'compare_points_systems';
-    if (/\bwhy\b/i.test(text) && targetSeason && titleLanguage) return 'recalculate_season_champion';
-    if (changedLanguage && changedSubject) return 'list_changed_championships';
-    if (subjectName && titleLanguage) return 'recalculate_entity_titles';
-    if (targetSeason && titleLanguage && winnerLanguage) return 'recalculate_season_champion';
-    if (titleLanguage && rankingLanguage) return 'recalculate_title_counts';
-    return null;
+    if (comparisonLanguage && comparisonYears.length >= 2) add('compare_points_systems', 0.99, ['comparison language', 'two rulebooks']);
+    if (headToHead) add('driver_head_to_head', 0.96, ['two named subjects', 'head-to-head language']);
+    if (streakCategory) add('streak_leader', 0.94, ['streak language', streakCategory]);
+    if (seasonStandings) add('season_standings', 0.92, ['standings language']);
+    if (raceResult) add('race_result', 0.90, ['race-result language']);
+    if (recordSubject && recordCategory) add('record_subject_total', 0.91, ['named subject', recordCategory]);
+    if (recordIntent) add(recordIntent, 0.86, ['ranking language', recordCategory]);
+    if (comparisonLanguage && (comparisonYears.length || extractComparisonSubjectName(text))) add('compare_points_systems', 0.84, ['comparison language']);
+    if (/\bwhy\b/i.test(text) && targetSeason && titleLanguage) add('recalculate_season_champion', 0.82, ['why question', 'season', 'championship language']);
+    if (changedLanguage && changedSubject) add('list_changed_championships', 0.80, ['change language', 'championship subject']);
+    if (subjectName && titleLanguage) add('recalculate_entity_titles', 0.78, ['named subject', 'championship language']);
+    if (targetSeason && titleLanguage && winnerLanguage) add('recalculate_season_champion', 0.76, ['season', 'championship winner language']);
+    if (titleLanguage && rankingLanguage) add('recalculate_title_counts', 0.74, ['ranking language', 'championship language']);
+
+    if (!candidates.length) candidates.push(...localFallbackCandidates(text));
+
+    const bestByIntent = new Map();
+    candidates.forEach(candidate => {
+        if (!bestByIntent.has(candidate.intent) || bestByIntent.get(candidate.intent).score < candidate.score) {
+            bestByIntent.set(candidate.intent, candidate);
+        }
+    });
+    return [...bestByIntent.values()].sort((first, second) => second.score - first.score);
 }
+
+function detectIntent(query) {
+    const candidate = detectIntentCandidates(query)[0];
+    return candidate && candidate.score >= ASK_LANGUAGE_POLICY.minimumIntentScore ? candidate.intent : null;
+}
+
+function competingIntentCandidates(candidates) {
+    if (candidates.length < 2) return [];
+    const [first, second] = candidates;
+    return first.score - second.score <= ASK_LANGUAGE_POLICY.ambiguityMargin ? [first, second] : [];
+}
+
+const ASK_SLOT_EXTRACTORS = Object.freeze({
+    entity: extractEntity,
+    pointsSystemYear: extractPointsSystemYear,
+    comparisonPointsSystemYears: extractComparisonPointsSystemYears,
+    targetSeason: extractTargetSeason,
+    subjectName: extractSubjectName,
+    recordSubjectName: extractRecordSubjectName,
+    comparisonSubjectName: extractComparisonSubjectName,
+    recordCategory: extractRecordCategory,
+    recordConstructorName: extractRecordConstructorName,
+    recordSeasonRange: extractRecordSeasonRange,
+    seasonRange: extractSeasonRange,
+    recordVenue: extractRecordVenue,
+    nationalityName: extractRecordNationalityName,
+    raceFormat: extractRaceFormat,
+    resultLimit: extractRecordLimit,
+    minStarts: extractMinimumStarts,
+    raceResult: extractRaceResultSlots,
+    headToHead: extractHeadToHeadSlots,
+    standingRound: extractStandingRound,
+    comparisonMetric: extractComparisonMetric,
+    streakCategory: extractStreakCategory
+});
 
 function extractSlots(query) {
     const normalized = normalizedQuery(query);
-    const entity = extractEntity(normalized);
-    let intent = detectIntent(normalized);
-    if (intent === 'driver_head_to_head' && /\b(?:constructors?|teams?)\b/i.test(normalized)) intent = 'constructor_head_to_head';
-    const comparisonPointsSystemYears = extractComparisonPointsSystemYears(normalized);
-    const raceResult = intent === 'race_result' ? extractRaceResultSlots(normalized) : null;
-    const headToHead = extractHeadToHeadSlots(normalized);
+    const entity = ASK_SLOT_EXTRACTORS.entity(normalized);
+    let intentCandidates = detectIntentCandidates(normalized);
+    let intent = intentCandidates[0]?.score >= ASK_LANGUAGE_POLICY.minimumIntentScore ? intentCandidates[0].intent : null;
+    if (intent === 'driver_head_to_head' && /\b(?:constructors?|teams?)\b/i.test(normalized)) {
+        intent = 'constructor_head_to_head';
+        intentCandidates = intentCandidates.map(candidate => candidate.intent === 'driver_head_to_head'
+            ? Object.freeze({ ...candidate, intent: 'constructor_head_to_head' })
+            : candidate);
+    }
+    const comparisonPointsSystemYears = ASK_SLOT_EXTRACTORS.comparisonPointsSystemYears(normalized);
+    const raceResult = intent === 'race_result' ? ASK_SLOT_EXTRACTORS.raceResult(normalized) : null;
+    const headToHead = ASK_SLOT_EXTRACTORS.headToHead(normalized);
     const subjectName = intent === 'record_subject_total'
-        ? extractRecordSubjectName(normalized)
-        : raceResult?.subjectName || extractSubjectName(normalized) || extractComparisonSubjectName(normalized);
-    const constructorName = extractRecordConstructorName(normalized);
+        ? ASK_SLOT_EXTRACTORS.recordSubjectName(normalized)
+        : raceResult?.subjectName || ASK_SLOT_EXTRACTORS.subjectName(normalized) || ASK_SLOT_EXTRACTORS.comparisonSubjectName(normalized);
+    const constructorName = ASK_SLOT_EXTRACTORS.recordConstructorName(normalized);
     const range = intent && ['archive_records', 'archive_streaks'].includes(intentDefinition(intent)?.family)
-        ? extractRecordSeasonRange(normalized)
-        : extractSeasonRange(normalized);
+        ? ASK_SLOT_EXTRACTORS.recordSeasonRange(normalized)
+        : ASK_SLOT_EXTRACTORS.seasonRange(normalized);
     if (intent && intentDefinition(intent)?.family === 'comparisons' && range.fromYear === null && range.toYear === null) {
         const singleSeason = normalized.match(/\b(?:in|during|only)\s+(?:the\s+)?((?:19|20)\d{2})(?:\s+season)?\b/i);
         if (singleSeason) range.fromYear = range.toYear = Number(singleSeason[1]);
@@ -470,31 +515,37 @@ function extractSlots(query) {
         const season = normalized.match(/\b((?:19|20)\d{2})\b/);
         if (season) range.fromYear = range.toYear = Number(season[1]);
     }
-    const recordCategory = extractRecordCategory(normalized);
-    const venue = extractRecordVenue(normalized);
+    const recordCategory = ASK_SLOT_EXTRACTORS.recordCategory(normalized);
+    const venue = ASK_SLOT_EXTRACTORS.recordVenue(normalized);
     const circuitName = venue.circuitName;
     const venueCountryName = venue.venueCountryName;
-    const nationalityName = extractRecordNationalityName(normalized);
-    const raceFormat = extractRaceFormat(normalized);
-    const resultLimit = extractRecordLimit(normalized);
-    const minStarts = extractMinimumStarts(normalized);
+    const nationalityName = ASK_SLOT_EXTRACTORS.nationalityName(normalized);
+    const raceFormat = ASK_SLOT_EXTRACTORS.raceFormat(normalized);
+    const resultLimit = ASK_SLOT_EXTRACTORS.resultLimit(normalized);
+    const minStarts = ASK_SLOT_EXTRACTORS.minStarts(normalized);
+    const competingIntents = competingIntentCandidates(intentCandidates);
     return {
         intent,
+        intentCandidates,
+        intentScore: intentCandidates[0]?.score || 0,
+        interpretationSource: intentCandidates[0]?.fallback ? 'local_fallback' : intentCandidates.length ? 'rules' : 'none',
+        competingIntents,
+        intentAmbiguous: competingIntents.length > 1,
         entity: ['record_subject_total', 'recalculate_entity_titles', 'compare_points_systems'].includes(intent) && subjectName && !entity.explicit ? null : entity.value,
         entityExplicit: entity.explicit,
         entityAmbiguous: entity.ambiguous,
-        pointsSystemYear: intent === 'compare_points_systems' ? comparisonPointsSystemYears[0] || null : extractPointsSystemYear(normalized),
+        pointsSystemYear: intent === 'compare_points_systems' ? comparisonPointsSystemYears[0] || null : ASK_SLOT_EXTRACTORS.pointsSystemYear(normalized),
         comparisonPointsSystemYears,
-        targetSeason: raceResult?.targetSeason || extractTargetSeason(normalized)
+        targetSeason: raceResult?.targetSeason || ASK_SLOT_EXTRACTORS.targetSeason(normalized)
             || (intent === 'season_standings' ? Number(normalized.match(/\b((?:19|20)\d{2})\b/)?.[1]) || null : null),
         subjectName,
         subjectNames: headToHead?.subjectNames || [],
         eventName: raceResult?.eventName || null,
         resultView: raceResult?.resultView || null,
-        standingRound: extractStandingRound(normalized),
+        standingRound: ASK_SLOT_EXTRACTORS.standingRound(normalized),
         comparisonScope: headToHead?.comparisonScope || null,
-        comparisonMetric: headToHead?.comparisonMetric || extractComparisonMetric(normalized),
-        streakCategory: extractStreakCategory(normalized),
+        comparisonMetric: headToHead?.comparisonMetric || ASK_SLOT_EXTRACTORS.comparisonMetric(normalized),
+        streakCategory: ASK_SLOT_EXTRACTORS.streakCategory(normalized),
         constructorName: intent && ['archive_records', 'comparisons'].includes(intentDefinition(intent)?.family) || !intent ? constructorName : null,
         circuitName: intent && ['archive_records', 'comparisons'].includes(intentDefinition(intent)?.family) || !intent ? circuitName : null,
         venueCountryName: intent && ['archive_records', 'comparisons'].includes(intentDefinition(intent)?.family) || !intent ? venueCountryName : null,
@@ -517,12 +568,18 @@ function interpretLocally(query) {
         : !requiresRulebook ? true : slots.intent === 'compare_points_systems'
         ? slots.comparisonPointsSystemYears.length >= 2 && slots.comparisonPointsSystemYears.every(pointsSystemExists)
         : pointsSystemExists(slots.pointsSystemYear);
-    const ambiguousFields = slots.entityAmbiguous ? ['entity'] : [];
+    const ambiguousFields = [
+        ...(slots.entityAmbiguous ? ['entity'] : []),
+        ...(slots.intentAmbiguous ? ['intent'] : [])
+    ];
     const missingFields = missingRequiredSlots(slots.intent, slots);
     if (slots.intent === 'race_result' && slots.resultView === 'driver' && !slots.subjectName) missingFields.push('subjectName');
     let reason = 'Ask about Formula 1 records, or recalculate Drivers’ or Constructors’ Championships under a historical scoring system.';
     if (slots.entityAmbiguous) {
         reason = 'Should Racelytic calculate the Drivers’ Championship or the Constructors’ Championship?';
+    } else if (slots.intentAmbiguous) {
+        const labels = slots.competingIntents.map(candidate => intentLabel(candidate.intent));
+        reason = `This could mean ${labels[0]} or ${labels[1]}. Ask for one of those results at a time.`;
     } else if (slots.unsupportedQualifiers.length) {
         reason = `Racelytic cannot apply ${slots.unsupportedQualifiers.join(' or ')} to this record yet. Remove that qualifier or adjust the filters.`;
     } else if (slots.intent === 'race_result' && missingFields.length) {
@@ -545,6 +602,10 @@ function interpretLocally(query) {
     return {
         intent: supported ? slots.intent : 'unsupported',
         detectedIntent: slots.intent,
+        intentCandidates: slots.intentCandidates,
+        intentScore: slots.intentScore,
+        interpretationSource: slots.interpretationSource,
+        competingIntents: slots.competingIntents,
         entity: slots.entity,
         entityExplicit: slots.entityExplicit,
         pointsSystemYear: slots.pointsSystemYear,
@@ -581,7 +642,9 @@ function interpretQuestion(query) {
 }
 
 module.exports = {
+    ASK_SLOT_EXTRACTORS,
     detectIntent,
+    detectIntentCandidates,
     detectRecordIntent,
     extractComparisonPointsSystemYears,
     extractComparisonSubjectName,

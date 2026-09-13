@@ -1,7 +1,7 @@
 "parentConstructorId","positionDisplayOrder","constructorId","yearFrom","yearTo"
 "alfa-romeo",1,"sauber",1993,2005
-"alfa-romeo",2,"bmw-sauber",2006,2009
-"alfa-romeo",3,"sauber",2010,2018
+"alfa-romeo",2,"bmw-sauber",2006,2010
+"alfa-romeo",3,"sauber",2011,2018
 "alfa-romeo",4,"alfa-romeo",2019,2023
 "alfa-romeo",5,"kick-sauber",2024,2025
 "alfa-romeo",6,"audi",2026,
@@ -28,8 +28,8 @@
 "aston-martin",5,"racing-point",2019,2020
 "aston-martin",6,"aston-martin",2021,
 "audi",1,"sauber",1993,2005
-"audi",2,"bmw-sauber",2006,2009
-"audi",3,"sauber",2010,2018
+"audi",2,"bmw-sauber",2006,2010
+"audi",3,"sauber",2011,2018
 "audi",4,"alfa-romeo",2019,2023
 "audi",5,"kick-sauber",2024,2025
 "audi",6,"audi",2026,
@@ -45,8 +45,8 @@
 "benetton",5,"renault",2016,2020
 "benetton",6,"alpine",2021,
 "bmw-sauber",1,"sauber",1993,2005
-"bmw-sauber",2,"bmw-sauber",2006,2009
-"bmw-sauber",3,"sauber",2010,2018
+"bmw-sauber",2,"bmw-sauber",2006,2010
+"bmw-sauber",3,"sauber",2011,2018
 "bmw-sauber",4,"alfa-romeo",2019,2023
 "bmw-sauber",5,"kick-sauber",2024,2025
 "bmw-sauber",6,"audi",2026,
@@ -95,8 +95,8 @@
 "jordan",5,"racing-point",2019,2020
 "jordan",6,"aston-martin",2021,
 "kick-sauber",1,"sauber",1993,2005
-"kick-sauber",2,"bmw-sauber",2006,2009
-"kick-sauber",3,"sauber",2010,2018
+"kick-sauber",2,"bmw-sauber",2006,2010
+"kick-sauber",3,"sauber",2011,2018
 "kick-sauber",4,"alfa-romeo",2019,2023
 "kick-sauber",5,"kick-sauber",2024,2025
 "kick-sauber",6,"audi",2026,
@@ -173,8 +173,8 @@
 "renault",5,"renault",2016,2020
 "renault",6,"alpine",2021,
 "sauber",1,"sauber",1993,2005
-"sauber",2,"bmw-sauber",2006,2009
-"sauber",3,"sauber",2010,2018
+"sauber",2,"bmw-sauber",2006,2010
+"sauber",3,"sauber",2011,2018
 "sauber",4,"alfa-romeo",2019,2023
 "sauber",5,"kick-sauber",2024,2025
 "sauber",6,"audi",2026,

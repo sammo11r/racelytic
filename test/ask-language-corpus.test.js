@@ -1,6 +1,9 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { interpretLocally } = require('../backend/ask-interpreter');
+const { ASK_SLOT_EXTRACTORS, interpretLocally } = require('../backend/ask-interpreter');
+const { ASK_LANGUAGE_POLICY, INTENT_CATALOG } = require('../backend/ask-intents');
+const { SLOT_DEFINITIONS, extractFollowUpDirectives } = require('../backend/ask-slots');
+const { localFallbackCandidates } = require('../backend/ask-local-fallback');
 
 const supported = [
     ['Who has the most world championships using the 1982 points system?', 'drivers', 1982],
@@ -139,4 +142,103 @@ test('rulebook comparisons extract two systems without confusing season ranges',
     const incomplete = interpretLocally('Which scoring system gives Alonso the most titles?');
     assert.equal(incomplete.intent, 'unsupported');
     assert.deepEqual(incomplete.missingFields, ['comparisonPointsSystemYears']);
+});
+
+const recordVariations = [
+    ['Which driver has the greatest number of race victories?', 'wins', null, null, null],
+    ['Who is the race victory record holder?', 'wins', null, null, null],
+    ['Rank drivers by podium finishes', 'podiums', null, null, null],
+    ['Who achieved the most rostrum finishes?', 'podiums', null, null, null],
+    ['Which driver recorded the most non-finishes?', 'dnfs', null, null, null],
+    ['Who accumulated the most championship points?', 'points', null, null, null],
+    ['Give me the leading five drivers by victories', 'wins', 5, null, null],
+    ['List the ten drivers with the most wins', 'wins', 10, null, null],
+    ['Who took the most wins during 2010?', 'wins', null, 2010, 2010]
+];
+
+test('record vocabulary accepts common synonyms, written limits, and season wording', () => {
+    recordVariations.forEach(([query, recordCategory, resultLimit, fromYear, toYear]) => {
+        const result = interpretLocally(query);
+        assert.equal(result.intent, 'record_leader', query);
+        assert.equal(result.recordCategory, recordCategory, query);
+        assert.equal(result.resultLimit, resultLimit, query);
+        assert.equal(result.fromYear, fromYear, query);
+        assert.equal(result.toYear, toYear, query);
+    });
+
+    const subject = interpretLocally("Hamilton's total race victories");
+    assert.equal(subject.intent, 'record_subject_total');
+    assert.equal(subject.subjectName, 'Hamilton');
+    assert.equal(subject.recordCategory, 'wins');
+});
+
+test('intent detection exposes ranked candidates and supporting evidence', () => {
+    const result = interpretLocally('Rank drivers by podium finishes');
+    assert.equal(result.intentScore, 0.86);
+    assert.deepEqual(result.intentCandidates[0], {
+        intent: 'record_leader',
+        score: 0.86,
+        evidence: ['ranking language', 'podiums']
+    });
+});
+
+test('every declared intent owns a tested set of realistic question variations', () => {
+    INTENT_CATALOG.forEach(definition => {
+        assert.ok(definition.label, `${definition.id} needs a user-facing label`);
+        assert.ok(definition.examples.length >= 4, `${definition.id} needs at least four examples`);
+        definition.examples.forEach(query => {
+            const result = interpretLocally(query);
+            assert.equal(result.intent, definition.id, `${definition.id}: ${query}`);
+        });
+    });
+});
+
+test('close competing intents request clarification instead of guessing', () => {
+    const query = 'Show the 2024 standings and the Monaco race winner';
+    const result = interpretLocally(query);
+    assert.equal(result.intent, 'unsupported');
+    assert.equal(result.detectedIntent, 'season_standings');
+    assert.deepEqual(result.ambiguousFields, ['intent']);
+    assert.deepEqual(result.competingIntents.map(candidate => candidate.intent), ['season_standings', 'race_result']);
+    assert.ok(result.competingIntents[0].score - result.competingIntents[1].score <= ASK_LANGUAGE_POLICY.ambiguityMargin);
+    assert.match(result.reason, /season standings or a race result/i);
+});
+
+test('follow-up slot definitions distinguish replacement from explicit clearing', () => {
+    assert.deepEqual(Object.keys(ASK_SLOT_EXTRACTORS), [
+        'entity', 'pointsSystemYear', 'comparisonPointsSystemYears', 'targetSeason', 'subjectName',
+        'recordSubjectName', 'comparisonSubjectName', 'recordCategory', 'recordConstructorName',
+        'recordSeasonRange', 'seasonRange', 'recordVenue', 'nationalityName', 'raceFormat',
+        'resultLimit', 'minStarts', 'raceResult', 'headToHead', 'standingRound',
+        'comparisonMetric', 'streakCategory'
+    ]);
+    assert.equal(SLOT_DEFINITIONS.pointsSystemYear.kind, 'year');
+    assert.equal(extractFollowUpDirectives('Use 1991 scoring instead').isFollowUp, true);
+    assert.deepEqual([...extractFollowUpDirectives('All seasons').clearFields].sort(), ['fromYear', 'toYear']);
+    assert.deepEqual([...extractFollowUpDirectives('Without the team filter').clearFields], ['constructorName']);
+    assert.equal(extractFollowUpDirectives('What about constructors?').subjectReplacement, null);
+    assert.equal(extractFollowUpDirectives('What about Fernando Alonso?').subjectReplacement, 'Fernando Alonso');
+});
+
+test('local fallback classifies new phrasing without bypassing slot validation', () => {
+    const record = interpretLocally('Career victory leaderboard');
+    assert.equal(record.intent, 'record_leader');
+    assert.equal(record.recordCategory, 'wins');
+    assert.equal(record.interpretationSource, 'local_fallback');
+    assert.equal(record.intentCandidates[0].fallback, true);
+
+    const standings = interpretLocally('Season leaderboard for 2024');
+    assert.equal(standings.intent, 'season_standings');
+    assert.equal(standings.targetSeason, 2024);
+    assert.equal(standings.interpretationSource, 'local_fallback');
+
+    const missingSeason = interpretLocally('Season leaderboard');
+    assert.equal(missingSeason.intent, 'unsupported');
+    assert.equal(missingSeason.detectedIntent, 'season_standings');
+    assert.deepEqual(missingSeason.missingFields, ['targetSeason']);
+
+    const unrelated = interpretLocally('Tell me the weather tomorrow');
+    assert.equal(unrelated.intent, 'unsupported');
+    assert.equal(unrelated.interpretationSource, 'none');
+    assert.deepEqual(localFallbackCandidates('Tell me the weather tomorrow'), []);
 });

@@ -7,6 +7,7 @@ const {
     calculateStreakLeader,
     calculateTitleCounts,
     executeAskQuery,
+    resolveNamedCircuit,
     resolveNamedSubject,
     resolvePointsSystem
 } = require('../backend/ask-engine');
@@ -55,6 +56,19 @@ test('named subjects resolve locally across drivers and constructors', async () 
     assert.equal((await resolveNamedSubject(connection, 'Hamlton')).name, 'Lewis Hamilton');
     assert.equal((await resolveNamedSubject(connection, 'Checo')).name, 'Sergio Perez');
     assert.equal((await resolveNamedSubject(connection, 'Schumi')).name, 'Michael Schumacher');
+});
+
+test('ambiguous circuit names are surfaced before record calculation', async () => {
+    const connection = { query: async () => [
+        { id: 'north-ring', name: 'North Ring' },
+        { id: 'south-ring', name: 'South Ring' }
+    ] };
+    await assert.rejects(resolveNamedCircuit(connection, 'Ring', 'f1'), error => {
+        assert.equal(error.statusCode, 422);
+        assert.equal(error.suggestionField, 'circuitName');
+        assert.deepEqual(error.suggestions.map(item => item.name), ['North Ring', 'South Ring']);
+        return true;
+    });
 });
 
 test('local interpretation understands the MVP title-count question', () => {

@@ -7,15 +7,42 @@
 </head>
 <body>
   <div id="header"></div>
+  <nav class="points-local-nav" aria-label="Points systems sections"><div class="container">
+    <a href="#historical-systems" data-points-nav="history">Historical archive</a>
+    <a href="#compare-systems" data-points-nav="compare">Compare systems</a>
+    <a href="#your-systems" data-points-nav="custom">Your systems</a>
+  </div></nav>
   <main class="container page points-library-page">
-    <header class="points-page-heading"><div class="eyebrow">CHAMPIONSHIP RULES</div><h1>Design the way a championship scores</h1><p>Start with an official system or build your own. Preview every race, sprint, bonus and counting rule before applying it.</p></header>
+    <header class="points-page-heading"><div class="eyebrow">CHAMPIONSHIP RULES</div><h1>Explore how Formula 1 has scored</h1><p>Browse the official systems used through history, compare eras side by side, or create reusable rules for Racelytic’s simulators.</p></header>
 
-    <section class="points-presets" aria-labelledby="points-presets-title"><div class="section-heading"><div><div class="eyebrow">OFFICIAL PRESETS</div><h2 id="points-presets-title">Start from familiar rules</h2></div><span class="section-note">Available without an account</span></div><div id="official-systems" class="points-preset-grid"></div></section>
+    <section id="historical-systems" class="points-history" aria-labelledby="points-history-title">
+      <div class="section-heading"><div><div class="eyebrow">OFFICIAL HISTORY</div><h2 id="points-history-title">Historical points systems</h2></div><span class="section-note" id="points-history-count">Loading official systems…</span></div>
+      <p class="points-section-intro">See what each finishing position was worth, which results counted and the special rules that defined every scoring era.</p>
+      <form class="points-history-filters" id="points-history-filters" role="search">
+        <label><span>Find a system</span><input id="points-history-search" type="search" placeholder="Search an era, year or rule"></label>
+        <label><span>Season</span><select id="points-history-season"><option value="">All seasons</option></select></label>
+        <button class="button secondary" id="points-history-clear" type="button">Clear filters</button>
+      </form>
+      <div id="points-history-summary" class="points-history-summary" aria-live="polite"></div>
+      <div id="official-systems" class="points-history-grid"></div>
+    </section>
+
+    <section id="compare-systems" class="points-compare" aria-labelledby="points-compare-title">
+      <div class="section-heading"><div><div class="eyebrow">SIDE BY SIDE</div><h2 id="points-compare-title">Compare scoring eras</h2></div><button class="button secondary" id="points-compare-copy" type="button">Copy comparison link</button></div>
+      <p class="points-section-intro">Compare race points, sprints, bonuses and dropped-score rules without translating between eras yourself.</p>
+      <div class="points-compare-controls">
+        <label><span>First system</span><select id="points-compare-first"></select></label>
+        <span aria-hidden="true">vs</span>
+        <label><span>Second system</span><select id="points-compare-second"></select></label>
+      </div>
+      <div id="points-compare-result" class="points-compare-result" tabindex="0" aria-label="Points-system comparison" aria-live="polite"></div>
+    </section>
 
     <section id="points-login-prompt" class="points-login-prompt" hidden><div><strong>Sign in to save custom rules</strong><span>You can inspect presets and public systems now. An account lets you save, edit and reuse your own.</span></div><a class="button primary" href="/account">Sign in or create account</a></section>
 
+    <section id="your-systems" class="points-custom" aria-labelledby="your-systems-title">
     <section id="points-system-manager" class="points-system-manager points-library-manager">
-      <div class="section-heading"><div><div class="eyebrow">YOUR LIBRARY</div><h2>Your points systems</h2></div><button class="button primary" id="new-system-button" type="button" hidden>New points system</button></div>
+      <div class="section-heading"><div><div class="eyebrow">YOUR LIBRARY</div><h2 id="your-systems-title">Your points systems</h2></div><button class="button primary" id="new-system-button" type="button" hidden>New points system</button></div>
       <div id="saved-systems" class="saved-systems"></div>
 
       <form id="points-system-form" class="points-system-form" hidden novalidate>
@@ -38,8 +65,9 @@
     </section>
 
     <section class="points-community"><div class="section-heading"><div><div class="eyebrow">PUBLIC SYSTEMS</div><h2>Community rulesets</h2></div><label class="points-community-search"><span>Search</span><input id="points-community-search" type="search" placeholder="Search public rules"></label></div><div id="public-systems" class="saved-systems"></div></section>
+    </section>
   </main>
   <footer class="footer"><div class="container">Racelytic</div></footer>
-  <script src="/js/utils.js"></script><script src="/js/header.js"></script><script src="/js/points-systems.js"></script>
+  <script src="/js/utils.js"></script><script src="/js/header.js"></script><script src="/js/f1-points-systems.js"></script><script src="/js/points-systems.js"></script>
 </body>
 </html>

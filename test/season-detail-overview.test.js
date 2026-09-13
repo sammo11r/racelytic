@@ -40,6 +40,12 @@ test('summary rendering and API include the constructors champion', () => {
     assert.match(script, /completed \? 'Constructors’ champion' : 'Leading constructor'/);
 });
 
+test('season summary links directly to its historical points system', () => {
+    assert.match(html, /id="season-points-system-link"/);
+    assert.match(script, /points-systems\?season=/);
+    assert.match(script, /View the \$\{year\} points system/);
+});
+
 test('season summary adapts from six columns to tablet and mobile grids', () => {
     const css = fs.readFileSync(path.join(frontend, 'css/season-detail-overview.css'), 'utf8');
     assert.match(css, /grid-template-columns: 2fr 1\.25fr 1\.25fr 1\.5fr \.85fr \.85fr/);

@@ -10,14 +10,31 @@ const script = fs.readFileSync(path.join(frontend, 'js/points-systems.js'), 'utf
 const builder = fs.readFileSync(path.join(frontend, 'js/championship-builder.js'), 'utf8');
 const css = fs.readFileSync(path.join(frontend, 'css/points-systems.css'), 'utf8');
 
-test('points systems starts with a compact useful preset library', () => {
+test('points systems starts with a historical archive and keeps the custom library', () => {
   assert.doesNotMatch(html, /points-library-hero/);
   assert.match(html, /class="points-page-heading"/);
+  assert.match(html, /id="historical-systems"/);
+  assert.match(html, /id="points-history-search"/);
+  assert.match(html, /id="points-history-season"/);
   assert.match(html, /id="official-systems"/);
-  assert.match(html, /Available without an account/);
+  assert.match(html, /id="your-systems"/);
   assert.match(html, /\/css\/points-systems\.css/);
+  assert.match(html, /\/js\/f1-points-systems\.js/);
   assert.match(script, /const F1_PRESETS = \[/);
   assert.match(script, /const JUNIOR_PRESETS =/);
+  assert.match(script, /function historicalSystems/);
+  assert.match(script, /function historyChange/);
+});
+
+test('official scoring eras can be compared and applied to simulations', () => {
+  assert.match(html, /id="compare-systems"/);
+  assert.match(html, /id="points-compare-first"/);
+  assert.match(html, /id="points-compare-second"/);
+  assert.match(html, /id="points-compare-copy"/);
+  assert.match(script, /function renderHistoricalComparison/);
+  assert.match(script, /Apply \$\{esc\(first\.label\)\}/);
+  assert.match(script, /window\.history\.replaceState/);
+  assert.match(css, /\.points-compare-result table/);
 });
 
 test('rule editor uses direct position inputs and explicit counting modes', () => {
@@ -76,4 +93,19 @@ test('points editor and preset cards stack cleanly on smaller screens', () => {
   assert.match(css, /\.points-editor-workspace \{ grid-template-columns: 1fr; \}/);
   assert.match(css, /@media \(max-width: 700px\)/);
   assert.match(css, /\.points-preset-grid, \.points-library-page \.saved-systems \{ grid-template-columns: 1fr; \}/);
+});
+
+test('points-system cards use the compact library layout', () => {
+  assert.match(css, /\.points-history-grid \{ display: grid; grid-template-columns: repeat\(3,minmax\(0,1fr\)\)/);
+  assert.match(css, /\.points-history-card \{[^}]*padding: 13px/);
+  assert.match(css, /\.points-system-card \{[^}]*min-height: 125px/);
+  assert.match(css, /@media \(max-width: 1050px\)[\s\S]*\.points-history-grid \{ grid-template-columns: repeat\(2,minmax\(0,1fr\)\); \}/);
+  assert.match(script, /points-history-card-heading"><h3>\$\{esc\(system\.label\)\}<\/h3>/);
+  assert.doesNotMatch(script, />Apply to a season<\/a>/);
+});
+
+test('points-system section navigation remains fixed below the main header', () => {
+  assert.match(css, /#header \{ position: sticky; z-index: 1000; top: 0; \}/);
+  assert.match(css, /\.points-local-nav \{ position: fixed;[^}]*top: var\(--header-height\);[^}]*right: 0; left: 0;/);
+  assert.match(css, /\.points-library-page\.page \{ padding-top: 75px; \}/);
 });

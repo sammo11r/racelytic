@@ -1,24 +1,71 @@
 /* Points-system library and editor. */
-.points-library-page.page { padding-top: 28px; }
+#header { position: sticky; z-index: 1000; top: 0; }
+.points-local-nav { position: fixed; z-index: 900; top: var(--header-height); right: 0; left: 0; border-bottom: 1px solid var(--border); background: rgba(255,255,255,.96); backdrop-filter: blur(12px); }
+.points-local-nav .container { display: flex; overflow-x: auto; gap: 5px; padding-block: 7px; scrollbar-width: none; }
+.points-local-nav .container::-webkit-scrollbar { display: none; }
+.points-local-nav a { flex: 0 0 auto; padding: 8px 12px; border-radius: 7px; color: var(--text-secondary); font-size: 10px; font-weight: 800; text-decoration: none; }
+.points-local-nav a:hover { background: var(--surface-alt); color: var(--text); }
+.points-local-nav a[aria-current="page"] { background: var(--text); color: #fff; }
+.points-library-page.page { padding-top: 75px; }
 .points-page-heading { max-width: 880px; }
 .points-page-heading .eyebrow { margin-bottom: 9px; color: var(--accent); }
 .points-page-heading h1 { margin: 0; color: var(--text); font-size: clamp(36px,5vw,62px); line-height: 1; letter-spacing: -.055em; text-wrap: balance; }
 .points-page-heading p { max-width: 760px; margin: 14px 0 0; color: var(--text-secondary); font-size: 16px; line-height: 1.55; }
+.points-history, .points-compare, .points-custom { scroll-margin-top: calc(var(--header-height) + 62px); }
+.points-compare[hidden], .points-local-nav a[hidden] { display: none; }
+.points-history { margin-top: 42px; }
+.points-section-intro { max-width: 760px; margin: 8px 0 0; color: var(--text-secondary); font-size: 12px; line-height: 1.55; }
+.points-history-filters { display: grid; grid-template-columns: minmax(220px,1fr) minmax(150px,.45fr) auto; align-items: end; gap: 10px; margin-top: 18px; padding: 14px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface-alt); }
+.points-history-filters label, .points-compare-controls label { display: grid; gap: 6px; }
+.points-history-filters label > span, .points-compare-controls label > span { color: #5b626d; font-size: 8px; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; }
+.points-history-filters input, .points-history-filters select, .points-compare-controls select { width: 100%; min-height: 42px; border: 1px solid var(--border); border-radius: 8px; background: #fff; font: inherit; font-size: 11px; }
+.points-history-filters input { padding-inline: 12px; }
+.points-history-filters .button { min-height: 42px; }
+.points-history-summary { margin: 12px 0 8px; color: #5b626d; font-size: 9px; font-weight: 750; }
+.points-history-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 9px; }
+.points-history-card { display: flex; min-width: 0; flex-direction: column; padding: 13px; border: 1px solid var(--border); border-radius: 11px; background: #fff; box-shadow: var(--shadow-small); }
+.points-history-card-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.points-history-card-heading h3 { min-width: 0; margin: 0; }
+.points-history-card-heading button { padding: 4px 0; border: 0; background: transparent; color: var(--text-secondary); cursor: pointer; font: inherit; font-size: 9px; font-weight: 800; text-decoration: underline; text-underline-offset: 3px; }
+.points-history-card h3 { font-size: 17px; }
+.points-score-strip { display: flex; overflow-x: auto; gap: 4px; margin-top: 8px; padding-bottom: 2px; scrollbar-width: thin; }
+.points-score-strip span { display: grid; min-width: 36px; min-height: 40px; place-items: center; padding: 4px; border: 1px solid var(--border); border-radius: 7px; background: var(--surface-alt); }
+.points-score-strip small, .points-score-strip strong { display: block; }
+.points-score-strip small { color: #5b626d; font-size: 7px; font-weight: 800; }
+.points-score-strip strong { margin-top: 1px; font-size: 11px; }
+.points-history-change { flex: 1 1 auto; margin: 9px 0 0; color: var(--text-secondary); font-size: 9px; line-height: 1.4; }
+.points-history-change strong { display: block; margin-bottom: 2px; color: #b41d2a; font-size: 7px; letter-spacing: .08em; text-transform: uppercase; }
+.points-history-card details { margin: 8px 0 10px; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+.points-history-card summary { min-height: 32px; padding: 8px 0; cursor: pointer; color: var(--text); font-size: 9px; font-weight: 800; }
+.points-history-card ul { margin: 0 0 9px; padding-left: 16px; color: var(--text-secondary); font-size: 9px; line-height: 1.5; }
+.points-compare { margin-top: 56px; padding-top: 46px; border-top: 1px solid var(--border); }
+.points-compare-controls { display: grid; grid-template-columns: minmax(0,1fr) auto minmax(0,1fr); align-items: end; gap: 13px; margin-top: 18px; padding: 16px; border: 1px solid var(--border); border-radius: 12px 12px 0 0; background: var(--surface-alt); }
+.points-compare-controls > span { padding-bottom: 13px; color: #5b626d; font-size: 9px; font-weight: 850; text-transform: uppercase; }
+.points-compare-result { overflow-x: auto; border: 1px solid var(--border); border-top: 0; border-radius: 0 0 12px 12px; background: #fff; }
+.points-compare-result table { width: 100%; min-width: 620px; border-collapse: collapse; }
+.points-compare-result caption { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+.points-compare-result th, .points-compare-result td { padding: 13px 15px; border-bottom: 1px solid var(--border); text-align: left; vertical-align: top; }
+.points-compare-result thead th { background: #fafbfc; color: #3f4650; font-size: 10px; }
+.points-compare-result tbody th { width: 22%; color: #5b626d; font-size: 9px; }
+.points-compare-result tbody td { font-size: 11px; font-weight: 750; }
+.points-compare-result tr.is-different td { background: rgba(var(--accent-rgb),.045); }
+.points-compare-actions { display: flex; flex-wrap: wrap; gap: 8px; padding: 14px; }
+.points-custom { margin-top: 58px; padding-top: 1px; border-top: 1px solid var(--border); }
 .points-presets { margin-top: 36px; }
 .points-preset-grid { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 10px; margin-top: 14px; }
-.points-preset-card { display: flex; min-height: 190px; flex-direction: column; padding: 19px; border: 1px solid var(--border); border-radius: 13px; background: #fff; box-shadow: var(--shadow-small); }
+.points-preset-card { display: flex; min-height: 150px; flex-direction: column; padding: 14px; border: 1px solid var(--border); border-radius: 11px; background: #fff; box-shadow: var(--shadow-small); }
 .points-preset-card > span, .points-system-card > span { color: var(--accent); font-size: 9px; font-weight: 850; letter-spacing: .1em; text-transform: uppercase; }
-.points-preset-card > strong { margin-top: 9px; font-size: 18px; }
-.points-preset-card > small { margin: 6px 0 16px; color: var(--text-secondary); font-size: 11px; line-height: 1.45; }
+.points-preset-card > strong { margin-top: 6px; font-size: 17px; }
+.points-preset-card > small { margin: 4px 0 10px; color: var(--text-secondary); font-size: 10px; line-height: 1.4; }
 .points-card-actions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: auto; }
-.points-card-actions a, .points-card-actions button { min-height: 32px; padding: 7px 9px; border: 1px solid var(--border); border-radius: 7px; background: var(--surface-alt); color: var(--text); font: inherit; font-size: 9px; font-weight: 800; cursor: pointer; }
+.points-card-actions a, .points-card-actions button { min-height: 30px; padding: 6px 8px; border: 1px solid var(--border); border-radius: 7px; background: var(--surface-alt); color: var(--text); font: inherit; font-size: 9px; font-weight: 800; cursor: pointer; }
 .points-card-actions a:first-child { border-color: var(--accent); background: var(--accent); color: #fff; }
 .points-library-page .points-login-prompt { margin: 26px 0 0; }
 .points-library-page .points-library-manager { margin-top: 48px; }
 .points-library-page .saved-systems { grid-template-columns: repeat(3,minmax(0,1fr)); }
-.points-system-card { display: flex; min-height: 165px; flex-direction: column; align-items: stretch; padding: 18px; border: 1px solid var(--border); border-radius: 13px; background: #fff; box-shadow: var(--shadow-small); }
-.points-system-card > strong { margin-top: 8px; font-size: 17px; }
-.points-system-card > small { margin: 5px 0 14px; color: var(--text-muted); font-size: 11px; line-height: 1.45; }
+.points-system-card { display: flex; min-height: 125px; flex-direction: column; align-items: stretch; padding: 14px; border: 1px solid var(--border); border-radius: 11px; background: #fff; box-shadow: var(--shadow-small); }
+.points-system-card > strong { margin-top: 5px; font-size: 16px; }
+.points-system-card > small { margin: 3px 0 10px; color: var(--text-muted); font-size: 10px; line-height: 1.4; }
 .points-system-form { overflow: visible; }
 .points-editor-workspace { display: grid; grid-template-columns: minmax(0,1.5fr) minmax(300px,.65fr); align-items: start; gap: 0; }
 .points-editor-main { min-width: 0; padding: 0 25px 25px; }
@@ -70,13 +117,21 @@
 .points-community-search span { color: var(--text-muted); font-size: 8px; font-weight: 800; text-transform: uppercase; }
 .points-community-search input { width: 100%; height: 38px; }
 @media (max-width: 1050px) {
+  .points-history-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
   .points-preset-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
   .points-editor-workspace { grid-template-columns: 1fr; }
   .points-live-preview { margin: 0 25px 25px; }
 }
 @media (max-width: 700px) {
-  .points-library-page.page { padding-top: 22px; }
+  .points-local-nav a { min-height: 40px; }
+  .points-library-page.page { padding-top: 69px; }
   .points-page-heading h1 { font-size: 38px; }
+  .points-history-filters, .points-compare-controls { grid-template-columns: 1fr; }
+  .points-history-filters .button { width: 100%; }
+  .points-history-grid { grid-template-columns: 1fr; }
+  .points-compare-controls > span { padding: 0; text-align: center; }
+  .points-compare .section-heading { align-items: flex-start; flex-direction: column; gap: 12px; }
+  .points-history-card-heading button { min-height: 40px; }
   .points-preset-grid, .points-library-page .saved-systems { grid-template-columns: 1fr; }
   .points-library-page .points-login-prompt { align-items: stretch; flex-direction: column; }
   .points-editor-main { padding: 0 18px 18px; }

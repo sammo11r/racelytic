@@ -12,6 +12,7 @@
 </head>
 <body>
   <div id="header"></div>
+  <nav class="ratings-local-nav" aria-label="Ratings sections"><div class="container"><a href="/ratings" data-rating-route="overview">Overview</a><a href="/ratings/leaderboard" data-rating-route="leaderboard">Leaderboard</a><a href="/ratings/compare" data-rating-route="compare">Compare</a><a href="/ratings/driver" data-rating-route="driver">Driver profile</a><a href="/ratings/methodology" data-rating-route="methodology">Methodology</a></div></nav>
   <main class="container page database-directory ratings-directory">
     <header class="database-directory-heading">
       <div class="eyebrow">RACELYTIC RATINGS</div>
@@ -42,8 +43,19 @@
         <strong class="database-category-action">How ratings work <span aria-hidden="true">→</span></strong>
       </a>
     </nav>
+    <section class="ratings-overview-live" aria-labelledby="ratings-overview-live-title">
+      <div class="ratings-overview-live-heading"><div><div class="eyebrow">LATEST SNAPSHOT</div><h2 id="ratings-overview-live-title">The current rating picture</h2><p id="ratings-overview-freshness">Loading the latest calculated order…</p></div><label><span>Find a rated driver</span><input id="ratings-overview-search" type="search" autocomplete="off" placeholder="Search drivers or teams…"></label></div>
+      <div id="ratings-overview-search-results" class="ratings-overview-search-results" aria-live="polite"></div>
+      <div class="ratings-overview-grid">
+        <article><div class="ratings-overview-card-heading"><span>CURRENT TOP FIVE</span><a href="/ratings/leaderboard">Full leaderboard</a></div><ol id="ratings-overview-leaders" class="ratings-overview-list"><li>Loading ratings…</li></ol></article>
+        <article><div class="ratings-overview-card-heading"><span>RECENT MOVERS</span><a href="/ratings/leaderboard">Explore changes</a></div><ol id="ratings-overview-movers" class="ratings-overview-list"><li>Loading changes…</li></ol></article>
+        <article class="ratings-overview-feature"><div class="ratings-overview-card-heading"><span>FEATURED COMPARISON</span><a id="ratings-overview-compare-link" href="/ratings/compare">Open comparison</a></div><div id="ratings-overview-feature"><p>Preparing a current-grid comparison…</p></div></article>
+      </div>
+    </section>
   </main>
   <footer class="footer"><div class="container">Racelytic</div></footer>
   <script src="/js/header.js"></script>
+  <script src="/js/ratings-navigation.js"></script>
+  <script src="/js/ratings-overview.js"></script>
 </body>
 </html>

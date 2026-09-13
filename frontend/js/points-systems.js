@@ -64,13 +64,170 @@ function systemDetails(system) {
   return parts.join(' · ');
 }
 
+function historicalSystems() {
+  if (pointsSeries !== 'f1') {
+    return officialPresets.map(system => {
+      const normalized = normaliseSystem(system);
+      return { ...normalized, key: system.seasonKey, label: system.name, seasons: system.name, constructorRacePoints: [...normalized.racePoints], constructorsAvailable: true, source: system };
+    });
+  }
+  return Object.entries(F1_POINTS_SYSTEMS).map(([key, source]) => ({
+    key,
+    label: source.name,
+    seasons: source.name.replace(/ ·.*$/, ''),
+    racePoints: [...(source.race || [])],
+    constructorRacePoints: [...(source.constructorRace || source.race || [])],
+    sprintPoints: [...(source.sprint || [])],
+    qualifyingPoints: [],
+    poleBonus: Number(source.poleBonus || 0),
+    fastestLapBonus: Number(source.fastestLapBonus || 0),
+    fastestLapMaxPosition: source.fastestLapMaxPosition || null,
+    countBestRounds: source.countBest === Infinity ? null : source.countBest || null,
+    bestFirstRounds: source.bestFirstRounds || null,
+    firstRoundsWindow: source.firstRoundsWindow || null,
+    bestLastRounds: source.bestLastRounds || null,
+    lastRoundsWindow: source.lastRoundsWindow || null,
+    constructorCountBest: source.constructorCountBest,
+    constructorScoringCars: source.constructorScoringCars,
+    constructorsAvailable: source.constructorsAvailable !== false,
+    doublePointsFinalRound: Boolean(source.doublePointsFinalRound),
+    source
+  })).sort((first, second) => (historyYears(first)[0] || 0) - (historyYears(second)[0] || 0));
+}
+
+function historyYears(system) {
+  const match = String(system.key).match(/^(\d{4})(?:-(\d{4}|present))?$/);
+  if (!match) return [];
+  const start = Number(match[1]), end = match[2] === 'present' || !match[2] ? (match[2] ? new Date().getFullYear() : start) : Number(match[2]);
+  return Array.from({ length: Math.max(0, end - start + 1) }, (_, index) => start + index);
+}
+
+function historicalCounting(system) {
+  if (system.bestFirstRounds || system.bestLastRounds) {
+    const parts = [];
+    if (system.bestFirstRounds) parts.push(`best ${system.bestFirstRounds} of the first ${system.firstRoundsWindow}`);
+    if (system.bestLastRounds) parts.push(`best ${system.bestLastRounds} of the last ${system.lastRoundsWindow}`);
+    return `${parts.join(' and ')} results counted`;
+  }
+  return system.countBestRounds ? `Best ${system.countBestRounds} results counted` : 'Every result counted';
+}
+
+function historicalNotes(system) {
+  const notes = [];
+  if (!system.constructorsAvailable) notes.push('No Constructors’ Championship');
+  else if (system.constructorScoringCars === 1) notes.push('Best-placed constructor car scored');
+  if (system.constructorRacePoints.join(',') !== system.racePoints.join(',')) notes.push(`Constructors used ${system.constructorRacePoints.join('–')}`);
+  if (system.fastestLapBonus) notes.push(`${pointText(system.fastestLapBonus)} for fastest lap${system.fastestLapMaxPosition ? ` inside the top ${system.fastestLapMaxPosition}` : ''}`);
+  if (system.sprintPoints.length) notes.push(`Sprint ${system.sprintPoints.join('–')}`);
+  if (system.doublePointsFinalRound) notes.push('Final round awarded double points');
+  notes.push(historicalCounting(system));
+  return notes;
+}
+
+function historyChange(system, previous) {
+  if (!previous) {
+    const additions = [];
+    if (system.sprintPoints.length) additions.push(`points for ${system.sprintPoints.length} secondary-race positions`);
+    if (system.fastestLapBonus) additions.push('a fastest-lap bonus');
+    if (system.poleBonus) additions.push('a pole bonus');
+    const additionText = additions.length > 1 ? `${additions.slice(0, -1).join(', ')} and ${additions.at(-1)}` : additions[0];
+    return `The archive begins with ${system.racePoints[0]} points for a win and points for the top ${system.racePoints.length}${additionText ? `, plus ${additionText}` : ''}.`;
+  }
+  const changes = [];
+  if (system.racePoints[0] !== previous.racePoints[0]) changes.push(`a win changed from ${previous.racePoints[0]} to ${system.racePoints[0]} points`);
+  if (system.racePoints.length !== previous.racePoints.length) changes.push(`${system.racePoints.length} positions now scored`);
+  if (Boolean(system.fastestLapBonus) !== Boolean(previous.fastestLapBonus)) changes.push(system.fastestLapBonus ? 'the fastest-lap bonus returned' : 'the fastest-lap bonus was removed');
+  if (Boolean(system.sprintPoints.length) !== Boolean(previous.sprintPoints.length)) changes.push(system.sprintPoints.length ? 'sprint points were introduced' : 'sprint points were removed');
+  if (system.doublePointsFinalRound !== previous.doublePointsFinalRound) changes.push(system.doublePointsFinalRound ? 'the finale awarded double points' : 'double points ended');
+  if (historicalCounting(system) !== historicalCounting(previous)) changes.push('the results-counting rule changed');
+  return changes.length ? `${changes.join('; ')}.` : 'The points scale stayed stable while the applicable season changed.';
+}
+
+function historicalSystemCard(system, previous, canCompare) {
+  const preset = officialPresets.find(item => item.seasonKey === system.key);
+  const notes = historicalNotes(system);
+  return `<article class="points-history-card" id="points-system-${esc(system.key)}"><div class="points-history-card-heading"><h3>${esc(system.label)}</h3>${canCompare ? `<button type="button" data-compare-system="${esc(system.key)}">Compare</button>` : ''}</div><div class="points-score-strip" tabindex="0" aria-label="${esc(system.label)} race points by finishing position">${system.racePoints.map((value, index) => `<span><small>P${index + 1}</small><strong>${fmtNumber(value)}</strong></span>`).join('')}</div><p class="points-history-change"><strong>What changed</strong>${esc(historyChange(system, previous))}</p><details><summary>Full scoring rules</summary><ul>${notes.map(note => `<li>${esc(note)}</li>`).join('')}</ul></details>${preset && currentUser ? `<div class="points-card-actions"><button type="button" data-copy-preset="${esc(preset.key)}">Customize</button></div>` : ''}</article>`;
+}
+
+function populateHistoryControls(history) {
+  const season = document.getElementById('points-history-season');
+  const years = [...new Set(history.flatMap(historyYears))].sort((a, b) => b - a);
+  season.innerHTML = `<option value="">All seasons</option>${years.map(year => `<option value="${year}">${year}</option>`).join('')}`;
+  const requestedSeason = new URLSearchParams(location.search).get('season');
+  if (years.includes(Number(requestedSeason))) season.value = requestedSeason;
+  document.getElementById('points-history-search').value = String(new URLSearchParams(location.search).get('q') || '').slice(0, 80);
+  const first = document.getElementById('points-compare-first'), second = document.getElementById('points-compare-second');
+  const canCompare = history.length > 1;
+  document.getElementById('compare-systems').hidden = !canCompare;
+  document.querySelector('[data-points-nav="compare"]').hidden = !canCompare;
+  const options = history.map(item => `<option value="${esc(item.key)}">${esc(item.label)}</option>`).join('');
+  first.innerHTML = options;
+  second.innerHTML = options;
+  const requested = (new URLSearchParams(location.search).get('compare') || '').split(',');
+  const defaults = pointsSeries === 'f1' ? ['1982-1990', '2025-present'] : [history[0]?.key, history.at(-1)?.key];
+  first.value = history.some(item => item.key === requested[0]) ? requested[0] : defaults[0];
+  second.value = history.some(item => item.key === requested[1]) ? requested[1] : defaults[1];
+}
+
+function renderHistoricalSystems() {
+  const history = historicalSystems();
+  const query = document.getElementById('points-history-search').value.trim().toLocaleLowerCase();
+  const season = Number(document.getElementById('points-history-season').value);
+  const visible = history.filter(system => (!season || historyYears(system).includes(season)) && (!query || `${system.label} ${system.seasons} ${system.racePoints.join(' ')} ${historicalNotes(system).join(' ')}`.toLocaleLowerCase().includes(query)));
+  document.getElementById('points-history-count').textContent = `${history.length} official system${history.length === 1 ? '' : 's'}`;
+  document.getElementById('points-history-summary').textContent = `${visible.length} system${visible.length === 1 ? '' : 's'} shown${season ? ` for ${season}` : ''}`;
+  document.getElementById('official-systems').innerHTML = visible.length ? visible.map(system => historicalSystemCard(system, history[history.indexOf(system) - 1], history.length > 1)).join('') : '<div class="empty-state">No official system matches these filters.</div>';
+  document.querySelectorAll('[data-compare-system]').forEach(button => button.addEventListener('click', () => {
+    const first = document.getElementById('points-compare-first'), second = document.getElementById('points-compare-second');
+    if (first.value === button.dataset.compareSystem) second.value = history.find(item => item.key !== button.dataset.compareSystem)?.key || button.dataset.compareSystem;
+    else second.value = button.dataset.compareSystem;
+    renderHistoricalComparison({ updateUrl: true });
+    document.getElementById('compare-systems').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }));
+  document.querySelectorAll('[data-copy-preset]').forEach(button => button.addEventListener('click', () => editSystem(officialPresets.find(item => item.key === button.dataset.copyPreset), { copy: true })));
+}
+
+function comparisonValue(system, field) {
+  if (field === 'race') return system.racePoints.join('–') || 'None';
+  if (field === 'sprint') return system.sprintPoints.join('–') || 'None';
+  if (field === 'bonuses') return [system.poleBonus ? `${pointText(system.poleBonus)} pole` : '', system.fastestLapBonus ? `${pointText(system.fastestLapBonus)} fastest lap${system.fastestLapMaxPosition ? ` · top ${system.fastestLapMaxPosition}` : ''}` : ''].filter(Boolean).join(' · ') || 'None';
+  if (field === 'constructors') {
+    if (!system.constructorsAvailable) return 'No Constructors’ Championship';
+    const parts = [];
+    if (system.constructorRacePoints.join(',') !== system.racePoints.join(',')) parts.push(`Points ${system.constructorRacePoints.join('–')}`);
+    if (system.constructorScoringCars === 1) parts.push('Best-placed car scored');
+    return parts.join(' · ') || 'Same scale as drivers';
+  }
+  if (field === 'special') return system.doublePointsFinalRound ? 'Final round awarded double points' : 'None';
+  return historicalCounting(system);
+}
+
+function renderHistoricalComparison({ updateUrl = false } = {}) {
+  const systemsHistory = historicalSystems();
+  const first = systemsHistory.find(item => item.key === document.getElementById('points-compare-first').value) || systemsHistory[0];
+  const second = systemsHistory.find(item => item.key === document.getElementById('points-compare-second').value) || systemsHistory.at(-1);
+  if (!first || !second) return;
+  const rows = [['Race points', 'race'], ['Sprint / secondary race', 'sprint'], ['Bonuses', 'bonuses'], ['Counting rule', 'counting'], ['Constructors', 'constructors'], ['Special rules', 'special']];
+  document.getElementById('points-compare-result').innerHTML = `<table><caption>${esc(first.label)} compared with ${esc(second.label)}</caption><thead><tr><th scope="col">Rule</th><th scope="col">${esc(first.label)}</th><th scope="col">${esc(second.label)}</th></tr></thead><tbody>${rows.map(([label, field]) => { const one = comparisonValue(first, field), two = comparisonValue(second, field); return `<tr class="${one === two ? '' : 'is-different'}"><th scope="row">${label}</th><td>${esc(one)}</td><td>${esc(two)}</td></tr>`; }).join('')}</tbody></table><div class="points-compare-actions"><a class="button primary" href="${scoringRoute('season')}?points=${encodeURIComponent(first.key)}">Apply ${esc(first.label)}</a><a class="button secondary" href="${scoringRoute('season')}?points=${encodeURIComponent(second.key)}">Apply ${esc(second.label)}</a></div>`;
+  if (updateUrl) {
+    const params = new URLSearchParams(location.search);
+    params.set('compare', `${first.key},${second.key}`);
+    window.history.replaceState(null, '', `${location.pathname}?${params}#compare-systems`);
+  }
+}
+
 function presetCard(system) {
   const preset = normaliseSystem(system);
   return `<article class="points-preset-card"><span>${esc(preset.era)}</span><strong>${esc(preset.name)}</strong><small>${esc(systemDetails(preset))}</small><div class="points-card-actions"><a href="${scoringRoute('season')}?points=${encodeURIComponent(preset.seasonKey)}">Use preset</a>${currentUser ? `<button type="button" data-copy-preset="${esc(preset.key)}">Customize</button>` : ''}<a href="${scoringRoute('scenario')}?points=${encodeURIComponent(preset.scenarioKey)}">Scenario</a><a href="${scoringRoute('builder')}?points=${encodeURIComponent(preset.builderKey)}">Builder</a></div></article>`;
 }
 function renderPresets() {
-  document.getElementById('official-systems').innerHTML = officialPresets.map(presetCard).join('');
-  document.querySelectorAll('[data-copy-preset]').forEach(button => button.addEventListener('click', () => editSystem(officialPresets.find(item => item.key === button.dataset.copyPreset), { copy: true })));
+  const history = historicalSystems();
+  populateHistoryControls(history);
+  renderHistoricalSystems();
+  renderHistoricalComparison();
+  if (['#historical-systems', '#compare-systems', '#your-systems'].includes(location.hash)) {
+    document.querySelector(location.hash)?.scrollIntoView({ block: 'start' });
+  }
 }
 
 function systemCard(system, editable = false) {
@@ -180,7 +337,9 @@ async function initialise() {
   try {
     const seriesName = isAcademyPointsPage ? 'F1 Academy' : isF3PointsPage ? 'Formula 3' : isF2PointsPage ? 'Formula 2' : 'Formula 1';
     document.querySelector('.points-page-heading .eyebrow').textContent = `${seriesName.toUpperCase()} CHAMPIONSHIP RULES`;
-    document.querySelector('.points-page-heading p').textContent = `Start with ${seriesName} rules or build your own. Preview every race, ${isAcademyPointsPage ? 'reverse-grid race' : 'sprint'}, bonus and counting rule before applying it.`;
+    document.querySelector('.points-page-heading h1').textContent = `Explore ${seriesName} scoring history`;
+    document.querySelector('.points-page-heading p').textContent = `Browse available official ${seriesName} systems, compare their race, ${isAcademyPointsPage ? 'reverse-grid race' : 'sprint'}, bonus and counting rules, or create your own.`;
+    document.getElementById('points-history-title').textContent = `${seriesName} points systems`;
     document.querySelector('#points-login-prompt a').href = `/account?series=${encodeURIComponent(pointsSeries)}`;
     if (isAcademyPointsPage) { document.getElementById('sprint-score-label').textContent = 'Reverse-grid race'; document.getElementById('sprint-score-note').textContent = 'Optional reverse-grid classification'; document.getElementById('sprint-counting-label').textContent = 'Include reverse-grid race points in the round before applying result limits'; }
     const account = await getJSON('/api/account'); currentUser = account.user;
@@ -194,12 +353,49 @@ async function initialise() {
       renderSystems();
       document.getElementById('public-systems').scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
+    else if (['#historical-systems', '#compare-systems', '#your-systems'].includes(location.hash)) {
+      window.setTimeout(() => document.querySelector(location.hash)?.scrollIntoView({ block: 'start' }), 100);
+    }
   } catch (error) { setError('saved-systems', error.message); renderPresets(); }
 }
 
 document.getElementById('new-system-button').addEventListener('click', () => editSystem());
 document.getElementById('cancel-system-button').addEventListener('click', () => { systemForm.hidden = true; });
 document.getElementById('reset-system-button').addEventListener('click', () => { if (window.confirm('Reset this editor to the official preset?')) { try { sessionStorage.removeItem(pointsDraftKey); } catch {} applySystemToForm({ ...officialPresets[0], name: '' }); document.getElementById('points-system-message').textContent = 'Editor reset.'; } });
+function updateHistoryUrl() {
+  const params = new URLSearchParams(location.search);
+  const season = document.getElementById('points-history-season').value;
+  const query = document.getElementById('points-history-search').value.trim();
+  if (season) params.set('season', season); else params.delete('season');
+  if (query) params.set('q', query); else params.delete('q');
+  window.history.replaceState(null, '', `${location.pathname}${params.size ? `?${params}` : ''}#historical-systems`);
+}
+document.getElementById('points-history-filters').addEventListener('submit', event => event.preventDefault());
+document.getElementById('points-history-search').addEventListener('input', () => { renderHistoricalSystems(); updateHistoryUrl(); });
+document.getElementById('points-history-season').addEventListener('change', () => { renderHistoricalSystems(); updateHistoryUrl(); });
+document.getElementById('points-history-clear').addEventListener('click', () => {
+  document.getElementById('points-history-search').value = '';
+  document.getElementById('points-history-season').value = '';
+  renderHistoricalSystems(); updateHistoryUrl();
+});
+['points-compare-first', 'points-compare-second'].forEach(id => document.getElementById(id).addEventListener('change', () => renderHistoricalComparison({ updateUrl: true })));
+document.getElementById('points-compare-copy').addEventListener('click', async event => {
+  renderHistoricalComparison({ updateUrl: true });
+  try {
+    await navigator.clipboard.writeText(location.href);
+    const original = event.currentTarget.textContent; event.currentTarget.textContent = 'Copied';
+    setTimeout(() => { event.currentTarget.textContent = original; }, 1400);
+  } catch { event.currentTarget.textContent = 'Copy unavailable'; }
+});
+function updatePointsLocalNav() {
+  const section = location.hash === '#compare-systems' ? 'compare' : location.hash === '#your-systems' ? 'custom' : 'history';
+  document.querySelectorAll('[data-points-nav]').forEach(link => {
+    if (link.dataset.pointsNav === section) link.setAttribute('aria-current', 'page'); else link.removeAttribute('aria-current');
+  });
+}
+document.querySelectorAll('[data-points-nav]').forEach(link => link.addEventListener('click', () => requestAnimationFrame(updatePointsLocalNav)));
+window.addEventListener('hashchange', updatePointsLocalNav);
+updatePointsLocalNav();
 document.getElementById('points-community-search').addEventListener('input', renderSystems);
 document.querySelectorAll('[data-add-points-position]').forEach(button => button.addEventListener('click', () => { pointEditors[button.dataset.addPointsPosition].push(0); renderPositionEditor(button.dataset.addPointsPosition); updatePreview(); }));
 systemForm.addEventListener('input', event => { if (event.target.matches('[data-point-field]')) pointEditors[event.target.dataset.pointField][Number(event.target.dataset.pointIndex)] = event.target.value === '' ? NaN : Number(event.target.value); updatePreview(); });

@@ -374,7 +374,7 @@ async function initialiseScenario() {
     if (isAcademyScenario) document.getElementById('scenario-points').innerHTML = '<option value="modern">F1 Academy · official</option>';
     systems.forEach(saved => { const key = `custom:${saved.id}`; SCENARIO_SYSTEMS[key] = { name: saved.name, race: saved.racePoints, sprint: saved.sprintPoints, poleBonus: saved.poleBonus, fastestLapBonus: saved.fastestLapBonus, fastestLapMaxPosition: saved.fastestLapMaxPosition, sprintFastestLapMaxPosition: isAcademyScenario ? 8 : undefined }; document.getElementById('scenario-points').insertAdjacentHTML('beforeend', `<option value="${esc(key)}">${esc(saved.name)} · custom</option>`); });
     if ([...document.getElementById('scenario-points').options].some(option => option.value === params.get('points'))) document.getElementById('scenario-points').value = params.get('points');
-    document.getElementById('scenario-manage-rules').href = `${scenarioBase()}/points-systems`;
+    document.getElementById('scenario-manage-rules').href = `${scenarioBase()}/points-systems#your-systems`;
     renderScenarioRules();
     await (isAcademyScenario ? academyLoadSeason() : loadScenarioSeason());
   } catch (error) { setError('scenario-grid', error.message); }

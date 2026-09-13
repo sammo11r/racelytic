@@ -14,7 +14,7 @@ let communityRecords = [];
 let communityChampionships = [];
 let communityType = 'all';
 
-function pointsUrl() { return `${accountBase}/points-systems`; }
+function pointsUrl() { return `${accountBase}/points-systems#your-systems`; }
 function recordsUrl() { return `${accountBase}/records`; }
 function builderUrl(series = accountSeries) {
   return series === 'f1' ? '/championship-builder' : `/${series}/championship-builder`;

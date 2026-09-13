@@ -201,7 +201,7 @@ router.get('/api/ratings', async (req, res) => {
             const state = sourceUncertainty(row, uncertaintyAsOf, config, source);
             return {
                 rank: index + 1, driverId: row.driver_id, driverName: row.driver_name,
-                constructorName: row.constructor_name || '', rating: number(row.rating_after),
+                constructorName: row.constructor_name || '', rating: number(row.rating_after), previousRating: number(row.rating_before),
                 peakRating: number(row.peak_rating), change: number(row.rating_change), events: Number(row.event_count),
                 uncertainty: number(state.uncertainty), uncertaintyLabel: uncertaintyLabel(series, state.uncertainty, state.evidence),
                 evidence: number(state.evidence, 2),
@@ -233,6 +233,27 @@ router.get('/api/ratings', async (req, res) => {
             years: years.map(row => Number(row.year)), generatedAt: run?.calculated_at || null, configuration: config,
             eventCount: Number(run?.event_count || 0),
             freshness: { isCurrent: ratingsCurrent, latestSourceEvent, latestRatedEvent }, leaderboard });
+    } catch (error) { sendError(res, error); }
+});
+
+router.get('/api/ratings/validation', async (req, res) => {
+    const series = seriesFrom(req);
+    const source = ratingSource(req, series);
+    try {
+        await ensureRatingsSchema();
+        const rows = await pool.query(`SELECT metrics, evaluated_at
+            FROM app_rating_evaluations
+            WHERE model_version = ? AND series = ?
+            ORDER BY evaluated_at DESC, id DESC LIMIT 1`, [source.version, series]);
+        if (!rows.length) return res.json({ available: false, modelVersion: source.version, model: source.key, modelLabel: source.label });
+        let metrics = {};
+        try { metrics = typeof rows[0].metrics === 'string' ? JSON.parse(rows[0].metrics) : rows[0].metrics || {}; } catch {}
+        res.set('Cache-Control', 'no-cache, max-age=0, must-revalidate');
+        res.json({ available: true, modelVersion: source.version, model: source.key, modelLabel: source.label,
+            evaluatedAt: rows[0].evaluated_at, events: metrics.events ?? metrics.selected?.events ?? null,
+            accuracy: metrics.pairwise?.accuracy ?? metrics.selected?.accuracy ?? null,
+            brierScore: metrics.pairwise?.brierScore ?? metrics.selected?.brier ?? null,
+            positionMeanAbsoluteError: metrics.positions?.meanAbsoluteError ?? metrics.selected?.positionMAE ?? null });
     } catch (error) { sendError(res, error); }
 });
 

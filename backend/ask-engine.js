@@ -270,7 +270,17 @@ async function resolveNamedCircuit(connection, name, series) {
         error.statusCode = 422;
         throw error;
     }
-    return ranked[0];
+    const best = ranked.filter(candidate => candidate.score === ranked[0].score);
+    if (best.length > 1) {
+        const names = best.slice(0, 4).map(candidate => candidate.name).join(', ');
+        const error = new Error(`“${name}” matches more than one circuit: ${names}. Try the full circuit name.`);
+        error.statusCode = 422;
+        error.suggestions = best.slice(0, 4).map(({ id, name: circuitName }) => ({ id, name: circuitName, entity: 'circuits' }));
+        error.suggestionField = 'circuitName';
+        error.originalName = name;
+        throw error;
+    }
+    return best[0];
 }
 
 async function resolveVenueCountry(connection, name, series) {
@@ -321,6 +331,7 @@ async function resolveRecordVenue(connection, { circuitName, venueCountryName },
             const venueCountry = await resolveVenueCountry(connection, name, series);
             if (venueCountry) return { circuit: null, venueCountry };
         }
+        if (circuitError.suggestions?.length) throw circuitError;
         const error = new Error(`Racelytic could not resolve “${name}” as a ${seriesDetails(series).name} circuit or host country. The scope was not ignored.`);
         error.statusCode = 422;
         throw error;
@@ -1805,16 +1816,21 @@ async function calculateDriverHeadToHead(connection, interpretation) {
     };
 }
 
+const ASK_QUERY_HANDLERS = Object.freeze({
+    record_leader: calculateRecordLeader,
+    record_subject_total: calculateRecordSubjectTotal,
+    race_result: calculateRaceResult,
+    season_standings: calculateSeasonStandings,
+    driver_head_to_head: calculateDriverHeadToHead,
+    constructor_head_to_head: calculateConstructorHeadToHead,
+    streak_leader: calculateStreakLeader,
+    compare_points_systems: comparePointsSystems
+});
+
 async function executeAskQuery(connection, interpretation) {
     const intent = interpretation.intent;
-    if (intent === 'record_leader') return calculateRecordLeader(connection, interpretation);
-    if (intent === 'record_subject_total') return calculateRecordSubjectTotal(connection, interpretation);
-    if (intent === 'race_result') return calculateRaceResult(connection, interpretation);
-    if (intent === 'season_standings') return calculateSeasonStandings(connection, interpretation);
-    if (intent === 'driver_head_to_head') return calculateDriverHeadToHead(connection, interpretation);
-    if (intent === 'constructor_head_to_head') return calculateConstructorHeadToHead(connection, interpretation);
-    if (intent === 'streak_leader') return calculateStreakLeader(connection, interpretation);
-    if (intent === 'compare_points_systems') return comparePointsSystems(connection, interpretation);
+    const handler = ASK_QUERY_HANDLERS[intent];
+    if (handler) return handler(connection, interpretation);
     if (intent === 'recalculate_entity_titles') {
         const subject = await resolveNamedSubject(connection, interpretation.subjectName, interpretation.entity);
         const result = await calculateTitleCounts(connection, { ...interpretation, entity: subject.entity });
@@ -1843,6 +1859,7 @@ async function executeAskQuery(connection, interpretation) {
 }
 
 module.exports = {
+    ASK_QUERY_HANDLERS,
     availablePointsSystems,
     nationalityOptions,
     calculateRecordLeader,
@@ -1859,6 +1876,7 @@ module.exports = {
     nameMatchScore,
     raceMetadata,
     resolveNamedSubject,
+    resolveNamedCircuit,
     resolvePointsSystem,
     ruleSummary
 };

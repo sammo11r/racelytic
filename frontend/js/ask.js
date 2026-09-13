@@ -15,7 +15,7 @@ const askSeries = window.RacelyticSeries.fromPath();
 const askSeriesName = askSeries.name;
 
 function isFollowUpQuery(query) {
-  return /^(?:and\b|now\b|only\b|instead\b|what\s+about\b|how\s+about\b|show\b|make\s+that\b|at\b|in\b|with\b|without\b|from\b|since\b|through\b|until\b|between\b|as\s+team-?mates?\b|career\b|shared\b)/i.test(String(query || '').trim());
+  return /^(?:and\b|now\b|only\b|instead\b|what\s+about\b|how\s+about\b|show\b|make\s+that\b|at\b|in\b|with\b|without\b|from\b|since\b|through\b|until\b|between\b|before\b|after\b|use\b|using\b|all\b|remove\b|clear\b|as\s+team-?mates?\b|career\b|shared\b)/i.test(String(query || '').trim());
 }
 
 function entityName(entity, plural = false) {

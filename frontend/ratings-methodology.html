@@ -11,6 +11,7 @@
 </head>
 <body data-ratings-view="methodology">
   <div id="header"></div>
+  <nav class="ratings-local-nav" aria-label="Ratings sections"><div class="container"><a href="/ratings" data-rating-route="overview">Overview</a><a href="/ratings/leaderboard" data-rating-route="leaderboard">Leaderboard</a><a href="/ratings/compare" data-rating-route="compare">Compare</a><a href="/ratings/driver" data-rating-route="driver">Driver profile</a><a href="/ratings/methodology" data-rating-route="methodology">Methodology</a></div></nav>
   <main class="ratings-page ratings-method-page">
     <header class="container ratings-hero">
       <div class="ratings-hero-copy">
@@ -31,10 +32,12 @@
       </div>
 
       <div class="ratings-method-copy">
-        <article><div class="eyebrow">UNCERTAINTY</div><h3>Evidence, not an error bar</h3><p>Everyone begins at 1500 with uncertainty of ±260. Weighted evidence narrows that range towards a ±45 floor, while inactive evidence halves every three years and displayed uncertainty is recalculated for the selected date. Evidence labels reflect each championship’s calendar: Stable begins at 50 weighted events in F1, 30 in F2, 24 in F3 and 16 in Academy. These labels describe how established the evidence is—not the possible error in a race prediction.</p></article>
-        <article><div class="eyebrow">READING A PROFILE</div><h3>Current form and career context</h3><p>Current rating is the score after the latest rated event; peak is the highest score reached at any point. Expected converts the pre-event pairwise probabilities into an implied finishing position. Change is that event’s rating movement, while Weight reports the format and distance multiplier applied before retirement-specific matchup adjustments.</p></article>
+        <article id="uncertainty"><div class="eyebrow">UNCERTAINTY</div><h3>Evidence, not an error bar</h3><p>Everyone begins at 1500 with uncertainty of ±260. Weighted evidence narrows that range towards a ±45 floor, while inactive evidence halves every three years and displayed uncertainty is recalculated for the selected date. Evidence labels reflect each championship’s calendar: Stable begins at 50 weighted events in F1, 30 in F2, 24 in F3 and 16 in Academy. These labels describe how established the evidence is—not the possible error in a race prediction.</p></article>
+        <article id="reading-a-profile"><div class="eyebrow">READING A PROFILE</div><h3>Current form and career context</h3><p>Current rating is the score after the latest rated event; peak is the highest score reached at any point. Expected converts the pre-event pairwise probabilities into an implied finishing position. Change is that event’s rating movement, while Weight reports the format and distance multiplier applied before retirement-specific matchup adjustments.</p></article>
         <article><div class="eyebrow">VALIDATION</div><h3>Changes have to earn their place</h3><p>Candidate settings are tested chronologically: the model learns from earlier races and is scored on later, unseen periods. Pairwise and equal-event accuracy, Brier score, log loss, finishing-position error and active-field rating movement are monitored. Confidence intervals resample complete race weekends so the many comparisons from one event are not treated as independent evidence. Promotion also requires consistent folds, a minimum improvement and agreement with the later-period holdout. A more complex setting is not published merely because it fits one series or era better.</p></article>
         <article><div class="eyebrow">LIMITS</div><h3>Results include more than the driver</h3><p>Car performance, qualifying pace, strategy, reliability and mechanical luck cannot be fully separated from classifications. Racelytic Ratings describe competitive outcomes against the field. They are not a pure measure of driver talent and should not be read as one.</p></article>
+        <article id="validation-results"><div class="eyebrow">LATEST VALIDATION</div><h3>Published performance checks</h3><div id="ratings-validation-live" class="ratings-validation-live" aria-live="polite"><p>Loading the latest saved validation report…</p></div></article>
+        <article id="model-history"><div class="eyebrow">MODEL HISTORY</div><h3>A versioned public record</h3><p><strong>Elo 1.4</strong> is the current competitive model. Every ratings page displays its active model and recalculation date; saved validation reports remain tied to the model version and championship that produced them.</p></article>
       </div>
 
       <p class="ratings-caveat"><strong>Current interpretation:</strong> use the rating to follow competitive form, the rank to understand position within a series, and the evidence label to judge how established that estimate is. Cross-series rating comparisons are not supported.</p>
@@ -44,5 +47,7 @@
   <footer class="footer"><div class="container">Racelytic</div></footer>
   <script src="/js/utils.js"></script>
   <script src="/js/header.js"></script>
+  <script src="/js/ratings-navigation.js"></script>
+  <script src="/js/ratings-methodology.js"></script>
 </body>
 </html>
