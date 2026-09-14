@@ -210,7 +210,7 @@ test('follow-up slot definitions distinguish replacement from explicit clearing'
         'recordSubjectName', 'comparisonSubjectName', 'recordCategory', 'recordConstructorName',
         'recordSeasonRange', 'seasonRange', 'recordVenue', 'nationalityName', 'raceFormat',
         'resultLimit', 'minStarts', 'raceResult', 'headToHead', 'standingRound',
-        'comparisonMetric', 'streakCategory'
+        'comparisonMetric', 'streakCategory', 'profileName', 'topic'
     ]);
     assert.equal(SLOT_DEFINITIONS.pointsSystemYear.kind, 'year');
     assert.equal(extractFollowUpDirectives('Use 1991 scoring instead').isFollowUp, true);

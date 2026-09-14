@@ -3,6 +3,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const { renderInitialSeoContent } = require('../backend/seo-prerender');
+const { racePageCopy } = require('../backend/seo');
 
 const template = fs.readFileSync(path.join(__dirname, '../frontend/driver.html'), 'utf8');
 const fixture = name => fs.readFileSync(path.join(__dirname, `../frontend/${name}`), 'utf8');
@@ -99,4 +100,27 @@ test('season and race prerenders populate existing summaries without adding new 
     assert.match(race, /<h1>Test Grand Prix<\/h1>/);
     assert.match(race, /Winning Driver/);
     assert.doesNotMatch(race, /Loading race weekend/);
+});
+
+test('chassis detail prerenders have entity-specific visible copy across series', () => {
+    const f1 = renderInitialSeoContent(fixture('chassis.html'), {
+        kind: 'chassis', series: 'f1', chassis: { id: 'test-01', name: 'Test 01' }
+    });
+    assert.match(f1, /<h1>Test 01<\/h1>/);
+    assert.match(f1, /Test 01 chassis in the Formula 1 archive/);
+
+    const academy = renderInitialSeoContent(fixture('f3-chassis.html'), {
+        kind: 'chassis', series: 'academy', chassis: { id: 'test-f1a', name: 'Test & F1A' }
+    });
+    assert.match(academy, /<h1>Test &amp; F1A<\/h1>/);
+    assert.match(academy, /F1 Academy archive/);
+});
+
+test('junior race metadata distinguishes repeat venue weekends by round', () => {
+    const context = { series: { key: 'f2', name: 'Formula 2' } };
+    const first = racePageCopy(context, { year: 2020, round: 4, name: 'Silverstone' });
+    const second = racePageCopy(context, { year: 2020, round: 5, name: 'Silverstone' });
+    assert.match(first.title, /Silverstone · Round 4 · Formula 2/);
+    assert.match(second.description, /Silverstone round 5 Formula 2/);
+    assert.notEqual(first.title, second.title);
 });

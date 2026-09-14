@@ -175,6 +175,33 @@ test('Ask API detects series mismatches and carries follow-up context', async ()
     });
 });
 
+test('Ask API keeps follow-up context in a temporary server conversation', async () => {
+    let executed;
+    await withAskApi({ execute: async (connection, interpretation) => {
+        executed = interpretation;
+        return {
+            intent: 'record_leader', entity: 'drivers', entityLabel: 'Drivers', answer: 'Answer', assumptions: [],
+            record: { label: 'Wins', total: 1, entries: [{ id: 'driver', name: 'Driver', value: 1 }] }
+        };
+    } }, async server => {
+        const first = await post(server, '/api/ask', { query: 'Who has the most race wins?' });
+        assert.equal(first.status, 200);
+        assert.match(first.body.conversation.id, /^[0-9a-f-]{36}$/);
+        assert.equal(first.body.conversation.turnCount, 1);
+        assert.equal(first.body.grounding.tool, 'find_records');
+        assert.equal(first.body.grounding.evidenceItems, 1);
+
+        const followUp = await post(server, '/api/ask', {
+            query: 'Only since 2022', conversationId: first.body.conversation.id
+        });
+        assert.equal(followUp.status, 200);
+        assert.equal(executed.fromYear, 2022);
+        assert.equal(executed.recordCategory, 'wins');
+        assert.equal(followUp.body.conversation.id, first.body.conversation.id);
+        assert.equal(followUp.body.conversation.turnCount, 2);
+    });
+});
+
 test('Ask API accepts editable comparison slots and returns slot-aware suggestions', async () => {
     let executed;
     await withAskApi({ execute: async (connection, interpretation) => {
@@ -242,6 +269,31 @@ test('Ask API carries comparison context through natural follow-up refinements',
         const replacement = await post(server, '/api/ask', { query: 'What about Fernando Alonso?', context });
         assert.equal(replacement.status, 200);
         assert.deepEqual(executed.subjectNames, ['Lewis Hamilton', 'Fernando Alonso']);
+    });
+});
+
+test('Ask API resolves conversational pronouns and season references locally', async () => {
+    let executed;
+    await withAskApi({ execute: async (_connection, interpretation) => {
+        executed = interpretation;
+        return { intent: interpretation.intent, entity: interpretation.entity, entityLabel: 'Archive', answer: 'Answer', assumptions: [], record: { entries: [] }, summary: { standings: [], races: 0 } };
+    } }, async server => {
+        const pronoun = await post(server, '/api/ask', {
+            query: 'How many wins did he have?',
+            context: { intent: 'driver_profile', entity: 'drivers', subjectName: 'Fernando Alonso' }
+        });
+        assert.equal(pronoun.status, 200);
+        assert.equal(executed.intent, 'record_subject_total');
+        assert.equal(executed.subjectName, 'Fernando Alonso');
+
+        const season = await post(server, '/api/ask', {
+            query: 'What happened that season?',
+            context: { intent: 'season_standings', entity: 'drivers', targetSeason: 2012 }
+        });
+        assert.equal(season.status, 200);
+        assert.equal(executed.intent, 'season_summary');
+        assert.equal(executed.targetSeason, 2012);
+        assert.deepEqual(season.body.planner, { mode: 'local', version: 'racelytic-intent-nb-v1', externalServices: false });
     });
 });
 

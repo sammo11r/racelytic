@@ -3,6 +3,7 @@ const assert = require('node:assert/strict');
 const {
     calculateDriverHeadToHead,
     calculateRaceResult,
+    calculateRecalculatedPointsTotals,
     calculateSeasonStandings,
     calculateStreakLeader,
     calculateTitleCounts,
@@ -195,8 +196,26 @@ test('natural record sample thresholds and season-summary language remain suppor
     assert.deepEqual(rate.unsupportedQualifiers, []);
 
     const summary = interpretLocally('Summarize the 2024 season');
-    assert.equal(summary.intent, 'season_standings');
+    assert.equal(summary.intent, 'season_summary');
     assert.equal(summary.targetSeason, 2024);
+});
+
+test('archive profiles, season summaries and glossary questions map to explicit tools', async () => {
+    const questions = [
+        ['Tell me about Fernando Alonso', 'driver_profile', 'Fernando Alonso'],
+        ['Tell me about the Ferrari team', 'constructor_profile', 'Ferrari'],
+        ['Tell me about the Monaco circuit', 'circuit_profile', 'Monaco'],
+        ['Summarize the 2012 season', 'season_summary', 2012],
+        ['How does DRS work?', 'motorsport_explanation', 'DRS']
+    ];
+    for (const [query, intent, value] of questions) {
+        const interpreted = interpretLocally(query);
+        assert.equal(interpreted.intent, intent, query);
+        assert.equal(interpreted.subjectName || interpreted.circuitName || interpreted.targetSeason || interpreted.topic, value, query);
+    }
+    const explanation = await executeAskQuery(null, { intent: 'motorsport_explanation', topic: 'countback' });
+    assert.equal(explanation.explanation.topic, 'Countback');
+    assert.match(explanation.answer, /tied on points/i);
 });
 
 test('driver comparisons extract team and circuit refinements without changing driver names', () => {
@@ -411,7 +430,29 @@ test('title-count calculation aggregates deterministic simulated champions', asy
     assert.equal(result.ranking[0].titles, 2);
     assert.equal(result.changedChampionships.length, 1);
     assert.equal(result.changedChampionships[0].year, 2001);
+    assert.deepEqual(result.pointsRanking.map(entry => ({
+        name: entry.name,
+        points: entry.points,
+        officialPoints: entry.officialPoints,
+        change: entry.change
+    })), [
+        { name: 'Alpha Driver', points: 33, officialPoints: 38, change: -5 },
+        { name: 'Beta Driver', points: 22, officialPoints: 32, change: -10 }
+    ]);
     assert.match(result.answer, /Alpha Driver would have the most/);
+
+    const pointsResult = await calculateRecalculatedPointsTotals(connection, {
+        intent: 'recalculate_points_totals',
+        entity: 'drivers',
+        pointsSystemYear: 1982,
+        fromYear: 2000,
+        toYear: 2001
+    });
+    assert.equal(pointsResult.intent, 'recalculate_points_totals');
+    assert.equal(pointsResult.rankingMetric, 'points');
+    assert.equal(pointsResult.ranking[0].name, 'Alpha Driver');
+    assert.equal(pointsResult.ranking[0].points, 33);
+    assert.match(pointsResult.answer, /Alpha Driver would have the most cumulative points with 33/);
 });
 
 test('title-count calculation executes constructor questions with constructor standings', async () => {

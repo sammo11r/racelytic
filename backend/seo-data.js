@@ -1,5 +1,5 @@
 const pool = require('./db');
-const { entityPageTitle, publicEntityName, routeContext } = require('./seo');
+const { entityPageTitle, publicEntityName, racePageCopy, routeContext } = require('./seo');
 const { resourcePath } = require('./resource-routes');
 const { optionalConstructorLineage } = require('./constructor-lineage');
 const { f2CircuitImageId } = require('../frontend/js/f2-circuit-images');
@@ -319,19 +319,30 @@ async function resolveRaceMetadata(context, id) {
     }
     if (!raceRows.length) return { robots: 'noindex, follow', notFound: true };
     const race = raceRows[0], winner = winnerRows[0] || {};
-    const name = race.displayName || race.name || race.officialName;
     const raceSessionCount = Number(race.raceSessionCount || 0);
     const completedRaceSessionCount = Number(race.completedRaceSessionCount || 0);
     const hasResults = series === 'f1' ? Boolean(winnerRows.length)
         : raceSessionCount > 0 && completedRaceSessionCount === raceSessionCount;
+    const copy = racePageCopy(context, race);
     return {
-        title: `${race.year} ${name} · ${context.series.name} · Racelytic`,
-        description: `${race.year} ${name} ${context.series.name} race weekend, circuit details and complete session results.`,
+        ...copy,
         initialContent: {
             kind: 'race', series, race, hasResults,
             inProgress: !hasResults && Number(race.supportingResultCount || 0) > 0,
             ...winner
         }
+    };
+}
+
+async function resolveChassisMetadata(context, id) {
+    const prefix = SERIES_PREFIX[context.series.key];
+    const rows = await pool.query(`SELECT id, name FROM ${prefix}chassis WHERE id = ?`, [id]);
+    if (!rows.length) return { robots: 'noindex, follow', notFound: true };
+    const chassis = rows[0];
+    return {
+        title: entityPageTitle(chassis.name, context.series.name, 'Chassis'),
+        description: `Explore the ${chassis.name} ${context.series.name} chassis, including its recorded seasons, teams, engines and race history.`,
+        initialContent: { kind: 'chassis', series: context.series.key, chassis }
     };
 }
 
@@ -341,6 +352,7 @@ async function resolveEntityMetadata(req, context, page, id) {
     if (page === 'circuit') return resolveCircuitMetadata(context, id);
     if (page === 'season') return resolveSeasonMetadata(context, id);
     if (page === 'race') return resolveRaceMetadata(context, id);
+    if (page === 'chassis') return resolveChassisMetadata(context, id);
     const prefix = SERIES_PREFIX[context.series.key];
     const entity = page === 'team' ? 'constructor' : page;
     let sql;

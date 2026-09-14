@@ -229,6 +229,14 @@ function renderRaceContent(html, initial) {
     return html.replace(new RegExp(`<section id="${id}" aria-busy="true">[\\s\\S]*?<\\/section>`), head);
 }
 
+function renderChassisContent(html, initial) {
+    const name = initial.chassis?.name;
+    const series = SERIES[initial.series]?.name;
+    if (!name || !series) return html;
+    const heading = `<h1>${escapeHtml(name)}</h1><p>Explore the ${escapeHtml(name)} chassis in the ${escapeHtml(series)} archive, including its recorded seasons, teams, engines and race history.</p>`;
+    return html.replace(/<h1>Chassis<\/h1><p>[\s\S]*?<\/p>/, heading);
+}
+
 function renderInitialSeoContent(html, initial) {
     if (!initial) return html;
     if (initial.kind === 'driver') return renderDriverContent(html, initial);
@@ -236,6 +244,7 @@ function renderInitialSeoContent(html, initial) {
     if (initial.kind === 'circuit') return renderCircuitContent(html, initial);
     if (initial.kind === 'season') return renderSeasonContent(html, initial);
     if (initial.kind === 'race') return renderRaceContent(html, initial);
+    if (initial.kind === 'chassis') return renderChassisContent(html, initial);
     return html;
 }
 

@@ -55,7 +55,52 @@ const INTENT_CATALOG = Object.freeze([
         requiredSlots: ['targetSeason'],
         optionalSlots: ['entity', 'standingRound', 'resultLimit'],
         description: 'Show a season championship table, including standings after a round.',
-        examples: ['Show the 2024 driver standings', 'Show the 2023 constructor championship table', 'Driver standings after round 10 in 2022', 'Summarize the 2020 season', 'Season leaderboard for 2024']
+        examples: ['Show the 2024 driver standings', 'Show the 2023 constructor championship table', 'Driver standings after round 10 in 2022', 'Final standings for the 2020 season', 'Season leaderboard for 2024']
+    },
+    {
+        id: 'driver_profile',
+        label: 'a driver profile',
+        family: 'archive_facts',
+        requiredSlots: ['subjectName'],
+        optionalSlots: [],
+        description: 'Summarize a driver’s identity, career span, teams, results and championships.',
+        examples: ['Tell me about Fernando Alonso', 'Who is Lewis Hamilton?', 'Give me a profile of Ayrton Senna', 'Which teams did Sebastian Vettel drive for?']
+    },
+    {
+        id: 'constructor_profile',
+        label: 'a constructor profile',
+        family: 'archive_facts',
+        requiredSlots: ['subjectName'],
+        optionalSlots: [],
+        description: 'Summarize a constructor or team’s history, drivers, results and championships.',
+        examples: ['Tell me about the Ferrari team', 'Give me a constructor profile of McLaren', 'Who drove for Williams?', 'What is the Red Bull Racing team?']
+    },
+    {
+        id: 'circuit_profile',
+        label: 'a circuit profile',
+        family: 'archive_facts',
+        requiredSlots: ['circuitName'],
+        optionalSlots: [],
+        description: 'Summarize a circuit, its location, archive history and most frequent winners.',
+        examples: ['Tell me about the Monaco circuit', 'Give me a profile of Silverstone track', 'What is the Spa-Francorchamps circuit?', 'Tell me about the Monza circuit']
+    },
+    {
+        id: 'season_summary',
+        label: 'a season summary',
+        family: 'archive_facts',
+        requiredSlots: ['targetSeason'],
+        optionalSlots: [],
+        description: 'Summarize a season’s champions, races, winners and leading standings.',
+        examples: ['Summarize the 2012 season', 'What happened in the 2021 season?', 'Give me an overview of the 2008 season', 'Who were the 2023 champions?']
+    },
+    {
+        id: 'motorsport_explanation',
+        label: 'a motorsport explanation',
+        family: 'knowledge',
+        requiredSlots: ['topic'],
+        optionalSlots: [],
+        description: 'Explain a supported motorsport term or a Racelytic methodology concept.',
+        examples: ['What is countback?', 'Explain the undercut', 'How does DRS work?', 'What does classified mean?']
     },
     {
         id: 'driver_head_to_head',
@@ -94,6 +139,15 @@ const INTENT_CATALOG = Object.freeze([
         optionalSlots: ['fromYear', 'toYear'],
         description: 'Rank championship totals under a historical rulebook.',
         examples: ['Who has the most titles under 1982 rules?', 'Rank drivers by championships using 1991 scoring', 'Top constructor by titles with 2010 points', 'Who leads the WDC count under current rules?']
+    },
+    {
+        id: 'recalculate_points_totals',
+        label: 'recalculated career points totals',
+        family: 'points_counterfactual',
+        requiredSlots: ['entity', 'pointsSystemYear'],
+        optionalSlots: ['fromYear', 'toYear', 'resultLimit'],
+        description: 'Rank cumulative career points after rescoring every completed season with one historical rulebook.',
+        examples: ['Who would have the most points if all seasons used the 2024 points system?', 'Rank drivers by career points under 2010 scoring', 'Which constructor scores the most total points with 1991 rules?', 'Top cumulative driver points using current rules']
     },
     {
         id: 'recalculate_season_champion',

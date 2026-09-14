@@ -38,7 +38,7 @@ test('Ask Racelytic opens directly on its working surface', () => {
     assert.doesNotMatch(ask, /class="ask-form-help"/);
     assert.match(ask, /Show supported question types/);
     assert.match(ask, /class="ask-question-menu" role="region" aria-label="Supported question types" tabindex="0"/);
-    assert.equal((ask.match(/<li><strong>/g) || []).length, 12);
+    assert.equal((ask.match(/<li><strong>/g) || []).length, 18);
     assert.match(ask, /class="ask-layout"/);
     assert.match(ask, /class="ask-query-panel"/);
     assert.match(ask, /id="ask-refinement"/);
@@ -186,6 +186,11 @@ test('Ask examples expose each extended MVP question type', () => {
     assert.match(ask, /How many titles would Alonso have under 1982 rules/);
     assert.match(ask, /Which championships change under 1991 rules/);
     assert.match(ask, /Compare the 1982 and 1991 points systems/);
+    assert.match(ask, /Driver profiles/);
+    assert.match(ask, /Constructor profiles/);
+    assert.match(ask, /Circuit profiles/);
+    assert.match(ask, /Season summaries/);
+    assert.match(ask, /Motorsport explanations/);
 });
 
 test('Ask exposes circuit and host-country scopes independently', () => {

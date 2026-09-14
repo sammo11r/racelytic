@@ -96,6 +96,9 @@ body[data-ask-series] .ask-question-f1-only { display: none; }
 .ask-conversation button:hover { background: rgba(var(--accent-rgb), .06); }
 .ask-conversation button span, .ask-conversation button small { display: block; }
 .ask-conversation button small { margin-top: 3px; color: var(--text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ask-conversation-actions { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 10px; color: var(--text-secondary); font-size: 12px; }
+.ask-conversation-actions button { min-height: 40px; padding: 7px 11px; border: 1px solid var(--border); border-radius: 999px; background: #fff; color: var(--text); font: inherit; font-weight: 800; cursor: pointer; white-space: nowrap; }
+.ask-conversation-actions button:hover { border-color: var(--accent); color: var(--accent); }
 .ask-refinement-details { margin-top: 12px; }
 .ask-refinement-details summary { padding: 10px 0; color: var(--text); font-size: 13px; font-weight: 800; cursor: pointer; }
 .ask-refinement-details:not([open]) { border-bottom: 1px solid var(--border); }
@@ -124,6 +127,7 @@ body[data-ask-series] .ask-question-f1-only { display: none; }
 .ask-answer-kicker span:last-child { text-align: right; }
 .ask-answer-card h2 { max-width: 900px; margin: 14px 0 8px; color: #fff; font-size: clamp(26px, 3.4vw, 40px); line-height: 1.08; letter-spacing: -.04em; }
 .ask-answer-card p { margin: 0; color: #bfc3cc; font-size: 13px; line-height: 1.45; }
+.ask-grounding { display: inline-flex; margin-top: 14px; padding: 6px 9px; border: 1px solid rgba(255,255,255,.18); border-radius: 999px; color: #d9dce3; font-size: 11px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
 
 .ask-focus-card { display: grid; grid-template-columns: minmax(160px, 1fr) repeat(2, minmax(110px, auto)) auto; gap: 20px; align-items: center; margin-top: 14px; padding: 20px 24px; border: 1px solid var(--border); border-radius: 13px; background: #fff; color: var(--text); text-decoration: none; }
 .ask-focus-card > span { grid-column: 1; color: var(--accent); font-size: 10px; font-weight: 850; letter-spacing: .1em; text-transform: uppercase; }

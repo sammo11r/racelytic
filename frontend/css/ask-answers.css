@@ -1,0 +1,16 @@
+.ask-answer-main { max-width: 980px; padding-top: clamp(42px, 7vw, 84px); padding-bottom: 72px; }
+.ask-answer-main article { max-width: 840px; margin: 0 auto; }
+.ask-answer-main h1 { max-width: 820px; margin: 10px 0 20px; font-size: clamp(36px, 6vw, 66px); line-height: 1.04; letter-spacing: -.035em; }
+.ask-answer-lead { max-width: 760px; margin: 0; color: var(--text, #f5f7fb); font-size: clamp(22px, 3vw, 30px); line-height: 1.42; }
+.ask-answer-updated { margin: 14px 0 42px; color: var(--muted, #9ca8bb); font-size: 14px; }
+.ask-answer-main section, .ask-answer-main aside { margin-top: 38px; }
+.ask-answer-main h2 { margin-bottom: 14px; font-size: clamp(23px, 3vw, 31px); }
+.ask-answer-main p, .ask-answer-main li { line-height: 1.65; }
+.ask-answer-main .table-scroll { overflow-x: auto; border: 1px solid rgba(255,255,255,.12); border-radius: 14px; }
+.ask-answer-main table { width: 100%; border-collapse: collapse; background: rgba(255,255,255,.025); }
+.ask-answer-main caption { padding: 14px 16px; text-align: left; color: var(--muted, #9ca8bb); }
+.ask-answer-main th, .ask-answer-main td { padding: 13px 16px; border-top: 1px solid rgba(255,255,255,.09); text-align: left; white-space: nowrap; }
+.ask-answer-main tbody th { font-weight: 650; }
+.ask-answer-main a { color: inherit; text-decoration-color: rgba(255,255,255,.42); text-underline-offset: 3px; }
+.ask-answer-main a:hover { text-decoration-color: currentColor; }
+@media (max-width: 620px) { .ask-answer-main th, .ask-answer-main td { padding: 11px 12px; } }

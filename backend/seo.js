@@ -33,7 +33,7 @@ const PAGE_META = Object.freeze({
     'ratings-compare': ['Ratings Comparison', 'Compare driver rating trajectories across seasons and racing history.'],
     'ratings-driver': ['Driver Rating Profile', 'Inspect a driver rating history, evidence level and race-by-race changes.'],
     'ratings-methodology': ['Ratings Methodology', 'Learn how Racelytic Ratings are calculated, validated and interpreted.'],
-    simulator: ['Simulator', 'Rewrite championships with alternative points, results, calendars and fields.'],
+    simulator: ['Season Simulator', 'Rewrite championships with alternative points, results, calendars and fields.'],
     'simulator-overview': ['Simulator', 'Explore championship simulations, scenario tools and custom scoring systems.'],
     'simulate-season': ['Season Simulator', 'Recalculate a championship with alternative scoring and result rules.'],
     'simulate-race': ['Race Replay', 'Replay a race with circuit position, timing and classification data.'],
@@ -116,6 +116,17 @@ function publicEntityName(entity) {
 
 function entityPageTitle(name, seriesName, entityLabel) {
     return `${name} — ${seriesName} ${entityLabel} · Racelytic`;
+}
+
+function racePageCopy(context, race) {
+    const name = race.displayName || race.name || race.officialName;
+    const round = Number(race.round);
+    const roundTitle = context.series.key !== 'f1' && Number.isInteger(round) && round > 0 ? ` · Round ${round}` : '';
+    const roundDescription = context.series.key !== 'f1' && Number.isInteger(round) && round > 0 ? ` round ${round}` : '';
+    return {
+        title: `${race.year} ${name}${roundTitle} · ${context.series.name} · Racelytic`,
+        description: `${race.year} ${name}${roundDescription} ${context.series.name} race weekend, circuit details and complete session results.`
+    };
 }
 
 function canonicalPath(pathname, query) {
@@ -216,6 +227,14 @@ function breadcrumbItems(metadata) {
 function entitySchema(metadata) {
     const initial = metadata.initialContent;
     if (!initial) return null;
+    if (initial.kind === 'ask-answer') {
+        return {
+            '@type': 'Question', '@id': `${metadata.canonical}#question`, url: metadata.canonical,
+            name: initial.question,
+            acceptedAnswer: { '@type': 'Answer', text: initial.answer },
+            ...(initial.dateModified ? { dateModified: initial.dateModified } : {})
+        };
+    }
     if (initial.kind === 'driver') {
         const driver = initial.driver;
         return {
@@ -301,12 +320,14 @@ function renderSitemap(routes) {
         .filter(route => {
             const parsed = new URL(route, DEFAULT_SITE_ORIGIN);
             const metadata = metadataFor(parsed.pathname, Object.fromEntries(parsed.searchParams));
+            const canonical = new URL(metadata.canonical);
+            const isCanonicalRoute = parsed.pathname === canonical.pathname && parsed.search === canonical.search;
             const verifiedCommunityPage = routeContext(parsed.pathname).page === 'championship-builder'
                 && parsed.searchParams.has('id');
-            return metadata.robots === 'index, follow' || verifiedCommunityPage;
+            return isCanonicalRoute && (metadata.robots === 'index, follow' || verifiedCommunityPage);
         })
         .sort((a, b) => a.localeCompare(b));
     return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map(route => `  <url><loc>${esc(`${siteOrigin()}${route}`)}</loc></url>`).join('\n')}\n</urlset>\n`;
 }
 
-module.exports = { applySeo, canonicalPath, entityPageTitle, metadataFor, publicEntityName, renderRobots, renderSitemap, renderStructuredData, routeContext };
+module.exports = { applySeo, canonicalPath, entityPageTitle, metadataFor, publicEntityName, racePageCopy, renderRobots, renderSitemap, renderStructuredData, routeContext };

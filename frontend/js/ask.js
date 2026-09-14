@@ -8,6 +8,7 @@ const askQuestionHelp = document.getElementById('ask-question-help');
 const askInitialState = askAnswerStatus.innerHTML;
 let askRequest = null;
 let askContext = null;
+let askConversationId = null;
 let askFilterOptions = null;
 let askLastInterpretation = null;
 let askConversation = [];
@@ -125,13 +126,14 @@ function interpretationControls(data) {
 }
 
 function conversationTrail() {
-  if (askConversation.length < 2) return '';
-  return `<details class="ask-conversation"><summary>Conversation history <span>${askConversation.length}</span></summary><ol>${askConversation.slice(-8).map(entry => `<li><button type="button" data-ask-history-query="${esc(entry.query)}"><span>${esc(entry.query)}</span><small>${esc(entry.answer)}</small></button></li>`).join('')}</ol></details>`;
+  if (!askConversationId) return '';
+  const history = askConversation.length < 2 ? '' : `<details class="ask-conversation"><summary>Conversation history <span>${askConversation.length}</span></summary><ol>${askConversation.slice(-8).map(entry => `<li><button type="button" data-ask-history-query="${esc(entry.query)}"><span>${esc(entry.query)}</span><small>${esc(entry.answer)}</small></button></li>`).join('')}</ol></details>`;
+  return `<div class="ask-conversation-actions"><span>Context stays active for follow-up questions.</span><button type="button" data-ask-new-conversation>New conversation</button></div>${history}`;
 }
 
 function refinementPanel(data, followUps = [], forceOpen = false) {
   const compact = window.matchMedia('(max-width: 980px)').matches;
-  const editable = ['record_leader', 'record_subject_total', 'race_result', 'season_standings', 'driver_head_to_head', 'constructor_head_to_head', 'streak_leader', 'recalculate_title_counts', 'recalculate_season_champion', 'recalculate_entity_titles', 'list_changed_championships', 'compare_points_systems']
+  const editable = ['record_leader', 'record_subject_total', 'race_result', 'season_standings', 'driver_head_to_head', 'constructor_head_to_head', 'streak_leader', 'recalculate_title_counts', 'recalculate_points_totals', 'recalculate_season_champion', 'recalculate_entity_titles', 'list_changed_championships', 'compare_points_systems']
     .includes(data.intent || data.interpretation?.detectedIntent || data.interpretation?.intent);
   return `${conversationTrail()}${followUps.length ? `<div class="ask-followups"><span>Ask a follow-up</span>${followUps.map(question => `<button type="button" data-ask-followup="${esc(question)}">${esc(question)}</button>`).join('')}</div>` : ''}
     ${editable ? `
@@ -314,18 +316,19 @@ function rankingRowClass(entry, index) {
 }
 
 function rankingSection(data) {
-  const heading = data.intent === 'recalculate_season_champion' ? 'Recalculated season result' : 'Recalculated title leaders';
+  const pointsRanking = data.rankingMetric === 'points';
+  const heading = pointsRanking ? 'Recalculated career points leaders' : data.intent === 'recalculate_season_champion' ? 'Recalculated season result' : 'Recalculated title leaders';
   return `<section class="ask-evidence" aria-labelledby="ask-ranking-title">
     <div class="ask-section-heading"><div><span>RESULTS</span><h2 id="ask-ranking-title">${heading}</h2></div><small>${esc(data.entityLabel)} · official totals cover the same seasons</small></div>
     <div class="table-wrap">
       <table class="ask-ranking-table">
         <caption class="visually-hidden">${esc(heading)}</caption>
-        <thead><tr><th>Rank</th><th>${data.entity === 'constructors' ? 'Constructor' : 'Driver'}</th><th>Recalculated titles</th><th>Official titles</th><th>Difference</th></tr></thead>
+        <thead><tr><th>Rank</th><th>${data.entity === 'constructors' ? 'Constructor' : 'Driver'}</th><th>Recalculated ${pointsRanking ? 'points' : 'titles'}</th><th>Official ${pointsRanking ? 'points' : 'titles'}</th><th>Difference</th></tr></thead>
         <tbody>${data.ranking.slice(0, 10).map((entry, index) => `<tr${rankingRowClass(entry, index)}>
           <td data-label="Rank">${fmtNumber(entry.rank)}</td>
           <td data-label="${entityName(data.entity)}"><a href="${entityUrl(data.entity, entry.id)}"><strong>${esc(entry.name)}</strong></a></td>
-          <td data-label="Recalculated titles"><strong>${fmtNumber(entry.titles)}</strong></td>
-          <td data-label="Official titles">${fmtNumber(entry.officialTitles)}</td>
+          <td data-label="Recalculated ${pointsRanking ? 'points' : 'titles'}"><strong>${fmtNumber(pointsRanking ? entry.points : entry.titles)}</strong></td>
+          <td data-label="Official ${pointsRanking ? 'points' : 'titles'}">${fmtNumber(pointsRanking ? entry.officialPoints : entry.officialTitles)}</td>
           <td data-label="Difference"><span class="ask-title-change ${entry.change > 0 ? 'up' : entry.change < 0 ? 'down' : ''}">${signedTitles(entry.change)}</span></td>
         </tr>`).join('')}</tbody>
       </table>
@@ -493,6 +496,14 @@ function recordScopeSummary(data) {
 }
 
 function suggestedFollowUps(data) {
+  if (data.intent === 'recalculate_points_totals') return ['Only since 2000', 'Now show constructors', 'Use the 1991 points system instead'];
+  if (['driver_profile', 'constructor_profile'].includes(data.intent)) return [
+    data.profile?.associations?.[0] ? `Tell me about ${data.profile.associations[0].name}${data.intent === 'driver_profile' ? ' team' : ''}` : 'Who has the most wins?',
+    data.intent === 'driver_profile' ? `How many wins does ${data.profile.name} have?` : `Who drove for ${data.profile.name}?`
+  ];
+  if (data.intent === 'circuit_profile') return [`Who has the most wins at ${data.profile.name}?`, 'Tell me about the Silverstone circuit'];
+  if (data.intent === 'season_summary') return [`Show the ${data.summary.year} driver standings`, `Show the ${data.summary.year} constructor standings`];
+  if (data.intent === 'motorsport_explanation') return ['Explain countback', 'What is a sprint race?', 'What does DNF mean?'];
   if (['record_leader', 'record_subject_total'].includes(data.intent)) return [
     'Only since 2022',
     `Now show ${data.entity === 'constructors' ? 'drivers' : entityName('constructors', true).toLowerCase()}`,
@@ -520,11 +531,38 @@ function suggestedFollowUps(data) {
   return [];
 }
 
+function profileSection(data) {
+  const profile = data.profile;
+  if (!profile) return '';
+  const associationLabel = profile.kind === 'driver' ? 'Teams' : profile.kind === 'constructor' ? 'Drivers' : 'Winning drivers';
+  return `<section class="ask-evidence" aria-labelledby="ask-profile-title">
+    <div class="ask-section-heading"><div><span>${esc(profile.kind.toUpperCase())} PROFILE</span><h2 id="ask-profile-title">${profile.href ? `<a href="${esc(profile.href)}">${esc(profile.name)}</a>` : esc(profile.name)}</h2></div><small>${esc(profile.subtitle || 'Recorded archive')}</small></div>
+    <div class="ask-comparison-grid">${profile.facts.map(fact => `<article class="ask-comparison-card"><span>${esc(fact.label)}</span><strong>${esc(fact.value)}</strong></article>`).join('')}</div>
+    ${profile.bestSeason ? `<p><strong>Best recorded championship finish:</strong> P${fmtNumber(profile.bestSeason.position)} in ${fmtNumber(profile.bestSeason.year)} with ${fmtNumber(profile.bestSeason.points)} points.</p>` : ''}
+    ${profile.associations?.length ? `<div class="ask-profile-links"><h3>${associationLabel}</h3><ul>${profile.associations.map(item => `<li><a href="${esc(item.href)}">${esc(item.name)}</a>${item.value ? ` <span>${esc(item.value)}</span>` : ''}</li>`).join('')}</ul></div>` : ''}
+  </section>`;
+}
+
+function seasonSummarySection(data) {
+  const summary = data.summary;
+  if (!summary) return '';
+  const table = (title, rows) => rows?.length ? `<div class="table-wrap"><table class="ask-ranking-table"><caption>${esc(title)}</caption><thead><tr><th>Rank</th><th>Competitor</th><th>Points</th></tr></thead><tbody>${rows.map(entry => `<tr><td>${fmtNumber(entry.position)}</td><td><a href="${esc(entry.href)}"><strong>${esc(entry.name)}</strong></a></td><td>${fmtNumber(entry.points)}</td></tr>`).join('')}</tbody></table></div>` : '';
+  return `<section class="ask-evidence" aria-labelledby="ask-season-summary-title"><div class="ask-section-heading"><div><span>SEASON SUMMARY</span><h2 id="ask-season-summary-title">${fmtNumber(summary.year)} at a glance</h2></div><small>${fmtNumber(summary.races)} races · ${fmtNumber(summary.winners)} winners</small></div>${table('Drivers’ championship', summary.standings)}${table('Constructors’ championship', summary.constructorStandings)}</section>`;
+}
+
+function knowledgeSection(data) {
+  if (!data.explanation) return '';
+  return `<section class="ask-explanation" aria-labelledby="ask-knowledge-title"><div class="ask-section-heading"><div><span>MOTORSPORT GLOSSARY</span><h2 id="ask-knowledge-title">${esc(data.explanation.topic)}</h2></div><small>Curated definition</small></div><p class="ask-explanation-outcome">${esc(data.explanation.text)}</p></section>`;
+}
+
 function renderAnswer(data) {
   const changed = data.changedChampionships || [];
   const recordIntent = ['record_leader', 'record_subject_total'].includes(data.intent);
-  const archiveFact = ['race_result', 'season_standings', 'driver_head_to_head', 'constructor_head_to_head', 'streak_leader'].includes(data.intent);
-  const evidence = data.intent === 'race_result' ? raceResultSection(data)
+  const archiveFact = ['race_result', 'season_standings', 'driver_head_to_head', 'constructor_head_to_head', 'streak_leader', 'driver_profile', 'constructor_profile', 'circuit_profile', 'season_summary', 'motorsport_explanation'].includes(data.intent);
+  const evidence = ['driver_profile', 'constructor_profile', 'circuit_profile'].includes(data.intent) ? profileSection(data)
+    : data.intent === 'season_summary' ? seasonSummarySection(data)
+    : data.intent === 'motorsport_explanation' ? knowledgeSection(data)
+    : data.intent === 'race_result' ? raceResultSection(data)
     : data.intent === 'season_standings' ? standingsSection(data)
     : ['driver_head_to_head', 'constructor_head_to_head'].includes(data.intent) ? headToHeadSection(data)
     : data.intent === 'streak_leader' ? streakSection(data)
@@ -532,6 +570,8 @@ function renderAnswer(data) {
     ? recordSection(data)
     : data.intent === 'compare_points_systems'
     ? comparisonSection(data)
+    : data.intent === 'recalculate_points_totals'
+    ? rankingSection(data)
     : data.intent === 'list_changed_championships'
       ? `${changesSection(data)}${rankingSection(data)}`
       : `${explanationSection(data)}${rankingSection(data)}${changesSection(data)}`;
@@ -543,21 +583,26 @@ function renderAnswer(data) {
       : `Based on ${fmtNumber(data.record.total)} ranked ${entityName(data.entity, true).toLowerCase()} in the recorded ${esc(askSeriesName)} archive.`
     : data.intent === 'compare_points_systems'
     ? 'The same completed seasons were recalculated under both complete rulebooks.'
+    : data.intent === 'recalculate_points_totals'
+    ? 'Career points are summed after every completed season is rescored under the selected complete rulebook.'
     : `${fmtNumber(changed.length)} championship${changed.length === 1 ? '' : 's'} change${changed.length === 1 ? 's' : ''} hands compared with the official results.`;
+  const grounding = data.grounding?.grounded
+    ? `<span class="ask-grounding">Grounded · ${esc(data.grounding.label)}</span>`
+    : '';
   const scopeSummary = recordIntent ? recordScopeSummary(data) : '';
   const followUps = suggestedFollowUps(data);
   askAnswerStatus.innerHTML = `
     <article class="ask-answer-card">
       <div class="ask-answer-kicker"><span>${recordIntent || archiveFact ? 'OFFICIAL ARCHIVE ANSWER' : 'RECALCULATED ANSWER'}</span><span>${recordIntent ? esc(scopeSummary || data.record.label) : archiveFact ? esc(askSeriesName) : `${fmtNumber(data.seasonsEvaluated)} seasons`}</span></div>
       <h2 tabindex="-1">${esc(data.answer)}</h2>
-      <p>${answerContext}</p>
+      <p>${answerContext}</p>${grounding}
     </article>`;
   askResult.innerHTML = `
     ${data.intent === 'compare_points_systems' || recordIntent ? '' : focusSection(data)}
     ${evidence}
     <details class="ask-method">
       <summary>Evidence, rules and assumptions</summary>
-      <div>${data.methodology ? `<dl><dt>Source</dt><dd>${esc(data.methodology.source)}${data.methodology.href ? ` <a href="${esc(data.methodology.href)}">Open source record</a>` : ''}</dd><dt>Coverage</dt><dd>${esc(data.methodology.coverage)}</dd><dt>Sample</dt><dd>${esc(data.methodology.sample)}</dd></dl>` : ''}${data.pointsSystem ? `<ul>${data.pointsSystem.rules.map(rule => `<li>${esc(rule)}</li>`).join('')}</ul>` : ''}<ul>${(data.assumptions || []).map(assumption => `<li>${esc(assumption)}</li>`).join('')}</ul>${data.excludedSeasons?.length ? `<p>Excluded because detailed classifications are incomplete: ${data.excludedSeasons.map(fmtNumber).join(', ')}.</p>` : ''}</div>
+      <div>${data.planner ? `<dl><dt>Language planner</dt><dd>Local · ${esc(data.planner.version)}</dd><dt>External services</dt><dd>None</dd></dl>` : ''}${data.grounding ? `<dl><dt>Trusted tool</dt><dd>${esc(data.grounding.label)}</dd><dt>Evidence returned</dt><dd>${fmtNumber(data.grounding.evidenceItems)} item${Number(data.grounding.evidenceItems) === 1 ? '' : 's'}</dd></dl>` : ''}${data.methodology ? `<dl><dt>Source</dt><dd>${esc(data.methodology.source)}${data.methodology.href ? ` <a href="${esc(data.methodology.href)}">Open source record</a>` : ''}</dd><dt>Coverage</dt><dd>${esc(data.methodology.coverage)}</dd><dt>Sample</dt><dd>${esc(data.methodology.sample)}</dd></dl>` : ''}${data.pointsSystem ? `<ul>${data.pointsSystem.rules.map(rule => `<li>${esc(rule)}</li>`).join('')}</ul>` : ''}<ul>${(data.assumptions || []).map(assumption => `<li>${esc(assumption)}</li>`).join('')}</ul>${data.excludedSeasons?.length ? `<p>Excluded because detailed classifications are incomplete: ${data.excludedSeasons.map(fmtNumber).join(', ')}.</p>` : ''}</div>
     </details>`;
   askRefinement.innerHTML = refinementPanel(data, followUps);
   syncInterpretationForms();
@@ -586,6 +631,7 @@ async function ask(question, pushHistory = true, interpretation = null) {
       body: JSON.stringify({
         query,
         series: askSeries.key,
+        ...(askConversationId ? { conversationId: askConversationId } : {}),
         ...(askContext && isFollowUpQuery(query) ? { context: askContext } : {}),
         ...(interpretation ? { interpretation } : {})
       }),
@@ -593,15 +639,12 @@ async function ask(question, pushHistory = true, interpretation = null) {
     });
     const payload = await response.json();
     if (!response.ok) {
-      if (!isFollowUpQuery(query)) askContext = null;
       return renderError(payload);
     }
     askContext = payload.interpretation;
     askLastInterpretation = payload.interpretation;
-    const conversationEntry = { query, answer: payload.answer || 'Calculated answer' };
-    if (askConversation.at(-1)?.query === query) askConversation[askConversation.length - 1] = conversationEntry;
-    else askConversation.push(conversationEntry);
-    askConversation = askConversation.slice(-8);
+    askConversationId = payload.conversation?.id || askConversationId;
+    askConversation = payload.conversation?.turns || [{ query, answer: payload.answer || 'Calculated answer' }];
     if (pushHistory) history.replaceState({}, '', askUrl(query, payload.interpretation));
     renderAnswer(payload);
     if (pushHistory && window.matchMedia('(max-width: 980px)').matches) {
@@ -640,6 +683,7 @@ document.addEventListener('submit', event => {
     comparisonScope: values.comparisonScope,
     comparisonMetric: values.comparisonMetric,
     streakCategory: values.streakCategory,
+    topic: values.topic,
     constructorName: values.constructorName || '',
     circuitName: values.circuitName || '',
     venueCountryName: values.venueCountryName || '',
@@ -670,6 +714,22 @@ document.addEventListener('change', event => {
 });
 
 document.addEventListener('click', event => {
+  const newConversation = event.target.closest('[data-ask-new-conversation]');
+  if (newConversation) {
+    if (askConversationId) fetch(`/api/ask/conversations/${encodeURIComponent(askConversationId)}`, { method: 'DELETE' }).catch(() => {});
+    askConversationId = null;
+    askContext = null;
+    askConversation = [];
+    askLastInterpretation = null;
+    askQuery.value = '';
+    history.pushState({}, '', `${askSeries.path}/ask`);
+    askAnswerStatus.innerHTML = askInitialState;
+    askRefinement.innerHTML = '';
+    askResult.innerHTML = '';
+    if (askExamples) askExamples.hidden = false;
+    askQuery.focus();
+    return;
+  }
   if (askQuestionHelp?.open && !askQuestionHelp.contains(event.target)) askQuestionHelp.open = false;
   const historyEntry = event.target.closest('[data-ask-history-query]');
   if (historyEntry) {
@@ -726,6 +786,7 @@ document.addEventListener('keydown', event => {
 });
 
 window.addEventListener('popstate', () => {
+  askConversationId = null;
   askContext = null;
   askConversation = [];
   const query = new URLSearchParams(location.search).get('q') || '';

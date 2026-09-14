@@ -789,6 +789,8 @@ async function calculateTitleCounts(connection, { pointsSystemYear, fromYear, to
     }]));
     const simulatedTitles = new Map();
     const officialTitles = new Map();
+    const simulatedCareerPoints = new Map();
+    const officialCareerPoints = new Map();
     const names = new Map();
     const changedChampionships = [];
     const seasonExplanations = [];
@@ -812,6 +814,12 @@ async function calculateTitleCounts(connection, { pointsSystemYear, fromYear, to
         const standingsResult = selectedEntity === 'constructors'
             ? simulateConstructors(data, resolved.system)
             : simulateDrivers(data, resolved.system);
+        standingsResult.forEach(entry => {
+            const id = String(entry.id);
+            names.set(id, entry.name || id);
+            simulatedCareerPoints.set(id, Number(simulatedCareerPoints.get(id) || 0) + Number(entry.points || 0));
+            officialCareerPoints.set(id, Number(officialCareerPoints.get(id) || 0) + Number(entry.originalPoints || 0));
+        });
         const simulatedChampion = standingsResult[0];
         const officialChampion = officialChampionByYear.get(season.year);
         if (!simulatedChampion || !officialChampion) continue;
@@ -847,6 +855,15 @@ async function calculateTitleCounts(connection, { pointsSystemYear, fromYear, to
         .map((entry, index) => ({ ...entry, rank: index + 1, change: entry.titles - entry.officialTitles }));
     const mostTitles = ranking[0]?.titles || 0;
     const leaders = ranking.filter(entry => entry.titles === mostTitles);
+    const pointsRanking = [...simulatedCareerPoints].map(([id, points]) => ({
+        id,
+        name: names.get(id) || id,
+        points: Number(points.toFixed(2)),
+        officialPoints: Number(Number(officialCareerPoints.get(id) || 0).toFixed(2)),
+        change: Number((points - Number(officialCareerPoints.get(id) || 0)).toFixed(2)),
+        href: resourcePath('f1', selectedEntity === 'constructors' ? 'constructor' : 'driver', id)
+    })).sort((first, second) => second.points - first.points || first.name.localeCompare(second.name))
+        .map((entry, index) => ({ ...entry, rank: index + 1 }));
     const evaluatedYears = [...seasons.keys()].filter(year => !excludedSeasons.includes(year)).sort((first, second) => first - second);
     const assumptions = [
         `Only completed Formula 1 ${labels.championship} are included.`,
@@ -866,12 +883,27 @@ async function calculateTitleCounts(connection, { pointsSystemYear, fromYear, to
         seasonsEvaluated,
         excludedSeasons,
         ranking,
+        pointsRanking,
         changedChampionships,
         seasonExplanations,
         assumptions
     };
     cache.set(cacheKey, { savedAt: Date.now(), value });
     return value;
+}
+
+async function calculateRecalculatedPointsTotals(connection, interpretation) {
+    const result = await calculateTitleCounts(connection, interpretation);
+    const ranking = result.pointsRanking.slice(0, interpretation.resultLimit || 20);
+    const leader = ranking[0];
+    if (!leader) throw askHttpError('No recalculated career points were available for that range.');
+    return {
+        ...result,
+        intent: 'recalculate_points_totals',
+        answer: `${leader.name} would have the most cumulative points with ${leader.points.toLocaleString('en-US')} under the ${result.pointsSystem.name} points system.`,
+        ranking,
+        rankingMetric: 'points'
+    };
 }
 
 function seasonChampionAnswer(result, year) {
@@ -1816,11 +1848,109 @@ async function calculateDriverHeadToHead(connection, interpretation) {
     };
 }
 
+const MOTORSPORT_GLOSSARY = Object.freeze({
+    countback: ['Countback', 'When competitors are tied on points, countback ranks them by their best results: most wins first, then second places, third places, and so on until the tie is broken.'],
+    classification: ['Classification', 'A classification is the official finishing order. A driver may be classified without reaching the finish if they completed enough of the race distance; disqualifications and non-starters are handled separately.'],
+    constructor: ['Constructor', 'In Formula 1, the constructor is the entrant credited with designing the listed chassis. Constructor championship points are scored by the team’s eligible cars, while a driver keeps their own points when changing teams.'],
+    'fastest lap': ['Fastest lap', 'The fastest lap is the quickest single lap recorded during a race. Whether it earns a championship point depends on the season’s rules and, in some eras, the driver’s finishing position.'],
+    'pole position': ['Pole position', 'Pole position is first place on the starting grid as officially attributed for the event. Sprint-era weekends can separate the statistic of pole from the result that sets the Grand Prix grid.'],
+    sprint: ['Sprint', 'A sprint is a shorter race held in addition to the main Grand Prix or feature race. Its format, points and effect on the starting grid have changed between seasons.'],
+    'reverse grid': ['Reverse grid', 'A reverse-grid race starts some drivers in the opposite order from a prior qualifying or race classification. The number of reversed positions and eligibility rules depend on the championship and season.'],
+    'dropped scores': ['Dropped scores', 'Under dropped-score rules, only a specified number of a competitor’s best results count toward the championship. Racelytic applies the limits and any season-part rules from the selected historical rulebook.'],
+    'shared drives': ['Shared drives', 'A shared drive occurs when more than one driver is credited with the same car in a race. Historical championship rules determine whether and how the resulting points are divided.'],
+    'parc ferme': ['Parc fermé', 'Parc fermé is the restricted period when teams may make only limited changes to a car. Breaking the applicable restrictions can require a pit-lane start or another sporting penalty.'],
+    undercut: ['Undercut', 'An undercut is an early pit stop intended to use fresher tyres for faster laps and move ahead when a rival stops later. It works only when the time gained exceeds the pit-stop and traffic cost.'],
+    DRS: ['DRS', 'The Drag Reduction System opens an adjustable rear-wing flap in permitted zones to reduce drag. Its sporting availability and activation conditions are defined by the rules for each season.'],
+    'safety car': ['Safety car', 'The safety car slows and groups the field while a hazard is managed. Overtaking is restricted, and pit stops can become relatively cheaper because the cars are circulating more slowly.'],
+    'Racelytic ratings': ['Racelytic ratings', 'Racelytic ratings are analytical estimates derived from recorded performance; they are not official championship points. The rating pages document the model, inputs and uncertainty used for each published result.'],
+    'alternate points': ['Alternate points systems', 'Racelytic’s alternate-points tools replay recorded classifications through a complete historical scoring rulebook, including eligible positions, fastest-lap or sprint points, countback and dropped-score rules where applicable.'],
+    DNF: ['DNF', 'DNF means did not finish. It describes a retirement, but it does not always mean unclassified: a retired driver can still appear in the official classification after completing enough distance.'],
+    'grid penalty': ['Grid penalty', 'A grid penalty moves a driver from their qualifying position when the starting grid is formed. Racelytic distinguishes qualifying performance from the official grid position where the archive records both.']
+});
+
+function numberFact(label, value) {
+    return { label, value: Number(value || 0).toLocaleString('en-US') };
+}
+
+async function calculateDriverProfile(connection, interpretation) {
+    const series = normaliseSeries(interpretation.series);
+    const prefix = seriesPrefix(series);
+    const subject = await resolveNamedSubject(connection, interpretation.subjectName, 'drivers', series);
+    const [identityRows, seasonRows, statsRows, teamRows] = await Promise.all([
+        isJuniorSeries(series)
+            ? connection.query(`SELECT id, name, firstName, lastName, countryCode FROM ${prefix}drivers WHERE id = ?`, [subject.id])
+            : connection.query(`SELECT d.id, d.name, d.firstName, d.lastName, d.dateOfBirth, d.permanentNumber, d.abbreviation, c.name AS nationality FROM drivers d LEFT JOIN countries c ON c.id = d.nationalityCountryId WHERE d.id = ?`, [subject.id]),
+        isJuniorSeries(series)
+            ? connection.query(`SELECT year, positionNumber, points, championshipWon FROM ${prefix}season_driver_standings WHERE driverId = ? ORDER BY year DESC`, [subject.id])
+            : connection.query(`SELECT year, positionNumber, points, championshipWon FROM seasons_driver_standings WHERE driverId = ? ORDER BY year DESC`, [subject.id]),
+        isJuniorSeries(series)
+            ? connection.query(`SELECT COUNT(DISTINCT results.sessionId) AS starts, SUM(results.positionNumber = 1) AS wins, SUM(results.positionNumber BETWEEN 1 AND 3) AS podiums, SUM(LOWER(CAST(results.polePosition AS CHAR)) IN ('1','true')) AS poles, SUM(COALESCE(results.points, 0)) AS points FROM ${prefix}session_results results JOIN ${prefix}sessions sessions ON sessions.id = results.sessionId WHERE results.driverId = ? AND LOWER(CAST(sessions.isRace AS CHAR)) IN ('1','true')`, [subject.id])
+            : connection.query(`SELECT SUM(UPPER(COALESCE(positionText, '')) NOT IN ('DNS','DNQ','DNPQ','WD')) AS starts, SUM(positionNumber = 1) AS wins, SUM(positionNumber BETWEEN 1 AND 3) AS podiums, SUM(LOWER(CAST(polePosition AS CHAR)) IN ('1','true')) AS poles, SUM(COALESCE(points, 0)) AS points FROM races_race_results WHERE driverId = ?`, [subject.id]),
+        isJuniorSeries(series)
+            ? connection.query(`SELECT DISTINCT constructors.id, constructors.name FROM ${prefix}session_results results JOIN ${prefix}constructors constructors ON constructors.id = results.constructorId WHERE results.driverId = ? ORDER BY constructors.name`, [subject.id])
+            : connection.query(`SELECT DISTINCT constructors.id, constructors.name FROM races_race_results results JOIN constructors ON constructors.id = results.constructorId WHERE results.driverId = ? ORDER BY constructors.name`, [subject.id])
+    ]);
+    const identity = identityRows[0] || subject;
+    const stats = statsRows[0] || {};
+    const years = seasonRows.map(row => Number(row.year)).filter(Boolean);
+    const titles = seasonRows.filter(row => isTrue(row.championshipWon)).length;
+    const best = seasonRows.filter(row => Number(row.positionNumber) > 0).sort((a, b) => Number(a.positionNumber) - Number(b.positionNumber))[0];
+    const facts = [numberFact('Race starts', stats.starts), numberFact('Wins', stats.wins), numberFact('Podiums', stats.podiums), numberFact('Pole positions', stats.poles), numberFact('Championships', titles), numberFact('Recorded points', stats.points)];
+    const span = years.length ? `${Math.min(...years)}–${Math.max(...years)}` : 'No season standings recorded';
+    return { intent: 'driver_profile', answer: `${identity.name} is represented in the ${seriesDetails(series).name} archive across ${span}.`, entity: 'drivers', entityLabel: 'Driver', profile: { kind: 'driver', id: subject.id, name: identity.name, href: entityHref(series, 'drivers', subject.id), subtitle: identity.nationality || identity.countryCode || '', facts, bestSeason: best ? { year: Number(best.year), position: Number(best.positionNumber), points: Number(best.points || 0) } : null, associations: teamRows.map(row => ({ id: String(row.id), name: row.name, href: entityHref(series, 'constructors', row.id) })) }, methodology: { source: 'Official standings and race classifications stored in the Racelytic archive.', coverage: span, sample: `${facts.length} career measures and ${teamRows.length} teams.` }, assumptions: ['Career totals use recorded race classifications; missing historical fields are not inferred.'] };
+}
+
+async function calculateConstructorProfile(connection, interpretation) {
+    const series = normaliseSeries(interpretation.series);
+    const prefix = seriesPrefix(series);
+    const subject = await resolveNamedSubject(connection, interpretation.subjectName, 'constructors', series);
+    const [identityRows, seasonRows, statsRows, driverRows] = await Promise.all([
+        isJuniorSeries(series) ? connection.query(`SELECT id, name, abbreviation, countryCode FROM ${prefix}constructors WHERE id = ?`, [subject.id]) : connection.query(`SELECT k.id, k.name, k.fullName, c.name AS countryName FROM constructors k LEFT JOIN countries c ON c.id = k.countryId WHERE k.id = ?`, [subject.id]),
+        isJuniorSeries(series) ? connection.query(`SELECT year, positionNumber, points, championshipWon FROM ${prefix}season_constructor_standings WHERE constructorId = ? ORDER BY year DESC`, [subject.id]) : connection.query(`SELECT year, positionNumber, points, championshipWon FROM seasons_constructor_standings WHERE constructorId = ? ORDER BY year DESC`, [subject.id]),
+        isJuniorSeries(series) ? connection.query(`SELECT COUNT(DISTINCT results.sessionId) AS starts, SUM(results.positionNumber = 1) AS wins, SUM(results.positionNumber BETWEEN 1 AND 3) AS podiums, SUM(COALESCE(results.points,0)) AS points FROM ${prefix}session_results results JOIN ${prefix}sessions sessions ON sessions.id = results.sessionId WHERE results.constructorId = ? AND LOWER(CAST(sessions.isRace AS CHAR)) IN ('1','true')`, [subject.id]) : connection.query(`SELECT COUNT(DISTINCT raceId) AS starts, SUM(positionNumber = 1) AS wins, SUM(positionNumber BETWEEN 1 AND 3) AS podiums, SUM(COALESCE(points,0)) AS points FROM races_race_results WHERE constructorId = ?`, [subject.id]),
+        isJuniorSeries(series) ? connection.query(`SELECT DISTINCT d.id, d.name FROM ${prefix}session_results r JOIN ${prefix}drivers d ON d.id = r.driverId WHERE r.constructorId = ? ORDER BY d.name`, [subject.id]) : connection.query(`SELECT DISTINCT d.id, d.name FROM races_race_results r JOIN drivers d ON d.id = r.driverId WHERE r.constructorId = ? ORDER BY d.name`, [subject.id])
+    ]);
+    const identity = identityRows[0] || subject; const stats = statsRows[0] || {}; const years = seasonRows.map(row => Number(row.year)).filter(Boolean); const titles = seasonRows.filter(row => isTrue(row.championshipWon)).length;
+    const facts = [numberFact('Race entries', stats.starts), numberFact('Wins', stats.wins), numberFact('Podiums', stats.podiums), numberFact('Championships', titles), numberFact('Recorded points', stats.points)]; const span = years.length ? `${Math.min(...years)}–${Math.max(...years)}` : 'No season standings recorded';
+    return { intent: 'constructor_profile', answer: `${identity.fullName || identity.name} is represented in the ${seriesDetails(series).name} archive across ${span}.`, entity: 'constructors', entityLabel: 'Constructor', profile: { kind: 'constructor', id: subject.id, name: identity.fullName || identity.name, href: entityHref(series, 'constructors', subject.id), subtitle: identity.countryName || identity.countryCode || '', facts, associations: driverRows.slice(0, 30).map(row => ({ id: String(row.id), name: row.name, href: entityHref(series, 'drivers', row.id) })) }, methodology: { source: 'Official standings and race classifications stored in the Racelytic archive.', coverage: span, sample: `${facts.length} career measures and ${driverRows.length} drivers.` }, assumptions: ['Race entries count distinct events with a recorded constructor result.'] };
+}
+
+async function calculateCircuitProfile(connection, interpretation) {
+    const series = normaliseSeries(interpretation.series); const prefix = seriesPrefix(series); const circuit = await resolveNamedCircuit(connection, interpretation.circuitName, series);
+    const [identityRows, raceRows, winnerRows] = await Promise.all([
+        isJuniorSeries(series) ? connection.query(`SELECT id, name, placeName, type, direction, lengthMeters, turns FROM ${prefix}circuits WHERE id = ?`, [circuit.id]) : connection.query(`SELECT c.id, COALESCE(NULLIF(c.fullName,''),c.name) AS name, c.placeName, c.type, c.direction, co.name AS countryName FROM circuits c LEFT JOIN countries co ON co.id = c.countryId WHERE c.id = ?`, [circuit.id]),
+        connection.query(`SELECT COUNT(*) AS races, MIN(year) AS firstYear, MAX(year) AS lastYear FROM ${prefix}races WHERE circuitId = ?`, [circuit.id]),
+        isJuniorSeries(series) ? connection.query(`SELECT d.id, d.name, COUNT(*) AS wins FROM ${prefix}session_results sr JOIN ${prefix}sessions s ON s.id = sr.sessionId JOIN ${prefix}races r ON r.id = sr.raceId JOIN ${prefix}drivers d ON d.id = sr.driverId WHERE r.circuitId = ? AND sr.positionNumber = 1 AND LOWER(CAST(s.isRace AS CHAR)) IN ('1','true') GROUP BY d.id, d.name ORDER BY wins DESC, d.name LIMIT 10`, [circuit.id]) : connection.query(`SELECT d.id, d.name, COUNT(*) AS wins FROM races_race_results rr JOIN races r ON r.id = rr.raceId JOIN drivers d ON d.id = rr.driverId WHERE r.circuitId = ? AND rr.positionNumber = 1 GROUP BY d.id, d.name ORDER BY wins DESC, d.name LIMIT 10`, [circuit.id])
+    ]);
+    const identity = identityRows[0] || circuit; const archive = raceRows[0] || {}; const facts = [numberFact('Events', archive.races), { label: 'First season', value: archive.firstYear || '—' }, { label: 'Latest season', value: archive.lastYear || '—' }, ...(identity.lengthMeters ? [{ label: 'Length', value: `${(Number(identity.lengthMeters) / 1000).toFixed(3)} km` }] : []), ...(identity.turns ? [numberFact('Turns', identity.turns)] : [])];
+    return { intent: 'circuit_profile', answer: `${identity.name} is a ${[identity.type, identity.direction].filter(Boolean).join(', ') || 'racing'} circuit${identity.placeName || identity.countryName ? ` in ${[identity.placeName, identity.countryName].filter(Boolean).join(', ')}` : ''}.`, entityLabel: 'Circuit', profile: { kind: 'circuit', id: circuit.id, name: identity.name, href: resourcePath(series, 'circuit', circuit.id), subtitle: [identity.placeName, identity.countryName].filter(Boolean).join(', '), facts, associations: winnerRows.map(row => ({ id: String(row.id), name: row.name, value: `${row.wins} win${Number(row.wins) === 1 ? '' : 's'}`, href: entityHref(series, 'drivers', row.id) })) }, methodology: { source: 'Circuit metadata and official race classifications stored in the Racelytic archive.', coverage: archive.firstYear ? `${archive.firstYear}–${archive.lastYear}` : 'No recorded events', sample: `${archive.races || 0} events and ${winnerRows.length} winning drivers.` }, assumptions: ['Winner counts include race sessions represented in the selected series archive.'] };
+}
+
+async function calculateSeasonSummary(connection, interpretation) {
+    const series = normaliseSeries(interpretation.series); const prefix = seriesPrefix(series); const year = Number(interpretation.targetSeason);
+    const drivers = await calculateSeasonStandings(connection, { ...interpretation, entity: 'drivers', resultLimit: 5 });
+    let constructors = null; try { constructors = await calculateSeasonStandings(connection, { ...interpretation, entity: 'constructors', resultLimit: 5 }); } catch {}
+    const raceRows = isJuniorSeries(series) ? await connection.query(`SELECT COUNT(DISTINCT CASE WHEN sr.driverId IS NOT NULL THEN s.id END) AS races, COUNT(DISTINCT CASE WHEN sr.positionNumber = 1 THEN sr.driverId END) AS winners, MAX(r.date) AS scheduledLastDate FROM ${prefix}sessions s JOIN ${prefix}races r ON r.id = s.raceId LEFT JOIN ${prefix}session_results sr ON sr.sessionId = s.id WHERE s.year = ? AND LOWER(CAST(s.isRace AS CHAR)) IN ('1','true')`, [year]) : await connection.query(`SELECT COUNT(DISTINCT CASE WHEN rr.driverId IS NOT NULL THEN r.id END) AS races, COUNT(DISTINCT rr.driverId) AS winners, MAX(r.date) AS scheduledLastDate FROM races r LEFT JOIN races_race_results rr ON rr.raceId = r.id AND rr.positionNumber = 1 WHERE r.year = ?`, [year]);
+    const counts = raceRows[0] || {}; const lastDate = counts.scheduledLastDate ? new Date(counts.scheduledLastDate) : null; const completed = lastDate && lastDate < new Date(); const status = completed ? 'won' : 'leads'; const constructorPhrase = constructors?.standings?.[0] ? `; ${constructors.standings[0].name} ${status} the constructors’ championship` : '';
+    return { intent: 'season_summary', answer: `${drivers.standings[0].name} ${status} the ${year} ${seriesDetails(series).name} drivers’ championship${constructorPhrase}.`, entityLabel: 'Season', summary: { year, completed, races: Number(counts.races || 0), winners: Number(counts.winners || 0), standings: drivers.standings, constructorStandings: constructors?.standings || [] }, methodology: { source: 'Official standings and recorded race classifications in the Racelytic archive.', coverage: `${year} season`, sample: `${counts.races || 0} completed races and ${counts.winners || 0} different winners.`, href: resourcePath(series, 'season', year) }, assumptions: [completed ? 'Champions use the final official standings stored in the archive.' : 'The season is not yet complete; the answer describes the current recorded leaders.'] };
+}
+
+async function explainMotorsportTerm(_connection, interpretation) {
+    const entry = MOTORSPORT_GLOSSARY[interpretation.topic]; if (!entry) throw askHttpError('That term is not in the Racelytic glossary yet.');
+    return { intent: 'motorsport_explanation', answer: entry[1], entityLabel: 'Explanation', explanation: { topic: entry[0], text: entry[1] }, methodology: { source: 'Racelytic curated motorsport and methodology glossary.', coverage: 'General definition; exact sporting rules vary by series and season.', sample: 'One reviewed glossary entry.' }, assumptions: ['For event-specific rulings, the regulations and official classification for that season take precedence.'] };
+}
+
 const ASK_QUERY_HANDLERS = Object.freeze({
     record_leader: calculateRecordLeader,
     record_subject_total: calculateRecordSubjectTotal,
     race_result: calculateRaceResult,
     season_standings: calculateSeasonStandings,
+    driver_profile: calculateDriverProfile,
+    constructor_profile: calculateConstructorProfile,
+    circuit_profile: calculateCircuitProfile,
+    season_summary: calculateSeasonSummary,
+    motorsport_explanation: explainMotorsportTerm,
+    recalculate_points_totals: calculateRecalculatedPointsTotals,
     driver_head_to_head: calculateDriverHeadToHead,
     constructor_head_to_head: calculateConstructorHeadToHead,
     streak_leader: calculateStreakLeader,
@@ -1866,10 +1996,16 @@ module.exports = {
     calculateRecordSubjectTotal,
     calculateRaceResult,
     calculateSeasonStandings,
+    calculateDriverProfile,
+    calculateConstructorProfile,
+    calculateCircuitProfile,
+    calculateSeasonSummary,
+    explainMotorsportTerm,
     calculateDriverHeadToHead,
     calculateConstructorHeadToHead,
     calculateStreakLeader,
     calculateTitleCounts,
+    calculateRecalculatedPointsTotals,
     comparePointsSystems,
     executeAskQuery,
     inferRacePointsMultiplier,

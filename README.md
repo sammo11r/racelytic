@@ -79,6 +79,18 @@ Run `npm run build:frontend` after changing the shell, series configuration, or 
 
 Use `npm run consolidate:css` to remove exact duplicate top-level CSS rules safely. The normal `npm run check` command verifies that both generated output and CSS remain current.
 
+## Ask Racelytic architecture
+
+Ask Racelytic uses a grounded conversational pipeline. `backend/routes/ask.js` interprets the question and follow-up context, `backend/ask-tools.js` selects a registered archive or calculation tool, and `backend/ask-engine.js` performs the deterministic calculation. Answers include the selected tool and evidence count; prose never replaces the underlying archive result.
+
+Language planning runs entirely inside the Node.js process. A small statistical intent model is trained at startup from the version-controlled intent catalogue and is used only when the higher-confidence grammar rules do not match. It has no API client, network call, hosted model, telemetry, or runtime download; missing slots still produce a clarification instead of invoking a broader tool.
+
+Run `node --test test/ask-supported-questions.test.js` for the supported-question contract suite. It fails when an intent lacks a canonical question, required-slot coverage, a trusted tool mapping, clarification behavior, or an out-of-scope safety boundary. The broader 270-question language-planner corpus lives in `test/ask-local-planner.test.js`.
+
+Successful questions receive an opaque conversation ID. The latest structured context and up to twelve turns are retained in server memory for 30 minutes so follow-ups such as “only since 2022” work without resending the full conversation. The **New conversation** action deletes that context immediately. Conversations are not written to the application database and are not sent to an external AI service.
+
+Register a new question family in `backend/ask-intents.js`, map it to a trusted tool in `backend/ask-tools.js`, implement its deterministic executor, and add language, API and evidence tests before exposing it in the interface.
+
 ## Quality checks
 
 Run JavaScript syntax and local-link checks with `npm run check`.

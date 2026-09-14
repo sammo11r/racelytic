@@ -17,11 +17,14 @@ const { renderSeasonComparisonHtml } = require('./season-comparison-renderer');
 const { renderCircuitAnalysisHtml } = require('./circuit-analysis-renderer');
 const { renderRecordsHtml } = require('./records-renderer');
 const { renderAskHtml } = require('./ask-renderer');
+const { answerMap, descriptionFor, readSnapshot, renderAnswerPage } = require('./ask-answer-pages');
 const { RESOURCE_ROUTES, resourcePath } = require('./resource-routes');
 
 const app = express();
 const PORT = Number(process.env.PORT || 3000);
 const frontendDirectory = path.join(__dirname, '../frontend');
+const askAnswerSnapshot = readSnapshot();
+const askAnswers = answerMap(askAnswerSnapshot);
 
 function sendSeoPage(req, res, next, file, transform = content => content) {
     fs.readFile(path.join(frontendDirectory, file), 'utf8', async (error, content) => {
@@ -178,6 +181,24 @@ for (const [legacy, target] of [['/index.html', '/'], ['/f2.html', '/f2'], ['/f3
     app.get(legacy, (req, res) => res.redirect(308, target));
 }
 
+function sendAskAnswer(req, res, next) {
+    const page = askAnswers.get(req.path);
+    if (!page) return next();
+    const initialContent = { kind: 'ask-answer', question: page.question, answer: page.result.answer,
+        dateModified: askAnswerSnapshot.generatedAt };
+    const html = renderAnswerPage(page, askAnswerSnapshot);
+    res.set('Cache-Control', 'public, max-age=3600, stale-while-revalidate=86400');
+    res.type('html').send(applySeo(renderPageShell(html), req.path, {}, {
+        title: `${page.question} · Racelytic`, description: descriptionFor(page), robots: 'index, follow', initialContent
+    }));
+}
+
+app.get('/answers/:slug', sendAskAnswer);
+app.get('/:series/answers/:slug', (req, res, next) => {
+    if (!['f2', 'f3', 'academy'].includes(req.params.series)) return next();
+    return sendAskAnswer(req, res, next);
+});
+
 Object.entries(ACADEMY_PAGES).forEach(([slug, file]) => {
     app.get(slug ? `/academy/${slug}` : '/academy', (req, res, next) => {
         if (Object.hasOwn(RESOURCE_ROUTES, slug)) {
@@ -220,6 +241,7 @@ const sitemapRoutes = [
     ...publicPages.map(file => `/${file.slice(0, -'.html'.length)}`).filter(route => !/^\/f[23]-/.test(route)),
     ...juniorPages.map(({ route }) => route),
     ...Object.keys(ACADEMY_PAGES).filter(Boolean).map(slug => `/academy/${slug}`),
+    ...askAnswerSnapshot.pages.map(page => page.path),
 ];
 
 app.get('/robots.txt', (req, res) => res.type('text/plain').send(renderRobots()));

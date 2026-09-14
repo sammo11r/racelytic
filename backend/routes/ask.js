@@ -7,6 +7,9 @@ const { RECORD_CATEGORIES, intentDefinition, isRecordCategory, missingRequiredSl
 const { isJuniorSeries, normaliseSeries, seriesPrefix } = require('../series-config');
 const { extractFollowUpDirectives, mergeFollowUpSlot } = require('../ask-slots');
 const { all: SERIES } = require('../../frontend/js/series-config');
+const { AskConversationStore } = require('../ask-conversations');
+const { executeAskTool } = require('../ask-tools');
+const { LOCAL_PLANNER_VERSION } = require('../ask-local-fallback');
 
 function askOptions(series = 'f1') {
     return {
@@ -45,7 +48,7 @@ function assertRequestedScopesApplied(interpretation, result) {
     const inferredLocation = interpretation.confidence !== 'confirmed';
     const checks = [
         ['constructorName', Boolean(result.constructorFilter || filters.constructor)],
-        ['circuitName', Boolean(scope.circuit || filters.circuit || inferredLocation && (scope.venueCountry || filters.venueCountry))],
+        ['circuitName', Boolean(result.profile?.kind === 'circuit' || scope.circuit || filters.circuit || inferredLocation && (scope.venueCountry || filters.venueCountry))],
         ['venueCountryName', Boolean(scope.venueCountry || filters.venueCountry || inferredLocation && (scope.circuit || filters.circuit))],
         ['nationalityName', Boolean(scope.nationality)],
         ['pointsSystemYear', Boolean(result.pointsSystem)]
@@ -109,6 +112,7 @@ function applyConfirmedInterpretation(interpreted, requested) {
         streakCategory: Object.hasOwn(requested, 'streakCategory') && streakCategories.has(requested.streakCategory) ? requested.streakCategory : interpreted.streakCategory || null,
         constructorName,
         circuitName: confirmedName('circuitName'),
+        topic: confirmedName('topic'),
         venueCountryName: confirmedName('venueCountryName'),
         nationalityName: confirmedName('nationalityName'),
         raceFormat,
@@ -150,12 +154,19 @@ function applyFollowUpInterpretation(interpreted, context, query) {
     if (!context || typeof context !== 'object') return interpreted;
     const text = String(query || '').trim();
     const directives = extractFollowUpDirectives(text);
-    if (!directives.isFollowUp || !supportedIntentIds().has(context.intent)) return interpreted;
+    const hasReference = /\b(?:he|him|his|she|her|hers|they|them|their|theirs|it|its|that|those|same|previous|former|latter)\b/i.test(text);
+    if ((!directives.isFollowUp && !hasReference) || !supportedIntentIds().has(context.intent)) return interpreted;
     const { clearFields, subjectReplacement } = directives;
     const entityChanged = interpreted.entityExplicit && interpreted.entity && interpreted.entity !== context.entity;
     const value = (field, fallback = null) => mergeFollowUpSlot(interpreted, context, field, clearFields, fallback);
-    let detectedIntent = ['driver_head_to_head', 'constructor_head_to_head'].includes(context.intent) && !(interpreted.subjectNames || []).length
-        ? context.intent : interpreted.detectedIntent || context.intent;
+    let detectedIntent = directives.isFollowUp && interpreted.interpretationSource === 'local_fallback'
+        ? context.intent
+        : ['driver_head_to_head', 'constructor_head_to_head'].includes(context.intent) && !(interpreted.subjectNames || []).length
+            ? context.intent : interpreted.detectedIntent || context.intent;
+    if (/\bwhat\s+happened\b.*\b(?:that|the same|previous)\s+(?:season|year)\b/i.test(text) && context.targetSeason) detectedIntent = 'season_summary';
+    if (/\b(?:profile|tell me more)\b/i.test(text) && /\b(?:him|her|them|it|that driver|that team|that constructor)\b/i.test(text)) {
+        detectedIntent = context.entity === 'constructors' ? 'constructor_profile' : 'driver_profile';
+    }
     if (entityChanged && context.intent === 'driver_head_to_head' && interpreted.entity === 'constructors') detectedIntent = 'constructor_head_to_head';
     if (entityChanged && context.intent === 'constructor_head_to_head' && interpreted.entity === 'drivers') detectedIntent = 'driver_head_to_head';
     if (subjectReplacement && context.intent === 'record_leader') detectedIntent = 'record_subject_total';
@@ -164,6 +175,12 @@ function applyFollowUpInterpretation(interpreted, context, query) {
     if (subjectReplacement && ['driver_head_to_head', 'constructor_head_to_head'].includes(context.intent)) {
         subjectNames = [...(context.subjectNames || [])];
         subjectNames[1] = subjectReplacement;
+    }
+    const contextualSubject = context.subjectName || context.subjectNames?.[0] || null;
+    const pronoun = /^(?:he|him|his|she|her|hers|they|them|their|theirs|it|its|that\s+(?:driver|team|constructor))$/i;
+    if (contextualSubject) {
+        if (pronoun.test(String(interpreted.subjectName || '').trim())) interpreted = { ...interpreted, subjectName: contextualSubject };
+        subjectNames = subjectNames.map(name => pronoun.test(String(name).trim()) ? contextualSubject : name);
     }
     const requestedScope = directives.comparisonScope;
     const requestedView = directives.resultView;
@@ -177,23 +194,25 @@ function applyFollowUpInterpretation(interpreted, context, query) {
         comparisonPointsSystemYears: interpreted.comparisonPointsSystemYears?.length >= 2
             ? interpreted.comparisonPointsSystemYears : context.comparisonPointsSystemYears || [],
         recordCategory: value('recordCategory'),
-        subjectName: entityChanged ? null : subjectReplacement && ['record_leader', 'record_subject_total', 'race_result'].includes(context.intent)
+        subjectName: entityChanged ? null : subjectReplacement && ['record_leader', 'record_subject_total', 'race_result', 'driver_profile', 'constructor_profile'].includes(context.intent)
             ? subjectReplacement : value('subjectName'),
         constructorName: entityChanged ? null : value('constructorName'),
-        circuitName: interpreted.venueCountryName ? null : value('circuitName'),
+        circuitName: /\b(?:that|the same|previous)\s+(?:circuit|track|venue)\b/i.test(text) ? context.circuitName
+            : interpreted.venueCountryName ? null : value('circuitName'),
         venueCountryName: interpreted.circuitName ? null : value('venueCountryName'),
         nationalityName: value('nationalityName'),
         raceFormat: value('raceFormat'),
         resultLimit: value('resultLimit'),
         minStarts: value('minStarts'),
-        targetSeason: value('targetSeason'),
-        eventName: value('eventName'),
+        targetSeason: /\b(?:that|the same|previous)\s+(?:season|year)\b/i.test(text) ? context.targetSeason : value('targetSeason'),
+        eventName: /\b(?:that|the same|previous)\s+race\b/i.test(text) ? context.eventName : value('eventName'),
         resultView: subjectReplacement && context.intent === 'race_result' ? 'driver' : requestedView || value('resultView'),
         standingRound: value('standingRound'),
         subjectNames,
         comparisonScope: requestedScope || value('comparisonScope'),
         comparisonMetric: value('comparisonMetric'),
         streakCategory: value('streakCategory'),
+        topic: value('topic'),
         fromYear: value('fromYear'),
         toYear: value('toYear'),
         confidence: 'contextual',
@@ -225,6 +244,7 @@ function supportedResponse(res, interpretation, message) {
     return res.status(422).json({
         error: message || seriesReason,
         interpretation,
+        planner: { mode: 'local', version: LOCAL_PLANNER_VERSION, externalServices: false },
         options: askOptions(series),
         ...(suggestedAction ? { suggestedAction } : {}),
         examples: isJuniorSeries(series) ? juniorExamples : [
@@ -248,7 +268,8 @@ function createAskRouter({
     execute = executeAskQuery,
     interpret = interpretQuestion,
     connect = withConnection,
-    limiter = new MemoryRateLimiter({ windowMs: 5 * 60 * 1000, limit: 20, maxEntries: 5000 })
+    limiter = new MemoryRateLimiter({ windowMs: 5 * 60 * 1000, limit: 20, maxEntries: 5000 }),
+    conversations = new AskConversationStore()
 } = {}) {
     const router = express.Router();
     router.get('/api/ask/options', async (req, res) => {
@@ -280,6 +301,14 @@ function createAskRouter({
             res.status(500).json({ error: 'Filter suggestions are unavailable right now.' });
         }
     });
+    router.delete('/api/ask/conversations/:conversationId', (req, res) => {
+        const origin = req.get('origin');
+        if (origin && origin !== `${req.protocol}://${req.get('host')}`) {
+            return res.status(403).json({ error: 'Invalid request origin.' });
+        }
+        conversations.delete(req.params.conversationId);
+        res.status(204).end();
+    });
     router.post('/api/ask', async (req, res) => {
     const origin = req.get('origin');
     if (origin && origin !== `${req.protocol}://${req.get('host')}`) {
@@ -304,7 +333,11 @@ function createAskRouter({
                 seriesMismatch: { current: series, requested: requestedSeries, name: target.name, url: `${target.path}/ask?q=${encodeURIComponent(query)}` }
             });
         }
-        const contextual = applyFollowUpInterpretation({ ...interpret(query), series }, req.body?.context, query);
+        const conversation = conversations.get(req.body?.conversationId, series);
+        const conversationContext = req.body?.context && typeof req.body.context === 'object'
+            ? req.body.context
+            : conversation?.context;
+        const contextual = applyFollowUpInterpretation({ ...interpret(query), series }, conversationContext, query);
         interpretation = applyConfirmedInterpretation(contextual, req.body?.interpretation);
         const supportedIntents = supportedIntentIds();
         if (!supportedIntents.has(interpretation.intent)) return supportedResponse(res, interpretation);
@@ -318,11 +351,10 @@ function createAskRouter({
                 options: askOptions(series)
             });
         }
-        const result = await connect(connection => execute(connection, interpretation));
+        const execution = await connect(connection => executeAskTool(connection, interpretation, execute));
+        const { result, grounding } = execution;
         assertRequestedScopesApplied(interpretation, result);
-        res.json({
-            query,
-            interpretation: {
+        const responseInterpretation = {
                 intent: result.intent || interpretation.intent,
                 series: SERIES[series].name,
                 entity: result.entity,
@@ -338,6 +370,7 @@ function createAskRouter({
                 comparisonScope: result.comparison?.scope || interpretation.comparisonScope,
                 comparisonMetric: result.comparison?.metric || interpretation.comparisonMetric,
                 streakCategory: interpretation.streakCategory,
+                topic: interpretation.topic,
                 constructorName: interpretation.constructorName,
                 circuitName: result.scope?.circuit?.name || result.comparison?.filters?.circuit?.name
                     || (result.scope?.venueCountry || result.comparison?.filters?.venueCountry ? null : interpretation.circuitName),
@@ -352,9 +385,23 @@ function createAskRouter({
                 toYear: interpretation.toYear,
                 confidence: interpretation.confidence,
                 interpretationSource: interpretation.interpretationSource || 'rules'
-            },
+            };
+        const savedConversation = conversations.remember({
+            id: conversation?.id,
+            series,
+            query,
+            answer: result.answer,
+            context: { ...interpretation, ...responseInterpretation, series },
+            tool: grounding.tool
+        });
+        res.json({
+            query,
+            ...result,
+            interpretation: responseInterpretation,
+            planner: { mode: 'local', version: LOCAL_PLANNER_VERSION, externalServices: false },
             options: askOptions(series),
-            ...result
+            conversation: conversations.publicView(savedConversation),
+            grounding
         });
     } catch (error) {
         if (!error.statusCode) console.error(`Ask Racelytic failed: ${error.message}`);

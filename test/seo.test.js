@@ -17,6 +17,8 @@ test('SEO metadata creates descriptive series-aware titles', () => {
     assert.match(metadataFor('/f3/race-analysis').description, /grid movement, finishing positions, attrition and team performance/);
     assert.match(metadataFor('/academy/circuit-analysis').description, /circuit specialists, winner trends, reliability/);
     assert.doesNotMatch(metadataFor('/f2/season-analysis').description, /across the Formula 2 archive/);
+    assert.equal(metadataFor('/simulator').title, 'Season Simulator · Formula 1 · Racelytic');
+    assert.equal(metadataFor('/simulator-overview').title, 'Simulator · Formula 1 · Racelytic');
 });
 
 test('detail canonicals retain only their identity parameter', () => {
@@ -113,4 +115,7 @@ test('robots and sitemap advertise crawlable canonical pages only', () => {
     assert.doesNotMatch(sitemap, /\/account<\/loc>/);
     assert.doesNotMatch(sitemap, /\/race<\/loc>/);
     assert.match(renderSitemap(['/driver?id=max-verstappen']), /\/driver\?id=max-verstappen/);
+    const aboutSitemap = renderSitemap(['/about', '/f2/about', '/f3/about', '/academy/about']);
+    assert.match(aboutSitemap, /<loc>https:\/\/racelytic\.com\/about<\/loc>/);
+    assert.doesNotMatch(aboutSitemap, /\/(?:f2|f3|academy)\/about<\/loc>/);
 });
