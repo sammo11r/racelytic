@@ -1,4 +1,5 @@
-const QUIZ_SERIES = location.pathname.startsWith('/academy/') ? 'academy' : location.pathname.startsWith('/f3/') ? 'f3' : 'f2';
+const QUIZ_SERIES = location.pathname.startsWith('/formula-e/') ? 'fe' : location.pathname.startsWith('/academy/') ? 'academy' : location.pathname.startsWith('/f3/') ? 'f3' : 'f2';
+const seasonLabel = year => QUIZ_SERIES === 'fe' ? `${Number(year) - 1}–${String(year).slice(-2)}` : String(year);
 
 function storedProgress(key) {
   try { const value = JSON.parse(localStorage.getItem(key) || 'null'); return value && Array.isArray(value.answers) ? value : null; }
@@ -30,8 +31,8 @@ function updateCard(quiz, total, validIds, key) {
       const card = document.querySelector(`[data-quiz-card="${type}"]`);
       if (!card || !summary) return;
       card.querySelector('[data-quiz-coverage]').textContent = type === 'race-winners'
-        ? `Since ${summary.firstYear}`
-        : `${summary.firstYear}–${summary.lastYear}`;
+        ? `Since ${seasonLabel(summary.firstYear)}`
+        : `${seasonLabel(summary.firstYear)}–${seasonLabel(summary.lastYear)}`;
       card.querySelector('[data-quiz-count]').textContent = `${summary.total} ${type === 'race-winners' ? 'winners' : 'seasons'}`;
       updateCard(type, summary.total, new Set(summary.answerIds), key);
     });
@@ -39,7 +40,7 @@ function updateCard(quiz, total, validIds, key) {
     const season = quizzes.seasonRaceWinners;
     const seasonCard = document.querySelector('[data-quiz-card="season-race-winners"]');
     if (seasonCard && season) {
-      seasonCard.querySelector('[data-quiz-coverage]').textContent = `${season.year} season`;
+      seasonCard.querySelector('[data-quiz-coverage]').textContent = `${seasonLabel(season.year)} season`;
       seasonCard.querySelector('[data-quiz-count]').textContent = `${season.total} races`;
       updateCard('season-race-winners', season.total, new Set(season.answerIds), `racelytic-quiz-${QUIZ_SERIES}-season-race-winners-${season.year}`);
     }

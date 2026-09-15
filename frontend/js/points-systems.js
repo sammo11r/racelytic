@@ -2,8 +2,9 @@ const systemForm = document.getElementById('points-system-form');
 const isF2PointsPage = window.location.pathname.startsWith('/f2/');
 const isAcademyPointsPage = window.location.pathname.startsWith('/academy/');
 const isF3PointsPage = window.location.pathname.startsWith('/f3/') || isAcademyPointsPage;
-const pointsSeries = isAcademyPointsPage ? 'academy' : isF3PointsPage ? 'f3' : isF2PointsPage ? 'f2' : 'f1';
-const pointsBase = pointsSeries === 'f1' ? '' : `/${pointsSeries}`;
+const isFormulaEPointsPage = window.location.pathname.startsWith('/formula-e/');
+const pointsSeries = isFormulaEPointsPage ? 'fe' : isAcademyPointsPage ? 'academy' : isF3PointsPage ? 'f3' : isF2PointsPage ? 'f2' : 'f1';
+const pointsBase = pointsSeries === 'f1' ? '' : pointsSeries === 'fe' ? '/formula-e' : `/${pointsSeries}`;
 const pointsDraftKey = `racelytic:points-system-draft:${pointsSeries}`;
 
 const F1_PRESETS = [
@@ -18,7 +19,8 @@ const JUNIOR_PRESETS = {
     { key: 'modern', seasonKey: 'f3-current', scenarioKey: 'modern', builderKey: 'modern', name: 'Formula 3 · current', era: 'Current feature and sprint', racePoints: [25,18,15,12,10,8,6,4,2,1], sprintPoints: [10,9,8,7,6,5,4,3,2,1], qualifyingPoints: [], poleBonus: 2, fastestLapBonus: 1, fastestLapMaxPosition: 10 },
     { key: 'f3-legacy', seasonKey: 'f3-legacy', scenarioKey: 'f3-legacy', builderKey: 'f3-legacy', name: 'Formula 3 · 2019–2021', era: 'Legacy sprint format', racePoints: [25,18,15,12,10,8,6,4,2,1], sprintPoints: [15,12,10,8,6,5,4,3,2,1], qualifyingPoints: [], poleBonus: 4, fastestLapBonus: 2, fastestLapMaxPosition: 10 }
   ],
-  academy: [{ key: 'modern', seasonKey: 'academy-current', scenarioKey: 'modern', builderKey: 'modern', name: 'F1 Academy · official', era: 'Standard and reverse-grid races', racePoints: [25,18,15,12,10,8,6,4,2,1], sprintPoints: [10,8,6,5,4,3,2,1], qualifyingPoints: [], poleBonus: 2, fastestLapBonus: 1, fastestLapMaxPosition: 10 }]
+  academy: [{ key: 'modern', seasonKey: 'academy-current', scenarioKey: 'modern', builderKey: 'modern', name: 'F1 Academy · official', era: 'Standard and reverse-grid races', racePoints: [25,18,15,12,10,8,6,4,2,1], sprintPoints: [10,8,6,5,4,3,2,1], qualifyingPoints: [], poleBonus: 2, fastestLapBonus: 1, fastestLapMaxPosition: 10 }],
+  fe: FORMULA_E_POINTS_PRESETS
 };
 const officialPresets = pointsSeries === 'f1' ? F1_PRESETS : JUNIOR_PRESETS[pointsSeries];
 
@@ -96,6 +98,7 @@ function historicalSystems() {
 }
 
 function historyYears(system) {
+  if (Array.isArray(system.years)) return system.years;
   const match = String(system.key).match(/^(\d{4})(?:-(\d{4}|present))?$/);
   if (!match) return [];
   const start = Number(match[1]), end = match[2] === 'present' || !match[2] ? (match[2] ? new Date().getFullYear() : start) : Number(match[2]);
@@ -218,7 +221,7 @@ function renderHistoricalComparison({ updateUrl = false } = {}) {
 
 function presetCard(system) {
   const preset = normaliseSystem(system);
-  return `<article class="points-preset-card"><span>${esc(preset.era)}</span><strong>${esc(preset.name)}</strong><small>${esc(systemDetails(preset))}</small><div class="points-card-actions"><a href="${scoringRoute('season')}?points=${encodeURIComponent(preset.seasonKey)}">Use preset</a>${currentUser ? `<button type="button" data-copy-preset="${esc(preset.key)}">Customize</button>` : ''}<a href="${scoringRoute('scenario')}?points=${encodeURIComponent(preset.scenarioKey)}">Scenario</a><a href="${scoringRoute('builder')}?points=${encodeURIComponent(preset.builderKey)}">Builder</a></div></article>`;
+  return `<article class="points-preset-card"><span>${esc(preset.era)}</span><strong>${esc(preset.name)}</strong><small>${esc(systemDetails(preset))}</small><div class="points-card-actions"><a href="${scoringRoute('season')}?points=${encodeURIComponent(preset.seasonKey)}">Use preset</a>${currentUser ? `<button type="button" data-copy-preset="${esc(preset.key)}">Customize</button>` : ''}<a href="${scoringRoute('scenario')}?points=${encodeURIComponent(preset.scenarioKey)}">Scenario</a>${preset.builderKey ? `<a href="${scoringRoute('builder')}?points=${encodeURIComponent(preset.builderKey)}">Builder</a>` : ''}</div></article>`;
 }
 function renderPresets() {
   const history = historicalSystems();
@@ -335,13 +338,18 @@ function editSystem(system = null, options = {}) {
 async function loadSystems() { systems = await getJSON('/api/points-systems'); renderSystems(); }
 async function initialise() {
   try {
-    const seriesName = isAcademyPointsPage ? 'F1 Academy' : isF3PointsPage ? 'Formula 3' : isF2PointsPage ? 'Formula 2' : 'Formula 1';
+    const seriesName = isFormulaEPointsPage ? 'Formula E' : isAcademyPointsPage ? 'F1 Academy' : isF3PointsPage ? 'Formula 3' : isF2PointsPage ? 'Formula 2' : 'Formula 1';
     document.querySelector('.points-page-heading .eyebrow').textContent = `${seriesName.toUpperCase()} CHAMPIONSHIP RULES`;
     document.querySelector('.points-page-heading h1').textContent = `Explore ${seriesName} scoring history`;
     document.querySelector('.points-page-heading p').textContent = `Browse available official ${seriesName} systems, compare their race, ${isAcademyPointsPage ? 'reverse-grid race' : 'sprint'}, bonus and counting rules, or create your own.`;
     document.getElementById('points-history-title').textContent = `${seriesName} points systems`;
     document.querySelector('#points-login-prompt a').href = `/account?series=${encodeURIComponent(pointsSeries)}`;
     if (isAcademyPointsPage) { document.getElementById('sprint-score-label').textContent = 'Reverse-grid race'; document.getElementById('sprint-score-note').textContent = 'Optional reverse-grid classification'; document.getElementById('sprint-counting-label').textContent = 'Include reverse-grid race points in the round before applying result limits'; }
+    if (isFormulaEPointsPage) {
+      document.getElementById('sprint-score-label').closest('.points-score-group').hidden = true;
+      document.getElementById('sprint-counting-label').closest('label').hidden = true;
+      document.querySelector('.points-page-heading p').textContent = 'Browse official Formula E scoring eras, compare E-Prix bonuses and counting rules, or create your own.';
+    }
     const account = await getJSON('/api/account'); currentUser = account.user;
     document.getElementById('points-login-prompt').hidden = Boolean(currentUser); document.getElementById('new-system-button').hidden = !currentUser;
     renderPresets(); await loadSystems();

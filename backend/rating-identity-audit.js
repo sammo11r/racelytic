@@ -1,4 +1,4 @@
-const SERIES = Object.freeze(['f1', 'f2', 'f3', 'academy']);
+const SERIES = Object.freeze(['f1', 'f2', 'f3', 'academy', 'fe']);
 
 // These are separate historical entrants that intentionally share a normalized
 // display name in F1DB. Keep the exception exact so a new ID reusing either name
@@ -9,6 +9,17 @@ const KNOWN_CONSTRUCTOR_NAME_COLLISIONS = Object.freeze({
         ats: Object.freeze(['ats', 'ats-wheels'])
     })
 });
+
+// Source archives sometimes encode the same person with different punctuation-derived
+// slugs. These aliases are audit-only: every championship still has an isolated pool.
+const KNOWN_DRIVER_ID_ALIASES = Object.freeze({
+    'jerome-d-ambrosio': 'jerome-dambrosio'
+});
+
+function canonicalDriverId(value) {
+    const id = String(value || '');
+    return KNOWN_DRIVER_ID_ALIASES[id] || id;
+}
 
 function normalizedIdentity(value) {
     return String(value || '').normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
@@ -115,7 +126,7 @@ function crossSeriesDrivers(seriesAudits) {
     const sharedNames = [...byName.entries()].filter(([, identities]) =>
         new Set([...identities].map(value => value.split(':')[0])).size > 1);
     const matches = sharedNames.map(([name, identities]) => {
-        const values = [...identities].sort(), ids = new Set(values.map(value => value.slice(value.indexOf(':') + 1)));
+        const values = [...identities].sort(), ids = new Set(values.map(value => canonicalDriverId(value.slice(value.indexOf(':') + 1))));
         return { name, identities: values, linked: ids.size === 1 };
     });
     const idConflicts = [...byId.entries()].filter(([, identities]) => {
@@ -143,4 +154,4 @@ function auditRatingIdentities(eventsBySeries) {
     return { issueCount, series, crossSeries };
 }
 
-module.exports = { auditRatingIdentities, auditSeries, graphHealth, normalizedIdentity };
+module.exports = { auditRatingIdentities, auditSeries, canonicalDriverId, graphHealth, normalizedIdentity };

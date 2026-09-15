@@ -8,7 +8,7 @@ const CONTRACT = require('../data/formula-e-data-contract.json');
 const ORIGIN = 'https://www.fiaformulae.com';
 const DATA_DIR = path.join(__dirname, '../data');
 const CACHE_DIR = path.join(DATA_DIR, '.formula-e-cache');
-const CACHE_VERSION = 14;
+const CACHE_VERSION = 16;
 const DEFAULT_SEASON = 12;
 const ISO3_TO_ISO2 = Object.freeze({
   ARG: 'ar', AUS: 'au', AUT: 'at', BEL: 'be', BGR: 'bg', BRA: 'br', BRB: 'bb', CAN: 'ca',
@@ -585,8 +585,15 @@ function enrichDataset(dataset, officialData) {
           chassisId: chassisForSeason(dataset.seasons[0]?.seasonNumber).id, engineId: official.vehicle ? slug(official.vehicle) : '' });
       }
       matches.push({ official, result });
+      result.positionDisplayOrder = officialIndex + 1;
+      result.positionNumber = official.positionNumber;
+      result.status = officialStatus(official.status, official.positionNumber);
       result.driverNumber = official.driverNumber;
       result.laps = official.laps;
+      result.time = official.positionNumber === 1 ? official.time : official.gap || official.time;
+      result.timeMillis = official.positionNumber === 1 ? parseTimeMillis(official.time) : '';
+      result.gapMillis = /^\+/.test(official.gap) ? parseTimeMillis(official.gap) : '';
+      result.gapLaps = parseGapLaps(official.gap);
       result.fastestLapNumber = official.fastestLapNumber;
       result.fastestLapTime = official.fastestLapTime;
       result.fastestLapTimeMillis = official.fastestLapTimeMillis;
@@ -610,6 +617,14 @@ function enrichDataset(dataset, officialData) {
       }
       matchedResults += 1;
     }
+    const matchedRaceResults = new Set(matches.map(({ result }) => result));
+    const unmatchedRaceResults = raceResults.filter(result => !matchedRaceResults.has(result))
+      .sort((first, second) => Number(second.laps || 0) - Number(first.laps || 0)
+        || Number(first.positionDisplayOrder || Infinity) - Number(second.positionDisplayOrder || Infinity)
+        || String(first.driverId).localeCompare(String(second.driverId)));
+    unmatchedRaceResults.forEach((result, index) => {
+      result.positionDisplayOrder = officialRows.length + index + 1;
+    });
     raceResults.forEach(result => { result.fastestLap = 'False'; });
     const eligible = matches.filter(({ official }) => official.fastestLapTimeMillis !== '' && !/disqual/i.test(official.status));
     if (eligible.length) {

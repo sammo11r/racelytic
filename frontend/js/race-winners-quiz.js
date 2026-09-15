@@ -6,10 +6,11 @@ let quizGaveUp = false;
 let renderedColumnCount = 0;
 let measuredTableWidth = 0;
 let newlyRevealedSlots = new Set();
-const QUIZ_SERIES = document.body.classList.contains('f2-mode') ? 'f2' : 'f1';
+const QUIZ_SERIES = document.body.classList.contains('fe-mode') ? 'fe' : document.body.classList.contains('f2-mode') ? 'f2' : 'f1';
 const QUIZ_PROGRESS_KEY = QUIZ_SERIES === 'f1' ? 'racelytic-quiz-race-winners' : `racelytic-quiz-${QUIZ_SERIES}-race-winners`;
 const quizApi = path => `${path}${QUIZ_SERIES === 'f1' ? '' : `?series=${QUIZ_SERIES}`}`;
-const CHAMPIONSHIP_NAME = QUIZ_SERIES === 'f1' ? 'Formula 1' : 'Formula 2';
+const CHAMPIONSHIP_NAME = { f1: 'Formula 1', f2: 'Formula 2', fe: 'Formula E' }[QUIZ_SERIES];
+const seasonLabel = year => QUIZ_SERIES === 'fe' ? `${Number(year) - 1}–${String(year).slice(-2)}` : String(year);
 
 function saveQuizProgress() {
   try {
@@ -115,14 +116,14 @@ function renderWinnerBoard() {
   board.classList.add('is-measuring');
   board.innerHTML = columns.map(column => `<div class="quiz-column-table table-wrap">
     <table class="champions-quiz-table race-winners-table${QUIZ_SERIES === 'f2' ? ' f2-race-winners-table' : ''}">
-      <thead><tr><th>Wins</th><th>Driver</th><th>Nation</th>${QUIZ_SERIES === 'f2' ? '<th>Feature</th><th>Sprint</th>' : '<th>First win</th>'}</tr></thead>
+      <thead><tr><th>Wins</th><th>Driver</th><th>Nation</th>${QUIZ_SERIES === 'f2' ? '<th>Feature</th><th>Sprint</th>' : QUIZ_SERIES === 'fe' ? '<th>First season</th><th>Latest season</th>' : '<th>First win</th>'}</tr></thead>
       <tbody>${column.map(row => {
         const name = revealedWinners.get(row.slot);
         return `<tr data-slot="${row.slot}" class="${name ? 'is-revealed' : ''}${newlyRevealedSlots.has(row.slot) ? ' is-new-answer' : ''}">
           <td><strong>${fmtNumber(row.wins)}</strong></td>
           <td class="quiz-driver-cell">${driverCellContent(name, row.driverNameLength)}</td>
           <td>${nationCellContent(row)}</td>
-          ${QUIZ_SERIES === 'f2' ? `<td>${fmtNumber(row.featureWins)}</td><td>${fmtNumber(row.sprintWins)}</td>` : `<td>${esc(row.firstWinYear)}</td>`}
+          ${QUIZ_SERIES === 'f2' ? `<td>${fmtNumber(row.featureWins)}</td><td>${fmtNumber(row.sprintWins)}</td>` : QUIZ_SERIES === 'fe' ? `<td>${esc(seasonLabel(row.firstWinYear))}</td><td>${esc(seasonLabel(row.lastWinYear))}</td>` : `<td>${esc(row.firstWinYear)}</td>`}
         </tr>`;
       }).join('')}</tbody>
     </table>
@@ -131,7 +132,7 @@ function renderWinnerBoard() {
   measuredTableWidth = Math.max(measuredTableWidth, ...[...board.querySelectorAll('.quiz-column-table')].map(table => table.getBoundingClientRect().width));
   const fittedColumnCount = responsiveColumnCount(board, rows.length);
   if (fittedColumnCount !== columnCount) return renderWinnerBoard();
-  preserveMeasuredColumnProportions(board, QUIZ_SERIES === 'f2' ? 5 : 4);
+  preserveMeasuredColumnProportions(board, QUIZ_SERIES === 'f1' ? 4 : 5);
   board.classList.remove('is-measuring');
   updateQuizStatus();
 }

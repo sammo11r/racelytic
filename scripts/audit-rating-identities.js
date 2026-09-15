@@ -6,7 +6,7 @@ async function main() {
     const connection = await pool.getConnection();
     try {
         const events = {};
-        for (const series of ['f1', 'f2', 'f3', 'academy']) events[series] = await loadRatingEvents(connection, series);
+        for (const series of ['f1', 'f2', 'f3', 'academy', 'fe']) events[series] = await loadRatingEvents(connection, series);
         const report = auditRatingIdentities(events);
         if (process.argv.includes('--summary')) {
             console.table(Object.entries(report.series).map(([series, item]) => ({

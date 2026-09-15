@@ -7,12 +7,14 @@ const SCENARIO_SYSTEMS = {
 const isF2Scenario = window.location.pathname.startsWith('/f2/');
 const isAcademyScenario = window.location.pathname.startsWith('/academy/');
 const isF3Scenario = window.location.pathname.startsWith('/f3/') || isAcademyScenario;
+const isFormulaEScenario = window.location.pathname.startsWith('/formula-e/');
 if (isF2Scenario) SCENARIO_SYSTEMS.modern = { name: 'Formula 2 · current', race: [25,18,15,12,10,8,6,4,2,1], sprint: [10,8,6,5,4,3,2,1], poleBonus: 2, fastestLapBonus: 1, fastestLapMaxPosition: 10 };
 if (isF3Scenario) {
   SCENARIO_SYSTEMS.modern = { name: 'Formula 3 · current', race: [25,18,15,12,10,8,6,4,2,1], sprint: [10,9,8,7,6,5,4,3,2,1], poleBonus: 2, fastestLapBonus: 1, fastestLapMaxPosition: 10 };
   SCENARIO_SYSTEMS['f3-legacy'] = { name: 'Formula 3 · 2019–2021', race: [25,18,15,12,10,8,6,4,2,1], sprint: [15,12,10,8,6,5,4,3,2,1], poleBonus: 4, fastestLapBonus: 2, fastestLapMaxPosition: 10 };
 }
 if (isAcademyScenario) SCENARIO_SYSTEMS.modern = { name: 'F1 Academy · official', race: [25,18,15,12,10,8,6,4,2,1], sprint: [10,8,6,5,4,3,2,1], poleBonus: 2, fastestLapBonus: 1, fastestLapMaxPosition: 10, sprintFastestLapMaxPosition: 8 };
+if (isFormulaEScenario) Object.assign(SCENARIO_SYSTEMS, FORMULA_E_POINTS_SYSTEMS);
 
 let scenarioData = null;
 let predictions = new Map();
@@ -27,6 +29,7 @@ let academyFastestLapPredictions = new Map();
 let scenarioDirty = false;
 
 function scenarioBase() {
+  if (isFormulaEScenario) return '/formula-e';
   if (isAcademyScenario) return '/academy';
   if (window.location.pathname.startsWith('/f3/')) return '/f3';
   if (isF2Scenario) return '/f2';
@@ -95,6 +98,8 @@ function renderScenarioRules() {
   if (!system) return;
   const note = isAcademyScenario
     ? 'Each remaining race is edited separately, including its eligible pole and fastest-lap bonuses.'
+    : isFormulaEScenario
+      ? 'Each remaining E-Prix finish and its pole and fastest-lap bonuses are editable.'
     : isF3Scenario
       ? 'Sprint and feature classifications plus their bonus recipients are editable for every remaining round.'
       : isF2Scenario
@@ -177,13 +182,25 @@ function finishCounts(driver, throughRound) {
   });
   return counts;
 }
-function projectedPoints(driver, throughRound = Infinity) {
+function projectedRoundScores(driver, throughRound = Infinity) {
   const system = scenarioSystem(), id = String(driver.driverId);
-  return scenarioData.calendar.filter(race => Number(race.round) <= throughRound).reduce((sum, race) => {
+  return scenarioData.calendar.filter(race => Number(race.round) <= throughRound).map(race => {
     const result = driver.raceResults?.[String(race.round)];
-    if (Number(race.round) <= cutoff()) return sum + Number(result?.points || 0) + Number(result?.sprintPoints || 0);
-    return sum + futureScore(result, predictions.get(Number(race.round))?.get(id), system, isF3Scenario ? sprintPredictions.get(Number(race.round))?.get(id) : result?.sprintPosition, id, Number(race.round));
-  }, 0);
+    const points = Number(race.round) <= cutoff()
+      ? Number(result?.points || 0) + Number(result?.sprintPoints || 0)
+      : futureScore(result, predictions.get(Number(race.round))?.get(id), system, isF3Scenario ? sprintPredictions.get(Number(race.round))?.get(id) : result?.sprintPosition, id, Number(race.round));
+    return { points, excluded: /DSQ|EXC|EXCLUDED/i.test(String(result?.positionText || result?.status || '')) };
+  });
+}
+function projectedPoints(driver, throughRound = Infinity) {
+  return ScenarioScoring.countedPoints(projectedRoundScores(driver, throughRound), scenarioSystem());
+}
+function maximumProjectedPoints(driver, afterRound = cutoff()) {
+  const maximum = maximumRoundScore();
+  const completed = projectedRoundScores(driver, afterRound);
+  const remaining = scenarioData.calendar.filter(race => Number(race.round) > afterRound)
+    .map(() => ({ points: maximum, excluded: false }));
+  return ScenarioScoring.countedPoints([...completed, ...remaining], scenarioSystem());
 }
 function standings(throughRound = Infinity) {
   return scenarioData.driverChampionship.map(driver => ({ ...driver, projectedPoints: projectedPoints(driver, throughRound), finishes: finishCounts(driver, throughRound) })).sort((a, b) => {
@@ -193,10 +210,10 @@ function standings(throughRound = Infinity) {
   });
 }
 function clinchingRound() {
-  const future = scenarioData.calendar.filter(race => Number(race.round) > cutoff()), maximum = maximumRoundScore();
-  for (const [index, race] of future.entries()) {
-    const table = standings(Number(race.round)), remaining = future.length - index - 1, leader = table[0];
-    const challengerMaximum = Math.max(...table.slice(1).map(driver => driver.projectedPoints + remaining * maximum));
+  const future = scenarioData.calendar.filter(race => Number(race.round) > cutoff());
+  for (const race of future) {
+    const table = standings(Number(race.round)), leader = table[0];
+    const challengerMaximum = Math.max(...table.slice(1).map(driver => maximumProjectedPoints(driver, Number(race.round))));
     if (leader.projectedPoints > challengerMaximum) return race;
   }
   return null;
@@ -250,15 +267,16 @@ function renderScenarioGrid() {
 function renderScenarioOutlook() {
   const table = standings(), leader = table[0], runnerUp = table[1], currentTable = standings(cutoff()), currentLeader = currentTable[0], roundsLeft = scenarioData.calendar.filter(race => Number(race.round) > cutoff()).length;
   const currentById = new Map(currentTable.map((driver, index) => [String(driver.driverId), { position: index + 1, points: driver.projectedPoints }]));
-  const maximum = maximumRoundScore() * roundsLeft, incomplete = incompleteStandardRounds(), clinch = incomplete ? null : clinchingRound(), margin = runnerUp ? leader.projectedPoints - runnerUp.projectedPoints : 0;
+  const maximum = Math.max(0, ...currentTable.map(driver => maximumProjectedPoints(driver) - driver.projectedPoints));
+  const incomplete = incompleteStandardRounds(), clinch = incomplete ? null : clinchingRound(), margin = runnerUp ? leader.projectedPoints - runnerUp.projectedPoints : 0;
   document.getElementById('scenario-summary').innerHTML = `
     <div class="scenario-summary-primary"><span>Projected champion</span><strong>${esc(leader.name)}</strong><small>${fmtNumber(leader.projectedPoints)} points · ${margin ? `leads by ${fmtNumber(margin)} points` : 'ahead on countback'}</small></div>
     <div><span>Official leader at cutoff</span><strong>${esc(currentLeader.name)}</strong><small>${fmtNumber(currentLeader.projectedPoints)} points after round ${cutoff()}</small></div>
     <div><span>Remaining</span><strong>${roundsLeft} round${roundsLeft === 1 ? '' : 's'}</strong><small>Optimistic maximum: ${fmtNumber(maximum)} points</small></div>
     <div><span>Scenario status</span><strong>${incomplete ? `${incomplete} incomplete race${incomplete === 1 ? '' : 's'}` : 'All races assigned'}</strong><small>${incomplete ? 'Unassigned entries score zero for now' : clinch ? `Earliest projected clinch: R${clinch.round} · ${esc(displayRaceName(clinch))}` : 'Title remains open through the final round'}</small></div>`;
-  const driverBase = isAcademyScenario ? '/academy' : window.location.pathname.startsWith('/f3/') ? '/f3' : isF2Scenario ? '/f2' : '';
+  const driverBase = isFormulaEScenario ? '/formula-e' : isAcademyScenario ? '/academy' : window.location.pathname.startsWith('/f3/') ? '/f3' : isF2Scenario ? '/f2' : '';
   document.getElementById('scenario-standings').innerHTML = `<div class="scenario-standing-list">${table.map((driver, index) => {
-    const current = currentById.get(String(driver.driverId)) || { position: index + 1, points: 0 }, gain = driver.projectedPoints - current.points, maxTotal = current.points + maximum, canReach = maxTotal >= leader.projectedPoints;
+    const current = currentById.get(String(driver.driverId)) || { position: index + 1, points: 0 }, gain = driver.projectedPoints - current.points, maxTotal = maximumProjectedPoints(driver), canReach = maxTotal >= leader.projectedPoints;
     return `<a href="${resourceUrl('driver',driver.driverId,{base:driverBase})}"><b>${index + 1}</b><span><strong>${esc(driver.name)}</strong><small>P${current.position} → P${index + 1} <i class="scenario-standing-movement">${signed(current.position - (index + 1))}</i> · ${gain ? `+${fmtNumber(gain)} predicted` : 'no predicted points'} · max ${fmtNumber(maxTotal)} · ${canReach ? 'can reach leader’s total' : 'maximum below leader'}</small></span><em>${fmtNumber(driver.projectedPoints)}</em></a>`;
   }).join('')}</div>`;
   renderScenarioRules(); syncScenarioUrl();
@@ -367,11 +385,12 @@ async function initialiseScenario() {
   try {
     const [seasons, systems] = await Promise.all([getJSON('/api/seasons'), getJSON('/api/points-systems')]);
     const params = new URLSearchParams(window.location.search), seasonSelect = document.getElementById('scenario-season');
-    seasonSelect.innerHTML = seasons.map(season => `<option value="${season.year}">${season.year}</option>`).join('');
+    seasonSelect.innerHTML = seasons.map(season => `<option value="${season.year}">${esc(season.label || season.year)}</option>`).join('');
     if ([...seasonSelect.options].some(option => option.value === params.get('year'))) seasonSelect.value = params.get('year');
     if (isF2Scenario) document.getElementById('scenario-points').innerHTML = '<option value="modern">Formula 2 · current</option>';
     if (isF3Scenario && !isAcademyScenario) document.getElementById('scenario-points').innerHTML = '<option value="modern">Formula 3 · current</option><option value="f3-legacy">Formula 3 · 2019–2021</option>';
     if (isAcademyScenario) document.getElementById('scenario-points').innerHTML = '<option value="modern">F1 Academy · official</option>';
+    if (isFormulaEScenario) document.getElementById('scenario-points').innerHTML = Object.entries(FORMULA_E_POINTS_SYSTEMS).map(([key, system]) => `<option value="${esc(key)}">${esc(system.name)}</option>`).join('');
     systems.forEach(saved => { const key = `custom:${saved.id}`; SCENARIO_SYSTEMS[key] = { name: saved.name, race: saved.racePoints, sprint: saved.sprintPoints, poleBonus: saved.poleBonus, fastestLapBonus: saved.fastestLapBonus, fastestLapMaxPosition: saved.fastestLapMaxPosition, sprintFastestLapMaxPosition: isAcademyScenario ? 8 : undefined }; document.getElementById('scenario-points').insertAdjacentHTML('beforeend', `<option value="${esc(key)}">${esc(saved.name)} · custom</option>`); });
     if ([...document.getElementById('scenario-points').options].some(option => option.value === params.get('points'))) document.getElementById('scenario-points').value = params.get('points');
     document.getElementById('scenario-manage-rules').href = `${scenarioBase()}/points-systems#your-systems`;

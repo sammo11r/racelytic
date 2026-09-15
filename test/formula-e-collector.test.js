@@ -139,12 +139,13 @@ test('official Formula E data enriches car numbers, fastest laps and nationaliti
   const base = { raceId: 'fe-2024-25-r1-sao-paulo', seasonKey: '2024-25', year: 2025, round: 1, points: 25, status: '', driverNumber: '',
     laps: '', time: '', timeMillis: '', gapMillis: '', fastestLap: 'False', fastestLapNumber: '', fastestLapTime: '', fastestLapTimeMillis: '', averageSpeed: '' };
   const classifications = [[
-    { ...base, sessionId: `${base.raceId}-race`, positionDisplayOrder: 1, positionNumber: 1, gridPositionNumber: 1, polePosition: 'False', driverId: 'test-driver', driverName: 'Test Driver', abbreviation: 'TES', constructorId: 'test-team', teamName: 'Test Team' }
+    { ...base, sessionId: `${base.raceId}-race`, positionDisplayOrder: 5, positionNumber: 5, gridPositionNumber: 1, polePosition: 'False', driverId: 'test-driver', driverName: 'Test Driver', abbreviation: 'TES', constructorId: 'test-team', teamName: 'Test Team' },
+    { ...base, sessionId: `${base.raceId}-race`, positionDisplayOrder: 1, positionNumber: '', points: 0, status: 'DNS', gridPositionNumber: 2, polePosition: 'False', driverId: 'withdrawn-driver', driverName: 'Withdrawn Driver', abbreviation: 'WDR', constructorId: 'test-team', teamName: 'Test Team' }
   ]];
   const standings = { drivers: [{ positionNumber: 1, id: 'test-driver', name: 'Test Driver', points: 25, constructorId: 'test-team', teamName: 'Test Team' }],
     teams: [{ positionNumber: 1, id: 'test-team', name: 'Test Team', points: 25 }], manufacturers: [] };
   const dataset = buildDataset(identity, [round], classifications, standings);
-  const official = { classifications: new Map([[1, [{ name: 'Test Driver', firstName: 'Test', lastName: 'Driver', abbreviation: 'TES',
+  const official = { classifications: new Map([[1, [{ name: 'Test Driver', firstName: 'Test', lastName: 'Driver', abbreviation: 'TES', positionNumber: 1,
     nationalityCode: 'GBR', driverNumber: '27', laps: 35, fastestLapNumber: 12, fastestLapTime: '1:10.000',
     fastestLapTimeMillis: 70000, averageSpeed: 150, status: 'Classified', teamNationalityCode: 'USA', vehicle: 'Test 99X Electric' }]]]),
     qualifying: new Map([[1, [{ name: 'Test Driver', firstName: 'Test', lastName: 'Driver', abbreviation: 'TES',
@@ -154,7 +155,11 @@ test('official Formula E data enriches car numbers, fastest laps and nationaliti
     circuits: new Map([[1, { lengthMeters: 2933, layoutUrl: 'https://example.test/circuit-map.pdf' }]]) };
   assert.deepEqual(enrichDataset(dataset, official), { officialRounds: 1, matchedResults: 1, fastestLaps: 1, qualifyingResults: 1, polePositions: 1 });
   assert.equal(dataset.entries[0].driverNumber, '27');
-  assert.equal(dataset.results.find(row => row.sessionId.endsWith('-race')).fastestLap, 'True');
+  const raceResult = dataset.results.find(row => row.sessionId.endsWith('-race'));
+  assert.equal(raceResult.fastestLap, 'True');
+  assert.equal(raceResult.positionDisplayOrder, 1);
+  assert.equal(raceResult.positionNumber, 1);
+  assert.equal(dataset.results.find(row => row.driverId === 'withdrawn-driver' && row.sessionId.endsWith('-race')).positionDisplayOrder, 2);
   assert.equal(dataset.sessions.find(row => row.id.endsWith('-qualifying')).name, 'Qualifying');
   assert.equal(dataset.results.find(row => row.sessionId.endsWith('-qualifying')).polePosition, 'True');
   assert.equal(dataset.entries[0].engineId, 'test-99x-electric');

@@ -86,7 +86,6 @@ function initialiseFooter() {
             account: `/account?series=${activeSeries}`
         };
         footer.querySelectorAll('[data-footer-page]').forEach(link => { link.href = footerRoutes[link.dataset.footerPage]; });
-        if (isFormulaEMode) footer.querySelectorAll('[data-footer-page="simulator"], [data-footer-page="games"]').forEach(link => link.remove());
         if (summary) summary.textContent = 'Independent motorsport history, statistics, and championship analysis.';
         if (isF2Mode) {
             const brand = footer.querySelector('.footer-brand');

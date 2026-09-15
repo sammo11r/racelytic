@@ -41,5 +41,15 @@
       + (academyPoleEligible(event) ? Number(system.poleBonus || 0) : 0);
   }
 
-  return { academyEventMaximum, academyEventScore, academyPoleEligible, awarded, isReverse };
+  function countedPoints(rounds, system) {
+    const limit = system.countBest ?? Infinity;
+    if (!Number.isFinite(Number(limit))) return rounds.reduce((sum, round) => sum + Number(round.points || 0), 0);
+    const forced = system.exclusionsCannotBeDropped ? rounds.filter(round => round.excluded) : [];
+    const available = system.exclusionsCannotBeDropped ? rounds.filter(round => !round.excluded) : rounds;
+    return [...forced, ...available.sort((a, b) => Number(b.points || 0) - Number(a.points || 0))
+      .slice(0, Math.max(0, Number(limit) - forced.length))]
+      .reduce((sum, round) => sum + Number(round.points || 0), 0);
+  }
+
+  return { academyEventMaximum, academyEventScore, academyPoleEligible, awarded, countedPoints, isReverse };
 }));

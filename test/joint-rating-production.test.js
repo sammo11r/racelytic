@@ -31,6 +31,8 @@ test('team-adjusted API source is allow-listed to F1', () => {
   assert.equal(adjusted.beta, true);
   assert.equal(ratingsRouter.ratingSource({ query: { model: 'team-adjusted' } }, 'f2').key, 'competitive');
   assert.equal(ratingsRouter.ratingSource({ query: { model: 'anything' } }, 'f1').key, 'competitive');
+  assert.equal(ratingsRouter.seriesFrom({ query: { series: 'fe' } }), 'fe');
+  assert.equal(ratingsRouter.ratingSource({ query: { model: 'team-adjusted' } }, 'fe').key, 'competitive');
 });
 
 test('ratings explorer exposes an explicit F1 beta without changing the default', () => {
@@ -47,6 +49,7 @@ test('rating freshness compares database timestamps without transport timezone s
   assert.equal(ratingsRouter.comparableEventTimestamp('2026-09-04'), '2026-09-04 00:00:00');
   assert.equal(ratingsRouter.comparableEventTimestamp('2026-08-23T08:30:00Z'), '2026-08-23 08:30:00');
   assert.equal(ratingsRouter.comparableEventTimestamp('2026-08-23 08:30:00'), '2026-08-23 08:30:00');
+  assert.match(ratingsRouter.latestSourceEventSql('fe'), /FROM fe_sessions sessions/);
 });
 
 test('rating freshness responses must revalidate after a rebuild', () => {

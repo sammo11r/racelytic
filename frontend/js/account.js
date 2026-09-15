@@ -1,13 +1,13 @@
 const accountById = id => document.getElementById(id);
 const accountSeries = (() => {
   const requested = new URLSearchParams(location.search).get('series');
-  if (['f1', 'f2', 'f3', 'academy'].includes(requested)) return requested;
+  if (['f1', 'f2', 'f3', 'academy', 'fe'].includes(requested)) return requested;
   if (document.body.classList.contains('academy-mode')) return 'academy';
   if (document.body.classList.contains('f3-mode')) return 'f3';
   if (document.body.classList.contains('f2-mode')) return 'f2';
   return 'f1';
 })();
-const accountBase = accountSeries === 'f1' ? '' : `/${accountSeries}`;
+const accountBase = accountSeries === 'f1' ? '' : accountSeries === 'fe' ? '/formula-e' : `/${accountSeries}`;
 
 let communitySystems = [];
 let communityRecords = [];
@@ -17,7 +17,7 @@ let communityType = 'all';
 function pointsUrl() { return `${accountBase}/points-systems#your-systems`; }
 function recordsUrl() { return `${accountBase}/records`; }
 function builderUrl(series = accountSeries) {
-  return series === 'f1' ? '/championship-builder' : `/${series}/championship-builder`;
+  return series === 'f1' ? '/championship-builder' : series === 'fe' ? '/formula-e/championship-builder' : `/${series}/championship-builder`;
 }
 
 function configureAccountLinks() {

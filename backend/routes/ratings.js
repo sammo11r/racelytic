@@ -8,7 +8,7 @@ const { displayedUncertainty, evidenceThresholds, modelConfiguration, uncertaint
 const { seriesPrefix } = require('../series-config');
 
 const router = express.Router();
-const SERIES = new Set(['f1', 'f2', 'f3', 'academy']);
+const SERIES = new Set(['f1', 'f2', 'f3', 'academy', 'fe']);
 
 function ratingSource(req, series) {
     if (series === 'f1' && req.query.model === 'team-adjusted') return {
@@ -309,5 +309,6 @@ router.get('/api/ratings/:driverId', async (req, res) => {
 
 module.exports = router;
 module.exports.ratingSource = ratingSource;
+module.exports.seriesFrom = seriesFrom;
 module.exports.latestSourceEventSql = latestSourceEventSql;
 module.exports.comparableEventTimestamp = comparableEventTimestamp;

@@ -1,7 +1,7 @@
 (function initialiseRatingsValidation() {
   const target = document.getElementById('ratings-validation-live');
   const query = new URLSearchParams(location.search);
-  const series = ['f1', 'f2', 'f3', 'academy'].includes(query.get('series')) ? query.get('series') : 'f1';
+  const series = ['f1', 'f2', 'f3', 'academy', 'fe'].includes(query.get('series')) ? query.get('series') : 'f1';
   const model = series === 'f1' && query.get('model') === 'team-adjusted' ? 'team-adjusted' : 'competitive';
   const format = value => Number.isFinite(Number(value)) ? Number(value).toFixed(3) : '—';
   fetch(`/api/ratings/validation?series=${encodeURIComponent(series)}&model=${encodeURIComponent(model)}`, { cache: 'no-store' })

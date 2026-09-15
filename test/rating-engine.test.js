@@ -163,6 +163,24 @@ test('historical multiple-car entries count a driver once at their best classifi
   assert.equal(field.find(driver => driver.driverId === 'A').positionNumber, 3);
 });
 
+test('source classifications normalize duplicate display orders without treating them as ties', () => {
+  const field = participants([
+    { driverId: 'A', positionNumber: 19, positionDisplayOrder: 19, positionText: 'NC', laps: 28 },
+    { driverId: 'B', positionDisplayOrder: 19, positionText: 'DSQ', laps: 30 },
+    { driverId: 'C', positionNumber: 1, positionDisplayOrder: 1, positionText: '1', laps: 30 }
+  ]);
+  assert.deepEqual(field.map(driver => [driver.driverId, driver.finishOrder]), [['C', 1], ['A', 2], ['B', 3]]);
+});
+
+test('source classifications order unclassified finishers by distance before stale display order', () => {
+  const field = participants([
+    { driverId: 'short', positionDisplayOrder: 14, positionText: 'NC', laps: 14 },
+    { driverId: 'long', positionDisplayOrder: 16, positionText: 'NC', laps: 33 },
+    { driverId: 'winner', positionNumber: 1, positionDisplayOrder: 1, positionText: '1', laps: 47 }
+  ]);
+  assert.deepEqual(field.map(driver => driver.driverId), ['winner', 'long', 'short']);
+});
+
 test('junior loaders retain session order and use the published format weights', async () => {
   const result = (eventId, sessionName, sessionNumber, driverId, position) => ({
     eventId, eventDate: '2024-05-01', year: 2024, round: 1, raceName: 'Test Weekend',
@@ -183,4 +201,16 @@ test('junior loaders retain session order and use the published format weights',
   assert.deepEqual([sprint.weight, feature.weight], [.5, 1]);
   const calculated = calculateRatings(events);
   assert.ok(calculated.rows.find(row => row.eventId === 'weekend:feature' && row.driverId === 'A').ratingBefore < 1500);
+});
+
+test('Formula E loaders treat every E-Prix as a full-weight race', async () => {
+  const rows = ['A', 'B'].map((driverId, index) => ({
+    eventId: 'eprix:race', eventDate: '2025-01-11', year: 2025, round: 1, raceName: 'Mexico City E-Prix',
+    sessionName: 'Race', sessionNumber: 3, positionDisplayOrder: index + 1, positionNumber: index + 1,
+    positionText: String(index + 1), driverId, constructorId: 'team', laps: 36,
+    driverName: driverId, constructorName: 'Team'
+  }));
+  const [event] = await loadJuniorEvents({ query: async () => rows }, 'fe');
+  assert.equal(event.sessionType, 'race');
+  assert.equal(event.weight, 1);
 });

@@ -28,11 +28,11 @@ test('championship dropdown preserves active state and route translation', () =>
 
 test('championship pill remains compact and accessible across breakpoints', () => {
     assert.match(css, /\.header-identity \{[\s\S]*?gap: 14px;/);
-    assert.match(css, /\.championship-selector-trigger \{[\s\S]*?width: 38px;[\s\S]*?height: 30px;/);
+    assert.match(css, /\.championship-selector-trigger \{[\s\S]*?width: 36px;[\s\S]*?height: 28px;/);
     assert.match(css, /\.championship-selector-trigger \{[\s\S]*?background: var\(--accent\);/);
     assert.match(css, /\.championship-options \{[\s\S]*?position: absolute;[\s\S]*?display: flex;/);
-    assert.match(css, /\.championship-options \[role="option"\] \{[\s\S]*?font: 850 11px\//);
+    assert.match(css, /\.championship-options \[role="option"\] \{[\s\S]*?font: 850 10\.5px\//);
     assert.match(css, /@keyframes championship-pill-open/);
-    assert.match(css, /@media \(max-width: 520px\) \{[\s\S]*?\.site-header \.championship-selector-trigger \{ width: 38px; min-width: 38px; \}/);
+    assert.match(css, /@media \(max-width: 520px\) \{[\s\S]*?\.site-header \.championship-selector-trigger \{ width: 36px; min-width: 36px; \}/);
     assert.doesNotMatch(css, /championship-portal-open|championship-portal-layer/);
 });

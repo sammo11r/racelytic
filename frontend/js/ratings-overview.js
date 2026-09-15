@@ -1,5 +1,5 @@
 (function initialiseRatingsOverview() {
-  const names = { f1: 'Formula 1', f2: 'Formula 2', f3: 'Formula 3', academy: 'F1 Academy' };
+  const names = { f1: 'Formula 1', f2: 'Formula 2', f3: 'Formula 3', academy: 'F1 Academy', fe: 'Formula E' };
   const query = new URLSearchParams(location.search);
   const series = Object.hasOwn(names, query.get('series')) ? query.get('series') : 'f1';
   const model = series === 'f1' && query.get('model') === 'team-adjusted' ? 'team-adjusted' : '';
@@ -21,6 +21,9 @@
     Object.entries(extra).forEach(([key, value]) => target.searchParams.set(key, value));
     return `${target.pathname}?${target.searchParams}`;
   };
+  document.querySelectorAll('a[href^="/ratings"]').forEach(link => {
+    link.href = destination(link.getAttribute('href'));
+  });
   const dateLabel = value => value ? new Intl.DateTimeFormat(undefined, { day: 'numeric', month: 'short', year: 'numeric' }).format(new Date(value)) : 'an unavailable date';
   const driverRow = (driver, detail) => {
     const item = document.createElement('li');

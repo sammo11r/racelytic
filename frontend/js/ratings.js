@@ -1,4 +1,4 @@
-const ratingNames = { f1: 'Formula 1', f2: 'Formula 2', f3: 'Formula 3', academy: 'F1 Academy' };
+const ratingNames = { f1: 'Formula 1', f2: 'Formula 2', f3: 'Formula 3', academy: 'F1 Academy', fe: 'Formula E' };
 const ratingColours = ['#c61f2d', '#075fcb', '#6938c7', '#984800'];
 const defaultComparisonDrivers = ['max-verstappen', 'charles-leclerc'];
 const ratingViews = { '/ratings/leaderboard': 'leaderboard', '/ratings/compare': 'compare', '/ratings/driver': 'driver' };
@@ -53,6 +53,12 @@ function ratingDate(value) {
   return Number.isNaN(date.getTime()) ? '' : new Intl.DateTimeFormat(undefined, { day: 'numeric', month: 'short', year: 'numeric' }).format(date);
 }
 
+function ratingSeasonLabel(year) {
+  const value = Number(year);
+  return ratingState.series === 'fe' && Number.isInteger(value)
+    ? `${value - 1}–${String(value).slice(-2)}` : String(year);
+}
+
 function ratingDestination(path, extra = {}) {
   const query = new URLSearchParams({ series: ratingState.series });
   if (ratingState.model === 'team-adjusted') query.set('model', ratingState.model);
@@ -61,9 +67,9 @@ function ratingDestination(path, extra = {}) {
 }
 
 function ratingBoardTitle(data) {
-  if (ratingState.order === 'peak') return ratingState.year ? `Peaks through ${ratingState.year}` : 'All-time peaks';
+  if (ratingState.order === 'peak') return ratingState.year ? `Peaks through ${ratingSeasonLabel(ratingState.year)}` : 'All-time peaks';
   if (ratingState.timelineLevel === 'event' && data.selectedEvent?.name) return `Order after ${data.selectedEvent.name}`;
-  if (ratingState.year && !isLatestRatingEvent()) return `Order after the ${ratingState.year} season`;
+  if (ratingState.year && !isLatestRatingEvent()) return `Order after the ${ratingSeasonLabel(ratingState.year)} season`;
   return 'Current order';
 }
 
@@ -126,6 +132,7 @@ function applyRatingSeriesTheme() {
   document.body.classList.toggle('f2-mode', ratingState.series === 'f2');
   document.body.classList.toggle('f3-mode', ratingState.series === 'f3');
   document.body.classList.toggle('academy-mode', ratingState.series === 'academy');
+  document.body.classList.toggle('fe-mode', ratingState.series === 'fe');
   document.body.dataset.series = ratingState.series;
   const help = document.getElementById('ratings-model-help');
   if (help) help.textContent = ratingState.model === 'team-adjusted'
@@ -519,7 +526,7 @@ function renderProfileEvents(history) {
   const teams = [...new Set(history.timeline.map(event => event.constructorName).filter(Boolean))].sort();
   if (!years.map(String).includes(ratingState.profileSeason)) ratingState.profileSeason = '';
   if (!teams.includes(ratingState.profileTeam)) ratingState.profileTeam = '';
-  ratingElements.profileSeason.innerHTML = '<option value="">All seasons</option>' + years.map(year => `<option value="${year}"${String(year) === ratingState.profileSeason ? ' selected' : ''}>${year}</option>`).join('');
+  ratingElements.profileSeason.innerHTML = '<option value="">All seasons</option>' + years.map(year => `<option value="${year}"${String(year) === ratingState.profileSeason ? ' selected' : ''}>${ratingSeasonLabel(year)}</option>`).join('');
   ratingElements.profileTeam.innerHTML = '<option value="">All teams</option>' + teams.map(team => `<option value="${esc(team)}"${team === ratingState.profileTeam ? ' selected' : ''}>${esc(team)}</option>`).join('');
   ratingElements.profileImpact.value = ratingState.profileImpact;
   const filtered = history.timeline.filter(event =>
@@ -577,8 +584,10 @@ function renderActiveHistory(histories) {
   const seasonChanges = new Map();
   timeline.forEach(event => seasonChanges.set(event.year, (seasonChanges.get(event.year) || 0) + event.change));
   const bestSeason = [...seasonChanges].sort((a, b) => b[1] - a[1])[0];
-  const years = first.year === latest.year ? String(first.year) : `${first.year}–${latest.year}`;
-  const seriesBase = ratingState.series === 'f1' ? '' : `/${ratingState.series}`;
+  const years = first.year === latest.year ? ratingSeasonLabel(first.year)
+    : ratingState.series === 'fe' ? `${ratingSeasonLabel(first.year)} to ${ratingSeasonLabel(latest.year)}`
+      : `${ratingSeasonLabel(first.year)}–${ratingSeasonLabel(latest.year)}`;
+  const seriesBase = ratingState.series === 'f1' ? '' : ratingState.series === 'fe' ? '/formula-e' : `/${ratingState.series}`;
   const driverProfileUrl = `${seriesBase}/drivers/${encodeURIComponent(item.id)}`;
   const compareUrl = `/ratings/compare?series=${encodeURIComponent(ratingState.series)}&drivers=${encodeURIComponent(item.id)}`;
 
@@ -589,7 +598,7 @@ function renderActiveHistory(histories) {
     ['Biggest loss', ratingChange(biggestLoss.change), `${biggestLoss.eventName} · ${ratingDate(biggestLoss.date)}`],
     ['Strongest field', Number.isFinite(strongestField.explanation?.fieldStrength) ? String(Math.round(strongestField.explanation.fieldStrength)) : '—', `${strongestField.eventName} · ${ratingDate(strongestField.date)}`],
     ['Longest positive run', `${longestPositiveRun(timeline)} events`, 'Consecutive rating gains'],
-    ['Best season', String(bestSeason[0]), `${ratingChange(bestSeason[1])} total rating change`]
+    ['Best season', ratingSeasonLabel(bestSeason[0]), `${ratingChange(bestSeason[1])} total rating change`]
   ];
   ratingElements.profileHighlights.innerHTML = highlights.map(([label, value, detail]) => `<article><span>${esc(label)}</span><strong>${esc(value)}</strong><small>${esc(detail)}</small></article>`).join('');
   ratingElements.summary.innerHTML = '';
@@ -642,7 +651,7 @@ async function renderRatingDetails() {
 
 function populateRatingYears(years) {
   const current = ratingState.year;
-  ratingElements.year.innerHTML = '<option value="">Latest available</option>' + years.map(year => `<option value="${year}">${year} season</option>`).join('');
+  ratingElements.year.innerHTML = '<option value="">Latest available</option>' + years.map(year => `<option value="${year}">${ratingSeasonLabel(year)} season</option>`).join('');
   ratingElements.year.value = years.includes(Number(current)) ? current : '';
   ratingState.year = ratingElements.year.value;
 }
@@ -664,6 +673,7 @@ function isLatestRatingEvent() {
 }
 
 function ratingSessionLabel(type) {
+  if (ratingState.series === 'fe' && type === 'race') return 'E-Prix';
   return ({ sprint: 'Sprint', feature: 'Feature race', race: 'Race', reverse: 'Reverse-grid race' })[type] || type || 'Race';
 }
 
@@ -691,17 +701,17 @@ function renderRatingTimeline() {
   if (!eventLevel) {
     const year = items[index];
     const events = ratingState.ratingEvents.filter(event => Number(event.year) === year);
-    ratingElements.timelineStart.textContent = String(items[0]);
+    ratingElements.timelineStart.textContent = ratingSeasonLabel(items[0]);
     ratingElements.timelineSpan.textContent = `${items.length} seasons`;
-    ratingElements.timelineEnd.textContent = String(items.at(-1));
+    ratingElements.timelineEnd.textContent = ratingSeasonLabel(items.at(-1));
     ratingState.year = String(year);
     if (!events.some(event => event.id === ratingState.eventId)) ratingState.eventId = events.at(-1)?.id || '';
     ratingElements.timelineLabel.textContent = 'AS OF SEASON';
-    ratingElements.timelineEvent.textContent = `${year} season`;
+    ratingElements.timelineEvent.textContent = `${ratingSeasonLabel(year)} season`;
     ratingElements.timelineMeta.textContent = `${events.length} rated event${events.length === 1 ? '' : 's'} · choose Explore races for exact rounds`;
-    ratingElements.timelineZoom.textContent = `Explore ${year} races`;
+    ratingElements.timelineZoom.textContent = `Explore ${ratingSeasonLabel(year)} races`;
     ratingElements.timelineRange.setAttribute('aria-label', 'Season timeline');
-    ratingElements.timelineRange.setAttribute('aria-valuetext', `${year} season`);
+    ratingElements.timelineRange.setAttribute('aria-valuetext', `${ratingSeasonLabel(year)} season`);
     ratingElements.timelinePrevious.setAttribute('aria-label', 'Previous season');
     ratingElements.timelineNext.setAttribute('aria-label', 'Next season');
     return;
@@ -712,10 +722,10 @@ function renderRatingTimeline() {
   ratingElements.timelineStart.textContent = 'Round 1';
   ratingElements.timelineSpan.textContent = `${items.length} rated events`;
   ratingElements.timelineEnd.textContent = `Round ${items.length}`;
-  ratingElements.timelineLabel.textContent = `${ratingState.year} SEASON`;
+  ratingElements.timelineLabel.textContent = `${ratingSeasonLabel(ratingState.year)} SEASON`;
   ratingElements.timelineEvent.textContent = `${event.name} · ${ratingSessionLabel(event.sessionType)}`;
   ratingElements.timelineMeta.textContent = `${ratingDate(event.date)} · event ${index + 1} of ${items.length}`;
-  ratingElements.timelineRange.setAttribute('aria-label', `${ratingState.year} rated event timeline`);
+  ratingElements.timelineRange.setAttribute('aria-label', `${ratingSeasonLabel(ratingState.year)} rated event timeline`);
   ratingElements.timelineRange.setAttribute('aria-valuetext', `${event.name}, ${ratingSessionLabel(event.sessionType)}, ${ratingDate(event.date)}`);
   ratingElements.timelinePrevious.setAttribute('aria-label', 'Previous rated event');
   ratingElements.timelineNext.setAttribute('aria-label', 'Next rated event');
@@ -738,9 +748,9 @@ async function loadRatingTimeline() {
     ratingState.eventId = ratingState.ratingEvents.filter(event => Number(event.year) === selectedYear).at(-1).id;
   }
   const years = [...timelineYears()].reverse();
-  ratingElements.year.innerHTML = years.map(year => `<option value="${year}">${year} season</option>`).join('');
+  ratingElements.year.innerHTML = years.map(year => `<option value="${year}">${ratingSeasonLabel(year)} season</option>`).join('');
   ratingElements.year.value = ratingState.year;
-  ratingElements.timelineSeason.innerHTML = years.map(year => `<option value="${year}">${year}</option>`).join('');
+  ratingElements.timelineSeason.innerHTML = years.map(year => `<option value="${year}">${ratingSeasonLabel(year)}</option>`).join('');
   ratingElements.timelineSeason.value = ratingState.year;
   renderRatingTimeline();
 }

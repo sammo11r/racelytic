@@ -43,7 +43,9 @@ test('series-specific capabilities and identity stay distinct', () => {
     assert.match(academy, /class="academy-mode"/);
     assert.match(fe, /class="fe-mode"/);
     assert.match(fe, /href="\/formula-e\/seasons"/);
-    assert.doesNotMatch(fe, /\/formula-e\/(?:ask|simulator|games|lights-out)/);
+    assert.match(fe, /href="\/formula-e\/champions-quiz"/);
+    assert.doesNotMatch(fe, /\/formula-e\/ask/);
+    assert.ok(new Set(seriesPageRoutes().map(page => page.route)).has('/formula-e/simulator'));
     assert.match(academy, /href="\/account\?series=academy"/);
     assert.match(f2, /href="\/f2\/champions-quiz"/);
     assert.match(f3, /href="\/f3\/lights-out"/);

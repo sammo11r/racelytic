@@ -62,6 +62,14 @@ const SERIES_PAGE_TEMPLATES = Object.freeze({
         'driver-comparison': 'driver-comparison.html', 'driver-form': 'driver-form.html',
         'teammate-battles': 'teammate-battles.html', 'circuit-analysis': 'circuit-analysis.html',
         records: 'records.html', about: 'f3-about.html',
+        simulator: 'f3-simulator.html', 'simulate-season': 'f3-simulate-season.html',
+        'scenario-calculator': 'f3-scenario-calculator.html', 'championship-builder': 'f3-championship-builder.html',
+        'points-systems': 'points-systems.html',
+        games: 'f2-games.html', 'idle-racing-manager': 'idle-racing-manager.html', 'lights-out': 'lights-out.html',
+        quizzes: 'f2-quizzes.html', 'champions-quiz': 'f2-champions-quiz.html',
+        'race-winners-quiz': 'f2-race-winners-quiz.html',
+        'constructor-champions-quiz': 'f2-constructor-champions-quiz.html',
+        'season-race-winners-quiz': 'f2-season-race-winners-quiz.html',
     }),
 });
 

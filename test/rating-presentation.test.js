@@ -13,6 +13,7 @@ test('displayed uncertainty decays evidence to the requested date', () => {
 test('evidence labels use championship-relative thresholds', () => {
   assert.deepEqual(evidenceThresholds('f1'), { measured: 10, stable: 50 });
   assert.deepEqual(evidenceThresholds('academy'), { measured: 6, stable: 16 });
+  assert.deepEqual(evidenceThresholds('fe'), { measured: 8, stable: 30 });
   assert.equal(uncertaintyLabel('f1', 80, 20), 'Measured');
   assert.equal(uncertaintyLabel('academy', 80, 20), 'Stable');
 });

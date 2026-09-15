@@ -4,10 +4,11 @@ const guessedConstructors = new Set();
 let activeDecade = 'all';
 let quizGaveUp = false;
 let newYears = new Set();
-const QUIZ_SERIES = location.pathname.startsWith('/academy/') ? 'academy' : location.pathname.startsWith('/f3/') ? 'f3' : location.pathname.startsWith('/f2/') ? 'f2' : 'f1';
+const QUIZ_SERIES = location.pathname.startsWith('/formula-e/') ? 'fe' : location.pathname.startsWith('/academy/') ? 'academy' : location.pathname.startsWith('/f3/') ? 'f3' : location.pathname.startsWith('/f2/') ? 'f2' : 'f1';
 const QUIZ_SERIES_QUERY = QUIZ_SERIES === 'f1' ? '' : `?series=${QUIZ_SERIES}`;
 const QUIZ_ENTITY_LABEL = document.body.dataset.quizEntityLabel || 'Constructor';
 const QUIZ_PROGRESS_KEY = QUIZ_SERIES === 'f1' ? 'racelytic-quiz-constructor-champions' : `racelytic-quiz-${QUIZ_SERIES}-constructor-champions`;
+const seasonLabel = year => QUIZ_SERIES === 'fe' ? `${Number(year) - 1}–${String(year).slice(-2)}` : String(year);
 
 function saveProgress() {
   try {
@@ -63,7 +64,7 @@ function renderBoard() {
   const columns = Array.from({ length: columnCount }, (_, index) => rows.slice(index * size, (index + 1) * size)).filter(column => column.length);
   document.getElementById('constructor-champions-quiz-board').innerHTML = columns.map(column => `<div class="quiz-column-table table-wrap"><table class="champions-quiz-table"><thead><tr><th>Season</th><th>${esc(QUIZ_ENTITY_LABEL)}</th></tr></thead><tbody>${column.map(row => {
     const name = revealedConstructors.get(row.year);
-    return `<tr data-year="${row.year}" class="${name ? 'is-revealed' : ''}${newYears.has(row.year) ? ' is-new-answer' : ''}"><td><strong>${row.year}</strong></td><td class="quiz-driver-cell">${answerCell(name, row.constructorNameLength)}</td></tr>`;
+    return `<tr data-year="${row.year}" class="${name ? 'is-revealed' : ''}${newYears.has(row.year) ? ' is-new-answer' : ''}"><td><strong>${esc(seasonLabel(row.year))}</strong></td><td class="quiz-driver-cell">${answerCell(name, row.constructorNameLength)}</td></tr>`;
   }).join('')}</tbody></table></div>`).join('');
   updateStatus();
 }

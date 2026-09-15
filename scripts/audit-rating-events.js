@@ -2,7 +2,7 @@ const pool = require('../backend/db');
 const { auditRatingEvents } = require('../backend/rating-audit');
 const { loadRatingEvents } = require('../backend/rating-data');
 
-const SERIES = ['f1', 'f2', 'f3', 'academy'];
+const SERIES = ['f1', 'f2', 'f3', 'academy', 'fe'];
 
 function argument(name) {
     return process.argv.find(value => value.startsWith(`--${name}=`))?.slice(name.length + 3);

@@ -183,6 +183,7 @@ test('ratings methodology explains weights and avoids claiming pure talent', () 
   assert.match(methodology, /resample complete race weekends/);
   assert.match(methodology, /displayed uncertainty is recalculated for the selected date/);
   assert.match(html, /Sprints and reverse-grid races carry half weight/);
+  assert.match(methodology, /Grands Prix, E-Prix and feature races carry full weight/);
   assert.match(html, /Non-starters are excluded/);
   assert.match(html, /first 10 events/);
   assert.match(html, /Expected is the model-implied finishing position/);
@@ -235,7 +236,7 @@ test('methodology is a dedicated transparent model page', () => {
   assert.match(methodology, /140 for the first 10 rated events, 98 through event 50 and 70 thereafter/);
   assert.match(methodology, /uncertainty of ±260/);
   assert.match(methodology, /towards a ±45 floor/);
-  assert.match(methodology, /Stable begins at 50 weighted events in F1, 30 in F2, 24 in F3 and 16 in Academy/);
+  assert.match(methodology, /Stable begins at 50 weighted events in F1, 30 in F2 and Formula E, 24 in F3 and 16 in Academy/);
   assert.match(methodology, /READING A PROFILE/);
   assert.match(methodology, /Disqualifications retain full effect/);
   assert.match(methodology, /zero-sum within its pool/);

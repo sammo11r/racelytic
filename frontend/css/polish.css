@@ -177,9 +177,9 @@ body.f2-mode .game-card-featured:hover { border-color: rgba(var(--accent-rgb), .
   position: relative;
   display: inline-flex;
   flex: 0 0 auto;
-  padding: 3px;
+  padding: 2px;
   border: 1px solid var(--border);
-  border-radius: 9px;
+  border-radius: 8px;
   background: var(--surface-alt);
   margin: 0;
   box-shadow: 0 1px 2px rgba(17,19,24,.04);
@@ -190,16 +190,16 @@ body.f2-mode .game-card-featured:hover { border-color: rgba(var(--accent-rgb), .
   display: inline-grid;
   align-items: center;
   justify-content: center;
-  width: 38px;
-  min-width: 38px;
-  height: 30px;
-  min-height: 30px;
-  padding: 0 7px;
+  width: 36px;
+  min-width: 36px;
+  height: 28px;
+  min-height: 28px;
+  padding: 0 6px;
   border: 0;
   border-radius: 6px;
   background: var(--accent);
   color: #fff;
-  font: 850 11px/1 var(--font-ui);
+  font: 850 10.5px/1 var(--font-ui);
   letter-spacing: .01em;
   text-align: center;
   white-space: nowrap;
@@ -217,12 +217,12 @@ body.f2-mode .game-card-featured:hover { border-color: rgba(var(--accent-rgb), .
   left: -1px;
   display: flex;
   width: max-content;
-  min-height: 38px;
+  min-height: 34px;
   align-items: center;
   gap: 1px;
-  padding: 3px 5px 3px 46px;
+  padding: 2px 4px 2px 42px;
   border: 1px solid var(--border);
-  border-radius: 9px;
+  border-radius: 8px;
   background: var(--surface-alt);
   box-shadow: 0 8px 22px rgba(16,18,24,.12);
   transform-origin: left center;
@@ -231,15 +231,15 @@ body.f2-mode .game-card-featured:hover { border-color: rgba(var(--accent-rgb), .
 .championship-options[hidden] { display: none; }
 .championship-options [role="option"] {
   display: inline-flex;
-  height: 30px;
+  height: 28px;
   align-items: center;
   justify-content: center;
-  padding: 0 10px;
+  padding: 0 9px;
   border: 0;
   border-radius: 6px;
   background: transparent;
   color: var(--text-secondary);
-  font: 850 11px/1 var(--font-ui);
+  font: 850 10.5px/1 var(--font-ui);
   letter-spacing: .01em;
   white-space: nowrap;
   cursor: pointer;
@@ -2536,6 +2536,8 @@ body.f2-mode .builder-race-picker,body.f3-mode .builder-race-picker { grid-templ
 .game-card-featured:hover { border-color: rgba(var(--accent-rgb),.7); }
 .game-card-featured .game-card-number,
 .game-card-featured .game-card-copy > span { color: #ff6571; }
+body.fe-mode .game-card-featured .game-card-number,
+body.fe-mode .game-card-featured .game-card-copy > span { color: var(--accent); }
 .game-card-number { position: relative; z-index: 1; color: var(--accent); font-size: 12px; font-weight: 850; letter-spacing: .12em; }
 .game-card-copy { position: relative; z-index: 1; margin-top: auto; }
 .game-card-copy > span { color: var(--accent); font-size: 10px; font-weight: 850; letter-spacing: .12em; }
@@ -3958,7 +3960,7 @@ h1, h2, h3, [id] { scroll-margin-top: calc(var(--header-height) + 20px); }
   .site-header .brand { font-size: 20px; }
   .site-header .brand::before { margin-right: 8px; }
   .site-header .championship-selector { margin: 0; }
-  .site-header .championship-selector-trigger { min-width: 38px; }
+  .site-header .championship-selector-trigger { min-width: 36px; }
   .site-header .global-search { width: clamp(145px, 13vw, 180px); margin-right: 0; }
   .site-header .nav-link { gap: 5px; padding-right: 8px; padding-left: 8px; font-size: 12px; }
   .site-header .account-link { margin-left: 2px; }
@@ -4083,14 +4085,14 @@ h1, h2, h3, [id] { scroll-margin-top: calc(var(--header-height) + 20px); }
 }
 
 @media (max-width: 520px) {
-  .site-header .championship-selector-trigger { width: 38px; min-width: 38px; }
+  .site-header .championship-selector-trigger { width: 36px; min-width: 36px; }
   .site-header .championship-options { max-width: calc(100vw - 16px); overflow-x: auto; scrollbar-width: none; }
   .site-header .championship-options::-webkit-scrollbar { display: none; }
 }
 
 @media (max-width: 420px) {
   .site-header .championship-selector.is-expanded .championship-selector-trigger { position: fixed; z-index: 1201; top: 12px; left: 12px; }
-  .site-header .championship-options { position: fixed; z-index: 1200; top: 8px; right: 8px; left: 8px; justify-content: flex-start; padding-left: 46px; }
+  .site-header .championship-options { position: fixed; z-index: 1200; top: 8px; right: 8px; left: 8px; justify-content: flex-start; padding-left: 42px; }
 }
 
 @media (max-width: 350px) {

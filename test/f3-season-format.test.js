@@ -6,6 +6,7 @@ const {
   f2SessionType,
   f3ResultPoints,
   f3SessionType,
+  formulaEResultPoints,
   resolveSeasonAwards
 } = require('../backend/routes/seasons');
 const pool = require('../backend/db');
@@ -68,6 +69,19 @@ test('awards fastest lap to the quickest top-ten finisher in each race session',
 
   assert.equal(drivers.get('sprint'), 'eligible-fastest');
   assert.equal(drivers.get('feature'), 'feature-fastest');
+});
+
+test('Formula E retains unrestricted historical fastest laps and its three-point pole bonus', () => {
+  const drivers = eligibleFastestLapDrivers([
+    { sessionId: 'race', driverId: 'raw-fastest', positionNumber: 14, fastestLap: true, fastestLapTimeMillis: 80000 },
+    { sessionId: 'race', driverId: 'top-ten-fastest', positionNumber: 7, fastestLap: false, fastestLapTimeMillis: 80500 }
+  ], Infinity);
+
+  assert.equal(drivers.get('race'), 'raw-fastest');
+  assert.equal(formulaEResultPoints({ officialPoints: null, positionNumber: 1 }, 'F', 2026, true), 28);
+  assert.equal(formulaEResultPoints({ officialPoints: null, positionNumber: 14, fastestLap: true }, 'F', 2016, false), 2);
+  assert.equal(formulaEResultPoints({ officialPoints: null, positionNumber: 14, fastestLap: true }, 'F', 2017, false), 1);
+  assert.equal(formulaEResultPoints({ officialPoints: null, positionNumber: 14, fastestLap: true }, 'F', 2018, false), 0);
 });
 
 test('assigns pole only to the feature-race qualifying pole sitter', () => {

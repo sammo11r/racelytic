@@ -540,7 +540,7 @@ body[data-ratings-view="driver"] .ratings-controls { display: none; }
 .ratings-timeline-season-picker { display: grid; gap: 3px; }
 .ratings-timeline-season-picker > span { color: #626975; font-size: 8px; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; }
 .ratings-timeline-season-picker select { min-width: 82px; height: 31px; border: 1px solid var(--border); border-radius: 7px; background: #fff; color: var(--text); font: inherit; font-size: 10px; font-weight: 750; }
-.ratings-timeline-heading span { color: #b41d2a; }
+.ratings-timeline-heading span { color: var(--accent); }
 .ratings-timeline-heading small, .ratings-timeline-scale { color: #626975; }
 
 .ratings-scale-context { display: flex; align-items: center; gap: 9px 14px; padding: 10px 15px; border-bottom: 1px solid var(--border); background: #fafbfc; color: #626975; font-size: 10px; line-height: 1.45; }
@@ -679,7 +679,7 @@ body[data-ratings-view="driver"] .ratings-controls { display: none; }
 .ratings-compare-insights > div { min-width: 0; padding: 13px 15px; border-right: 1px solid var(--border); }
 .ratings-compare-insights > div:last-child { border-right: 0; }
 .ratings-compare-insights span, .ratings-compare-insights strong, .ratings-compare-insights small { display: block; }
-.ratings-compare-insights span { color: #b41d2a; font-size: 7px; font-weight: 850; letter-spacing: .08em; }
+.ratings-compare-insights span { color: var(--accent); font-size: 7px; font-weight: 850; letter-spacing: .08em; }
 .ratings-compare-insights strong { margin-top: 5px; font-size: 12px; }
 .ratings-compare-insights small { margin-top: 3px; color: #5b626d; font-size: 8px; }
 
@@ -702,7 +702,10 @@ body[data-ratings-view="driver"] .ratings-controls { display: none; }
 .ratings-validation-live dt { color: #5b626d; font-size: 8px; font-weight: 800; }
 .ratings-validation-live dd { margin: 5px 0 0; font-size: 16px; font-weight: 850; }
 
-.ratings-hero-note > span { color: #b41d2a; }
+.ratings-hero-note > span { color: var(--accent); }
+
+body.fe-mode[data-ratings-view="leaderboard"] .ratings-heading,
+body.fe-mode[data-ratings-view="leaderboard"] .ratings-controls { display: none; }
 
 @media (max-width: 760px) {
   .ratings-local-nav a { min-height: 40px; padding-inline: 11px; }

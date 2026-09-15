@@ -23,10 +23,24 @@ function participants(rows) {
         if (!id || (existing && Number(existing.positionDisplayOrder || existing.positionNumber || 999) <= order)) continue;
         unique.set(id, row);
     }
-    return [...unique.values()].map(row => ({
+    const statusRank = row => classified(row) ? 0 : disqualified(row) ? 2 : started(row) ? 1 : 3;
+    const ordered = [...unique.values()].sort((first, second) => {
+        const statusDifference = statusRank(first) - statusRank(second);
+        if (statusDifference) return statusDifference;
+        if (classified(first) && classified(second)) {
+            return Number(first.positionNumber) - Number(second.positionNumber)
+                || Number(first.positionDisplayOrder || 999) - Number(second.positionDisplayOrder || 999);
+        }
+        return (Number(second.laps) || 0) - (Number(first.laps) || 0)
+            || Number(first.positionDisplayOrder || 999) - Number(second.positionDisplayOrder || 999)
+            || String(first.driverId || '').localeCompare(String(second.driverId || ''));
+    });
+    return ordered.map((row, index) => ({
         driverId: String(row.driverId || ''), driverName: row.driverName || row.driverId,
         constructorId: String(row.constructorId || ''), constructorName: row.constructorName || '',
-        finishOrder: Number(row.positionDisplayOrder || row.positionNumber || 999),
+        // Classification feeds occasionally reuse or mis-order the display position for NC/DSQ rows.
+        // Status and completed distance establish their order before a unique ordinal is assigned.
+        finishOrder: index + 1,
         positionNumber: Number(row.positionNumber) > 0 && Number(row.positionNumber) < 100 ? Number(row.positionNumber) : null,
         positionText: statusOf(row), started: started(row), classified: classified(row), disqualified: disqualified(row),
         completion: classified(row) || disqualified(row) ? 1 : maxLaps ? Math.min(1, (Number(row.laps) || 0) / maxLaps) : 0
@@ -82,6 +96,7 @@ async function loadF1Events(connection) {
 }
 
 function juniorSessionType(series, session, index, count) {
+    if (series === 'fe') return 'R';
     if (series === 'academy') return academySessionType(session, index, count, session.year);
     const name = String(session.sessionName || '').toLowerCase();
     if (name.includes('feature')) return 'F';
@@ -127,7 +142,7 @@ async function loadJuniorEvents(connection, series) {
             const source = rows.find(row => String(row.eventId) === event.id);
             if (series === 'academy') source.name = source.sessionName;
             const type = juniorSessionType(series, source, index, events.length);
-            event.sessionType = type === 'F' ? 'feature' : series === 'academy' ? 'reverse-grid' : 'sprint';
+            event.sessionType = type === 'R' ? 'race' : type === 'F' ? 'feature' : series === 'academy' ? 'reverse-grid' : 'sprint';
             event.eventSequence = Number(source.sessionNumber) || index + 1;
             event.weight = eventBaseWeight(event.sessionType, DEFAULT_CONFIGURATION);
         });

@@ -37,3 +37,13 @@ test('rating event audit exposes ordering, format, field and weight problems', (
   assert.equal(report.issues.duplicateDrivers.length, 1);
   assert.equal(report.issues.formatMismatches.length, 1);
 });
+
+test('rating event audit rejects Formula E sprint weights and duplicate classification orders', () => {
+  const report = auditRatingEvents([event('fe', { series: 'fe', name: 'Mexico City E-Prix', sessionName: 'Race',
+    sessionType: 'sprint', weight: .5, participants: [
+      { driverId: 'A', started: true, finishOrder: 1 },
+      { driverId: 'B', started: true, finishOrder: 1 }
+    ] })]);
+  assert.equal(report.issues.formatMismatches.length, 1);
+  assert.equal(report.issues.duplicateFinishOrders.length, 1);
+});

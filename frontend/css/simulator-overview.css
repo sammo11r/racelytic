@@ -25,6 +25,7 @@
 .f2-mode .simulator-example-card { --simulator-example-accent: #63a8ff; }
 .f3-mode .simulator-example-card { --simulator-example-accent: #ff944d; }
 .academy-mode .simulator-example-card { --simulator-example-accent: #ad7aff; }
+.fe-mode .simulator-example-card { --simulator-example-accent: #00a9ce; }
 .simulator-example-kicker { display: flex; justify-content: space-between; gap: 16px; color: rgba(255, 255, 255, .54); font-size: 10px; font-weight: 800; line-height: 1.4; letter-spacing: .13em; }
 .simulator-example-card p { max-width: 360px; margin: 16px 0 12px; color: #fff; font-size: 20px; font-weight: 750; line-height: 1.25; letter-spacing: -.025em; }
 .simulator-example-card strong { color: var(--simulator-example-accent); font-size: 12px; font-weight: 800; }

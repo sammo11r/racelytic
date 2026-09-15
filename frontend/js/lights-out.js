@@ -15,6 +15,7 @@
   if (path.startsWith('/f2/')) document.getElementById('lights-games-link').href = '/f2/games';
   else if (path.startsWith('/f3/')) document.getElementById('lights-games-link').href = '/f3/games';
   else if (path.startsWith('/academy/')) document.getElementById('lights-games-link').href = '/academy/games';
+  else if (path.startsWith('/formula-e/')) document.getElementById('lights-games-link').href = '/formula-e/games';
 
   function wait(milliseconds) {
     return new Promise(resolve => setTimeout(resolve, milliseconds));

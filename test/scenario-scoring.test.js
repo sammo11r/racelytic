@@ -1,6 +1,6 @@
 const assert = require('node:assert/strict');
 const test = require('node:test');
-const { academyEventMaximum, academyEventScore } = require('../frontend/js/scenario-scoring');
+const { academyEventMaximum, academyEventScore, countedPoints } = require('../frontend/js/scenario-scoring');
 
 const system = {
   race: [25, 18, 15, 12, 10, 8, 6, 4, 2, 1],
@@ -22,4 +22,14 @@ test('Academy scenario applies full and reverse-grid points independently', () =
   assert.equal(academyEventScore(reverse, { fastestLap: true }, 9, system), 0);
   assert.equal(academyEventMaximum(feature, system), 28);
   assert.equal(academyEventMaximum(reverse, system), 11);
+});
+
+test('scenario counting rules retain exclusions and drop the weakest eligible results', () => {
+  const rounds = [25, 18, 15, 12].map(points => ({ points, excluded: false }));
+  assert.equal(countedPoints(rounds, { countBest: 3 }), 58);
+  assert.equal(countedPoints([...rounds, { points: 0, excluded: true }], {
+    countBest: 3,
+    exclusionsCannotBeDropped: true
+  }), 43);
+  assert.equal(countedPoints(rounds, { countBest: Infinity }), 70);
 });

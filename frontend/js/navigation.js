@@ -128,9 +128,13 @@ function loadHeader() {
         const reverseF3PagePairs = Object.fromEntries(Object.entries(f3PagePairs).map(([f1, f3]) => [f3, f1]));
         const academyPagePairs = Object.fromEntries(Object.entries(f3PagePairs).map(([f1, f3]) => [f1, f3.replace('/f3', '/academy')]));
         const reverseAcademyPagePairs = Object.fromEntries(Object.entries(academyPagePairs).map(([f1, academy]) => [academy, f1]));
-        const formulaEPagePairs = Object.fromEntries(Object.entries(f3PagePairs)
-            .filter(([f1]) => !/simulator|points-systems|games|quiz|ask/.test(f1))
-            .map(([f1, f3]) => [f1, f3.replace('/f3', '/formula-e')]));
+        const formulaEPagePairs = {
+            ...Object.fromEntries(Object.entries(f3PagePairs)
+            .filter(([f1]) => !/ask/.test(f1))
+            .map(([f1, f3]) => [f1, f3.replace('/f3', '/formula-e')])),
+            '/world-champions-quiz': '/formula-e/champions-quiz',
+            '/race-winners-quiz': '/formula-e/race-winners-quiz'
+        };
         const reverseFormulaEPagePairs = Object.fromEntries(Object.entries(formulaEPagePairs).map(([f1, fe]) => [fe, f1]));
         const detailPages = {
             '/season': ['season', '/f2/seasons'], '/race': ['race', '/f2/races'],
@@ -357,6 +361,26 @@ function loadHeader() {
                     ['/formula-e/teammate-battles', 'Teammate battles', 'Direct intra-team head-to-heads'],
                     ['/formula-e/circuit-analysis', 'Circuit analysis', 'Performance by venue'],
                     ['/formula-e/records', 'Records', 'Formula E all-time leaders']
+                ]],
+                ['RACELYTIC RATINGS', [
+                    ['/ratings?series=fe', 'Overview', 'Explore Formula E driver ratings'],
+                    ['/ratings/leaderboard?series=fe', 'Leaderboard', 'See the order through Formula E history'],
+                    ['/ratings/compare?series=fe', 'Compare drivers', 'Plot up to four rating histories'],
+                    ['/ratings/driver?series=fe', 'Rating profile', 'Inspect E-Prix rating changes'],
+                    ['/ratings/methodology?series=fe', 'Methodology', 'Understand the model and its limits']
+                ]],
+                ['FORMULA E SIMULATOR', [
+                    ['/formula-e/simulator', 'Overview', 'Choose a Formula E simulation tool'],
+                    ['/formula-e/simulate-season', 'Simulate season', 'Recalculate a Formula E championship'],
+                    ['/formula-e/scenario-calculator', 'Scenario calculator', 'Project a Formula E title run-in'],
+                    ['/formula-e/championship-builder', 'Championship builder', 'Create a custom E-Prix calendar'],
+                    ['/formula-e/points-systems', 'Points systems', 'Browse official Formula E scoring rules']
+                ]],
+                ['FORMULA E GAMES', [
+                    ['/formula-e/games', 'Overview', 'Choose a Formula E game'],
+                    ['/formula-e/quizzes', 'Quizzes', 'Test your Formula E knowledge'],
+                    ['/formula-e/idle-racing-manager', 'Idle Racing Manager', 'Build a fictional racing team'],
+                    ['/formula-e/lights-out', 'Lights Out!', 'Test your reaction time']
                 ]]
             ];
             const seriesMenus = isFormulaEMode ? formulaEMenus : isAcademyMode

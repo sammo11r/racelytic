@@ -7,6 +7,7 @@ function eventIdentity(event) {
 }
 
 function expectedTypeFromName(event) {
+    if (event.series === 'fe') return 'race';
     const name = String(event.sessionName || event.name || '').toLowerCase();
     if (name.includes('feature')) return 'feature';
     if (name.includes('reverse')) return 'reverse-grid';
@@ -16,7 +17,7 @@ function expectedTypeFromName(event) {
 
 function auditRatingEvents(events, config = DEFAULT_CONFIGURATION) {
     const ordered = [...events].sort(compareEvents);
-    const missingSequence = [], invalidWeights = [], smallFields = [], duplicateDrivers = [], formatMismatches = [];
+    const missingSequence = [], invalidWeights = [], smallFields = [], duplicateDrivers = [], duplicateFinishOrders = [], formatMismatches = [];
     const orderingKeys = new Map(), weekendFormats = new Map();
 
     for (const event of ordered) {
@@ -39,6 +40,13 @@ function auditRatingEvents(events, config = DEFAULT_CONFIGURATION) {
         for (const driver of field) counts.set(String(driver.driverId), (counts.get(String(driver.driverId)) || 0) + 1);
         const duplicates = [...counts.entries()].filter(([, count]) => count > 1).map(([driverId]) => driverId);
         if (duplicates.length) duplicateDrivers.push({ ...identity, driverIds: duplicates });
+        const finishCounts = new Map();
+        for (const driver of field) {
+            const finishOrder = Number(driver.finishOrder);
+            if (Number.isFinite(finishOrder)) finishCounts.set(finishOrder, (finishCounts.get(finishOrder) || 0) + 1);
+        }
+        const repeatedOrders = [...finishCounts.entries()].filter(([, count]) => count > 1).map(([finishOrder]) => finishOrder);
+        if (repeatedOrders.length) duplicateFinishOrders.push({ ...identity, finishOrders: repeatedOrders });
 
         const expectedType = expectedTypeFromName(event);
         if (expectedType && expectedType !== event.sessionType) {
@@ -57,12 +65,12 @@ function auditRatingEvents(events, config = DEFAULT_CONFIGURATION) {
         sessions: items.sort((a, b) => a.eventSequence - b.eventSequence || a.id.localeCompare(b.id))
             .map(item => ({ id: item.id, sequence: item.eventSequence, type: item.sessionType })) }));
     const issueCount = missingSequence.length + invalidWeights.length + smallFields.length
-        + duplicateDrivers.length + formatMismatches.length + orderingCollisions.length;
+        + duplicateDrivers.length + duplicateFinishOrders.length + formatMismatches.length + orderingCollisions.length;
 
     return {
         summary: { events: ordered.length, weekends: weekendFormats.size, fallbackDateEvents: fallbackDates.length,
             issueCount, orderingCollisions: orderingCollisions.length },
-        issues: { missingSequence, orderingCollisions, invalidWeights, smallFields, duplicateDrivers, formatMismatches },
+        issues: { missingSequence, orderingCollisions, invalidWeights, smallFields, duplicateDrivers, duplicateFinishOrders, formatMismatches },
         fallbackDates,
         weekendFormats: formats
     };

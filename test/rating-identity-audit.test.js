@@ -1,12 +1,23 @@
 const assert = require('node:assert/strict');
 const test = require('node:test');
-const { auditRatingIdentities, normalizedIdentity } = require('../backend/rating-identity-audit');
+const { auditRatingIdentities, canonicalDriverId, normalizedIdentity } = require('../backend/rating-identity-audit');
 
 const participant = (driverId, driverName, constructorId, constructorName) =>
   ({ driverId, driverName, constructorId, constructorName });
 
 test('identity normalization is accent and punctuation insensitive', () => {
   assert.equal(normalizedIdentity('  Álex O\'Connor Jr. '), 'alex o connor jr');
+});
+
+test('known source-specific driver slugs resolve to one audited identity', () => {
+  assert.equal(canonicalDriverId('jerome-d-ambrosio'), 'jerome-dambrosio');
+  const report = auditRatingIdentities({
+    f1: [{ participants: [participant('jerome-dambrosio', 'Jérôme d’Ambrosio', 'f1-team', 'F1 Team')] }],
+    fe: [{ participants: [participant('jerome-d-ambrosio', 'Jerome d Ambrosio', 'fe-team', 'FE Team')] }]
+  });
+  assert.equal(report.crossSeries.matchedNames, 1);
+  assert.equal(report.crossSeries.linkedNames, 1);
+  assert.equal(report.issueCount, 0);
 });
 
 test('identity audit separates linked and conflicting cross-series drivers', () => {

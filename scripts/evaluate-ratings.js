@@ -1,6 +1,6 @@
 const pool = require('../backend/db');
 const { loadRatingEvents } = require('../backend/rating-data');
-const { calculateRatings, configuration, MODEL_VERSION } = require('../backend/rating-engine');
+const { calculateRatings, configuration, DEFAULT_CONFIGURATION, MODEL_VERSION } = require('../backend/rating-engine');
 const { comparisonMetrics, evaluateRatings, eventNormalizedMetrics, pairedBootstrapDelta } = require('../backend/rating-evaluation');
 const { teammateEvents } = require('../backend/rating-models');
 const { calculateJointRatings, competitiveControl, jointRateCandidates, jointStructureCandidates,
@@ -10,12 +10,13 @@ const { candidateGrid, configuredEvents, dynamicsCandidateGrid, holdoutCalibrati
     rollingUncertaintyCalibration } = require('../backend/rating-calibration');
 const { ensureRatingsSchema } = require('../backend/ratings');
 
-const SERIES = ['f1', 'f2', 'f3', 'academy'];
+const SERIES = ['f1', 'f2', 'f3', 'academy', 'fe'];
 const HOLDOUT_SPLITS = Object.freeze({
     f1: { tuningFromYear: 2000, holdoutYear: 2022 },
     f2: { tuningFromYear: 2017, holdoutYear: 2023 },
     f3: { tuningFromYear: 2019, holdoutYear: 2023 },
-    academy: { tuningFromYear: 2023, holdoutYear: 2025 }
+    academy: { tuningFromYear: 2023, holdoutYear: 2025 },
+    fe: { tuningFromYear: 2015, holdoutYear: 2023 }
 });
 const ROLLING_FOLDS = Object.freeze({
     f1: [
@@ -36,6 +37,11 @@ const ROLLING_FOLDS = Object.freeze({
     academy: [
         { tuningToYear: 2023, validationFromYear: 2024, validationToYear: 2024 },
         { tuningToYear: 2024, validationFromYear: 2025, validationToYear: 2026 }
+    ],
+    fe: [
+        { tuningToYear: 2018, validationFromYear: 2019, validationToYear: 2020 },
+        { tuningToYear: 2020, validationFromYear: 2021, validationToYear: 2022 },
+        { tuningToYear: 2022, validationFromYear: 2023, validationToYear: 2026 }
     ]
 });
 const EXPANDED_GRID = Object.freeze({
@@ -62,6 +68,12 @@ const F1_NESTED_FOLDS = Object.freeze([
     { fromYear: 2018, toYear: 2021, innerFolds: [{ fromYear: 2006, toYear: 2009 }, { fromYear: 2010, toYear: 2013 }, { fromYear: 2014, toYear: 2017 }] },
     { fromYear: 2022, toYear: 2026, innerFolds: [{ fromYear: 2010, toYear: 2013 }, { fromYear: 2014, toYear: 2017 }, { fromYear: 2018, toYear: 2021 }] }
 ]);
+
+function competitiveGrid(series) {
+    // Formula E has one race format in the rating feed, so sprintWeight is
+    // unidentifiable and must not be presented as a tunable improvement.
+    return series === 'fe' ? { ...EXPANDED_GRID, sprintWeights: [DEFAULT_CONFIGURATION.sprintWeight] } : EXPANDED_GRID;
+}
 
 function argument(name) {
     return process.argv.find(value => value.startsWith(`--${name}=`))?.slice(name.length + 3);
@@ -263,7 +275,8 @@ async function nestedJoint(connection, series) {
 
 async function calibrate(connection, series) {
     const candidates = [], events = await loadRatingEvents(connection, series);
-    for (const candidate of candidateGrid(requestedConfiguration())) {
+    const grid = series === 'fe' ? { sprintWeights: [DEFAULT_CONFIGURATION.sprintWeight] } : undefined;
+    for (const candidate of candidateGrid(requestedConfiguration(), grid)) {
         const config = candidate.configuration;
         const result = calculateRatings(configuredEvents(events, config), { ...config, collectComparisons: true });
         const evaluation = evaluateRatings(result, { fromYear: numericArgument('from-year'), toYear: numericArgument('to-year') });
@@ -283,14 +296,14 @@ async function holdout(connection, series) {
         holdoutYear: numericArgument('holdout-year') || defaults.holdoutYear,
         toYear: numericArgument('to-year'),
         baseConfiguration: requestedConfiguration(),
-        candidates: candidateGrid(requestedConfiguration(), EXPANDED_GRID)
+        candidates: candidateGrid(requestedConfiguration(), competitiveGrid(series))
     });
 }
 
 async function rolling(connection, series) {
     const events = await loadRatingEvents(connection, series);
     return rollingCalibration(events, {
-        folds: ROLLING_FOLDS[series], grid: EXPANDED_GRID,
+        folds: ROLLING_FOLDS[series], grid: competitiveGrid(series),
         baseConfiguration: requestedConfiguration()
     });
 }
@@ -321,9 +334,9 @@ async function uncertainty(connection, series) {
 
 async function validate(connection, series) {
     const events = await loadRatingEvents(connection, series);
-    const config = requestedConfiguration(), candidates = candidateGrid(config, EXPANDED_GRID);
+    const config = requestedConfiguration(), grid = competitiveGrid(series), candidates = candidateGrid(config, grid);
     const rollingReport = rollingCalibration(events, { folds: ROLLING_FOLDS[series],
-        grid: EXPANDED_GRID, baseConfiguration: config, candidates });
+        grid, baseConfiguration: config, candidates });
     const defaults = HOLDOUT_SPLITS[series];
     const holdoutReport = holdoutCalibration(events, { tuningFromYear: defaults.tuningFromYear,
         holdoutYear: defaults.holdoutYear, toYear: numericArgument('to-year'),
@@ -463,6 +476,6 @@ main().catch(async error => {
 
 module.exports = { DYNAMICS_GRID, EXPANDED_GRID, HOLDOUT_SPLITS, INACTIVITY_GRID, RETIREMENT_GRID,
     ROLLING_FOLDS, UNCERTAINTY_GRID,
-    calibrationSummary, evaluateJoint, evaluateTeammates, F1_NESTED_FOLDS, improveJoint, jointImprovementSummary,
+    calibrationSummary, competitiveGrid, evaluateJoint, evaluateTeammates, F1_NESTED_FOLDS, improveJoint, jointImprovementSummary,
     jointValidationSummary, nestedJoint, nestedJointSummary, requestedConfiguration, requestedJointConfiguration,
     summary, validateJoint };

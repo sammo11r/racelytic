@@ -1,5 +1,5 @@
 (function initialiseRatingsNavigation() {
-  const names = new Set(['f1', 'f2', 'f3', 'academy']);
+  const names = new Set(['f1', 'f2', 'f3', 'academy', 'fe']);
   const query = new URLSearchParams(location.search);
   const series = names.has(query.get('series')) ? query.get('series') : 'f1';
   const model = series === 'f1' && query.get('model') === 'team-adjusted' ? 'team-adjusted' : '';

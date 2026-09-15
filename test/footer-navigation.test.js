@@ -37,7 +37,8 @@ test('footer navigation follows the active championship on regular and neutral r
   assert.match(privacy, /document\.body\.classList\.contains\('fe-mode'\)/);
   assert.match(privacy, /\['f1', 'f2', 'f3', 'academy', 'fe'\]\.includes\(requestedSeries\)/);
   assert.match(privacy, /activeSeries === 'fe' \? '\/formula-e'/);
-  assert.match(privacy, /data-footer-page="simulator".*data-footer-page="games"/);
+  assert.match(privacy, /games: `\$\{seriesBase\}\/games`/);
+  assert.doesNotMatch(privacy, /data-footer-page="games"[^\n]*remove\(\)/);
   assert.match(privacy, /simulator: activeSeries === 'f1' \? '\/simulator-overview' : `\$\{seriesBase\}\/simulator`/);
   assert.match(privacy, /about: `\/about\?series=\$\{activeSeries\}`/);
   assert.match(privacy, /account: `\/account\?series=\$\{activeSeries\}`/);

@@ -34,6 +34,7 @@
   if (path.startsWith('/f2/')) byId('irm-games-link').href = '/f2/games';
   else if (path.startsWith('/f3/')) byId('irm-games-link').href = '/f3/games';
   else if (path.startsWith('/academy/')) byId('irm-games-link').href = '/academy/games';
+  else if (path.startsWith('/formula-e/')) byId('irm-games-link').href = '/formula-e/games';
 
   const offline = engine.calculateOfflineProgress(state);
   state = offline.state;

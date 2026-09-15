@@ -161,7 +161,7 @@ function answerRange(rows, field) {
 }
 
 async function buildQuizSummary(series) {
-    const includeDriverHistory = series === 'f1' || series === 'f2';
+    const includeDriverHistory = series === 'f1' || series === 'f2' || series === 'fe';
     const [champions, winners, constructors, season] = await Promise.all([
         includeDriverHistory ? getChampionAnswers(series) : Promise.resolve([]),
         includeDriverHistory ? (isJuniorSeries(series) ? getJuniorRaceWinners(series) : getRaceWinners()) : Promise.resolve([]),

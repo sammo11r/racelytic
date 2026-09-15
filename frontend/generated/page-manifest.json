@@ -816,6 +816,84 @@
       "slug": "about",
       "route": "/formula-e/about",
       "template": "f3-about.html"
+    },
+    {
+      "series": "fe",
+      "slug": "simulator",
+      "route": "/formula-e/simulator",
+      "template": "f3-simulator.html"
+    },
+    {
+      "series": "fe",
+      "slug": "simulate-season",
+      "route": "/formula-e/simulate-season",
+      "template": "f3-simulate-season.html"
+    },
+    {
+      "series": "fe",
+      "slug": "scenario-calculator",
+      "route": "/formula-e/scenario-calculator",
+      "template": "f3-scenario-calculator.html"
+    },
+    {
+      "series": "fe",
+      "slug": "championship-builder",
+      "route": "/formula-e/championship-builder",
+      "template": "f3-championship-builder.html"
+    },
+    {
+      "series": "fe",
+      "slug": "points-systems",
+      "route": "/formula-e/points-systems",
+      "template": "points-systems.html"
+    },
+    {
+      "series": "fe",
+      "slug": "games",
+      "route": "/formula-e/games",
+      "template": "f2-games.html"
+    },
+    {
+      "series": "fe",
+      "slug": "idle-racing-manager",
+      "route": "/formula-e/idle-racing-manager",
+      "template": "idle-racing-manager.html"
+    },
+    {
+      "series": "fe",
+      "slug": "lights-out",
+      "route": "/formula-e/lights-out",
+      "template": "lights-out.html"
+    },
+    {
+      "series": "fe",
+      "slug": "quizzes",
+      "route": "/formula-e/quizzes",
+      "template": "f2-quizzes.html"
+    },
+    {
+      "series": "fe",
+      "slug": "champions-quiz",
+      "route": "/formula-e/champions-quiz",
+      "template": "f2-champions-quiz.html"
+    },
+    {
+      "series": "fe",
+      "slug": "race-winners-quiz",
+      "route": "/formula-e/race-winners-quiz",
+      "template": "f2-race-winners-quiz.html"
+    },
+    {
+      "series": "fe",
+      "slug": "constructor-champions-quiz",
+      "route": "/formula-e/constructor-champions-quiz",
+      "template": "f2-constructor-champions-quiz.html"
+    },
+    {
+      "series": "fe",
+      "slug": "season-race-winners-quiz",
+      "route": "/formula-e/season-race-winners-quiz",
+      "template": "f2-season-race-winners-quiz.html"
     }
   ]
 }

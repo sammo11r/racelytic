@@ -78,6 +78,22 @@ function formulaESessionType() {
     return 'F';
 }
 
+function formulaEResultPoints(result, sessionType, year, polePosition) {
+    if (isDisqualified(result)) return 0;
+    if (result.officialPoints !== null && result.officialPoints !== undefined) {
+        return Number(result.officialPoints);
+    }
+    const racePoints = [25, 18, 15, 12, 10, 8, 6, 4, 2, 1];
+    const position = Number(result.positionNumber || 0);
+    let points = position > 0 ? Number(racePoints[position - 1] || 0) : 0;
+    const fastestLapEligible = Number(year) <= 2017 || (position > 0 && position <= 10);
+    if (['1', 'true'].includes(String(result.fastestLap).toLowerCase()) && fastestLapEligible) {
+        points += Number(year) <= 2016 ? 2 : 1;
+    }
+    if (polePosition) points += 3;
+    return points;
+}
+
 function f3ResultPoints(result, sessionType, year, polePosition) {
     if (isDisqualified(result)) return 0;
     if (result.officialPoints !== null && result.officialPoints !== undefined) {
@@ -100,17 +116,17 @@ function f3ResultPoints(result, sessionType, year, polePosition) {
 function juniorSeriesConfiguration(series) {
     if (series === 'academy') return { prefix: 'fa_', sessionType: academySessionType, resultPoints: f2ResultPoints };
     if (series === 'f3') return { prefix: 'f3_', sessionType: f3SessionType, resultPoints: f3ResultPoints };
-    if (series === 'fe') return { prefix: 'fe_', sessionType: formulaESessionType, resultPoints: f2ResultPoints };
+    if (series === 'fe') return { prefix: 'fe_', sessionType: formulaESessionType, resultPoints: formulaEResultPoints };
     return { prefix: 'f2_', sessionType: f2SessionType, resultPoints: f2ResultPoints };
 }
 
-function eligibleFastestLapDrivers(results) {
+function eligibleFastestLapDrivers(results, maxPosition = 10) {
     const timedCandidates = new Map();
     const importedCandidates = new Map();
 
     for (const result of results) {
         const position = Number(result.positionNumber || 0);
-        if (position < 1 || position > 10 || isDisqualified(result)) continue;
+        if (position < 1 || position > maxPosition || isDisqualified(result)) continue;
 
         const sessionId = String(result.sessionId);
         if (['1', 'true'].includes(String(result.fastestLap).toLowerCase()) && !importedCandidates.has(sessionId)) {
@@ -587,7 +603,10 @@ router.get('/api/seasons/:year', async (req, res) => {
                     });
                 }
 
-                const fastestLapDriverBySession = eligibleFastestLapDrivers(raceResults);
+                const fastestLapDriverBySession = eligibleFastestLapDrivers(
+                    raceResults,
+                    series === 'fe' ? Infinity : 10
+                );
 
                 const constructorsById = new Map();
                 const driversById = new Map();
@@ -1365,4 +1384,5 @@ module.exports.f2SessionType = f2SessionType;
 module.exports.f3ResultPoints = f3ResultPoints;
 module.exports.f3SessionType = f3SessionType;
 module.exports.formulaESessionType = formulaESessionType;
+module.exports.formulaEResultPoints = formulaEResultPoints;
 module.exports.academySessionType = academySessionType;

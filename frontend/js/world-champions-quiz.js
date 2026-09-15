@@ -6,10 +6,11 @@ let quizGaveUp = false;
 let renderedColumnCount = 0;
 let measuredTableWidth = 0;
 let newlyRevealedYears = new Set();
-const QUIZ_SERIES = document.body.classList.contains('f2-mode') ? 'f2' : 'f1';
+const QUIZ_SERIES = document.body.classList.contains('fe-mode') ? 'fe' : document.body.classList.contains('f2-mode') ? 'f2' : 'f1';
 const QUIZ_PROGRESS_KEY = QUIZ_SERIES === 'f1' ? 'racelytic-quiz-world-champions' : `racelytic-quiz-${QUIZ_SERIES}-champions`;
 const quizApi = path => `${path}${QUIZ_SERIES === 'f1' ? '' : `?series=${QUIZ_SERIES}`}`;
-const CHAMPIONSHIP_NAME = QUIZ_SERIES === 'f1' ? 'Formula 1' : 'Formula 2';
+const CHAMPIONSHIP_NAME = { f1: 'Formula 1', f2: 'Formula 2', fe: 'Formula E' }[QUIZ_SERIES];
+const seasonLabel = year => QUIZ_SERIES === 'fe' ? `${Number(year) - 1}–${String(year).slice(-2)}` : String(year);
 
 function saveQuizProgress() {
   try {
@@ -112,7 +113,7 @@ function renderQuizTable() {
       <tbody>${column.map(season => {
         const driver = revealedSeasons.get(season.year);
         return `<tr data-year="${season.year}" class="${driver ? 'is-revealed' : ''}${newlyRevealedYears.has(season.year) ? ' is-new-answer' : ''}">
-          <td><strong>${esc(season.year)}</strong></td>
+          <td><strong>${esc(seasonLabel(season.year))}</strong></td>
           <td class="quiz-driver-cell">${driverCellContent(driver, season.driverNameLength)}</td>
           <td>${season.teams.length ? season.teams.map(esc).join(' / ') : '—'}</td>
         </tr>`;

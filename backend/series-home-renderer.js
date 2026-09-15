@@ -43,13 +43,13 @@ const SERIES_HOME_CONFIG = Object.freeze({
     },
     fe: {
         ...SERIES.fe,
-        description: 'Explore twelve completed seasons of Formula E history in Racelytic.',
+        description: 'Explore, analyse, simulate and play with twelve completed seasons of Formula E history in Racelytic.',
         headline: 'Electric from the start.', subheadline: 'Every E-Prix tells a story.',
-        introduction: 'Explore Formula E from its inaugural 2014–15 season through the latest completed championship. Follow title fights, compare drivers and teams, revisit every E-Prix and discover how an all-electric world championship evolved across twelve seasons.',
+        introduction: 'Explore Formula E from its inaugural 2014–15 season through the latest completed championship. Follow title fights, compare drivers and teams, revisit every E-Prix, simulate alternate outcomes and put your knowledge and reactions to the test with our games.',
         askExample: '', askEnabled: false,
         entityLabel: 'Teams',
         archiveTitle: 'Twelve seasons.|One connected archive.',
-        archiveCopy: 'Official seasons, entrants, session classifications and standings connect every Formula E driver, team, circuit and E-Prix.'
+        archiveCopy: 'Official seasons, entrants, session classifications and standings connect every Formula E driver, team, circuit and E-Prix to the analysis, simulator and games.'
     }
 });
 
@@ -117,7 +117,7 @@ const SERIES_HOME_PREVIEWS = {
         drivers: [{ id: 'sebastien-buemi', name: 'Buemi', wins: 14, podiums: 35 }, { id: 'mitch-evans', name: 'Evans', wins: 16, podiums: 38 }],
         comparisonMetrics: [['wins', 'Race wins'], ['podiums', 'Podiums']],
         champions: [{ year: '2014–15', dataYear: 2015, name: 'Nelson Piquet Jr.', id: 'nelson-piquet-jr' }, { year: '2019–20', name: null }, { year: '2025–26', dataYear: 2026, name: 'Pascal Wehrlein', id: 'pascal-wehrlein' }],
-        quizHref: '/formula-e/seasons', quizAction: 'Explore every champion'
+        quizHref: '/formula-e/champions-quiz', quizAction: 'Name the champions'
     }
 };
 

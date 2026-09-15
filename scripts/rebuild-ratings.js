@@ -5,7 +5,7 @@ const { configuredEvents } = require('../backend/rating-calibration');
 const { calculateJointRatings, F1_JOINT_CONFIGURATION, JOINT_MODEL_VERSION } = require('../backend/joint-rating-model');
 const { ensureRatingsSchema } = require('../backend/ratings');
 
-const VALID_SERIES = ['f1', 'f2', 'f3', 'academy'];
+const VALID_SERIES = ['f1', 'f2', 'f3', 'academy', 'fe'];
 const requested = process.argv.find(argument => argument.startsWith('--series='))?.split('=')[1];
 const dryRun = process.argv.includes('--dry-run');
 

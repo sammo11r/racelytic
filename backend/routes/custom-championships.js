@@ -15,7 +15,7 @@ function configuration(input = {}) {
     const raceIds = identifiers(input.raceIds, 100);
     if (!raceIds.length) throw new Error('Add at least one race.');
     return {
-        series: ['f2', 'f3', 'academy'].includes(input.series) ? input.series : 'f1',
+        series: ['f1', 'f2', 'f3', 'academy', 'fe'].includes(input.series) ? input.series : 'f1',
         raceIds,
         driverIds: identifiers(input.driverIds, 1000),
         constructorIds: identifiers(input.constructorIds, 500),
@@ -23,7 +23,13 @@ function configuration(input = {}) {
             id: String(points.id || 'modern').slice(0, 100), name: String(points.name || 'Modern').slice(0, 100),
             race: scale(points.race), sprint: scale(points.sprint), qualifying: scale(points.qualifying),
             poleBonus: Number(points.poleBonus || 0), fastestLapBonus: Number(points.fastestLapBonus || 0),
-            fastestLapMaxPosition: points.fastestLapMaxPosition == null ? null : Number(points.fastestLapMaxPosition)
+            fastestLapMaxPosition: points.fastestLapMaxPosition == null ? null : Number(points.fastestLapMaxPosition),
+            countBest: points.countBest == null ? null : Number(points.countBest),
+            bestFirstRounds: points.bestFirstRounds == null ? null : Number(points.bestFirstRounds),
+            firstRoundsWindow: points.firstRoundsWindow == null ? null : Number(points.firstRoundsWindow),
+            bestLastRounds: points.bestLastRounds == null ? null : Number(points.bestLastRounds),
+            lastRoundsWindow: points.lastRoundsWindow == null ? null : Number(points.lastRoundsWindow),
+            sprintCountsTowardRound: points.sprintCountsTowardRound !== false
         }
     };
 }
