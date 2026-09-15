@@ -170,6 +170,24 @@
   gap: 4px;
 }
 .junior-season-detail-page .f2-calendar-sessions span { padding: 4px 6px; }
+.fe-mode .junior-season-detail-page .f2-calendar-race {
+  grid-template-columns: 28px 70px minmax(0, 1fr) auto;
+  gap: 6px;
+  min-height: 56px;
+  padding: 6px 9px;
+}
+.fe-mode .junior-season-detail-page .f2-calendar-sessions {
+  grid-column: auto;
+  justify-content: flex-end;
+  flex-wrap: nowrap;
+}
+.fe-mode .junior-season-detail-page .f2-calendar-sessions span {
+  overflow: hidden;
+  max-width: 150px;
+  padding: 4px 6px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 @media (max-width: 1100px) {
   .season-detail-page .calendar-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .season-summary-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
@@ -202,6 +220,7 @@
 @media (max-width: 380px) {
   .season-detail-page .calendar-race { grid-template-columns: 26px minmax(0, 1fr) auto; }
   .season-detail-page .calendar-date { display: none; }
+  .fe-mode .junior-season-detail-page .f2-calendar-race { grid-template-columns: 26px minmax(0, 1fr) auto; }
   .season-summary-grid { grid-template-columns: minmax(0, 1fr); }
   .season-summary-entry { border-right: 0 !important; border-bottom: 1px solid var(--border) !important; }
   .season-summary-entry:last-child { border-bottom: 0 !important; }

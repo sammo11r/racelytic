@@ -74,6 +74,10 @@ function f3SessionType(session, sessionIndex, sessionCount, year) {
     return sessionIndex === sessionCount - 1 ? 'F' : 'S';
 }
 
+function formulaESessionType() {
+    return 'F';
+}
+
 function f3ResultPoints(result, sessionType, year, polePosition) {
     if (isDisqualified(result)) return 0;
     if (result.officialPoints !== null && result.officialPoints !== undefined) {
@@ -96,6 +100,7 @@ function f3ResultPoints(result, sessionType, year, polePosition) {
 function juniorSeriesConfiguration(series) {
     if (series === 'academy') return { prefix: 'fa_', sessionType: academySessionType, resultPoints: f2ResultPoints };
     if (series === 'f3') return { prefix: 'f3_', sessionType: f3SessionType, resultPoints: f3ResultPoints };
+    if (series === 'fe') return { prefix: 'fe_', sessionType: formulaESessionType, resultPoints: f2ResultPoints };
     return { prefix: 'f2_', sessionType: f2SessionType, resultPoints: f2ResultPoints };
 }
 
@@ -144,11 +149,11 @@ router.get('/api/seasons', async (req, res) => {
     try {
 
         const series = String(req.query.series || '').toLowerCase();
-        if (['f2', 'f3', 'academy'].includes(series)) {
+        if (['f2', 'f3', 'academy', 'fe'].includes(series)) {
             const { prefix } = juniorSeriesConfiguration(series);
             const rows = await withConnection(async connection => {
                 const [seasons, raceCounts, driverCounts, constructorCounts, champions] = await Promise.all([
-                    connection.query(`SELECT year FROM ${prefix}seasons ORDER BY year DESC`),
+                    connection.query(`SELECT year${series === 'fe' ? ', label' : ''} FROM ${prefix}seasons ORDER BY year DESC`),
                     connection.query(`SELECT year, COUNT(*) AS raceCount FROM ${prefix}races GROUP BY year`),
                     connection.query(`SELECT year, COUNT(DISTINCT driverId) AS driverCount FROM ${prefix}entries WHERE driverId IS NOT NULL GROUP BY year`),
                     connection.query(`SELECT year, COUNT(DISTINCT constructorId) AS constructorCount FROM ${prefix}entries WHERE constructorId IS NOT NULL GROUP BY year`),
@@ -182,6 +187,7 @@ router.get('/api/seasons', async (req, res) => {
                     const year = Number(season.year);
                     return {
                         year,
+                        ...(season.label ? { label: season.label } : {}),
                         raceCount: raceMap.get(year) || 0,
                         driverCount: driverMap.get(year) || 0,
                         constructorCount: constructorMap.get(year) || 0,
@@ -331,10 +337,10 @@ router.get('/api/seasons/:year', async (req, res) => {
     try {
 
         const series = String(req.query.series || '').toLowerCase();
-        if (['f2', 'f3', 'academy'].includes(series)) {
+        if (['f2', 'f3', 'academy', 'fe'].includes(series)) {
             const { prefix, sessionType, resultPoints } = juniorSeriesConfiguration(series);
             const data = await withConnection(async connection => {
-                const seasonRows = await connection.query(`SELECT year FROM ${prefix}seasons WHERE year = ?`, [year]);
+                const seasonRows = await connection.query(`SELECT year${series === 'fe' ? ', label' : ''} FROM ${prefix}seasons WHERE year = ?`, [year]);
                 if (!seasonRows.length) return null;
 
                 const [races, raceSessions, raceResults, featureGridResults, qualifyingResults, qualifyingWinners, officialStandings, circuitCoordinates] = await Promise.all([
@@ -543,6 +549,32 @@ router.get('/api/seasons/:year', async (req, res) => {
                     `, [year]);
                 } catch (error) {
                     if (error.code !== 'ER_NO_SUCH_TABLE') throw error;
+                }
+
+                let manufacturerChampionship = [];
+                if (series === 'fe') {
+                    try {
+                        const manufacturerStandings = await connection.query(`
+                            SELECT standings.manufacturerId, standings.positionNumber,
+                                   standings.points, standings.championshipWon,
+                                   manufacturers.name, manufacturers.pictureUrl
+                            FROM fe_season_manufacturer_standings standings
+                            LEFT JOIN fe_manufacturers manufacturers
+                                ON manufacturers.id = standings.manufacturerId
+                            WHERE standings.year = ?
+                            ORDER BY standings.positionNumber
+                        `, [year]);
+                        manufacturerChampionship = manufacturerStandings.map(row => ({
+                            position: Number(row.positionNumber),
+                            manufacturerId: row.manufacturerId,
+                            name: row.name || row.manufacturerId,
+                            pictureUrl: row.pictureUrl || null,
+                            points: Number(row.points),
+                            champion: ['1', 'true'].includes(String(row.championshipWon).toLowerCase())
+                        }));
+                    } catch (error) {
+                        if (error.code !== 'ER_NO_SUCH_TABLE') throw error;
+                    }
                 }
 
                 const sessionContextById = new Map();
@@ -767,6 +799,7 @@ router.get('/api/seasons/:year', async (req, res) => {
 
                 return {
                     year,
+                    ...(series === 'fe' ? { label: seasonRows[0].label || String(year) } : {}),
                     summary: {
                         completed: seasonCompleted,
                         rounds: races.length,
@@ -779,11 +812,15 @@ router.get('/api/seasons/:year', async (req, res) => {
                         third: championship[2] || null,
                         constructorLeader: constructorChampionship.find(constructor => constructor.champion)
                             || constructorChampionship.find(constructor => constructor.position === 1)
+                            || null,
+                        manufacturerLeader: manufacturerChampionship.find(manufacturer => manufacturer.champion)
+                            || manufacturerChampionship[0]
                             || null
                     },
                     championship,
                     driverChampionship: comparisonChampionship,
                     constructorChampionship,
+                    ...(series === 'fe' ? { manufacturerChampionship } : {}),
                     calendar: races.map(race => {
                         const coordinates = coordinatesForRace(race);
                         return {
@@ -1327,4 +1364,5 @@ module.exports.f2ResultPoints = f2ResultPoints;
 module.exports.f2SessionType = f2SessionType;
 module.exports.f3ResultPoints = f3ResultPoints;
 module.exports.f3SessionType = f3SessionType;
+module.exports.formulaESessionType = formulaESessionType;
 module.exports.academySessionType = academySessionType;

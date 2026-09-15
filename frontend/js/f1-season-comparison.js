@@ -3,7 +3,7 @@
   const model = SeasonComparisonModel, analysis = SeasonAnalysisModel, $ = id => document.getElementById(id);
   const seriesKey = activeSeriesKey(), junior = seriesKey !== 'f1';
   const colors = [junior ? activeSeriesAccent() : '#d92337', '#334d70'];
-  const raceUnit = junior ? 'race sessions' : 'Grands Prix';
+  const raceUnit = seriesKey === 'fe' ? 'E-Prix races' : junior ? 'race sessions' : 'Grands Prix';
   let state = model.readState(location.search), data, comparison, requestId = 0, years = [];
   const normalizeSort = () => {
     if (junior && ['finish', 'qualifying'].includes(state.sort)) state.sort = 'feature';
@@ -57,7 +57,7 @@
   }
   function renderMetrics() {
     $('comparison-overview').innerHTML = metricTable([
-      ['races', junior ? 'Race sessions recorded' : 'Grands Prix recorded'], ['winners', 'Different winners'], ['teams', ['f3', 'academy'].includes(seriesKey) ? 'Winning teams' : 'Winning constructors'],
+      ['races', seriesKey === 'fe' ? 'E-Prix races recorded' : junior ? 'Race sessions recorded' : 'Grands Prix recorded'], ['winners', 'Different winners'], ['teams', ['f3', 'academy', 'fe'].includes(seriesKey) ? 'Winning teams' : 'Winning constructors'],
       ['margin', state.basis === 'matched' ? 'Lead at cutoff' : 'Championship margin', 1, ' pts'],
       ['marginPercent', 'Margin / leader’s points', 1, '%'], ['concentration', 'Top-three points share', 1, '%'],
       [junior ? 'unclassifiedRate' : 'retirementRate', junior ? 'Unclassified rate' : 'Retirement rate', 1, '%', junior ? 'Unclassified / starts · includes DSQ' : 'Recorded retirements / starts'], ['nonStarts', 'Non-starts', 0, '', 'DNS, DNQ and withdrawals'], ['disqualifications', 'Disqualifications']
@@ -69,7 +69,7 @@
   }
   function renderFields() {
     const columns = [['position', 'Pos.'], ['name', 'Driver'], ['points', 'Points'], ...(junior
-      ? [['sprint', seriesKey === 'academy' ? 'Avg. reverse' : 'Avg. sprint'], ['feature', seriesKey === 'academy' ? 'Avg. standard' : 'Avg. feature']]
+      ? seriesKey === 'fe' ? [['feature', 'Avg. finish']] : [['sprint', seriesKey === 'academy' ? 'Avg. reverse' : 'Avg. sprint'], ['feature', seriesKey === 'academy' ? 'Avg. standard' : 'Avg. feature']]
       : [['finish', 'Avg. finish'], ['qualifying', 'Avg. quali.']]), ['spread', 'Spread']];
     $('comparison-field-size').value = state.field;
     $('comparison-fields').innerHTML = comparison.snapshots.map((snapshot, index) => {

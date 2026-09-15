@@ -4,7 +4,7 @@ const F3_SEASON_PAGE_SIZE = 16;
 
 function matchingF3Seasons() {
   const query = document.getElementById('f3-season-search')?.value.trim() || '';
-  return query ? allF3Seasons.filter(season => String(season.year).includes(query)) : allF3Seasons;
+  return query ? allF3Seasons.filter(season => `${season.label || ''} ${season.year}`.includes(query)) : allF3Seasons;
 }
 
 function renderF3Seasons(seasons) {
@@ -21,7 +21,7 @@ function renderF3Seasons(seasons) {
     return `
       <a class="season-card f3-season-card" href="/f3/seasons/${encodeURIComponent(season.year)}">
         <div class="season-card-heading">
-          <div class="season-year">${esc(season.year)}</div>
+          <div class="season-year">${esc(season.label || season.year)}</div>
           <div class="season-card-champion${championName ? ' has-champion' : ''}">
             <span>F3 champion</span>
             <strong>${esc(championName || 'To be decided')}</strong>
@@ -44,7 +44,7 @@ function renderF3Seasons(seasons) {
 async function loadF3Seasons() {
   try {
     allF3Seasons = await getJSON('/api/seasons?series=f3');
-    document.getElementById('f3-season-years').innerHTML = allF3Seasons.map(season => `<option value="${esc(season.year)}"></option>`).join('');
+    document.getElementById('f3-season-years').innerHTML = allF3Seasons.map(season => `<option value="${esc(season.label || season.year)}"></option>`).join('');
     renderF3Seasons(allF3Seasons);
   } catch (error) {
     console.error('F3 seasons error:', error);
@@ -62,9 +62,9 @@ document.getElementById('f3-season-jump')?.addEventListener('submit', event => {
   event.preventDefault();
   const input = document.getElementById('f3-season-search');
   const message = document.getElementById('f3-season-search-message');
-  const exact = allF3Seasons.find(season => String(season.year) === input.value.trim());
+  const exact = allF3Seasons.find(season => [String(season.year), String(season.label || '')].includes(input.value.trim()));
   if (exact) {
-    input.value = String(exact.year);
+    input.value = String(exact.label || exact.year);
     f3SeasonPage = 1;
     renderF3Seasons([exact]);
     document.getElementById('f3-seasons')?.scrollIntoView({ behavior: 'smooth', block: 'start' });

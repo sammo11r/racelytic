@@ -2,8 +2,8 @@ let allSeasons = [];
 let seasonPage = 1;
 const SEASON_PAGE_SIZE = 16;
 const seasonSeries = activeSeriesKey();
-const seasonBase = seasonSeries === 'f1' ? '' : `/${seasonSeries}`;
-const seasonChampionLabel = { f1: 'World champion', f2: 'F2 champion', f3: 'F3 champion', academy: 'F1 Academy champion' }[seasonSeries];
+const seasonBase = seasonSeries === 'f1' ? '' : seasonSeries === 'fe' ? '/formula-e' : `/${seasonSeries}`;
+const seasonChampionLabel = { f1: 'World champion', f2: 'F2 champion', f3: 'F3 champion', academy: 'F1 Academy champion', fe: 'Formula E champion' }[seasonSeries];
 
 
 async function loadSeasons() {
@@ -40,7 +40,7 @@ function populateSeasonSearch() {
 
     if (list) {
         list.innerHTML = allSeasons.map(season =>
-            `<option value="${esc(season.year)}"></option>`
+            `<option value="${esc(season.label || season.year)}"></option>`
         ).join('');
     }
 }
@@ -51,7 +51,7 @@ function matchingSeasons() {
     const query = document.getElementById('season-search')?.value.trim() || '';
 
     const filtered = query
-        ? allSeasons.filter(season => String(season.year).includes(query))
+        ? allSeasons.filter(season => `${season.label || ''} ${season.year}`.includes(query))
         : allSeasons;
 
     const direction = document.getElementById('season-sort')?.value === 'asc' ? 1 : -1;
@@ -113,7 +113,7 @@ function renderSeasons(seasons) {
 
                 <div class="season-card-heading">
                     <div class="season-year">
-                        ${esc(season.year)}
+                        ${esc(season.label || season.year)}
                     </div>
 
                     <div class="season-card-champion${season.champion?.name ? ' has-champion' : ''}">

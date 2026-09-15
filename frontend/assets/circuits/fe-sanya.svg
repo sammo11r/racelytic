@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="500" height="500" viewBox="0 0 500 500" role="img" aria-labelledby="title-sanya">
+  <title id="title-sanya">Sanya Formula E circuit outline</title>
+  <!-- Simplified from https://results.formulae.fia.com/api/getfile/formula-e/files/results/04_Season%205%20-%202018-19/09_R06%20Sanya/01_Event%20Information/03_Sanya%20Circuit%20Map.pdf -->
+  <path d="M200.3 131.9 Q43.8 87.3 41.9 100.6 Q40.0 114.0 42.1 105.7 Q44.1 97.4 65.4 100.6 Q86.7 103.8 86.1 112.7 Q85.6 121.6 95.4 114.8 Q105.2 108.0 218.9 147.7 Q332.7 187.5 308.2 275.8 Q283.7 364.1 360.4 388.6 Q437.0 413.1 448.1 404.3 Q459.2 395.4 446.8 360.7 Q434.4 326.1 417.2 315.4 Q400.1 304.6 372.4 321.9 Q344.7 339.3 332.3 332.3 Q319.9 325.3 346.4 264.1 Q373.0 202.9 364.9 189.7 Q356.8 176.5 200.3 131.9 Z" fill="none" stroke="#111318" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

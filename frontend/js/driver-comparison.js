@@ -10,8 +10,7 @@
   const pageSize = 25;
 
   function comparisonUrl(type, id) {
-    const base = series === 'f1' ? '' : `/${series}`;
-    return `${base}/${type}?${type === 'season' ? 'year' : 'id'}=${encodeURIComponent(id)}`;
+    return seriesPageUrl(type, type === 'season' ? 'year' : 'id', id);
   }
 
   function number(value) { return value == null || value === '' ? null : Number(value); }

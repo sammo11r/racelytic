@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="500" height="500" viewBox="0 0 500 500" role="img" aria-labelledby="title-shanghai">
+  <title id="title-shanghai">Shanghai Formula E circuit outline</title>
+  <!-- Simplified from https://results.formulae.fia.com/api/getfile/formula-e/files/results/11_Season%2012%20-%202025-26/12_R12%20Shanghai/Event%20Information/S12_SHA%20Circuit%20Map%20V2.pdf -->
+  <path d="M64.0 105.9 Q41.2 95.9 59.4 153.0 Q77.5 210.1 125.6 267.6 Q173.7 325.1 165.2 345.8 Q156.6 366.6 147.2 342.0 Q137.8 317.5 117.9 326.3 Q97.9 335.0 100.1 354.2 Q102.3 373.4 122.0 389.3 Q141.8 405.3 298.7 361.4 Q455.6 317.5 455.6 284.1 Q455.6 250.8 407.1 228.0 Q358.6 205.3 340.4 177.7 Q322.3 150.2 288.1 156.2 Q254.0 162.2 245.6 189.7 Q237.2 217.3 209.3 226.8 Q181.3 236.4 134.0 176.1 Q86.7 115.9 64.0 105.9 Z" fill="none" stroke="#111318" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

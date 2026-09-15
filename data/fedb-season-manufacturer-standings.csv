@@ -1,0 +1,13 @@
+seasonKey,year,positionNumber,manufacturerId,points,championshipWon
+2024-25,2025,1,porsche,383,True
+2024-25,2025,2,jaguar,350,False
+2024-25,2025,3,nissan,342,False
+2024-25,2025,4,stellantis,274,False
+2024-25,2025,5,mahindra-racing,213,False
+2024-25,2025,6,lola,54,False
+2025-26,2026,1,porsche,498,True
+2025-26,2026,2,jaguar,400,False
+2025-26,2026,3,stellantis,292,False
+2025-26,2026,4,mahindra-racing,251,False
+2025-26,2026,5,nissan,189,False
+2025-26,2026,6,lola,85,False

@@ -5,11 +5,11 @@ const communityElements = {
   sort: document.getElementById('community-sort'), more: document.getElementById('community-more'),
   clear: document.getElementById('community-clear')
 };
-const communitySeriesNames = { all: 'All series', f1: 'Formula 1', f2: 'Formula 2', f3: 'Formula 3', academy: 'F1 Academy' };
+const communitySeriesNames = { all: 'All series', f1: 'Formula 1', f2: 'Formula 2', f3: 'Formula 3', academy: 'F1 Academy', fe: 'Formula E' };
 let communitySearchTimer;
 
 function communityBase(series, page) {
-  const base = series === 'f1' ? '' : `/${series}`;
+  const base = series === 'f1' ? '' : series === 'fe' ? '/formula-e' : `/${series}`;
   if (page === 'season') return series === 'f1' ? '/simulator' : `${base}/simulate-season`;
   return `${base}/${page}`;
 }
@@ -17,10 +17,10 @@ function communityBase(series, page) {
 function contextualSeries() {
   if (communityState.series !== 'all') return communityState.series;
   const requested = new URLSearchParams(location.search).get('series');
-  if (['f1', 'f2', 'f3', 'academy'].includes(requested)) return requested;
+  if (['f1', 'f2', 'f3', 'academy', 'fe'].includes(requested)) return requested;
   try {
     const remembered = localStorage.getItem('racelytic-series');
-    if (['f1', 'f2', 'f3', 'academy'].includes(remembered)) return remembered;
+    if (['f1', 'f2', 'f3', 'academy', 'fe'].includes(remembered)) return remembered;
   } catch {}
   return 'f1';
 }
@@ -35,7 +35,7 @@ function recordUrl(configuration = {}) {
   Object.entries(configuration).forEach(([key, value]) => {
     if (key !== 'series' && value !== null && value !== undefined && value !== '' && value !== false) query.set(key, String(value));
   });
-  const series = ['f2', 'f3', 'academy'].includes(configuration.series) ? configuration.series : 'f1';
+  const series = ['f2', 'f3', 'academy', 'fe'].includes(configuration.series) ? configuration.series : 'f1';
   return `${communityBase(series, 'records')}?${query}`;
 }
 
@@ -65,7 +65,7 @@ function creationPresentation(item) {
   }
   if (item.type === 'records') {
     const config = item.configuration || {};
-    const subject = config.type === 'constructors' ? (['f3', 'academy'].includes(item.series) ? 'Teams' : 'Constructors') : 'Drivers';
+    const subject = config.type === 'constructors' ? (['f3', 'academy', 'fe'].includes(item.series) ? 'Teams' : 'Constructors') : 'Drivers';
     const format = config.category === 'championships' ? 'Championship titles' : categoryLabel(config.category);
     const facts = [subject, format];
     if (config.fromYear || config.toYear) facts.push(`${config.fromYear || 'First'}–${config.toYear || 'latest'}`);
@@ -139,7 +139,7 @@ function resetCommunityPage() { communityState.page = 1; setCommunityUrl(); setC
 function initialiseCommunity() {
   const params = new URLSearchParams(location.search);
   if (['all', 'points', 'records', 'championships'].includes(params.get('type'))) communityState.type = params.get('type');
-  if (['all', 'f1', 'f2', 'f3', 'academy'].includes(params.get('series'))) communityState.series = params.get('series');
+  if (['all', 'f1', 'f2', 'f3', 'academy', 'fe'].includes(params.get('series'))) communityState.series = params.get('series');
   if (['newest', 'updated', 'oldest', 'name'].includes(params.get('sort'))) communityState.sort = params.get('sort');
   communityState.query = (params.get('q') || '').slice(0, 80);
   communityElements.query.value = communityState.query;

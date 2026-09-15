@@ -2,8 +2,9 @@ let allCircuits = [], circuitPage = 1, circuitSearch = '', circuitSort = 'name';
 let circuitView = 'current', circuitSeason = '', circuitCountry = '', circuitType = '';
 let latestCircuitSeason = null, circuitsLoaded = false;
 const CIRCUIT_PAGE_SIZE = 24;
-const CIRCUIT_SERIES = ['f2', 'f3', 'academy'].find(series => window.location?.pathname.startsWith(`/${series}/`)) || 'f1';
-const CIRCUIT_BASE = CIRCUIT_SERIES === 'f1' ? '' : `/${CIRCUIT_SERIES}`;
+const CIRCUIT_SERIES = window.location?.pathname.startsWith('/formula-e/') ? 'fe'
+  : ['f2', 'f3', 'academy'].find(series => window.location?.pathname.startsWith(`/${series}/`)) || 'f1';
+const CIRCUIT_BASE = CIRCUIT_SERIES === 'f1' ? '' : CIRCUIT_SERIES === 'fe' ? '/formula-e' : `/${CIRCUIT_SERIES}`;
 const CIRCUIT_CACHE_KEY = `racelytic:${CIRCUIT_SERIES}:circuits:v1`;
 const CIRCUIT_TYPES = { RACE: 'Race circuit', STREET: 'Street circuit', ROAD: 'Road circuit' };
 

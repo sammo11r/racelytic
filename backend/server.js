@@ -6,6 +6,7 @@ const fs = require('node:fs');
 const zlib = require('node:zlib');
 const { requireMonitorAuth } = require('./monitor-auth');
 const { ACADEMY_PAGES, renderAcademyHtml, renderAcademyScript } = require('./academy-renderer');
+const { FORMULA_E_PAGES, renderFormulaEHtml, renderFormulaEScript } = require('./formula-e-renderer');
 const { renderSeriesHome } = require('./series-home-renderer');
 const { applySeo, renderRobots, renderSitemap } = require('./seo');
 const { dynamicSitemapRoutes, resolveSeoMetadata } = require('./seo-data');
@@ -173,7 +174,7 @@ for (const { route, file, series, slug } of juniorPages) {
     } else app.get(route, (req, res, next) => sendSeoPage(req, res, next, file));
 }
 
-for (const [route, series] of [['/', 'f1'], ['/f2', 'f2'], ['/f3', 'f3'], ['/academy', 'academy']]) {
+for (const [route, series] of [['/', 'f1'], ['/f2', 'f2'], ['/f3', 'f3'], ['/academy', 'academy'], ['/formula-e', 'fe']]) {
     app.get(route, (req, res) => res.type('html').send(applySeo(renderPageShell(renderSeriesHome(series)), req.path, req.query)));
 }
 
@@ -214,33 +215,49 @@ Object.entries(ACADEMY_PAGES).forEach(([slug, file]) => {
     });
 });
 
+Object.entries(FORMULA_E_PAGES).forEach(([slug, file]) => {
+    app.get(`/formula-e/${slug}`, (req, res, next) => {
+        if (Object.hasOwn(RESOURCE_ROUTES, slug)) {
+            const config = RESOURCE_ROUTES[slug], id = req.query[config.parameter];
+            if (slug === 'chassis' && !id) return sendSeoPage(req, res, next, file, content => renderFormulaEHtml(file, content));
+            if (!id) return res.redirect(308, `/formula-e/${config.collection}`);
+            const extra = new URLSearchParams(req.query);
+            extra.delete(config.parameter);
+            const query = extra.toString();
+            return res.redirect(308, `${resourcePath('fe', slug, id)}${query ? `?${query}` : ''}`);
+        }
+        sendSeoPage(req, res, next, file, content => renderFormulaEHtml(file, content));
+    });
+});
+
 const resourceFiles = Object.freeze({
-    season: { f1: 'season.html', f2: 'f2-season.html', f3: 'f3-season.html', academy: 'f3-season.html' },
-    race: { f1: 'race.html', f2: 'f2-race.html', f3: 'f3-race.html', academy: 'f3-race.html' },
-    driver: { f1: 'driver.html', f2: 'f2-driver.html', f3: 'f3-driver.html', academy: 'f3-driver.html' },
+    season: { f1: 'season.html', f2: 'f2-season.html', f3: 'f3-season.html', academy: 'f3-season.html', fe: 'f3-season.html' },
+    race: { f1: 'race.html', f2: 'f2-race.html', f3: 'f3-race.html', academy: 'f3-race.html', fe: 'f3-race.html' },
+    driver: { f1: 'driver.html', f2: 'f2-driver.html', f3: 'f3-driver.html', academy: 'f3-driver.html', fe: 'f3-driver.html' },
     constructor: { f1: 'constructor.html', f2: 'f2-constructor.html' },
-    team: { f3: 'f3-team.html', academy: 'f3-team.html' },
-    circuit: { f1: 'circuit.html', f2: 'f2-circuit.html', f3: 'f3-circuit.html', academy: 'f3-circuit.html' },
+    team: { f3: 'f3-team.html', academy: 'f3-team.html', fe: 'f3-team.html' },
+    circuit: { f1: 'circuit.html', f2: 'f2-circuit.html', f3: 'f3-circuit.html', academy: 'f3-circuit.html', fe: 'f3-circuit.html' },
     chassis: { f1: 'chassis.html', f2: 'f2-chassis.html', f3: 'f3-chassis.html', academy: 'f3-chassis.html' }
 });
 
 for (const [resource, bySeries] of Object.entries(resourceFiles)) {
     const collection = RESOURCE_ROUTES[resource].collection;
     for (const [series, file] of Object.entries(bySeries)) {
-        const base = series === 'f1' ? '' : `/${series}`;
+        const base = series === 'f1' ? '' : series === 'fe' ? '/formula-e' : `/${series}`;
         const handler = (req, res, next) => sendSeoPage(req, res, next, file,
-            content => series === 'academy' ? renderAcademyHtml(file, content) : content);
+            content => series === 'academy' ? renderAcademyHtml(file, content) : series === 'fe' ? renderFormulaEHtml(file, content) : content);
         app.get(`${base}/${collection}/:resourceId`, handler);
         if (resource === 'race') app.get(`${base}/${collection}/:resourceId/:slug`, handler);
     }
 }
 
 const sitemapRoutes = [
-    '/', '/f2', '/f3', '/academy',
+    '/', '/f2', '/f3', '/academy', '/formula-e',
     ...Object.keys(ratingsPages),
     ...publicPages.map(file => `/${file.slice(0, -'.html'.length)}`).filter(route => !/^\/f[23]-/.test(route)),
     ...juniorPages.map(({ route }) => route),
     ...Object.keys(ACADEMY_PAGES).filter(Boolean).map(slug => `/academy/${slug}`),
+    ...Object.keys(FORMULA_E_PAGES).map(slug => `/formula-e/${slug}`),
     ...askAnswerSnapshot.pages.map(page => page.path),
 ];
 
@@ -261,6 +278,14 @@ app.get('/academy-js/:file', (req, res, next) => {
     fs.readFile(path.join(frontendDirectory, 'js', req.params.file), 'utf8', (error, content) => {
         if (error) return next(error);
         res.type('application/javascript').send(renderAcademyScript(content));
+    });
+});
+
+app.get('/formula-e-js/:file', (req, res, next) => {
+    if (!/^f3-[a-z0-9-]+\.js$|^f3\.js$/.test(req.params.file)) return res.sendStatus(404);
+    fs.readFile(path.join(frontendDirectory, 'js', req.params.file), 'utf8', (error, content) => {
+        if (error) return next(error);
+        res.type('application/javascript').send(renderFormulaEScript(content));
     });
 });
 

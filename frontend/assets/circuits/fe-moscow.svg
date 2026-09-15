@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="500" height="500" viewBox="0 0 500 500" role="img" aria-labelledby="title-moscow">
+  <title id="title-moscow">Moscow Formula E circuit outline</title>
+  <!-- Simplified from https://commons.wikimedia.org/wiki/Special:Redirect/file/Moscow_Street_Circuit.png -->
+  <path d="M444.5 235.7 Q460.0 71.3 443.6 234.7 Q427.1 398.2 276.7 406.9 Q126.4 415.6 107.8 393.6 Q89.1 371.6 77.8 304.3 Q66.5 236.9 53.3 252.2 Q40.0 267.4 45.0 330.2 Q49.9 393.0 51.1 332.2 Q52.3 271.4 71.7 348.3 Q91.1 425.1 66.5 349.5 Q42.0 273.8 54.1 256.1 Q66.2 238.5 76.8 305.3 Q87.5 372.0 109.5 395.4 Q131.5 418.8 111.7 423.7 Q91.9 428.7 260.5 414.4 Q429.1 400.2 444.5 235.7 Z" fill="none" stroke="#111318" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

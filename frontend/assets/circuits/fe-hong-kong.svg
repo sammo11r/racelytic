@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="500" height="500" viewBox="0 0 500 500" role="img" aria-labelledby="title-hong-kong">
+  <title id="title-hong-kong">Hong Kong Formula E circuit outline</title>
+  <!-- Simplified from https://results.formulae.fia.com/api/getfile/formula-e/files/results/04_Season%205%20-%202018-19/08_R05%20Hong%20Kong/01_Event%20Information/03_Hong%20Kong%20Circuit%20Map.pdf -->
+  <path d="M75.3 137.5 Q51.4 148.3 49.3 240.7 Q47.2 333.2 147.1 346.2 Q247.1 359.2 247.2 366.2 Q247.4 373.2 248.0 366.2 Q248.7 359.2 353.9 353.0 Q459.0 346.9 454.5 338.4 Q449.9 330.0 427.3 336.0 Q404.7 342.0 427.2 343.1 Q449.6 344.3 367.2 348.3 Q284.8 352.4 167.1 339.4 Q49.4 326.4 56.1 285.4 Q62.8 244.5 56.3 237.6 Q49.8 230.8 63.1 193.9 Q76.4 157.0 68.1 152.8 Q59.8 148.6 79.5 149.4 Q99.2 150.2 99.2 138.5 Q99.2 126.8 75.3 137.5 Z" fill="none" stroke="#111318" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

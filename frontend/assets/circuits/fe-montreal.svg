@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="500" height="500" viewBox="0 0 500 500" role="img" aria-labelledby="title-montreal">
+  <title id="title-montreal">Montreal Formula E circuit outline</title>
+  <!-- Simplified from https://commons.wikimedia.org/wiki/Special:Redirect/file/Montreal_Layout_2016.png -->
+  <path d="M181.8 179.7 Q40.0 176.2 42.9 219.5 Q45.9 262.9 65.8 265.8 Q85.7 268.7 90.4 284.3 Q95.1 299.8 160.7 296.9 Q226.3 293.9 255.6 311.5 Q284.9 329.1 302.4 323.8 Q320.0 318.5 322.9 297.4 Q325.9 276.4 390.3 267.9 Q454.7 259.4 456.2 223.3 Q457.7 187.3 397.0 185.3 Q336.4 183.2 390.6 190.0 Q444.8 196.7 445.9 226.3 Q447.1 255.9 384.4 262.6 Q321.8 269.3 317.9 291.0 Q314.1 312.7 299.8 316.8 Q285.4 320.9 256.7 303.6 Q228.0 286.3 162.7 289.2 Q97.4 292.2 94.5 277.2 Q91.5 262.3 72.2 260.8 Q52.9 259.4 52.0 219.2 Q51.1 179.1 187.3 181.2 Q323.5 183.2 181.8 179.7 Z" fill="none" stroke="#111318" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

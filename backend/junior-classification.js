@@ -19,4 +19,16 @@ function juniorClassificationTime(value) {
     return !text || /^(CLA|CLASSIFIED|FINISHED|RUNNING)$/i.test(text) ? null : text;
 }
 
-module.exports = { juniorClassificationPosition, juniorClassificationStatus, juniorClassificationTime };
+function fillTimedClassificationGaps(results) {
+    const timed = results.filter(result => Number(result.timeMillis) > 0);
+    if (!timed.length) return results;
+    const fastest = Math.min(...timed.map(result => Number(result.timeMillis)));
+    for (const result of timed) {
+        const hasGap = result.gapMillis !== null && result.gapMillis !== undefined
+            || result.gapLaps !== null && result.gapLaps !== undefined;
+        if (!hasGap) result.gapMillis = Math.max(0, Number(result.timeMillis) - fastest);
+    }
+    return results;
+}
+
+module.exports = { fillTimedClassificationGaps, juniorClassificationPosition, juniorClassificationStatus, juniorClassificationTime };

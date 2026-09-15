@@ -1,11 +1,11 @@
 const express = require('express');
 const { withConnection, sendError } = require('../route-helpers');
 const { optionalInteger } = require('../validation');
-const { f2SessionType, f3SessionType, academySessionType } = require('./seasons');
+const { f2SessionType, f3SessionType, academySessionType, formulaESessionType } = require('./seasons');
 const { isJuniorSeries, minimumSeasonYear, seriesPrefix } = require('../series-config');
 const { academyRaceAwardsPole, academyRaceDisplayName, academyRaceGridContext } = require('../academy-race-analysis');
 const { juniorRaceGridContext } = require('../junior-race-analysis');
-const { juniorClassificationPosition, juniorClassificationStatus, juniorClassificationTime } = require('../junior-classification');
+const { fillTimedClassificationGaps, juniorClassificationPosition, juniorClassificationStatus, juniorClassificationTime } = require('../junior-classification');
 
 const router = express.Router();
 
@@ -60,7 +60,7 @@ router.get('/api/races/:id', async (req, res) => {
                 const isDisqualified = row => /\b(?:DSQ|DQ|DISQ|DISQUALIFIED|EXC)\b/i.test(String(row.status || ''));
                 const sessionsById = new Map(sessionRows.map(session => [String(session.id), session]));
                 const raceSessions = sessionRows.filter(session => isTrue(session.isRace));
-                const sessionType = series === 'academy' ? academySessionType : series === 'f3' ? f3SessionType : f2SessionType;
+                const sessionType = series === 'academy' ? academySessionType : series === 'f3' ? f3SessionType : series === 'fe' ? formulaESessionType : f2SessionType;
                 const raceTypeBySession = new Map(raceSessions.map((session, index) => [
                     String(session.id),
                     sessionType(session, index, raceSessions.length, raceRows[0].year)
@@ -69,6 +69,7 @@ router.get('/api/races/:id', async (req, res) => {
                     || raceSessions.at(-1);
                 const sprintSessions = raceSessions.filter(session => raceTypeBySession.get(String(session.id)) === 'S');
                 const raceLabelBySession = new Map(raceSessions.map(session => {
+                    if (series === 'fe') return [String(session.id), session.name || 'Race'];
                     const type = raceTypeBySession.get(String(session.id));
                     if (type === 'F') return [String(session.id), 'Feature Race'];
                     const sprintIndex = sprintSessions.findIndex(candidate => String(candidate.id) === String(session.id));
@@ -86,12 +87,13 @@ router.get('/api/races/:id', async (req, res) => {
                 const importedFastestBySession = new Map();
                 resultRows.forEach(row => {
                     const session = sessionsById.get(String(row.sessionId));
-                    const position = Number(row.positionNumber || 0);
-                    if (!session || !isTrue(session.isRace) || position < 1 || position > 10 || isDisqualified(row)) return;
+                    if (!session || !isTrue(session.isRace)) return;
                     const sessionId = String(row.sessionId);
                     if (isTrue(row.fastestLap) && !importedFastestBySession.has(sessionId)) {
                         importedFastestBySession.set(sessionId, row.driverId);
                     }
+                    const position = Number(row.positionNumber || 0);
+                    if (position < 1 || position > 10 || isDisqualified(row)) return;
                     const lapTime = Number(row.fastestLapTimeMillis);
                     if (!Number.isFinite(lapTime) || lapTime <= 0) return;
                     const current = fastestLapBySession.get(sessionId);
@@ -100,7 +102,7 @@ router.get('/api/races/:id', async (req, res) => {
                     }
                 });
                 importedFastestBySession.forEach((driverId, sessionId) => {
-                    if (!fastestLapBySession.has(sessionId)) fastestLapBySession.set(sessionId, { driverId });
+                    if (series === 'fe' || !fastestLapBySession.has(sessionId)) fastestLapBySession.set(sessionId, { driverId });
                 });
                 const resultsBySession = new Map();
                 resultRows.forEach(row => {
@@ -124,6 +126,10 @@ router.get('/api/races/:id', async (req, res) => {
                         fastestLap: Boolean(isRace && String(row.driverId) === String(fastestLapBySession.get(sessionId)?.driverId))
                     });
                 });
+                if (series === 'fe') {
+                    sessionRows.filter(session => !isTrue(session.isRace) && !/grid/i.test(`${session.code} ${session.name}`))
+                        .forEach(session => fillTimedClassificationGaps(resultsBySession.get(String(session.id)) || []));
+                }
 
                 return {
                     race: raceRows[0],

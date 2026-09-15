@@ -14,7 +14,7 @@ const COLLECTION_TO_RESOURCE = Object.freeze(Object.fromEntries(
 
 function seriesBase(series) {
     const key = typeof series === 'string' ? series : series?.key;
-    return !key || key === 'f1' ? '' : `/${key}`;
+    return !key || key === 'f1' ? '' : key === 'fe' ? '/formula-e' : `/${key}`;
 }
 
 function slugify(value) {
@@ -37,12 +37,12 @@ function resourcePath(series, resource, id, label = '') {
 
 function matchResourcePath(pathname) {
     const clean = String(pathname || '/').replace(/\/+$/, '') || '/';
-    const match = clean.match(/^\/(?:((?:f2|f3|academy))\/)?(seasons|races|drivers|constructors|teams|circuits|chassis)\/([^/]+)(?:\/([^/]+))?$/);
+    const match = clean.match(/^\/(?:(f2|f3|academy|formula-e)\/)?(seasons|races|drivers|constructors|teams|circuits|chassis)\/([^/]+)(?:\/([^/]+))?$/);
     if (!match) return null;
     const resource = COLLECTION_TO_RESOURCE[match[2]];
     if (!resource || (match[4] && !RESOURCE_ROUTES[resource].slug)) return null;
     try {
-        return { series: match[1] || 'f1', resource, id: decodeURIComponent(match[3]), slug: match[4] || '' };
+        return { series: match[1] === 'formula-e' ? 'fe' : match[1] || 'f1', resource, id: decodeURIComponent(match[3]), slug: match[4] || '' };
     } catch {
         return null;
     }

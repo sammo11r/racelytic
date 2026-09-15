@@ -1,5 +1,5 @@
-const SERIES_ORDER = Object.freeze(['f1', 'f2', 'f3', 'academy']);
-const SERIES_LABELS = Object.freeze({ f1: 'F1', f2: 'F2', f3: 'F3', academy: 'F1 Academy' });
+const SERIES_ORDER = Object.freeze(['f1', 'f2', 'f3', 'academy', 'fe']);
+const SERIES_LABELS = Object.freeze({ f1: 'F1', f2: 'F2', f3: 'F3', academy: 'F1 Academy', fe: 'Formula E' });
 const GROUPS = Object.freeze([
     ['circuit', 'Circuits', 2],
     ['race', 'Race weekends', 5],

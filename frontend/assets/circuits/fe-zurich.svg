@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="500" height="500" viewBox="0 0 500 500" role="img" aria-labelledby="title-zurich">
+  <title id="title-zurich">Zurich Formula E circuit outline</title>
+  <!-- Simplified from https://commons.wikimedia.org/wiki/Special:Redirect/file/Zurich_E_Prix_Layout.png -->
+  <path d="M413.4 283.7 Q460.0 260.9 447.8 237.1 Q435.5 213.3 416.3 221.9 Q397.2 230.5 389.6 212.0 Q382.0 193.4 330.7 208.3 Q279.4 223.2 159.7 237.1 Q40.0 251.0 59.8 258.6 Q79.7 266.2 200.4 260.9 Q321.1 255.6 343.9 281.1 Q366.7 306.6 413.4 283.7 Z" fill="none" stroke="#111318" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

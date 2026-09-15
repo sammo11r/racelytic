@@ -134,6 +134,15 @@ test('URL state restores circuit, custom range, active view and sample filters',
   assert.equal(page.node('ca-workspace').hidden, false);
 });
 
+test('Formula E specialists default to one start so short-lived venues are populated', async () => {
+  const page = harness('?id=beijing', '/formula-e/circuit-analysis');
+  assert.equal(page.node('ca-minimum').value, '1');
+  page.requests[0].resolve([circuit('beijing')]); await flush();
+  page.requests[1].resolve(data('beijing', 2015)); await flush();
+  assert.match(page.node('ca-rankings').innerHTML, /winner/);
+  assert.match(page.urls.at(-1), /min=1/);
+});
+
 test('empty era hides all views and reset restores races without showing NaN or dash-percent', async () => {
   const page = harness('?id=adelaide&era=2020-9999');
   page.requests[0].resolve([circuit('adelaide')]); await flush();

@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="500" height="500" viewBox="0 0 500 500" role="img" aria-labelledby="title-cape-town">
+  <title id="title-cape-town">Cape Town Formula E circuit outline</title>
+  <!-- Simplified from https://results.formulae.fia.com/api/getfile/formula-e/files/results/08_Season%209%20-%202022-23/05_R05%20Cape%20Town/Event%20Information/S9_CPT_Circuit%20Map%20V3.pdf -->
+  <path d="M422.8 297.1 Q459.5 257.9 368.9 180.0 Q278.3 102.1 283.7 95.2 Q289.2 88.2 282.5 92.9 Q275.8 97.6 255.5 77.3 Q235.2 57.0 178.4 61.3 Q121.6 65.7 120.6 143.6 Q119.6 221.6 109.9 226.3 Q100.2 231.0 110.9 228.3 Q121.6 225.7 133.5 254.2 Q145.3 282.7 109.7 319.8 Q74.0 356.8 57.4 399.3 Q40.9 441.9 137.0 442.6 Q233.1 443.2 269.0 409.7 Q305.0 376.2 345.5 356.3 Q386.1 336.3 422.8 297.1 Z" fill="none" stroke="#111318" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

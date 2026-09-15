@@ -11,9 +11,11 @@ function databasePool() {
 
 const DATA_DIR = path.join(__dirname, '../../data');
 const IMPORT_LOCK = 'racelytic:data-import';
+const SERIES_FILE_PREFIX = Object.freeze({ f1: 'f1db-', f2: 'f2db-', f3: 'f3db-', academy: 'fadb-', fe: 'fedb-' });
 
 function tableNameFromFile(filename) {
   if (/^fadb-/i.test(filename)) return `fa_${filename.replace(/^fadb-/i, '').replace(/\.csv$/i, '').replace(/-/g, '_')}`;
+  if (/^fedb-/i.test(filename)) return `fe_${filename.replace(/^fedb-/i, '').replace(/\.csv$/i, '').replace(/-/g, '_')}`;
   const match = filename.toLowerCase().match(/^f([123])db-/);
   const series = match && match[1] !== '1' ? `f${match[1]}_` : '';
   return series + filename.replace(/^f[123]db-/i, '').replace(/\.csv$/i, '').replace(/-/g, '_');
@@ -63,11 +65,21 @@ function readCsv(filePath) {
   });
 }
 
-async function loadDatasets(dataDirectory = DATA_DIR) {
+function selectedFilePrefixes(series) {
+  if (!series || (Array.isArray(series) && !series.length)) return null;
+  const requested = Array.isArray(series) ? series : [series];
+  const invalid = requested.filter(value => !SERIES_FILE_PREFIX[String(value).toLowerCase()]);
+  if (invalid.length) throw new Error(`Unsupported import series: ${invalid.join(', ')}`);
+  return new Set(requested.map(value => SERIES_FILE_PREFIX[String(value).toLowerCase()]));
+}
+
+async function loadDatasets(dataDirectory = DATA_DIR, options = {}) {
+  const prefixes = selectedFilePrefixes(options.series);
   const files = fs.readdirSync(dataDirectory)
-    .filter(file => /^(?:f[123]db|fadb)-.*\.csv$/i.test(file))
+    .filter(file => /^(?:f[123]db|fadb|fedb)-.*\.csv$/i.test(file))
+    .filter(file => !prefixes || [...prefixes].some(prefix => file.toLowerCase().startsWith(prefix)))
     .sort();
-  if (!files.length) throw new Error(`No database CSV files found in ${dataDirectory}.`);
+  if (!files.length) throw new Error(`No matching database CSV files found in ${dataDirectory}.`);
   const datasets = [];
   const tables = new Set();
   for (const file of files) {
@@ -130,7 +142,7 @@ async function verifyPublishedTables(connection, datasets) {
 async function importAll(options = {}) {
   const dataDirectory = options.dataDirectory || DATA_DIR;
   const minimumRowRatio = Number(options.minimumRowRatio ?? process.env.DATA_SYNC_MIN_ROW_RATIO ?? 0.9);
-  const datasets = await loadDatasets(dataDirectory);
+  const datasets = await loadDatasets(dataDirectory, { series: options.series });
   const token = `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 7)}`;
   const stageName = table => `__sync_${token}_${table}`;
   const oldName = table => `__old_${token}_${table}`;
@@ -207,5 +219,6 @@ module.exports = {
   inferType,
   loadDatasets,
   normalizedImportValue,
+  selectedFilePrefixes,
   tableNameFromFile
 };

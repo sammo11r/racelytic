@@ -16,9 +16,8 @@ test('shared race analysis exposes the upgraded workspace to every championship'
   assert.match(html, /id="race-result-search"/);
   assert.match(html, /id="race-team-filter"/);
   assert.match(html, /css\/race-analysis\.css/);
-  assert.match(script, /location\.pathname\.startsWith\('\/f2\/'\)/);
-  assert.match(script, /location\.pathname\.startsWith\('\/f3\/'\)/);
-  assert.match(script, /location\.pathname\.startsWith\('\/academy\/'\)/);
+  assert.match(script, /const series = activeSeriesKey\(\)/);
+  assert.match(script, /const junior = series !== 'f1'/);
 });
 
 test('race analysis preserves state and separates result statuses', () => {
@@ -41,7 +40,7 @@ test('a championship switch cannot leave the initial flow without drivers', () =
 test('race-analysis entity links use registered detail routes in every championship', () => {
   const source = fs.readFileSync(path.join(__dirname, '../frontend/js/race-analysis.js'), 'utf8');
   const functionSource = source.match(/function entityUrl\(type, id\) \{[\s\S]*?\n  \}/)[0];
-  for (const [series, base, teamPage] of [['f1', '', 'constructor'], ['f2', '/f2', 'constructor'], ['f3', '/f3', 'team'], ['academy', '/academy', 'team']]) {
+  for (const [series, base, teamPage] of [['f1', '', 'constructor'], ['f2', '/f2', 'constructor'], ['f3', '/f3', 'team'], ['academy', '/academy', 'team'], ['fe', '/formula-e', 'team']]) {
     const entityUrl = require('node:vm').runInNewContext(`(${functionSource})`, { series, resourceUrl });
     assert.equal(entityUrl('team', 'prema-racing'), `${base}/${teamPage}s/prema-racing`);
     assert.equal(entityUrl('driver', 'a b'), `${base}/drivers/a%20b`);

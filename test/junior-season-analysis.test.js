@@ -82,6 +82,15 @@ test('three-race weekends retain distinct session labels and order', () => {
   assert.deepEqual(data.calendar.slice(0, 3).map(race => race.sessionType), ['S', 'S', 'F']);
 });
 
+test('Formula E result columns use concise E-Prix weekend names', () => {
+  const raw = fixture();
+  raw.calendar[0].name = 'Sao Paulo E-Prix';
+  const data = model.adaptJunior(raw, 'fe');
+  assert.match(data.calendar[0].name, /^Sao Paulo E-Prix · E-Prix race(?: \d+)?$/);
+  assert.equal(data.calendar[0].weekendName, 'Sao Paulo E-Prix');
+  assert.equal(model.resultColumnName(data.calendar[0], 'fe'), 'Sao Paulo E-Prix');
+});
+
 test('future sessions stop charts at recorded results and absent schedules cannot imply completeness', () => {
   const raw = fixture();
   raw.calendar.push({ round: 3, name: 'Future', date: '2099-01-01', sessions: [{ id: 'future', sessionNumber: 4, name: 'Sprint' }] });

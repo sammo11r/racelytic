@@ -2,11 +2,12 @@ let allConstructors = [], constructorPage = 1, constructorSearch = '', construct
 let constructorView = 'current', constructorSeason = '', constructorCountry = '', constructorType = '';
 let latestConstructorSeason = null, constructorsLoaded = false;
 const CONSTRUCTOR_PAGE_SIZE = 24;
-const CONSTRUCTOR_SERIES = ['f2', 'f3', 'academy'].find(series => window.location?.pathname.startsWith(`/${series}/`)) || 'f1';
-const CONSTRUCTOR_BASE = CONSTRUCTOR_SERIES === 'f1' ? '' : `/${CONSTRUCTOR_SERIES}`;
-const CONSTRUCTOR_ENTITY = ['f3', 'academy'].includes(CONSTRUCTOR_SERIES) ? 'team' : 'constructor';
+const CONSTRUCTOR_SERIES = window.location?.pathname.startsWith('/formula-e/') ? 'fe'
+  : ['f2', 'f3', 'academy'].find(series => window.location?.pathname.startsWith(`/${series}/`)) || 'f1';
+const CONSTRUCTOR_BASE = CONSTRUCTOR_SERIES === 'f1' ? '' : CONSTRUCTOR_SERIES === 'fe' ? '/formula-e' : `/${CONSTRUCTOR_SERIES}`;
+const CONSTRUCTOR_ENTITY = ['f3', 'academy', 'fe'].includes(CONSTRUCTOR_SERIES) ? 'team' : 'constructor';
 const CONSTRUCTOR_LABEL = CONSTRUCTOR_ENTITY === 'team' ? 'Teams' : 'Constructors';
-const CONSTRUCTOR_SERIES_LABEL = { f1: 'F1', f2: 'F2', f3: 'F3', academy: 'F1 Academy' }[CONSTRUCTOR_SERIES];
+const CONSTRUCTOR_SERIES_LABEL = { f1: 'F1', f2: 'F2', f3: 'F3', academy: 'F1 Academy', fe: 'FE' }[CONSTRUCTOR_SERIES];
 const CONSTRUCTOR_CACHE_KEY = `racelytic:${CONSTRUCTOR_SERIES}:constructors:v1`;
 const CONSTRUCTOR_TYPES = { champions: 'Championship winners' };
 

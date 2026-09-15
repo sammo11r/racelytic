@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="500" height="500" viewBox="0 0 500 500" role="img" aria-labelledby="title-hyderabad">
+  <title id="title-hyderabad">Hyderabad Formula E circuit outline</title>
+  <!-- Simplified from https://results.formulae.fia.com/api/getfile/formula-e/files/results/08_Season%209%20-%202022-23/04_R04%20Hyderabad/Event%20Information/S9_HYD_CIRCUIT%20MAP%20V4.pdf -->
+  <path d="M139.3 71.2 Q107.7 76.2 74.6 160.2 Q41.4 244.3 45.0 266.9 Q48.7 289.6 104.4 278.3 Q160.1 267.0 185.2 232.6 Q210.3 198.1 240.7 224.8 Q271.2 251.5 328.7 244.8 Q386.2 238.0 407.6 334.8 Q429.0 431.7 444.5 428.0 Q460.0 424.2 409.8 266.9 Q359.6 109.6 323.5 100.2 Q287.3 90.7 287.4 79.0 Q287.5 67.3 285.4 78.6 Q283.3 89.9 227.0 78.1 Q170.8 66.3 139.3 71.2 Z" fill="none" stroke="#111318" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

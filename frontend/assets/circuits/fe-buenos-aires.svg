@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="500" height="500" viewBox="0 0 500 500" role="img" aria-labelledby="title-buenos-aires">
+  <title id="title-buenos-aires">Buenos Aires Formula E circuit outline</title>
+  <!-- Simplified from https://commons.wikimedia.org/wiki/Special:Redirect/file/Puerto_Madero_Formula_E_Circuit.png -->
+  <path d="M392.8 314.0 Q459.7 323.9 410.6 248.4 Q361.5 172.9 280.0 174.4 Q198.6 175.9 250.2 177.7 Q301.7 179.5 312.8 205.3 Q323.9 231.1 366.6 239.5 Q409.3 247.8 433.2 286.8 Q457.1 325.7 391.8 314.5 Q326.5 303.3 321.1 269.7 Q315.6 236.1 305.6 270.3 Q295.6 304.5 224.5 303.4 Q153.5 302.3 118.8 251.4 Q84.2 200.4 62.7 192.0 Q41.2 183.5 115.4 179.2 Q189.5 174.9 115.0 178.6 Q40.5 182.4 61.8 191.6 Q83.1 200.9 118.2 252.2 Q153.3 303.4 224.8 304.4 Q296.2 305.4 305.8 271.3 Q315.4 237.2 320.7 270.7 Q325.9 304.2 392.8 314.0 Z" fill="none" stroke="#111318" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

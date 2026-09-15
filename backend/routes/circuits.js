@@ -1,8 +1,8 @@
 const express = require('express');
 const { withConnection, sendError } = require('../route-helpers');
-const { f2SessionType, f3SessionType, academySessionType } = require('./seasons');
+const { f2SessionType, f3SessionType, academySessionType, formulaESessionType } = require('./seasons');
 const { isJuniorSeries, seriesPrefix } = require('../series-config');
-const { juniorCircuitArchiveRow } = require('../circuit-archive');
+const { juniorCircuitArchiveRow, juniorCircuitImageId } = require('../circuit-archive');
 const { buildCircuitDetail, buildJuniorCircuitDetail } = require('../circuit-detail');
 const { buildJuniorCircuitAnalysis } = require('../junior-circuit-analysis');
 
@@ -60,7 +60,7 @@ router.get('/api/circuits', async (req, res) => {
                         LEFT JOIN countries co ON co.id = c.countryId`)
                 ]);
                 const byLayout = new Map(layouts.map(row => [row.layoutId, row]));
-                return circuits.map(row => juniorCircuitArchiveRow(row, byLayout));
+                return circuits.map(row => juniorCircuitArchiveRow(row, byLayout, series));
             });
             return res.json(rows);
         }
@@ -134,8 +134,8 @@ router.get('/api/circuits/:id/analysis', async (req, res) => {
                         ORDER BY races.year, races.round, sessions.sessionNumber, results.positionDisplayOrder`, [req.params.id])
                 ]);
                 if (!circuits.length) return null;
-                const sessionType = series === 'academy' ? academySessionType : series === 'f3' ? f3SessionType : f2SessionType;
-                return buildJuniorCircuitAnalysis(circuits[0], rows, series, sessionType);
+                const sessionType = series === 'academy' ? academySessionType : series === 'f3' ? f3SessionType : series === 'fe' ? formulaESessionType : f2SessionType;
+                return buildJuniorCircuitAnalysis({ ...circuits[0], layoutId: juniorCircuitImageId(circuits[0].id, series) }, rows, series, sessionType);
             });
             if (!data) return res.status(404).json({ error: `${series.toUpperCase()} circuit not found.` });
             return res.json(data);
@@ -233,11 +233,11 @@ router.get('/api/circuits/:id', async (req, res) => {
                 ]);
                 if (!circuitRows.length) return null;
                 const byLayout = new Map(layouts.map(row => [row.layoutId, row]));
-                const circuit = juniorCircuitArchiveRow(circuitRows[0], byLayout);
+                const circuit = juniorCircuitArchiveRow(circuitRows[0], byLayout, series);
                 const location = byLayout.get(circuit.layoutId);
                 circuit.latitude = location?.latitude ?? null;
                 circuit.longitude = location?.longitude ?? null;
-                return buildJuniorCircuitDetail(circuit, races, sessions, series, series === 'academy' ? academySessionType : series === 'f3' ? f3SessionType : f2SessionType);
+                return buildJuniorCircuitDetail(circuit, races, sessions, series, series === 'academy' ? academySessionType : series === 'f3' ? f3SessionType : series === 'fe' ? formulaESessionType : f2SessionType);
             });
             if (!data) return res.status(404).json({ error: `${series.toUpperCase()} circuit not found.` });
             return res.json(data);

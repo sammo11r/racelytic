@@ -40,6 +40,16 @@ const SERIES_HOME_CONFIG = Object.freeze({
         entityLabel: 'Teams',
         archiveTitle: 'A young championship.|A complete record.',
         archiveCopy: 'Seasons, entrants, sessions and standings connect across a dedicated archive built for the championship’s own race formats.'
+    },
+    fe: {
+        ...SERIES.fe,
+        description: 'Explore twelve completed seasons of Formula E history in Racelytic.',
+        headline: 'Electric from the start.', subheadline: 'Every E-Prix tells a story.',
+        introduction: 'Explore Formula E from its inaugural 2014–15 season through the latest completed championship. Follow title fights, compare drivers and teams, revisit every E-Prix and discover how an all-electric world championship evolved across twelve seasons.',
+        askExample: '', askEnabled: false,
+        entityLabel: 'Teams',
+        archiveTitle: 'Twelve seasons.|One connected archive.',
+        archiveCopy: 'Official seasons, entrants, session classifications and standings connect every Formula E driver, team, circuit and E-Prix.'
     }
 });
 
@@ -95,6 +105,19 @@ const SERIES_HOME_PREVIEWS = {
         note: '2024 title contenders · Points and wins across the full season.',
         href: '/academy/season-analysis?year=2024', action: 'Explore Pulling’s championship',
         drivers: [{ id: 'marta-garcia', name: 'García', wins: 7, poles: 4 }, { id: 'abbi-pulling', name: 'Pulling', wins: 9, poles: 12 }]
+    },
+    fe: {
+        year: '2025–26',
+        dataYear: 2026,
+        question: 'How close can a title fight get?',
+        copy: 'Wehrlein and Dennis finished five points apart after 17 races. Follow where the championship changed hands.',
+        contenders: [{ name: 'Pascal Wehrlein', id: 'pascal-wehrlein', points: 169, wins: 3 }, { name: 'Jake Dennis', id: 'jake-dennis', points: 164, wins: 2 }],
+        note: '2025–26 title contenders · Official final standings.',
+        href: '/formula-e/season-analysis?year=2026', action: 'Explore Wehrlein’s title season',
+        drivers: [{ id: 'sebastien-buemi', name: 'Buemi', wins: 14, podiums: 35 }, { id: 'mitch-evans', name: 'Evans', wins: 16, podiums: 38 }],
+        comparisonMetrics: [['wins', 'Race wins'], ['podiums', 'Podiums']],
+        champions: [{ year: '2014–15', dataYear: 2015, name: 'Nelson Piquet Jr.', id: 'nelson-piquet-jr' }, { year: '2019–20', name: null }, { year: '2025–26', dataYear: 2026, name: 'Pascal Wehrlein', id: 'pascal-wehrlein' }],
+        quizHref: '/formula-e/seasons', quizAction: 'Explore every champion'
     }
 };
 
@@ -145,7 +168,7 @@ function renderQuestions(config) {
           <div class="home-quiz-preview" aria-label="Champions quiz preview: can you name the ${missingChampion.year} champion?">
             ${preview.champions.map(champion => `<div${champion.name ? '' : ' class="home-quiz-missing"'}><span>${champion.year}</span><strong>${champion.name ? esc(champion.name) : 'Who took the title?'}</strong><span aria-hidden="true">${champion.name ? '✓' : '?'}</span></div>`).join('')}
           </div>
-          <a class="home-question-link" href="${esc(preview.quizHref)}">Name the champions</a>` : `<h3>How quick are your reactions?</h3>
+          <a class="home-question-link" href="${esc(preview.quizHref)}">${esc(preview.quizAction || 'Name the champions')}</a>` : `<h3>How quick are your reactions?</h3>
           <div class="home-lights-preview">
             <div class="home-start-lights" role="img" aria-label="Lights Out preview: five red starting lights"><i></i><i></i><i></i><i></i><i></i></div>
             <p>Wait for the lights. Then react.<br>Find out how fast you are off the line.</p>
@@ -196,11 +219,11 @@ function renderSeriesHome(seriesKey) {
 
     ${renderQuestions(config)}
 
-    <section class="container home-ask-entry" aria-labelledby="home-ask-title">
+    ${config.askEnabled === false ? '' : `<section class="container home-ask-entry" aria-labelledby="home-ask-title">
       <div><div class="eyebrow">ASK RACELYTIC</div><h2 id="home-ask-title">What would you like to know?</h2><p>${config.key === 'f1' ? 'Describe an alternate Formula 1 history' : `Ask about ${esc(config.name)} records`}. Racelytic calculates the answer from recorded results.</p></div>
       <form action="${esc(config.path)}/ask" method="get"><label class="visually-hidden" for="home-ask-query">Ask a ${esc(config.name)} history question</label><input id="home-ask-query" name="q" type="search" maxlength="300" value="${esc(config.askExample)}" aria-describedby="home-ask-example-note" required><button type="submit">Calculate <span aria-hidden="true">→</span></button></form>
       <span class="visually-hidden" id="home-ask-example-note">Example question. Edit it to ask something else, or calculate it as shown.</span>
-    </section>
+    </section>`}
 
     <section class="container home-archive" id="series-archive">
       <div class="home-archive-copy">

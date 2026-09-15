@@ -53,6 +53,16 @@ const SERIES_PAGE_TEMPLATES = Object.freeze({
         quizzes: 'f3-quizzes.html', 'constructor-champions-quiz': 'f3-constructor-champions-quiz.html',
         'season-race-winners-quiz': 'f3-season-race-winners-quiz.html', about: 'f3-about.html',
     }),
+    fe: Object.freeze({
+        database: 'f3-database.html', seasons: 'f3-seasons.html', season: 'f3-season.html',
+        races: 'f3-races.html', race: 'f3-race.html', drivers: 'f3-drivers.html', driver: 'f3-driver.html',
+        teams: 'f3-teams.html', team: 'f3-team.html', circuits: 'f3-circuits.html', circuit: 'f3-circuit.html',
+        chassis: 'f3-chassis.html', analysis: 'f3-analysis.html', 'season-analysis': 'season-analysis.html',
+        'season-comparison': 'season-comparison.html', 'race-analysis': 'race-analysis.html',
+        'driver-comparison': 'driver-comparison.html', 'driver-form': 'driver-form.html',
+        'teammate-battles': 'teammate-battles.html', 'circuit-analysis': 'circuit-analysis.html',
+        records: 'records.html', about: 'f3-about.html',
+    }),
 });
 
 function seriesPageRoutes(seriesKeys = Object.keys(SERIES_PAGE_TEMPLATES)) {

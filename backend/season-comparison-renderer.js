@@ -3,7 +3,7 @@ const { fromPath } = require('../frontend/js/series-config');
 function renderSeasonComparisonHtml(html, pathname) {
     const series = fromPath(pathname);
     if (series.key === 'f1') return html;
-    const types = series.key === 'academy' ? 'reverse-grid and standard races' : 'sprint and feature races';
+    const types = series.key === 'fe' ? 'E-Prix races' : series.key === 'academy' ? 'reverse-grid and standard races' : 'sprint and feature races';
     return html
         .replace('<body>', `<body class="${series.modeClass}">`)
         .replace('/assets/favicon.svg', series.favicon)

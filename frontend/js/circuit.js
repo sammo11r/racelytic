@@ -2,10 +2,11 @@ let circuitData = null;
 let circuitHistoryPage = 1, circuitHistorySeason = '', circuitHistorySearch = '', circuitHistorySort = 'newest';
 const CIRCUIT_HISTORY_PAGE_SIZE = 25;
 const circuitDetailId = resourceId('circuit');
-const circuitDetailSeries = ['f2', 'f3', 'academy'].find(series => String(window.location?.pathname || '').startsWith(`/${series}/`)) || 'f1';
-const circuitDetailBase = circuitDetailSeries === 'f1' ? '' : `/${circuitDetailSeries}`;
-const circuitDetailSeriesName = { f1: 'Formula 1', f2: 'Formula 2', f3: 'Formula 3', academy: 'F1 Academy' }[circuitDetailSeries];
-const circuitTeamPage = ['f3', 'academy'].includes(circuitDetailSeries) ? 'team' : 'constructor';
+const circuitDetailSeries = String(window.location?.pathname || '').startsWith('/formula-e/') ? 'fe'
+  : ['f2', 'f3', 'academy'].find(series => String(window.location?.pathname || '').startsWith(`/${series}/`)) || 'f1';
+const circuitDetailBase = circuitDetailSeries === 'f1' ? '' : circuitDetailSeries === 'fe' ? '/formula-e' : `/${circuitDetailSeries}`;
+const circuitDetailSeriesName = { f1: 'Formula 1', f2: 'Formula 2', f3: 'Formula 3', academy: 'F1 Academy', fe: 'Formula E' }[circuitDetailSeries];
+const circuitTeamPage = ['f3', 'academy', 'fe'].includes(circuitDetailSeries) ? 'team' : 'constructor';
 const CIRCUIT_DETAIL_CACHE = `racelytic:${circuitDetailSeries}:circuit:${circuitDetailId}:v2`;
 
 function circuitNode(id) { return document.getElementById(id); }

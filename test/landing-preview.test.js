@@ -37,11 +37,11 @@ test('landing driver comparison and revealed quiz answers match the archive', as
     }
 });
 
-for (const [series, prefix] of [['f2', 'f2db'], ['f3', 'f3db'], ['academy', 'fadb']]) {
+for (const [series, prefix] of [['f2', 'f2db'], ['f3', 'f3db'], ['academy', 'fadb'], ['fe', 'fedb']]) {
     test(`${series} landing examples match the official standings and career totals`, async () => {
         const example = SERIES_HOME_PREVIEWS[series];
         const standings = await rowsFrom(`${prefix}-season-driver-standings.csv`, () => true);
-        const topTwo = standings.filter(row => Number(row.year) === example.year).sort((a, b) => Number(a.positionNumber) - Number(b.positionNumber)).slice(0, 2);
+        const topTwo = standings.filter(row => Number(row.year) === Number(example.dataYear || example.year)).sort((a, b) => Number(a.positionNumber) - Number(b.positionNumber)).slice(0, 2);
         assert.deepEqual(topTwo.map(row => ({ id: row.driverId, points: Number(row.points), wins: Number(row.wins) })), example.contenders.map(({ id, points, wins }) => ({ id, points, wins })));
         const identities = await rowsFrom(`${prefix}-drivers.csv`, row => example.drivers.some(driver => driver.id === row.id));
         for (const driver of example.drivers) {
@@ -52,7 +52,7 @@ for (const [series, prefix] of [['f2', 'f2db'], ['f3', 'f3db'], ['academy', 'fad
             }
         }
         for (const answer of (example.champions || []).filter(champion => champion.name)) {
-            assert.equal(standings.find(row => Number(row.year) === answer.year && row.championshipWon.toLowerCase() === 'true').driverId, answer.id);
+            assert.equal(standings.find(row => Number(row.year) === Number(answer.dataYear || answer.year) && row.championshipWon.toLowerCase() === 'true').driverId, answer.id);
         }
     });
 }

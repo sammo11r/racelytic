@@ -1,9 +1,10 @@
-const constructorId = resourceId(activeSeriesKey() === 'f3' || activeSeriesKey() === 'academy' ? 'team' : 'constructor');
-const CONSTRUCTOR_SERIES = ['f2', 'f3', 'academy'].find(series => String(window.location?.pathname || '').startsWith(`/${series}/`)) || 'f1';
-const CONSTRUCTOR_BASE = CONSTRUCTOR_SERIES === 'f1' ? '' : `/${CONSTRUCTOR_SERIES}`;
-const CONSTRUCTOR_ENTITY = ['f3', 'academy'].includes(CONSTRUCTOR_SERIES) ? 'team' : 'constructor';
+const constructorId = resourceId(['f3', 'academy', 'fe'].includes(activeSeriesKey()) ? 'team' : 'constructor');
+const CONSTRUCTOR_SERIES = String(window.location?.pathname || '').startsWith('/formula-e/') ? 'fe'
+  : ['f2', 'f3', 'academy'].find(series => String(window.location?.pathname || '').startsWith(`/${series}/`)) || 'f1';
+const CONSTRUCTOR_BASE = CONSTRUCTOR_SERIES === 'f1' ? '' : CONSTRUCTOR_SERIES === 'fe' ? '/formula-e' : `/${CONSTRUCTOR_SERIES}`;
+const CONSTRUCTOR_ENTITY = ['f3', 'academy', 'fe'].includes(CONSTRUCTOR_SERIES) ? 'team' : 'constructor';
 const CONSTRUCTOR_ARCHIVE = `${CONSTRUCTOR_BASE}/${CONSTRUCTOR_ENTITY}s`;
-const CONSTRUCTOR_SERIES_NAME = { f1: 'Formula 1', f2: 'Formula 2', f3: 'Formula 3', academy: 'F1 Academy' }[CONSTRUCTOR_SERIES];
+const CONSTRUCTOR_SERIES_NAME = { f1: 'Formula 1', f2: 'Formula 2', f3: 'Formula 3', academy: 'F1 Academy', fe: 'Formula E' }[CONSTRUCTOR_SERIES];
 const CONSTRUCTOR_HAS_CHASSIS = CONSTRUCTOR_SERIES === 'f1';
 const CONSTRUCTOR_DETAIL_CACHE = `racelytic:${CONSTRUCTOR_SERIES}:constructor:${constructorId}:v2`;
 function constructorLineageChart(segments, currentYear = new Date().getFullYear()) {

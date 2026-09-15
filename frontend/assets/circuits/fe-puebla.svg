@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="500" height="500" viewBox="0 0 500 500" role="img" aria-labelledby="title-puebla">
+  <title id="title-puebla">Puebla Formula E circuit outline</title>
+  <!-- Simplified from https://results.formulae.fia.com/api/getfile/formula-e/files/results/06_Season%207%20-%202020-21/08_R08%20Puebla/Event%20Information/Circuit%20Map%20V2.pdf -->
+  <path d="M430.7 281.6 Q460.0 244.8 435.8 218.8 Q411.6 192.7 274.9 186.4 Q138.1 180.2 132.0 212.8 Q125.8 245.4 82.9 251.1 Q40.0 256.8 74.5 277.3 Q109.0 297.8 140.0 255.0 Q170.9 212.2 200.6 212.4 Q230.2 212.5 235.6 225.5 Q241.0 238.6 199.3 261.4 Q157.6 284.2 236.0 304.5 Q314.4 324.7 336.4 298.9 Q358.4 273.1 345.8 273.1 Q333.1 273.1 338.2 291.2 Q343.2 309.2 288.8 307.7 Q234.5 306.2 203.4 288.2 Q172.3 270.1 212.4 255.6 Q252.4 241.0 247.0 224.2 Q241.6 207.3 206.1 206.9 Q170.7 206.5 160.2 220.1 Q149.8 233.7 145.1 220.1 Q140.5 206.5 279.7 203.3 Q419.0 200.0 436.1 230.0 Q453.2 260.1 415.7 282.5 Q378.2 304.9 389.8 311.7 Q401.3 318.5 430.7 281.6 Z" fill="none" stroke="#111318" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

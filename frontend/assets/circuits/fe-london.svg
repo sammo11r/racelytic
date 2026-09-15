@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="500" height="500" viewBox="0 0 500 500" role="img" aria-labelledby="title-london">
+  <title id="title-london">London Formula E circuit outline</title>
+  <!-- Simplified from https://results.formulae.fia.com/api/getfile/formula-e/files/results/11_Season%2012%20-%202025-26/16_R16%20London/Event%20Information/S12_R16&amp;R17_LDN_Circuit%20Map%20V3.pdf -->
+  <path d="M46.4 201.3 Q40.0 216.9 47.3 267.0 Q54.6 317.1 67.0 322.9 Q79.5 328.8 87.3 310.6 Q95.1 292.5 103.1 300.6 Q111.0 308.7 132.7 298.9 Q154.4 289.0 222.8 292.5 Q291.2 295.9 303.9 287.9 Q316.5 280.0 304.2 291.6 Q291.9 303.2 298.7 309.8 Q305.4 316.4 346.7 316.4 Q387.9 316.4 392.6 297.3 Q397.3 278.2 428.1 277.9 Q459.0 277.5 459.5 263.0 Q460.0 248.4 444.2 227.0 Q428.5 205.5 383.9 192.1 Q339.4 178.8 212.9 175.0 Q86.4 171.2 69.6 178.4 Q52.8 185.7 46.4 201.3 Z" fill="none" stroke="#111318" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

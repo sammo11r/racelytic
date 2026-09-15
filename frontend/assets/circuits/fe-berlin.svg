@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="500" height="500" viewBox="0 0 500 500" role="img" aria-labelledby="title-berlin">
+  <title id="title-berlin">Berlin Formula E circuit outline</title>
+  <!-- Simplified from https://results.formulae.fia.com/api/getfile/formula-e/files/results/11_Season%2012%20-%202025-26/07_R07%20Berlin/Event%20Information/S12_BER_Circuit%20Map%20V1.pdf -->
+  <path d="M63.2 189.6 Q40.0 198.7 66.4 230.8 Q92.7 262.9 117.2 246.8 Q141.7 230.8 167.4 252.1 Q193.1 273.4 212.2 272.4 Q231.3 271.4 219.7 279.5 Q208.1 287.6 217.9 303.5 Q227.8 319.4 230.6 312.1 Q233.5 304.8 276.8 305.0 Q320.2 305.1 390.1 269.7 Q460.0 234.3 451.9 216.2 Q443.8 198.1 428.9 190.4 Q413.9 182.8 393.3 193.8 Q372.6 204.7 370.7 194.1 Q368.8 183.4 365.6 194.9 Q362.5 206.3 304.3 206.0 Q246.2 205.7 246.0 198.5 Q245.9 191.4 239.5 194.4 Q233.2 197.4 238.4 201.6 Q243.6 205.7 165.0 193.1 Q86.4 180.6 63.2 189.6 Z" fill="none" stroke="#111318" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

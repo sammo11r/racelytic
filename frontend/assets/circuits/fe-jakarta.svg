@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="500" height="500" viewBox="0 0 500 500" role="img" aria-labelledby="title-jakarta">
+  <title id="title-jakarta">Jakarta Formula E circuit outline</title>
+  <!-- Simplified from https://results.formulae.fia.com/api/getfile/formula-e/files/results/10_Season%2011%20-%202024-25/12_R12%20Jakarta/Event%20Information/S11_R12_JKT_Circuit%20Map%20V3.pdf -->
+  <path d="M448.8 249.3 Q443.9 170.1 413.5 160.8 Q383.1 151.6 323.3 189.9 Q263.5 228.1 280.4 244.2 Q297.4 260.3 289.9 253.8 Q282.3 247.4 284.8 258.9 Q287.2 270.5 253.8 290.9 Q220.4 311.4 173.8 313.3 Q127.1 315.2 116.1 303.2 Q105.0 291.1 112.9 265.9 Q120.8 240.7 87.2 246.5 Q53.6 252.3 47.3 289.7 Q41.0 327.1 120.3 326.8 Q199.5 326.4 201.2 337.6 Q203.0 348.8 203.1 337.4 Q203.3 326.1 305.8 318.0 Q408.2 310.0 378.7 269.6 Q349.1 229.2 366.5 207.2 Q383.8 185.1 395.5 236.5 Q407.2 287.9 430.4 308.2 Q453.7 328.5 448.8 249.3 Z" fill="none" stroke="#111318" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

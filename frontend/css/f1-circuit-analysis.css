@@ -34,7 +34,7 @@
 .ca-format-control { display: flex; gap: 20px; align-items: center; margin-bottom: 16px; }
 .ca-format-control label { min-width: 175px; }
 .ca-format-control .ca-note { margin: 0; }
-.f2-mode .ca-picker-option:is(:hover, [aria-selected="true"]), .f3-mode .ca-picker-option:is(:hover, [aria-selected="true"]), .academy-mode .ca-picker-option:is(:hover, [aria-selected="true"]) { background: color-mix(in srgb, var(--accent) 10%, white); }
+.f2-mode .ca-picker-option:is(:hover, [aria-selected="true"]), .f3-mode .ca-picker-option:is(:hover, [aria-selected="true"]), .academy-mode .ca-picker-option:is(:hover, [aria-selected="true"]), .fe-mode .ca-picker-option:is(:hover, [aria-selected="true"]) { background: color-mix(in srgb, var(--accent) 10%, white); }
 .ca-summary { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border: 1px solid var(--border); border-radius: 12px; background: #fff; overflow: hidden; margin-bottom: 25px; }
 .ca-summary > div { padding: 18px 20px; border-right: 1px solid var(--border); }
 .ca-summary > div:last-child { border: 0; }

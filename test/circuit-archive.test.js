@@ -211,7 +211,7 @@ test('junior templates and generated Academy page share controls and retain safe
 });
 
 test('junior archive normalizes country, types, metres, short names and calendar years without inventing results', () => {
-    const { juniorCircuitArchiveRow } = require('../backend/circuit-archive');
+    const { juniorCircuitArchiveRow, juniorCircuitImageId } = require('../backend/circuit-archive');
     const layouts = new Map([['silverstone-8', { name: 'Silverstone', countryName: 'United Kingdom', previousNames: '' }]]);
     const input = { id: 'silverstone-circuit_silverstone-circuit', name: 'Silverstone Circuit', placeName: 'Silverstone, Northamptonshire, Great Britain', type: 'Race Circuit', lengthMeters: '5891.000000', calendarYears: '2026,2024', currentSeason: 2026, recordedRacesHeld: '4', firstHeldYear: 2024, lastHeldYear: 2024 };
     const row = juniorCircuitArchiveRow(input, layouts);
@@ -234,6 +234,8 @@ test('junior archive normalizes country, types, metres, short names and calendar
     assert.equal(unknown.layoutId, null);
     assert.equal(unknown.countryId, '');
     assert.equal(juniorCircuitArchiveRow({ id: 'valencia', name: 'Circuit Ricardo Tormo' }, layouts).layoutId, null);
+    assert.equal(juniorCircuitImageId('valencia', 'fe'), 'fe-valencia');
+    assert.equal(juniorCircuitArchiveRow({ id: 'berlin', name: 'Berlin' }, layouts, 'fe').layoutId, 'fe-berlin');
 });
 
 test('junior archive counts distinct completed race sessions, not classifications or scheduled weekends', () => {

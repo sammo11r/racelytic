@@ -92,8 +92,8 @@ function routeContext(pathname) {
     const cleanPath = pathname === '/' ? '/' : String(pathname || '/').replace(/\/+$/, '');
     const resource = matchResourcePath(cleanPath);
     if (resource) return { cleanPath, page: resource.resource, resourceId: resource.id, resourceSlug: resource.slug, series: SERIES[resource.series] };
-    const match = cleanPath.match(/^\/(f2|f3|academy)(?:\/(.*))?$/);
-    const seriesKey = match?.[1] || 'f1';
+    const match = cleanPath.match(/^\/(f2|f3|academy|formula-e)(?:\/(.*))?$/);
+    const seriesKey = match?.[1] === 'formula-e' ? 'fe' : match?.[1] || 'f1';
     const ratingMatch = cleanPath.match(/^\/ratings\/(leaderboard|compare|driver|methodology)$/);
     const page = ratingMatch ? `ratings-${ratingMatch[1]}` : match ? match[2] || 'home' : cleanPath.slice(1) || 'home';
     return { cleanPath, page, series: SERIES[seriesKey] };

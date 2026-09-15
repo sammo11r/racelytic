@@ -1,0 +1,36 @@
+{
+  "version": 1,
+  "series": "fe",
+  "source": {
+    "name": "ABB FIA Formula E World Championship",
+    "resultsUrl": "https://results.formulae.fia.com/results",
+    "noticeBoardUrl": "https://results.formulae.fia.com/"
+  },
+  "seasonIdentity": {
+    "primaryKey": "seasonKey",
+    "example": "2024-25",
+    "compatibilityYear": "The calendar year in which the season ends",
+    "displayField": "label"
+  },
+  "files": {
+    "seasons": ["seasonKey", "seasonNumber", "year", "label", "startYear", "endYear", "sourceUrl"],
+    "drivers": ["id", "name", "firstName", "lastName", "abbreviation", "countryCode", "nationalityCode", "pictureUrl"],
+    "constructors": ["id", "name", "abbreviation", "countryCode", "pictureUrl"],
+    "chassis": ["id", "name", "generation", "manufacturer", "designer", "predecessor", "successor", "introducedYear", "retiredYear", "chassisConstruction", "frontSuspension", "rearSuspension", "lengthMm", "widthMm", "heightMm", "wheelbaseMm", "engineId", "engineName", "engineConfiguration", "engineLayout", "transmission", "powerHp", "powerKw", "powerRpm", "torqueNm", "weightKg", "weightIncludesDriver", "weightIncludesFuel", "fuel", "lubricants", "brakes", "tyres", "wheelRimLabel", "debut", "lastEvent", "sourceUrl"],
+    "engines": ["id", "name"],
+    "manufacturers": ["id", "name", "pictureUrl"],
+    "circuits": ["id", "name", "countryCode", "placeName", "type", "direction", "lengthMeters", "turns", "layoutUrl", "sourceUrl"],
+    "races": ["id", "seasonKey", "year", "round", "date", "endDate", "name", "code", "circuitId", "sourceUrl"],
+    "sessions": ["id", "raceId", "seasonKey", "year", "round", "sessionNumber", "code", "name", "startTimeUtc", "endTimeUtc", "isRace", "cancelled", "sourceUrl"],
+    "entries": ["raceId", "seasonKey", "year", "round", "driverNumber", "driverId", "constructorId", "chassisId", "engineId"],
+    "results": ["sessionId", "raceId", "seasonKey", "year", "round", "positionDisplayOrder", "positionNumber", "points", "polePosition", "status", "driverNumber", "driverId", "constructorId", "laps", "time", "timeMillis", "gapMillis", "gapLaps", "fastestLap", "fastestLapNumber", "fastestLapTime", "fastestLapTimeMillis", "averageSpeed"],
+    "driverStandings": ["seasonKey", "year", "positionNumber", "driverId", "constructorId", "points", "championshipWon", "starts", "wins", "podiums", "poles", "fastestLaps", "retirements"],
+    "constructorStandings": ["seasonKey", "year", "positionNumber", "constructorId", "points", "championshipWon"],
+    "manufacturerStandings": ["seasonKey", "year", "positionNumber", "manufacturerId", "points", "championshipWon"]
+  },
+  "prototypeLimitations": [
+    "The official historical selector reports Season 10 manufacturer standings as unavailable, so they are not inferred from team standings.",
+    "Qualifying is stored as the official displayed classification; duel-bracket modelling is deferred.",
+      "Attack Mode activation data is not available in the historical classification archive."
+  ]
+}

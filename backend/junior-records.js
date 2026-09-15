@@ -2,7 +2,7 @@ const f1Records = require('./f1-records');
 const { seriesPrefix, minimumSeasonYear, isJuniorSeries } = require('./series-config');
 const { buildJuniorCircuitAnalysis } = require('./junior-circuit-analysis');
 const { starter, classified } = require('../frontend/js/f1-circuit-analysis-model');
-const { f2SessionType, f3SessionType, academySessionType } = require('./routes/seasons');
+const { f2SessionType, f3SessionType, academySessionType, formulaESessionType } = require('./routes/seasons');
 
 function configuration(input = {}) {
     const series = String(input.series || '').toLowerCase();
@@ -120,7 +120,7 @@ async function explore(connection, input) {
     const titles = config.category === 'championships' ? await connection.query(`SELECT ${team ? 'constructorId' : 'driverId'} AS id, year
         FROM ${prefix}season_${team ? 'constructor' : 'driver'}_standings
         WHERE positionNumber = 1 AND LOWER(CAST(championshipWon AS CHAR)) IN ('1','true')`) : [];
-    const sessionType = config.series === 'academy' ? academySessionType : config.series === 'f3' ? f3SessionType : f2SessionType;
+    const sessionType = config.series === 'academy' ? academySessionType : config.series === 'f3' ? f3SessionType : config.series === 'fe' ? formulaESessionType : f2SessionType;
     const { races } = buildJuniorCircuitAnalysis(null, rows, config.series, sessionType);
     const countries = new Map(rows.map(row => [String(team ? row.constructorId : row.driverId), team ? row.constructorCountry : row.driverCountry]));
     const { entries, coverage } = aggregate(races, titles, config, countries);

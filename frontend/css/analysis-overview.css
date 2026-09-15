@@ -46,6 +46,7 @@
 .f2-mode .analysis-example-card { --analysis-example-accent: #63a8ff; }
 .f3-mode .analysis-example-card { --analysis-example-accent: #ff944d; }
 .academy-mode .analysis-example-card { --analysis-example-accent: #ad7aff; }
+.fe-mode .analysis-example-card { --analysis-example-accent: #00a9ce; }
 .analysis-example-content span {
   color: var(--analysis-example-accent);
   font-size: 12px;

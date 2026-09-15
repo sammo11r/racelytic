@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="500" height="500" viewBox="0 0 500 500" role="img" aria-labelledby="title-miami">
+  <title id="title-miami">Miami Formula E circuit outline</title>
+  <!-- Simplified from https://results.formulae.fia.com/api/getfile/formula-e/files/results/11_Season%2012%20-%202025-26/03_R03%20Miami/Event%20Information/S12_R03_MIA_Circuit%20Map%20V2.pdf -->
+  <path d="M179.4 81.4 Q40.0 78.1 55.9 80.4 Q71.9 82.8 61.4 92.3 Q50.9 101.8 62.8 112.3 Q74.7 122.8 100.2 116.1 Q125.6 109.4 205.5 157.7 Q285.4 206.0 286.9 224.3 Q288.3 242.6 298.8 231.0 Q309.2 219.3 326.6 230.7 Q343.9 242.2 342.0 257.8 Q340.1 273.5 315.2 269.7 Q290.2 265.9 311.8 277.6 Q333.5 289.2 329.7 320.9 Q325.9 352.5 284.5 387.2 Q243.1 421.9 263.6 433.4 Q284.0 444.8 337.0 438.1 Q390.1 431.5 394.8 408.2 Q399.6 384.8 426.0 362.3 Q452.4 339.7 447.4 228.6 Q442.4 117.5 417.7 107.3 Q392.9 97.1 392.5 83.5 Q392.0 70.0 389.8 82.6 Q387.7 95.2 362.3 90.7 Q336.8 86.1 347.7 79.2 Q358.7 72.3 351.3 63.8 Q343.9 55.2 331.3 70.0 Q318.7 84.7 179.4 81.4 Z" fill="none" stroke="#111318" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

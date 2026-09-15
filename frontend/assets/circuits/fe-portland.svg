@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="500" height="500" viewBox="0 0 500 500" role="img" aria-labelledby="title-portland">
+  <title id="title-portland">Portland Formula E circuit outline</title>
+  <!-- Simplified from https://results.formulae.fia.com/api/getfile/formula-e/files/results/09_Season%2010%20-%202023-24/13_R13%20Portland/Event%20Information/S10_R13&amp;R14_POR_Circuit%20Map%20V3.pdf -->
+  <path d="M52.1 261.5 Q40.0 278.9 53.3 294.8 Q66.7 310.7 102.2 310.3 Q137.6 309.9 155.3 300.0 Q172.9 290.0 185.3 304.3 Q197.6 318.5 230.5 313.4 Q263.3 308.4 267.2 324.6 Q271.1 340.9 268.5 324.6 Q265.9 308.4 274.1 308.6 Q282.3 308.7 282.3 320.0 Q282.3 331.4 283.9 319.9 Q285.5 308.4 361.2 305.7 Q437.0 303.0 444.1 313.9 Q451.1 324.8 446.2 313.2 Q441.3 301.5 450.7 292.8 Q460.0 284.0 446.9 266.8 Q433.9 249.6 415.2 247.7 Q396.6 245.8 326.2 202.5 Q255.9 159.1 181.0 169.8 Q106.0 180.4 106.7 174.1 Q107.5 167.8 98.4 184.4 Q89.4 201.1 95.3 194.4 Q101.1 187.8 109.9 221.1 Q118.7 254.4 91.4 249.3 Q64.1 244.1 52.1 261.5 Z" fill="none" stroke="#111318" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

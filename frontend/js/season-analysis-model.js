@@ -28,6 +28,7 @@
   const driversFor = data => data.analysisDrivers || data.driverChampionship;
   function juniorSessionType(session, index, count, year, series) {
     if (['S', 'F'].includes(session.type)) return session.type;
+    if (series === 'fe') return 'F';
     const name = String(session.name || '').toLowerCase();
     if (series === 'academy') {
       if (name.includes('reverse')) return 'S';
@@ -50,13 +51,14 @@
         analysisLabel: 'R' + race.round, name: race.name + ' · Race schedule unavailable' }];
       return sessions.map((session, index) => {
         const type = juniorSessionType(session, index, sessions.length, Number(data.year), series);
-        const category = series === 'academy' ? type === 'S' ? 'Reverse-grid race' : 'Standard race' : type === 'S' ? 'Sprint' : 'Feature';
+        const category = series === 'fe' ? 'E-Prix race' : series === 'academy' ? type === 'S' ? 'Reverse-grid race' : 'Standard race' : type === 'S' ? 'Sprint' : 'Feature';
         const sameType = sessions.filter((row, i) => juniorSessionType(row, i, sessions.length, Number(data.year), series) === type);
         const typeIndex = sameType.findIndex(row => row.id === session.id) + 1;
         const label = category + (sameType.length > 1 ? ' ' + typeIndex : '');
         return { ...race, id: session.id, round: ++sequence, weekendRound: race.round, sessionType: type,
+          weekendName: race.shortName || race.name || race.officialName,
           cancelled: Boolean(session.cancelled), date: session.date || race.endDate || race.date,
-          analysisLabel: 'R' + race.round + ' ' + (series === 'academy' ? 'Race ' + (index + 1) : type + (sameType.length > 1 ? typeIndex : '')),
+          analysisLabel: 'R' + race.round + ' ' + (['academy', 'fe'].includes(series) ? 'Race ' + (index + 1) : type + (sameType.length > 1 ? typeIndex : '')),
           name: race.name + ' · ' + (series === 'academy' ? 'Race ' + (index + 1) + ' · ' : '') + label };
       });
     });
@@ -74,6 +76,12 @@
     }));
     return { ...data, series, calendar, driverChampionship, analysisDrivers: driverChampionship,
       constructorChampionship: data.constructorChampionship.map(team => ({ ...team, championshipWon: Boolean(team.championshipWon) })) };
+  }
+  function resultColumnName(race, series) {
+    if (!race) return 'Race weekend';
+    return series === 'fe'
+      ? race.weekendName || race.shortName || race.name || race.officialName || 'E-Prix'
+      : race.name || race.officialName || race.shortName || 'Race weekend';
   }
   function seasonState(data, now = new Date()) {
     const calendar = [...data.calendar].sort((a, b) => Number(a.round) - Number(b.round));
@@ -150,5 +158,5 @@
     return { ...values, sprintAverage: average(sprint), featureAverage: average(feature), sprintCount: sprint.length, featureCount: feature.length,
       unclassified, unclassifiedRate: starts.length ? unclassified / starts.length * 100 : null };
   }
-  return { rulesFor, hasDroppedScores, countedPoints, seasonState, series, leaders, heatClass, averages, readState, raceRecorded, driversFor, adaptJunior, juniorSessionType, juniorAverages };
+  return { rulesFor, hasDroppedScores, countedPoints, seasonState, series, leaders, heatClass, averages, readState, raceRecorded, driversFor, adaptJunior, juniorSessionType, juniorAverages, resultColumnName };
 });

@@ -21,7 +21,7 @@ function configuredItems(rows, type) {
         return {
             type, id: row.id, name: row.name, ownerName: row.ownerName,
             description: type === 'championships' ? row.description || '' : '',
-            series: ['f2', 'f3', 'academy'].includes(configuration.series) ? configuration.series : 'f1',
+            series: ['f2', 'f3', 'academy', 'fe'].includes(configuration.series) ? configuration.series : 'f1',
             configuration, createdAt: row.createdAt, updatedAt: row.updatedAt
         };
     });

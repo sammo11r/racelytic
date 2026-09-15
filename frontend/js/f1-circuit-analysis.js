@@ -1,8 +1,9 @@
 const caModel = window.CircuitAnalysisModel;
-const caSeries = location.pathname.match(/^\/(f2|f3|academy)(?:\/|$)/)?.[1] || 'f1';
-const caJunior = caSeries !== 'f1', caBase = caJunior ? `/${caSeries}` : '';
-const caSeriesName = { f1: 'Formula 1', f2: 'Formula 2', f3: 'Formula 3', academy: 'F1 Academy' }[caSeries];
-const caTeamPage = ['f3', 'academy'].includes(caSeries) ? 'team' : 'constructor';
+const caPathSeries = location.pathname.match(/^\/(f2|f3|academy|formula-e)(?:\/|$)/)?.[1];
+const caSeries = caPathSeries === 'formula-e' ? 'fe' : caPathSeries || 'f1';
+const caJunior = caSeries !== 'f1', caBase = caSeries === 'fe' ? '/formula-e' : caJunior ? `/${caSeries}` : '';
+const caSeriesName = { f1: 'Formula 1', f2: 'Formula 2', f3: 'Formula 3', academy: 'F1 Academy', fe: 'Formula E' }[caSeries];
+const caTeamPage = ['f3', 'academy', 'fe'].includes(caSeries) ? 'team' : 'constructor';
 const caPoleLabel = caJunior ? 'Grid P1 conversion' : 'Pole conversion';
 const caPoleSample = caJunior ? 'known P1 starts' : 'recorded poles';
 const caMetrics = races => caModel.metrics(races, caJunior);
@@ -38,7 +39,7 @@ function caReadState() {
   if (caNode('from').value || caNode('to').value) caNode('era').value = 'custom';
   caNode('metric').value = Object.hasOwn(caMetricNames, query.get('metric')) ? query.get('metric') : 'wins';
   for (const [node, key] of [['minimum', 'min'], ['movement-minimum', 'movementMin']]) {
-    caNode(node).value = ['1', '3', '5', '10'].includes(query.get(key)) ? query.get(key) : '3';
+    caNode(node).value = ['1', '3', '5', '10'].includes(query.get(key)) ? query.get(key) : node === 'minimum' && caSeries === 'fe' ? '1' : '3';
   }
   if (caNode('era').value !== 'custom') caApplyEra();
   caYearVisibility();

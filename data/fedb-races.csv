@@ -1,0 +1,166 @@
+id,seasonKey,year,round,date,endDate,name,code,circuitId,sourceUrl
+fe-2014-15-r1-beijing,2014-15,2015,1,2014-09-13,,Beijing E-Prix,R1,beijing,https://www.fiaformulae.com/en/results-and-standings?season=1&round=1-beijing
+fe-2014-15-r2-putrajaya,2014-15,2015,2,2014-11-22,,Putrajaya E-Prix,R2,putrajaya,https://www.fiaformulae.com/en/results-and-standings?season=1&round=2-putrajaya
+fe-2014-15-r3-punta-del-este,2014-15,2015,3,2014-12-13,,Punta Del Este E-Prix,R3,punta-del-este,https://www.fiaformulae.com/en/results-and-standings?season=1&round=3-punta-del-este
+fe-2014-15-r4-buenos-aires,2014-15,2015,4,2015-01-10,,Buenos Aires E-Prix,R4,buenos-aires,https://www.fiaformulae.com/en/results-and-standings?season=1&round=4-buenos-aires
+fe-2014-15-r5-miami,2014-15,2015,5,2015-03-14,,Miami E-Prix,R5,miami,https://www.fiaformulae.com/en/results-and-standings?season=1&round=5-miami
+fe-2014-15-r6-long-beach,2014-15,2015,6,2015-04-04,,Long Beach E-Prix,R6,long-beach,https://www.fiaformulae.com/en/results-and-standings?season=1&round=6-long-beach
+fe-2014-15-r7-monaco,2014-15,2015,7,2015-05-09,,Monaco E-Prix,R7,monaco,https://www.fiaformulae.com/en/results-and-standings?season=1&round=7-monaco
+fe-2014-15-r8-berlin,2014-15,2015,8,2015-05-23,,Berlin E-Prix,R8,berlin,https://www.fiaformulae.com/en/results-and-standings?season=1&round=8-berlin
+fe-2014-15-r9-moscow,2014-15,2015,9,2015-06-06,,Moscow E-Prix,R9,moscow,https://www.fiaformulae.com/en/results-and-standings?season=1&round=9-moscow
+fe-2014-15-r10-london,2014-15,2015,10,2015-06-27,,London E-Prix,R10,london,https://www.fiaformulae.com/en/results-and-standings?season=1&round=10-london
+fe-2014-15-r11-london,2014-15,2015,11,2015-06-28,,London E-Prix,R11,london,https://www.fiaformulae.com/en/results-and-standings?season=1&round=11-london
+fe-2015-16-r1-beijing,2015-16,2016,1,2015-10-24,,Beijing E-Prix,R1,beijing,https://www.fiaformulae.com/en/results-and-standings?season=2&round=1-beijing
+fe-2015-16-r2-putrajaya,2015-16,2016,2,2015-11-07,,Putrajaya E-Prix,R2,putrajaya,https://www.fiaformulae.com/en/results-and-standings?season=2&round=2-putrajaya
+fe-2015-16-r3-punta-del-este,2015-16,2016,3,2015-12-19,,Punta Del Este E-Prix,R3,punta-del-este,https://www.fiaformulae.com/en/results-and-standings?season=2&round=3-punta-del-este
+fe-2015-16-r4-buenos-aires,2015-16,2016,4,2016-02-06,,Buenos Aires E-Prix,R4,buenos-aires,https://www.fiaformulae.com/en/results-and-standings?season=2&round=4-buenos-aires
+fe-2015-16-r5-mexico-city,2015-16,2016,5,2016-03-12,,Mexico City E-Prix,R5,mexico-city,https://www.fiaformulae.com/en/results-and-standings?season=2&round=5-mexico-city
+fe-2015-16-r6-long-beach,2015-16,2016,6,2016-04-02,,Long Beach E-Prix,R6,long-beach,https://www.fiaformulae.com/en/results-and-standings?season=2&round=6-long-beach
+fe-2015-16-r7-paris,2015-16,2016,7,2016-04-23,,Paris E-Prix,R7,paris,https://www.fiaformulae.com/en/results-and-standings?season=2&round=7-paris
+fe-2015-16-r8-berlin,2015-16,2016,8,2016-05-21,,Berlin E-Prix,R8,berlin,https://www.fiaformulae.com/en/results-and-standings?season=2&round=8-berlin
+fe-2015-16-r9-london,2015-16,2016,9,2016-07-02,,London E-Prix,R9,london,https://www.fiaformulae.com/en/results-and-standings?season=2&round=9-london
+fe-2015-16-r10-london,2015-16,2016,10,2016-07-03,,London E-Prix,R10,london,https://www.fiaformulae.com/en/results-and-standings?season=2&round=10-london
+fe-2016-17-r1-hong-kong,2016-17,2017,1,2016-10-09,,Hong Kong E-Prix,R1,hong-kong,https://www.fiaformulae.com/en/results-and-standings?season=3&round=1-hong-kong
+fe-2016-17-r2-marrakesh,2016-17,2017,2,2016-11-12,,Marrakesh E-Prix,R2,marrakesh,https://www.fiaformulae.com/en/results-and-standings?season=3&round=2-marrakesh
+fe-2016-17-r3-buenos-aires,2016-17,2017,3,2017-02-18,,Buenos Aires E-Prix,R3,buenos-aires,https://www.fiaformulae.com/en/results-and-standings?season=3&round=3-buenos-aires
+fe-2016-17-r4-mexico-city,2016-17,2017,4,2017-04-01,,Mexico City E-Prix,R4,mexico-city,https://www.fiaformulae.com/en/results-and-standings?season=3&round=4-mexico-city
+fe-2016-17-r5-monaco,2016-17,2017,5,2017-05-13,,Monaco E-Prix,R5,monaco,https://www.fiaformulae.com/en/results-and-standings?season=3&round=5-monaco
+fe-2016-17-r6-paris,2016-17,2017,6,2017-05-20,,Paris E-Prix,R6,paris,https://www.fiaformulae.com/en/results-and-standings?season=3&round=6-paris
+fe-2016-17-r7-berlin,2016-17,2017,7,2017-06-10,,Berlin E-Prix,R7,berlin,https://www.fiaformulae.com/en/results-and-standings?season=3&round=7-berlin
+fe-2016-17-r8-berlin,2016-17,2017,8,2017-06-11,,Berlin E-Prix,R8,berlin,https://www.fiaformulae.com/en/results-and-standings?season=3&round=8-berlin
+fe-2016-17-r9-new-york,2016-17,2017,9,2017-07-15,,New York E-Prix,R9,new-york,https://www.fiaformulae.com/en/results-and-standings?season=3&round=9-new-york
+fe-2016-17-r10-new-york,2016-17,2017,10,2017-07-16,,New York E-Prix,R10,new-york,https://www.fiaformulae.com/en/results-and-standings?season=3&round=10-new-york
+fe-2016-17-r11-montreal,2016-17,2017,11,2017-07-29,,Montreal E-Prix,R11,montreal,https://www.fiaformulae.com/en/results-and-standings?season=3&round=11-montreal
+fe-2016-17-r12-montreal,2016-17,2017,12,2017-07-30,,Montreal E-Prix,R12,montreal,https://www.fiaformulae.com/en/results-and-standings?season=3&round=12-montreal
+fe-2017-18-r1-hong-kong,2017-18,2018,1,2017-12-02,,Hong Kong E-Prix,R1,hong-kong,https://www.fiaformulae.com/en/results-and-standings?season=4&round=1-hong-kong
+fe-2017-18-r2-hong-kong,2017-18,2018,2,2017-12-03,,Hong Kong E-Prix,R2,hong-kong,https://www.fiaformulae.com/en/results-and-standings?season=4&round=2-hong-kong
+fe-2017-18-r3-marrakesh,2017-18,2018,3,2018-01-13,,Marrakesh E-Prix,R3,marrakesh,https://www.fiaformulae.com/en/results-and-standings?season=4&round=3-marrakesh
+fe-2017-18-r4-santiago,2017-18,2018,4,2018-02-03,,Santiago E-Prix,R4,santiago,https://www.fiaformulae.com/en/results-and-standings?season=4&round=4-santiago
+fe-2017-18-r5-mexico-city,2017-18,2018,5,2018-03-03,,Mexico City E-Prix,R5,mexico-city,https://www.fiaformulae.com/en/results-and-standings?season=4&round=5-mexico-city
+fe-2017-18-r6-punta-del-este,2017-18,2018,6,2018-03-17,,Punta Del Este E-Prix,R6,punta-del-este,https://www.fiaformulae.com/en/results-and-standings?season=4&round=6-punta-del-este
+fe-2017-18-r7-rome,2017-18,2018,7,2018-04-14,,Rome E-Prix,R7,rome,https://www.fiaformulae.com/en/results-and-standings?season=4&round=7-rome
+fe-2017-18-r8-paris,2017-18,2018,8,2018-04-28,,Paris E-Prix,R8,paris,https://www.fiaformulae.com/en/results-and-standings?season=4&round=8-paris
+fe-2017-18-r9-berlin,2017-18,2018,9,2018-05-19,,Berlin E-Prix,R9,berlin,https://www.fiaformulae.com/en/results-and-standings?season=4&round=9-berlin
+fe-2017-18-r10-zurich,2017-18,2018,10,2018-06-10,,Zurich E-Prix,R10,zurich,https://www.fiaformulae.com/en/results-and-standings?season=4&round=10-zurich
+fe-2017-18-r11-new-york,2017-18,2018,11,2018-07-14,,New York E-Prix,R11,new-york,https://www.fiaformulae.com/en/results-and-standings?season=4&round=11-new-york
+fe-2017-18-r12-new-york,2017-18,2018,12,2018-07-15,,New York E-Prix,R12,new-york,https://www.fiaformulae.com/en/results-and-standings?season=4&round=12-new-york
+fe-2018-19-r1-diriyah,2018-19,2019,1,2018-12-15,,Diriyah E-Prix,R1,diriyah,https://www.fiaformulae.com/en/results-and-standings?season=5&round=1-diriyah
+fe-2018-19-r2-marrakesh,2018-19,2019,2,2019-01-12,,Marrakesh E-Prix,R2,marrakesh,https://www.fiaformulae.com/en/results-and-standings?season=5&round=2-marrakesh
+fe-2018-19-r3-santiago,2018-19,2019,3,2019-01-26,,Santiago E-Prix,R3,santiago,https://www.fiaformulae.com/en/results-and-standings?season=5&round=3-santiago
+fe-2018-19-r4-mexico-city,2018-19,2019,4,2019-02-16,,Mexico City E-Prix,R4,mexico-city,https://www.fiaformulae.com/en/results-and-standings?season=5&round=4-mexico-city
+fe-2018-19-r5-hong-kong,2018-19,2019,5,2019-03-10,,Hong Kong E-Prix,R5,hong-kong,https://www.fiaformulae.com/en/results-and-standings?season=5&round=5-hong-kong
+fe-2018-19-r6-sanya,2018-19,2019,6,2019-03-23,,Sanya E-Prix,R6,sanya,https://www.fiaformulae.com/en/results-and-standings?season=5&round=6-sanya
+fe-2018-19-r7-rome,2018-19,2019,7,2019-04-13,,Rome E-Prix,R7,rome,https://www.fiaformulae.com/en/results-and-standings?season=5&round=7-rome
+fe-2018-19-r8-paris,2018-19,2019,8,2019-04-27,,Paris E-Prix,R8,paris,https://www.fiaformulae.com/en/results-and-standings?season=5&round=8-paris
+fe-2018-19-r9-monaco,2018-19,2019,9,2019-05-11,,Monaco E-Prix,R9,monaco,https://www.fiaformulae.com/en/results-and-standings?season=5&round=9-monaco
+fe-2018-19-r10-berlin,2018-19,2019,10,2019-05-25,,Berlin E-Prix,R10,berlin,https://www.fiaformulae.com/en/results-and-standings?season=5&round=10-berlin
+fe-2018-19-r11-bern,2018-19,2019,11,2019-06-22,,Bern E-Prix,R11,bern,https://www.fiaformulae.com/en/results-and-standings?season=5&round=11-bern
+fe-2018-19-r12-new-york,2018-19,2019,12,2019-07-13,,New York E-Prix,R12,new-york,https://www.fiaformulae.com/en/results-and-standings?season=5&round=12-new-york
+fe-2018-19-r13-new-york,2018-19,2019,13,2019-07-14,,New York E-Prix,R13,new-york,https://www.fiaformulae.com/en/results-and-standings?season=5&round=13-new-york
+fe-2019-20-r1-diriyah,2019-20,2020,1,2019-11-22,,Diriyah E-Prix,R1,diriyah,https://www.fiaformulae.com/en/results-and-standings?season=6&round=1-diriyah
+fe-2019-20-r2-diriyah,2019-20,2020,2,2019-11-23,,Diriyah E-Prix,R2,diriyah,https://www.fiaformulae.com/en/results-and-standings?season=6&round=2-diriyah
+fe-2019-20-r3-santiago,2019-20,2020,3,2020-01-18,,Santiago E-Prix,R3,santiago,https://www.fiaformulae.com/en/results-and-standings?season=6&round=3-santiago
+fe-2019-20-r4-mexico-city,2019-20,2020,4,2020-02-15,,Mexico City E-Prix,R4,mexico-city,https://www.fiaformulae.com/en/results-and-standings?season=6&round=4-mexico-city
+fe-2019-20-r5-marrakesh,2019-20,2020,5,2020-02-29,,Marrakesh E-Prix,R5,marrakesh,https://www.fiaformulae.com/en/results-and-standings?season=6&round=5-marrakesh
+fe-2019-20-r6-berlin,2019-20,2020,6,2020-08-05,,Berlin E-Prix,R6,berlin,https://www.fiaformulae.com/en/results-and-standings?season=6&round=6-berlin
+fe-2019-20-r7-berlin,2019-20,2020,7,2020-08-06,,Berlin E-Prix,R7,berlin,https://www.fiaformulae.com/en/results-and-standings?season=6&round=7-berlin
+fe-2019-20-r8-berlin,2019-20,2020,8,2020-08-08,,Berlin E-Prix,R8,berlin,https://www.fiaformulae.com/en/results-and-standings?season=6&round=8-berlin
+fe-2019-20-r9-berlin,2019-20,2020,9,2020-08-09,,Berlin E-Prix,R9,berlin,https://www.fiaformulae.com/en/results-and-standings?season=6&round=9-berlin
+fe-2019-20-r10-berlin,2019-20,2020,10,2020-08-12,,Berlin E-Prix,R10,berlin,https://www.fiaformulae.com/en/results-and-standings?season=6&round=10-berlin
+fe-2019-20-r11-berlin,2019-20,2020,11,2020-08-13,,Berlin E-Prix,R11,berlin,https://www.fiaformulae.com/en/results-and-standings?season=6&round=11-berlin
+fe-2020-21-r1-diriyah,2020-21,2021,1,2021-02-26,,Diriyah E-Prix,R1,diriyah,https://www.fiaformulae.com/en/results-and-standings?season=7&round=1-diriyah
+fe-2020-21-r2-diriyah,2020-21,2021,2,2021-02-27,,Diriyah E-Prix,R2,diriyah,https://www.fiaformulae.com/en/results-and-standings?season=7&round=2-diriyah
+fe-2020-21-r3-rome,2020-21,2021,3,2021-04-10,,Rome E-Prix,R3,rome,https://www.fiaformulae.com/en/results-and-standings?season=7&round=3-rome
+fe-2020-21-r4-rome,2020-21,2021,4,2021-04-11,,Rome E-Prix,R4,rome,https://www.fiaformulae.com/en/results-and-standings?season=7&round=4-rome
+fe-2020-21-r5-valencia,2020-21,2021,5,2021-04-24,,Valencia E-Prix,R5,valencia,https://www.fiaformulae.com/en/results-and-standings?season=7&round=5-valencia
+fe-2020-21-r6-valencia,2020-21,2021,6,2021-04-25,,Valencia E-Prix,R6,valencia,https://www.fiaformulae.com/en/results-and-standings?season=7&round=6-valencia
+fe-2020-21-r7-monaco,2020-21,2021,7,2021-05-08,,Monaco E-Prix,R7,monaco,https://www.fiaformulae.com/en/results-and-standings?season=7&round=7-monaco
+fe-2020-21-r8-puebla,2020-21,2021,8,2021-06-19,,Puebla E-Prix,R8,puebla,https://www.fiaformulae.com/en/results-and-standings?season=7&round=8-puebla
+fe-2020-21-r9-puebla,2020-21,2021,9,2021-06-20,,Puebla E-Prix,R9,puebla,https://www.fiaformulae.com/en/results-and-standings?season=7&round=9-puebla
+fe-2020-21-r10-new-york,2020-21,2021,10,2021-07-10,,New York E-Prix,R10,new-york,https://www.fiaformulae.com/en/results-and-standings?season=7&round=10-new-york
+fe-2020-21-r11-new-york,2020-21,2021,11,2021-07-11,,New York E-Prix,R11,new-york,https://www.fiaformulae.com/en/results-and-standings?season=7&round=11-new-york
+fe-2020-21-r12-london,2020-21,2021,12,2021-07-24,,London E-Prix,R12,london,https://www.fiaformulae.com/en/results-and-standings?season=7&round=12-london
+fe-2020-21-r13-london,2020-21,2021,13,2021-07-25,,London E-Prix,R13,london,https://www.fiaformulae.com/en/results-and-standings?season=7&round=13-london
+fe-2020-21-r14-berlin,2020-21,2021,14,2021-08-14,,Berlin E-Prix,R14,berlin,https://www.fiaformulae.com/en/results-and-standings?season=7&round=14-berlin
+fe-2020-21-r15-berlin,2020-21,2021,15,2021-08-15,,Berlin E-Prix,R15,berlin,https://www.fiaformulae.com/en/results-and-standings?season=7&round=15-berlin
+fe-2021-22-r1-diriyah,2021-22,2022,1,2022-01-28,,Diriyah E-Prix,R1,diriyah,https://www.fiaformulae.com/en/results-and-standings?season=8&round=1-diriyah
+fe-2021-22-r2-diriyah,2021-22,2022,2,2022-01-29,,Diriyah E-Prix,R2,diriyah,https://www.fiaformulae.com/en/results-and-standings?season=8&round=2-diriyah
+fe-2021-22-r3-mexico-city,2021-22,2022,3,2022-02-12,,Mexico City E-Prix,R3,mexico-city,https://www.fiaformulae.com/en/results-and-standings?season=8&round=3-mexico-city
+fe-2021-22-r4-rome,2021-22,2022,4,2022-04-09,,Rome E-Prix,R4,rome,https://www.fiaformulae.com/en/results-and-standings?season=8&round=4-rome
+fe-2021-22-r5-rome,2021-22,2022,5,2022-04-10,,Rome E-Prix,R5,rome,https://www.fiaformulae.com/en/results-and-standings?season=8&round=5-rome
+fe-2021-22-r6-monaco,2021-22,2022,6,2022-04-30,,Monaco E-Prix,R6,monaco,https://www.fiaformulae.com/en/results-and-standings?season=8&round=6-monaco
+fe-2021-22-r7-berlin,2021-22,2022,7,2022-05-14,,Berlin E-Prix,R7,berlin,https://www.fiaformulae.com/en/results-and-standings?season=8&round=7-berlin
+fe-2021-22-r8-berlin,2021-22,2022,8,2022-05-15,,Berlin E-Prix,R8,berlin,https://www.fiaformulae.com/en/results-and-standings?season=8&round=8-berlin
+fe-2021-22-r9-jakarta,2021-22,2022,9,2022-06-04,,Jakarta E-Prix,R9,jakarta,https://www.fiaformulae.com/en/results-and-standings?season=8&round=9-jakarta
+fe-2021-22-r10-marrakesh,2021-22,2022,10,2022-07-02,,Marrakesh E-Prix,R10,marrakesh,https://www.fiaformulae.com/en/results-and-standings?season=8&round=10-marrakesh
+fe-2021-22-r11-new-york,2021-22,2022,11,2022-07-16,,New York E-Prix,R11,new-york,https://www.fiaformulae.com/en/results-and-standings?season=8&round=11-new-york
+fe-2021-22-r12-new-york,2021-22,2022,12,2022-07-17,,New York E-Prix,R12,new-york,https://www.fiaformulae.com/en/results-and-standings?season=8&round=12-new-york
+fe-2021-22-r13-london,2021-22,2022,13,2022-07-30,,London E-Prix,R13,london,https://www.fiaformulae.com/en/results-and-standings?season=8&round=13-london
+fe-2021-22-r14-london,2021-22,2022,14,2022-07-31,,London E-Prix,R14,london,https://www.fiaformulae.com/en/results-and-standings?season=8&round=14-london
+fe-2021-22-r15-seoul,2021-22,2022,15,2022-08-13,,Seoul E-Prix,R15,seoul,https://www.fiaformulae.com/en/results-and-standings?season=8&round=15-seoul
+fe-2021-22-r16-seoul,2021-22,2022,16,2022-08-14,,Seoul E-Prix,R16,seoul,https://www.fiaformulae.com/en/results-and-standings?season=8&round=16-seoul
+fe-2022-23-r1-mexico-city,2022-23,2023,1,2023-01-14,,Mexico City E-Prix,R1,mexico-city,https://www.fiaformulae.com/en/results-and-standings?season=9&round=1-mexico-city
+fe-2022-23-r2-diriyah,2022-23,2023,2,2023-01-27,,Diriyah E-Prix,R2,diriyah,https://www.fiaformulae.com/en/results-and-standings?season=9&round=2-diriyah
+fe-2022-23-r3-diriyah,2022-23,2023,3,2023-01-28,,Diriyah E-Prix,R3,diriyah,https://www.fiaformulae.com/en/results-and-standings?season=9&round=3-diriyah
+fe-2022-23-r4-hyderabad,2022-23,2023,4,2023-02-11,,Hyderabad E-Prix,R4,hyderabad,https://www.fiaformulae.com/en/results-and-standings?season=9&round=4-hyderabad
+fe-2022-23-r5-cape-town,2022-23,2023,5,2023-02-25,,Cape Town E-Prix,R5,cape-town,https://www.fiaformulae.com/en/results-and-standings?season=9&round=5-cape-town
+fe-2022-23-r6-sao-paulo,2022-23,2023,6,2023-03-25,,Sao Paulo E-Prix,R6,sao-paulo,https://www.fiaformulae.com/en/results-and-standings?season=9&round=6-sao-paulo
+fe-2022-23-r7-berlin,2022-23,2023,7,2023-04-22,,Berlin E-Prix,R7,berlin,https://www.fiaformulae.com/en/results-and-standings?season=9&round=7-berlin
+fe-2022-23-r8-berlin,2022-23,2023,8,2023-04-23,,Berlin E-Prix,R8,berlin,https://www.fiaformulae.com/en/results-and-standings?season=9&round=8-berlin
+fe-2022-23-r9-monaco,2022-23,2023,9,2023-05-06,,Monaco E-Prix,R9,monaco,https://www.fiaformulae.com/en/results-and-standings?season=9&round=9-monaco
+fe-2022-23-r10-jakarta,2022-23,2023,10,2023-06-03,,Jakarta E-Prix,R10,jakarta,https://www.fiaformulae.com/en/results-and-standings?season=9&round=10-jakarta
+fe-2022-23-r11-jakarta,2022-23,2023,11,2023-06-04,,Jakarta E-Prix,R11,jakarta,https://www.fiaformulae.com/en/results-and-standings?season=9&round=11-jakarta
+fe-2022-23-r12-portland,2022-23,2023,12,2023-06-24,,Portland E-Prix,R12,portland,https://www.fiaformulae.com/en/results-and-standings?season=9&round=12-portland
+fe-2022-23-r13-rome,2022-23,2023,13,2023-07-15,,Rome E-Prix,R13,rome,https://www.fiaformulae.com/en/results-and-standings?season=9&round=13-rome
+fe-2022-23-r14-rome,2022-23,2023,14,2023-07-16,,Rome E-Prix,R14,rome,https://www.fiaformulae.com/en/results-and-standings?season=9&round=14-rome
+fe-2022-23-r15-london,2022-23,2023,15,2023-07-29,,London E-Prix,R15,london,https://www.fiaformulae.com/en/results-and-standings?season=9&round=15-london
+fe-2022-23-r16-london,2022-23,2023,16,2023-07-30,,London E-Prix,R16,london,https://www.fiaformulae.com/en/results-and-standings?season=9&round=16-london
+fe-2023-24-r1-mexico-city,2023-24,2024,1,2024-01-13,,Mexico City E-Prix,R1,mexico-city,https://www.fiaformulae.com/en/results-and-standings?season=10&round=1-mexico-city
+fe-2023-24-r2-diriyah,2023-24,2024,2,2024-01-26,,Diriyah E-Prix,R2,diriyah,https://www.fiaformulae.com/en/results-and-standings?season=10&round=2-diriyah
+fe-2023-24-r3-diriyah,2023-24,2024,3,2024-01-27,,Diriyah E-Prix,R3,diriyah,https://www.fiaformulae.com/en/results-and-standings?season=10&round=3-diriyah
+fe-2023-24-r4-sao-paulo,2023-24,2024,4,2024-03-16,,Sao Paulo E-Prix,R4,sao-paulo,https://www.fiaformulae.com/en/results-and-standings?season=10&round=4-sao-paulo
+fe-2023-24-r5-tokyo,2023-24,2024,5,2024-03-30,,Tokyo E-Prix,R5,tokyo,https://www.fiaformulae.com/en/results-and-standings?season=10&round=5-tokyo
+fe-2023-24-r6-misano,2023-24,2024,6,2024-04-13,,Misano E-Prix,R6,misano,https://www.fiaformulae.com/en/results-and-standings?season=10&round=6-misano
+fe-2023-24-r7-misano,2023-24,2024,7,2024-04-14,,Misano E-Prix,R7,misano,https://www.fiaformulae.com/en/results-and-standings?season=10&round=7-misano
+fe-2023-24-r8-monaco,2023-24,2024,8,2024-04-27,,Monaco E-Prix,R8,monaco,https://www.fiaformulae.com/en/results-and-standings?season=10&round=8-monaco
+fe-2023-24-r9-berlin,2023-24,2024,9,2024-05-11,,Berlin E-Prix,R9,berlin,https://www.fiaformulae.com/en/results-and-standings?season=10&round=9-berlin
+fe-2023-24-r10-berlin,2023-24,2024,10,2024-05-12,,Berlin E-Prix,R10,berlin,https://www.fiaformulae.com/en/results-and-standings?season=10&round=10-berlin
+fe-2023-24-r11-shanghai,2023-24,2024,11,2024-05-25,,Shanghai E-Prix,R11,shanghai,https://www.fiaformulae.com/en/results-and-standings?season=10&round=11-shanghai
+fe-2023-24-r12-shanghai,2023-24,2024,12,2024-05-26,,Shanghai E-Prix,R12,shanghai,https://www.fiaformulae.com/en/results-and-standings?season=10&round=12-shanghai
+fe-2023-24-r13-portland,2023-24,2024,13,2024-06-29,,Portland E-Prix,R13,portland,https://www.fiaformulae.com/en/results-and-standings?season=10&round=13-portland
+fe-2023-24-r14-portland,2023-24,2024,14,2024-06-30,,Portland E-Prix,R14,portland,https://www.fiaformulae.com/en/results-and-standings?season=10&round=14-portland
+fe-2023-24-r15-london,2023-24,2024,15,2024-07-20,,London E-Prix,R15,london,https://www.fiaformulae.com/en/results-and-standings?season=10&round=15-london
+fe-2023-24-r16-london,2023-24,2024,16,2024-07-21,,London E-Prix,R16,london,https://www.fiaformulae.com/en/results-and-standings?season=10&round=16-london
+fe-2024-25-r1-sao-paulo,2024-25,2025,1,2024-12-07,,Sao Paulo E-Prix,R1,sao-paulo,https://www.fiaformulae.com/en/results-and-standings?season=11&round=1-sao-paulo
+fe-2024-25-r2-mexico-city,2024-25,2025,2,2025-01-11,,Mexico City E-Prix,R2,mexico-city,https://www.fiaformulae.com/en/results-and-standings?season=11&round=2-mexico-city
+fe-2024-25-r3-jeddah,2024-25,2025,3,2025-02-14,,Jeddah E-Prix,R3,jeddah,https://www.fiaformulae.com/en/results-and-standings?season=11&round=3-jeddah
+fe-2024-25-r4-jeddah,2024-25,2025,4,2025-02-15,,Jeddah E-Prix,R4,jeddah,https://www.fiaformulae.com/en/results-and-standings?season=11&round=4-jeddah
+fe-2024-25-r5-miami,2024-25,2025,5,2025-04-12,,Miami E-Prix,R5,miami,https://www.fiaformulae.com/en/results-and-standings?season=11&round=5-miami
+fe-2024-25-r6-monaco,2024-25,2025,6,2025-05-03,,Monaco E-Prix,R6,monaco,https://www.fiaformulae.com/en/results-and-standings?season=11&round=6-monaco
+fe-2024-25-r7-monaco,2024-25,2025,7,2025-05-04,,Monaco E-Prix,R7,monaco,https://www.fiaformulae.com/en/results-and-standings?season=11&round=7-monaco
+fe-2024-25-r8-tokyo,2024-25,2025,8,2025-05-17,,Tokyo E-Prix,R8,tokyo,https://www.fiaformulae.com/en/results-and-standings?season=11&round=8-tokyo
+fe-2024-25-r9-tokyo,2024-25,2025,9,2025-05-18,,Tokyo E-Prix,R9,tokyo,https://www.fiaformulae.com/en/results-and-standings?season=11&round=9-tokyo
+fe-2024-25-r10-shanghai,2024-25,2025,10,2025-05-31,,Shanghai E-Prix,R10,shanghai,https://www.fiaformulae.com/en/results-and-standings?season=11&round=10-shanghai
+fe-2024-25-r11-shanghai,2024-25,2025,11,2025-06-01,,Shanghai E-Prix,R11,shanghai,https://www.fiaformulae.com/en/results-and-standings?season=11&round=11-shanghai
+fe-2024-25-r12-jakarta,2024-25,2025,12,2025-06-21,,Jakarta E-Prix,R12,jakarta,https://www.fiaformulae.com/en/results-and-standings?season=11&round=12-jakarta
+fe-2024-25-r13-berlin,2024-25,2025,13,2025-07-12,,Berlin E-Prix,R13,berlin,https://www.fiaformulae.com/en/results-and-standings?season=11&round=13-berlin
+fe-2024-25-r14-berlin,2024-25,2025,14,2025-07-13,,Berlin E-Prix,R14,berlin,https://www.fiaformulae.com/en/results-and-standings?season=11&round=14-berlin
+fe-2024-25-r15-london,2024-25,2025,15,2025-07-26,,London E-Prix,R15,london,https://www.fiaformulae.com/en/results-and-standings?season=11&round=15-london
+fe-2024-25-r16-london,2024-25,2025,16,2025-07-27,,London E-Prix,R16,london,https://www.fiaformulae.com/en/results-and-standings?season=11&round=16-london
+fe-2025-26-r1-sao-paulo,2025-26,2026,1,2025-12-06,,Sao Paulo E-Prix,R1,sao-paulo,https://www.fiaformulae.com/en/results-and-standings?season=12&round=1-sao-paulo
+fe-2025-26-r2-ciudad-de-mexico,2025-26,2026,2,2026-01-10,,Ciudad De Mexico E-Prix,R2,ciudad-de-mexico,https://www.fiaformulae.com/en/results-and-standings?season=12&round=2-ciudad-de-mexico
+fe-2025-26-r3-miami,2025-26,2026,3,2026-01-31,,Miami E-Prix,R3,miami,https://www.fiaformulae.com/en/results-and-standings?season=12&round=3-miami
+fe-2025-26-r4-jeddah,2025-26,2026,4,2026-02-13,,Jeddah E-Prix,R4,jeddah,https://www.fiaformulae.com/en/results-and-standings?season=12&round=4-jeddah
+fe-2025-26-r5-jeddah,2025-26,2026,5,2026-02-14,,Jeddah E-Prix,R5,jeddah,https://www.fiaformulae.com/en/results-and-standings?season=12&round=5-jeddah
+fe-2025-26-r6-madrid,2025-26,2026,6,2026-03-21,,Madrid E-Prix,R6,madrid,https://www.fiaformulae.com/en/results-and-standings?season=12&round=6-madrid
+fe-2025-26-r7-berlin,2025-26,2026,7,2026-05-02,,Berlin E-Prix,R7,berlin,https://www.fiaformulae.com/en/results-and-standings?season=12&round=7-berlin
+fe-2025-26-r8-berlin,2025-26,2026,8,2026-05-03,,Berlin E-Prix,R8,berlin,https://www.fiaformulae.com/en/results-and-standings?season=12&round=8-berlin
+fe-2025-26-r9-monaco,2025-26,2026,9,2026-05-16,,Monaco E-Prix,R9,monaco,https://www.fiaformulae.com/en/results-and-standings?season=12&round=9-monaco
+fe-2025-26-r10-monaco,2025-26,2026,10,2026-05-17,,Monaco E-Prix,R10,monaco,https://www.fiaformulae.com/en/results-and-standings?season=12&round=10-monaco
+fe-2025-26-r11-sanya-fenghuang-international-apt,2025-26,2026,11,2026-06-20,,Sanya Fenghuang International Apt E-Prix,R11,sanya-fenghuang-international-apt,https://www.fiaformulae.com/en/results-and-standings?season=12&round=11-sanya-fenghuang-international-apt
+fe-2025-26-r12-shanghai,2025-26,2026,12,2026-07-04,,Shanghai E-Prix,R12,shanghai,https://www.fiaformulae.com/en/results-and-standings?season=12&round=12-shanghai
+fe-2025-26-r13-shanghai,2025-26,2026,13,2026-07-05,,Shanghai E-Prix,R13,shanghai,https://www.fiaformulae.com/en/results-and-standings?season=12&round=13-shanghai
+fe-2025-26-r14-tokyo,2025-26,2026,14,2026-07-25,,Tokyo E-Prix,R14,tokyo,https://www.fiaformulae.com/en/results-and-standings?season=12&round=14-tokyo
+fe-2025-26-r15-tokyo,2025-26,2026,15,2026-07-26,,Tokyo E-Prix,R15,tokyo,https://www.fiaformulae.com/en/results-and-standings?season=12&round=15-tokyo
+fe-2025-26-r16-london,2025-26,2026,16,2026-08-15,,London E-Prix,R16,london,https://www.fiaformulae.com/en/results-and-standings?season=12&round=16-london
+fe-2025-26-r17-london,2025-26,2026,17,2026-08-16,,London E-Prix,R17,london,https://www.fiaformulae.com/en/results-and-standings?season=12&round=17-london

@@ -4,11 +4,12 @@ const { SERIES_HOME_CONFIG, SERIES_HOME_PREVIEWS, renderSeriesHome } = require('
 const { seriesPageRoutes } = require('../backend/series-pages');
 
 test('all championship landing pages use the shared template configuration', () => {
-    assert.deepEqual(Object.keys(SERIES_HOME_CONFIG), ['f1', 'f2', 'f3', 'academy']);
+    assert.deepEqual(Object.keys(SERIES_HOME_CONFIG), ['f1', 'f2', 'f3', 'academy', 'fe']);
 
     for (const [key, config] of Object.entries(SERIES_HOME_CONFIG)) {
         assert.equal(config.key, key);
-        assert.ok(config.headline && config.subheadline && config.introduction && config.askExample);
+        assert.ok(config.headline && config.subheadline && config.introduction);
+        assert.ok(config.askEnabled === false || config.askExample);
         assert.ok(SERIES_HOME_PREVIEWS[key].href.startsWith(config.path || '/'));
     }
 });
@@ -33,12 +34,16 @@ test('series-specific capabilities and identity stay distinct', () => {
     const f2 = renderSeriesHome('f2');
     const f3 = renderSeriesHome('f3');
     const academy = renderSeriesHome('academy');
+    const fe = renderSeriesHome('fe');
 
     assert.match(f1, /href="\/simulator\?year=2008&amp;points=1991-2002"/);
     assert.doesNotMatch(f2 + f3 + academy, /href="\/simulate-race"/);
     assert.match(f2, /class="f2-mode"/);
     assert.match(f3, /class="f3-mode"/);
     assert.match(academy, /class="academy-mode"/);
+    assert.match(fe, /class="fe-mode"/);
+    assert.match(fe, /href="\/formula-e\/seasons"/);
+    assert.doesNotMatch(fe, /\/formula-e\/(?:ask|simulator|games|lights-out)/);
     assert.match(academy, /href="\/account\?series=academy"/);
     assert.match(f2, /href="\/f2\/champions-quiz"/);
     assert.match(f3, /href="\/f3\/lights-out"/);
@@ -48,6 +53,7 @@ test('series-specific capabilities and identity stay distinct', () => {
 
 test('landing page Ask forms submit their visible example questions', () => {
     for (const [key, config] of Object.entries(SERIES_HOME_CONFIG)) {
+        if (config.askEnabled === false) continue;
         const html = renderSeriesHome(key);
         const form = html.match(/<form action="([^"]*\/ask)" method="get">[\s\S]*?<\/form>/)?.[0] || '';
         assert.match(form, new RegExp(`value="${config.askExample.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}"`));

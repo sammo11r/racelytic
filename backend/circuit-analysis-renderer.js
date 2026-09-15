@@ -6,8 +6,8 @@ function renderCircuitAnalysisHtml(html, pathname) {
     const series = fromPath(pathname);
     const template = fs.readFileSync(path.join(__dirname, '../frontend/templates/f1-circuit-analysis.html'), 'utf8');
     if (series.key === 'f1') return template;
-    const formats = series.key === 'academy' ? 'standard and reverse-grid races' : 'feature and sprint races';
-    const start = { f2: 2017, f3: 2019, academy: 2023 }[series.key];
+    const formats = series.key === 'fe' ? 'E-Prix races' : series.key === 'academy' ? 'standard and reverse-grid races' : 'feature and sprint races';
+    const start = { f2: 2017, f3: 2019, academy: 2023, fe: 2015 }[series.key];
     const periods = series.key === 'academy' ? '<option value="2023-2024">2023–2024</option><option value="2025-9999">2025–present</option>'
         : `<option value="${start}-2019">${start === 2019 ? '2019' : '2017–2019'}</option><option value="2020-9999">2020–present</option>`;
     return template

@@ -5,7 +5,7 @@ const { configuredItems, filterItems, pointItems } = require('../community');
 
 const router = express.Router();
 const TYPES = new Set(['all', 'points', 'records', 'championships']);
-const SERIES = new Set(['all', 'f1', 'f2', 'f3', 'academy']);
+const SERIES = new Set(['all', 'f1', 'f2', 'f3', 'academy', 'fe']);
 const SORTS = new Set(['newest', 'updated', 'oldest', 'name']);
 
 router.get('/api/community', async (req, res) => {

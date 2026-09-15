@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="500" height="500" viewBox="0 0 500 500" role="img" aria-labelledby="title-monaco">
+  <title id="title-monaco">Monaco Formula E circuit outline</title>
+  <!-- Simplified from https://results.formulae.fia.com/api/getfile/formula-e/files/results/11_Season%2012%20-%202025-26/09_R09%20Monaco/Event%20Information/S12_MCO_Circuit%20Map%20V1.pdf -->
+  <path d="M94.0 106.0 Q40.0 130.6 49.1 134.3 Q58.2 138.0 50.9 146.4 Q43.7 154.9 69.1 161.5 Q94.5 168.1 91.2 153.9 Q87.9 139.6 134.1 132.4 Q180.3 125.2 184.4 137.4 Q188.5 149.5 190.8 131.0 Q193.1 112.4 222.4 118.0 Q251.7 123.5 257.8 178.0 Q264.0 232.5 291.5 299.9 Q318.9 367.4 387.8 393.0 Q456.7 418.5 451.7 372.9 Q446.8 327.4 404.9 305.7 Q363.0 284.0 353.6 300.5 Q344.1 317.0 327.6 308.4 Q311.1 299.7 298.9 205.4 Q286.7 111.2 272.7 99.8 Q258.7 88.5 203.4 85.0 Q148.1 81.5 94.0 106.0 Z" fill="none" stroke="#111318" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

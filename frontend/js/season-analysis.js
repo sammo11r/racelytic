@@ -4,7 +4,7 @@
   const seriesKey = activeSeriesKey();
   const junior = seriesKey !== 'f1';
   const seriesQuery = junior ? '?series=' + seriesKey : '';
-  const driverBase = junior ? '/' + seriesKey + '/drivers/' : '/drivers/';
+  const driverBase = seriesKey === 'f1' ? '/drivers/' : seriesKey === 'fe' ? '/formula-e/drivers/' : `/${seriesKey}/drivers/`;
   const $ = id => document.getElementById(id);
   const initial = model.readState(location.search);
   let data, state, styles, selected = new Set(), view = initial.view, scoring = initial.scoring;
@@ -13,6 +13,7 @@
   const empty = text => '<div class="empty-state">' + esc(text) + '</div>';
   const number = value => value == null ? '—' : fmtNumber(value);
   const raceName = race => displayRaceName(race);
+  const resultColumnName = race => model.resultColumnName(race, seriesKey);
   const roundLabel = race => race.analysisLabel || 'R' + race.round;
   function saveState() {
     if (!data) return;
@@ -213,7 +214,7 @@
     const labels = { upcoming: 'Upcoming', missing: 'No data', cancelled: 'Cancelled', 'sprint-only': 'GP pending' };
     $('heatmap-readout').textContent = 'Select a result for details.';
     $('results-heatmap').innerHTML = '<table class="analysis-results-table"><caption>All ' + rows.length + ' drivers · ' + data.year + '</caption><thead><tr><th scope="col">Driver</th>' +
-      columns.map(race => '<th scope="col"><span>' + esc(roundLabel(race)) + '</span><small>' + esc(raceName(race)) + '</small></th>').join('') + '</tr></thead><tbody>' +
+      columns.map(race => '<th scope="col"><span>' + esc(roundLabel(race)) + '</span><small>' + esc(resultColumnName(race)) + '</small></th>').join('') + '</tr></thead><tbody>' +
       rows.map(driver => '<tr><th scope="row"><a href="' + driverBase + encodeURIComponent(driver.driverId) + '">' + esc(driver.name) + '</a></th>' +
         columns.map(race => {
           const result = driver.raceResults?.[race.round], status = state.roundStatus(race);
@@ -231,7 +232,7 @@
   }
   function renderAverages() {
     const columns = junior
-      ? [['name', 'Driver'], ['averageFinish', 'Avg. finish'], ['sprintAverage', seriesKey === 'academy' ? 'Avg. reverse-grid' : 'Avg. sprint'], ['featureAverage', seriesKey === 'academy' ? 'Avg. standard race' : 'Avg. feature'], ['spread', 'Finish spread'], ['finishes', 'Race sample'], ['unclassifiedRate', 'Unclassified rate'], ['position', state.complete ? 'Final standing' : 'Standing']]
+      ? [['name', 'Driver'], ['averageFinish', 'Avg. finish'], ...(seriesKey === 'fe' ? [] : [['sprintAverage', seriesKey === 'academy' ? 'Avg. reverse-grid' : 'Avg. sprint'], ['featureAverage', seriesKey === 'academy' ? 'Avg. standard race' : 'Avg. feature']]), ['spread', 'Finish spread'], ['finishes', 'Race sample'], ['unclassifiedRate', 'Unclassified rate'], ['position', state.complete ? 'Final standing' : 'Standing']]
       : [['name', 'Driver'], ['averageFinish', 'Avg. finish'], ['averageQualifying', 'Avg. qualifying'], ['spread', 'Finish spread'], ['finishes', 'Race sample'], ['qualifyingCount', 'Qual. sample'], ['retirementRate', 'Retirement rate'], ['position', state.complete ? 'Final standing' : 'Standing']];
     const rows = model.driversFor(data).map(junior ? model.juniorAverages : model.averages).sort((a, b) => {
       if (a[sortKey] == null) return b[sortKey] == null ? 0 : 1;

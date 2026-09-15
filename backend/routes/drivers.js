@@ -1,7 +1,7 @@
 const express = require('express');
 const { withConnection, sendError } = require('../route-helpers');
 const { integerOrDefault } = require('../validation');
-const { f2SessionType, f3SessionType, academySessionType } = require('./seasons');
+const { f2SessionType, f3SessionType, academySessionType, formulaESessionType } = require('./seasons');
 const { isJuniorSeries, seriesPrefix } = require('../series-config');
 const { academyComparisonLookups, comparisonRaceGroups } = require('../driver-comparison');
 const { driverRaceGridContexts } = require('../driver-race-grids');
@@ -102,7 +102,7 @@ function juniorClassificationLookups(gridResults, qualifyingResults) {
 
 function juniorRaceSessionLabel(series, row) {
     if (series === 'academy') return String(row.sessionName || 'Race');
-    const sessionType = series === 'academy' ? academySessionType : series === 'f3' ? f3SessionType : f2SessionType;
+    const sessionType = series === 'academy' ? academySessionType : series === 'f3' ? f3SessionType : series === 'fe' ? formulaESessionType : f2SessionType;
     const type = sessionType({ ...row, name: row.sessionName || row.name }, 0, 0, row.year);
     if (type === 'F') return 'Feature';
     const explicitSprintNumber = String(row.sessionName || '').match(/sprint[^0-9]*([0-9]+)/i)?.[1];
@@ -671,7 +671,7 @@ async function juniorDriverResults(connection, series, driverId) {
             positionsGained: !unclassified && positionNumber > 0 && gridPositionNumber !== null ? gridPositionNumber - positionNumber : null,
             reasonRetired: unclassified ? status : null,
             points: disqualified ? 0 : Number(row.points || 0), laps: Number(row.laps || 0),
-            fastestLap: ['f2', 'academy'].includes(series) && isTrue(row.fastestLap),
+            fastestLap: ['f2', 'academy', 'fe'].includes(series) && isTrue(row.fastestLap),
             polePosition: ['f2', 'academy'].includes(series) && isTrue(row.polePosition)
         };
     });

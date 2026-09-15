@@ -1,6 +1,6 @@
 async function loadSeriesHome() {
   const series = document.body.dataset.seriesHome || 'f1';
-  const base = series === 'f1' ? '' : `/${series}`;
+  const base = series === 'f1' ? '' : series === 'fe' ? '/formula-e' : `/${series}`;
 
   try {
     const data = await getJSON(`/api/dashboard?series=${encodeURIComponent(series)}`);
@@ -17,7 +17,7 @@ async function loadSeriesHome() {
       latestSeasonLink.textContent = `Latest season · ${data.latestSeason}`;
     }
     snapshotSeasonLink.href = seasonUrl;
-    document.getElementById('snapshot-season').textContent = data.latestSeason;
+    document.getElementById('snapshot-season').textContent = data.latestSeasonLabel || data.latestSeason;
     document.getElementById('snapshot-rounds').textContent = fmtNumber(data.currentSeason?.rounds || 0);
 
     const leader = data.currentSeason?.leader;

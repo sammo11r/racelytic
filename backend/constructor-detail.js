@@ -142,7 +142,7 @@ async function juniorConstructorResults(connection, prefix, series, id) {
             WHERE sessions.raceId IN (${placeholders})
             ORDER BY sessions.year, sessions.round, sessions.sessionNumber, results.positionDisplayOrder
         `, raceIds);
-    const sessionType = series === 'academy' ? academySessionType : series === 'f3' ? f3SessionType : f2SessionType;
+    const sessionType = series === 'academy' ? academySessionType : series === 'f3' ? f3SessionType : series === 'fe' ? () => 'F' : f2SessionType;
     const contexts = driverRaceGridContexts(series, contextRows, sessionType);
     return rows.map(row => {
         const positionNumber = juniorClassificationPosition(row.positionNumber);

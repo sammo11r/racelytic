@@ -14,6 +14,17 @@ function juniorSessionName(session) {
   return String(session.displayName || session.name || 'Session');
 }
 
+function juniorSessionOrder(session) {
+  if (juniorRaceConfig.series !== 'fe') return Number(session.sessionNumber || 0);
+  const key = `${session.code || ''} ${session.name || ''}`.toLowerCase();
+  const practice = key.match(/(?:fp|practice)[\s_-]*(\d+)?/);
+  if (practice) return 10 + Number(practice[1] || 0);
+  if (/qualif/.test(key)) return 100;
+  if (/grid/.test(key)) return 190;
+  if (session.isRace || /race/.test(key)) return 200;
+  return 150 + Number(session.sessionNumber || 0) / 100;
+}
+
 function juniorResultValue(value) {
   return value === null || value === undefined || value === '' ? '—' : esc(value);
 }
@@ -105,7 +116,10 @@ function juniorRaceStatusLabel(status) {
 }
 
 function availableJuniorSessions() {
-  return juniorRaceData.sessions.filter(session => session.cancelled || session.results.length);
+  const sessions = juniorRaceData.sessions.filter(session => session.cancelled || session.results.length);
+  return juniorRaceConfig.series === 'fe'
+    ? [...sessions].sort((first, second) => juniorSessionOrder(first) - juniorSessionOrder(second))
+    : sessions;
 }
 
 function activeJuniorSession() {
@@ -178,30 +192,32 @@ function renderJuniorRaceOverview(status) {
 
 function renderJuniorDesktopResults(session) {
   const kind = juniorSessionKind(session);
+  const showLaps = session.results.some(result => Number(result.laps) > 0);
   const heading = kind === 'race'
-    ? '<th>Pos.</th><th>Driver</th><th>Team</th><th>Grid</th><th>Change</th><th>Laps</th><th>Time / status</th><th>Points</th>'
+    ? `<th>Pos.</th><th>Driver</th><th>Team</th><th>Grid</th><th>Change</th>${showLaps ? '<th>Laps</th>' : ''}<th>Time / status</th><th>Points</th>`
     : kind === 'grid'
       ? '<th>Pos.</th><th>Driver</th><th>Team</th><th>Number</th>'
-      : '<th>Pos.</th><th>Driver</th><th>Team</th><th>Time</th><th>Gap</th><th>Laps</th>';
+      : `<th>Pos.</th><th>Driver</th><th>Team</th><th>Time</th><th>Gap</th>${showLaps ? '<th>Laps</th>' : ''}`;
   return `<div class="table-wrap race-results-table-wrap"><table class="session-results-table"><thead><tr>${heading}</tr></thead><tbody>${session.results.map(result => {
     const position = juniorResultValue(juniorResultFinish(result, kind === 'race'));
     const driver = `${juniorDriverLink(result)}${result.driverNumber ? `<small>#${esc(result.driverNumber)}${result.abbreviation ? ` · ${esc(result.abbreviation)}` : ''}</small>` : ''}`;
     const rowClass = juniorResultStatusClass(result).trim();
     const positionCell = `<span class="finish-position${juniorResultStatusClass(result)}">${position}</span>`;
-    if (kind === 'race') return `<tr class="${rowClass}"><td>${positionCell}</td><td>${driver}${juniorResultMarkers(result)}</td><td>${juniorTeamLink(result)}</td><td>${juniorGridValue(result.gridPositionNumber)}</td><td>${juniorGridMovement(result)}</td><td>${juniorResultValue(result.laps)}</td><td>${esc(juniorGap(result))}</td><td class="result-points-total">${result.points === null ? '—' : fmtNumber(result.points)}</td></tr>`;
+    if (kind === 'race') return `<tr class="${rowClass}"><td>${positionCell}</td><td>${driver}${juniorResultMarkers(result)}</td><td>${juniorTeamLink(result)}</td><td>${juniorGridValue(result.gridPositionNumber)}</td><td>${juniorGridMovement(result)}</td>${showLaps ? `<td>${juniorResultValue(result.laps)}</td>` : ''}<td>${esc(juniorGap(result))}</td><td class="result-points-total">${result.points === null ? '—' : fmtNumber(result.points)}</td></tr>`;
     if (kind === 'grid') return `<tr class="${rowClass}"><td>${positionCell}</td><td>${driver}</td><td>${juniorTeamLink(result)}</td><td>${juniorResultValue(result.driverNumber)}</td></tr>`;
-    return `<tr class="${rowClass}"><td>${positionCell}</td><td>${driver}${juniorResultMarkers(result)}</td><td>${juniorTeamLink(result)}</td><td>${juniorResultValue(juniorTime(result))}</td><td>${esc(juniorGap(result, false))}</td><td>${juniorResultValue(result.laps)}</td></tr>`;
+    return `<tr class="${rowClass}"><td>${positionCell}</td><td>${driver}${juniorResultMarkers(result)}</td><td>${juniorTeamLink(result)}</td><td>${juniorResultValue(juniorTime(result))}</td><td>${esc(juniorGap(result, false))}</td>${showLaps ? `<td>${juniorResultValue(result.laps)}</td>` : ''}</tr>`;
   }).join('')}</tbody></table></div>`;
 }
 
 function renderJuniorMobileResults(session) {
   const kind = juniorSessionKind(session);
+  const showLaps = session.results.some(result => Number(result.laps) > 0);
   return `<div class="session-result-cards">${session.results.map(result => {
     const details = kind === 'race'
-      ? [['Grid', juniorGridValue(result.gridPositionNumber)], ['Change', juniorGridMovement(result)], ['Laps', juniorResultValue(result.laps)], ['Time / status', esc(juniorGap(result))], ['Points', result.points === null ? '—' : fmtNumber(result.points)]]
+      ? [['Grid', juniorGridValue(result.gridPositionNumber)], ['Change', juniorGridMovement(result)], ...(showLaps ? [['Laps', juniorResultValue(result.laps)]] : []), ['Time / status', esc(juniorGap(result))], ['Points', result.points === null ? '—' : fmtNumber(result.points)]]
       : kind === 'grid'
         ? [['Grid number', juniorResultValue(result.driverNumber)]]
-        : [['Time', juniorResultValue(juniorTime(result))], ['Gap', esc(juniorGap(result, false))], ['Laps', juniorResultValue(result.laps)]];
+        : [['Time', juniorResultValue(juniorTime(result))], ['Gap', esc(juniorGap(result, false))], ...(showLaps ? [['Laps', juniorResultValue(result.laps)]] : [])];
     return `<article class="session-result-card${juniorResultStatusClass(result)}">
       <div class="session-result-card-head"><span class="finish-position${juniorResultStatusClass(result)}">${juniorResultValue(juniorResultFinish(result, kind === 'race'))}</span><div>${juniorDriverLink(result)}<small>${esc(result.constructorName || '—')}${result.driverNumber ? ` · #${esc(result.driverNumber)}` : ''}</small></div><div class="result-card-markers">${juniorResultMarkers(result)}</div></div>
       <dl>${details.map(([label, value]) => `<div><dt>${label}</dt><dd>${value}</dd></div>`).join('')}</dl>

@@ -1,8 +1,14 @@
 const { f2CircuitImageId } = require('../frontend/js/f2-circuit-images');
 
-function juniorCircuitArchiveRow(row, layouts) {
+function juniorCircuitImageId(circuitId, series) {
+    if (!circuitId) return null;
+    if (series === 'fe') return `fe-${circuitId}`;
     // The existing Valencia image mapping refers to a different venue; do not borrow its map or name.
-    const layoutId = row.id === 'valencia' ? null : f2CircuitImageId(row.id);
+    return circuitId === 'valencia' ? null : f2CircuitImageId(circuitId);
+}
+
+function juniorCircuitArchiveRow(row, layouts, series) {
+    const layoutId = juniorCircuitImageId(row.id, series);
     const canonical = layouts.get(layoutId);
     const location = String(row.placeName || '').split(',').map(part => part.trim()).filter(Boolean);
     const countryName = location.length > 1 ? location.pop() : canonical?.countryName || '';
@@ -25,4 +31,4 @@ function juniorCircuitArchiveRow(row, layouts) {
     };
 }
 
-module.exports = { juniorCircuitArchiveRow };
+module.exports = { juniorCircuitArchiveRow, juniorCircuitImageId };

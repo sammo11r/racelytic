@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="500" height="500" viewBox="0 0 500 500" role="img" aria-labelledby="title-new-york">
+  <title id="title-new-york">New York Formula E circuit outline</title>
+  <!-- Simplified from https://results.formulae.fia.com/api/getfile/formula-e/files/results/07_Season%208%20-%202021-22/11_R11%20New%20York%20City/Event%20Information/S8_R11-12_NYC_CircuitMap.pdf -->
+  <path d="M441.6 266.1 Q460.0 252.7 436.2 225.9 Q412.4 199.1 398.2 212.5 Q384.0 225.9 390.7 241.1 Q397.4 256.4 247.0 256.0 Q96.6 255.7 163.3 256.2 Q229.9 256.7 233.6 264.2 Q237.3 271.8 162.8 271.8 Q88.2 271.8 81.0 282.8 Q73.8 293.9 68.6 283.2 Q63.4 272.4 71.5 268.3 Q79.5 264.1 71.0 267.4 Q62.4 270.8 51.2 255.5 Q40.0 240.3 56.6 270.6 Q73.2 300.9 81.9 290.0 Q90.6 279.1 126.2 279.3 Q161.9 279.5 162.1 287.8 Q162.2 296.2 162.9 287.8 Q163.6 279.5 293.4 279.5 Q423.2 279.5 441.6 266.1 Z" fill="none" stroke="#111318" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

@@ -1,8 +1,8 @@
 (() => {
   'use strict';
   const $ = id => document.getElementById(id);
-  const junior = location.pathname.startsWith('/f2/') || location.pathname.startsWith('/f3/') || location.pathname.startsWith('/academy/');
-  const series = location.pathname.startsWith('/academy/') ? 'academy' : location.pathname.startsWith('/f3/') ? 'f3' : location.pathname.startsWith('/f2/') ? 'f2' : 'f1';
+  const series = activeSeriesKey();
+  const junior = series !== 'f1';
   const validViews = ['flow', 'matrix', 'contribution', 'attrition'];
   const params = new URLSearchParams(location.search);
   const initial = {
@@ -80,8 +80,9 @@
 
   function positionChangeText(change) { return change == null ? '—' : `${change > 0 ? '+' : ''}${change}`; }
   function entityUrl(type, id) {
-    const page = type === 'team' ? (['f3', 'academy'].includes(series) ? 'team' : 'constructor') : 'driver';
-    return resourceUrl(page, id, { base: series === 'f1' ? '' : `/${series}` });
+    const page = type === 'team' ? (['f3', 'academy', 'fe'].includes(series) ? 'team' : 'constructor') : 'driver';
+    const base = series === 'f1' ? '' : series === 'fe' ? '/formula-e' : `/${series}`;
+    return resourceUrl(page, id, { base });
   }
   function driverShortName(name) { const parts = String(name || '').replace(/\s+(Jr\.?|Sr\.?)$/i, '').split(/\s+/); return parts[parts.length - 1] || name; }
   function recordedRace(race) { return junior ? race.raceSessionCount === undefined || Number(race.raceSessionCount) > 0 : Boolean(race.winnerDriverId || race.winnerName || race.winnerConstructorId || race.winnerConstructorName); }

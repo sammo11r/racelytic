@@ -84,23 +84,23 @@ function emptyState(container, text, href, action) {
 
 function savedRecordFormat(config) {
   if (config.category === 'championships') return 'Season titles';
-  if (['f2', 'f3', 'academy'].includes(config.series)) {
+  if (['f2', 'f3', 'academy', 'fe'].includes(config.series)) {
     const format = config.raceFormat || (config.includeSprints ? 'all' : 'F');
-    return format === 'all' ? 'All race formats' : format === 'F' ? (config.series === 'academy' ? 'Standard races' : 'Feature races') : (config.series === 'academy' ? 'Reverse-grid races' : 'Sprint races');
+    return format === 'all' ? 'All race formats' : format === 'F' ? (config.series === 'fe' ? 'E-Prix races' : config.series === 'academy' ? 'Standard races' : 'Feature races') : (config.series === 'academy' ? 'Reverse-grid races' : 'Sprint races');
   }
   return config.includeSprints ? 'Grand Prix + sprint' : 'Grand Prix only';
 }
 
 function savedRecordUrl(configuration) {
   configuration = configuration || {};
-  if (['f2', 'f3', 'academy'].includes(configuration.series) && !configuration.raceFormat) {
+  if (['f2', 'f3', 'academy', 'fe'].includes(configuration.series) && !configuration.raceFormat) {
     configuration = { ...configuration, raceFormat: configuration.category === 'championships' ? 'all' : configuration.category === 'poles' ? 'F' : configuration.includeSprints ? 'all' : 'F' };
   }
   const query = new URLSearchParams();
   Object.entries(configuration).forEach(([key, value]) => {
     if (key !== 'series' && value !== null && value !== undefined && value !== '' && value !== false) query.set(key, String(value));
   });
-  const series = ['f2', 'f3', 'academy'].includes(configuration.series) ? `/${configuration.series}` : '';
+  const series = configuration.series === 'fe' ? '/formula-e' : ['f2', 'f3', 'academy'].includes(configuration.series) ? `/${configuration.series}` : '';
   return `${series}/records?${query}`;
 }
 
@@ -117,7 +117,7 @@ function renderRecords(records) {
   if (!records.length) return emptyState(container, 'Your personal record book is empty.', recordsUrl(), 'Explore records');
   container.innerHTML = records.slice(0, 6).map(record => {
     const config = record.configuration || {};
-    const detail = `${config.type === 'constructors' ? (['f3', 'academy'].includes(config.series) ? 'Teams' : 'Constructors') : 'Drivers'} · ${config.category || 'wins'} · ${savedRecordFormat(config)}`;
+    const detail = `${config.type === 'constructors' ? (['f3', 'academy', 'fe'].includes(config.series) ? 'Teams' : 'Constructors') : 'Drivers'} · ${config.category || 'wins'} · ${savedRecordFormat(config)}`;
     return `<a class="account-item-card" href="${esc(savedRecordUrl(config))}"><span>${esc(record.visibility)} RECORD</span><strong>${esc(record.name)}</strong><small>${esc(detail)}</small><b>Open →</b></a>`;
   }).join('');
 }
@@ -134,7 +134,7 @@ function renderChampionships(championships) {
 
 function recordDetail(record) {
   const config = record.configuration || {};
-  return [config.type === 'constructors' ? (['f3', 'academy'].includes(config.series) ? 'Teams' : 'Constructors') : 'Drivers', config.category || 'wins', savedRecordFormat(config)].join(' · ');
+  return [config.type === 'constructors' ? (['f3', 'academy', 'fe'].includes(config.series) ? 'Teams' : 'Constructors') : 'Drivers', config.category || 'wins', savedRecordFormat(config)].join(' · ');
 }
 
 function communityItems() {

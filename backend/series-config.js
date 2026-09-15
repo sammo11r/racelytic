@@ -1,4 +1,4 @@
-const JUNIOR_SERIES = Object.freeze(['f2', 'f3', 'academy']);
+const JUNIOR_SERIES = Object.freeze(['f2', 'f3', 'academy', 'fe']);
 
 function academySessionType(session, sessionIndex, sessionCount, year) {
     const name = String(session.name || '').toLowerCase();
@@ -21,12 +21,14 @@ function isJuniorSeries(value) {
 function seriesPrefix(value) {
     const series = String(value || '').toLowerCase();
     if (series === 'academy') return 'fa_';
+    if (series === 'fe') return 'fe_';
     return isJuniorSeries(series) ? `${series}_` : '';
 }
 
 function minimumSeasonYear(value) {
     const series = String(value || '').toLowerCase();
     if (series === 'academy') return 2023;
+    if (series === 'fe') return 2015;
     if (series === 'f3') return 2019;
     if (series === 'f2') return 2017;
     return 1950;

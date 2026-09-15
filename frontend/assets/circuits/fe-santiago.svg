@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="500" height="500" viewBox="0 0 500 500" role="img" aria-labelledby="title-santiago">
+  <title id="title-santiago">Santiago Formula E circuit outline</title>
+  <!-- Simplified from https://results.formulae.fia.com/api/getfile/formula-e/files/results/05_Season%206%20-%202019-20/03_R03%20Santiago/01_Event%20Information/Circuit%20Map%20V1%20-%20Santiago%20ePrix.pdf -->
+  <path d="M51.3 182.8 Q40.0 205.5 52.9 234.1 Q65.7 262.7 94.6 264.0 Q123.5 265.3 188.6 308.2 Q253.6 351.2 313.4 351.6 Q373.3 352.0 416.6 323.4 Q460.0 294.8 449.2 286.7 Q438.3 278.6 412.3 304.5 Q386.3 330.4 327.6 338.7 Q268.9 347.1 163.3 292.9 Q57.6 238.7 59.4 204.9 Q61.1 171.1 86.7 161.7 Q112.3 152.3 117.6 194.9 Q123.0 237.6 146.8 224.3 Q170.7 211.0 305.1 211.1 Q439.5 211.3 439.3 197.8 Q439.2 184.4 438.3 195.4 Q437.5 206.4 298.0 202.2 Q158.5 198.0 145.8 211.1 Q133.1 224.3 123.4 184.8 Q113.7 145.4 88.1 152.7 Q62.5 160.1 51.3 182.8 Z" fill="none" stroke="#111318" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

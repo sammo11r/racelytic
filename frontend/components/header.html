@@ -1,15 +1,23 @@
 <header class="site-header">
     <div class="container nav">
 
-        <a class="brand" href="/">
-            Racelytic<span>.</span>
-        </a>
+        <div class="header-identity">
+            <div class="championship-selector">
+                <button class="championship-selector-trigger" id="championship-select" type="button" aria-label="Change championship, currently Formula 1" aria-haspopup="listbox" aria-expanded="false" aria-controls="championship-options">
+                    <span data-active-series-short>F1</span>
+                </button>
+                <div class="championship-options" id="championship-options" role="listbox" aria-label="Championship" hidden>
+                    <button type="button" role="option" data-series="f1"><span>F1</span></button>
+                    <button type="button" role="option" data-series="f2"><span>F2</span></button>
+                    <button type="button" role="option" data-series="f3"><span>F3</span></button>
+                    <button type="button" role="option" data-series="academy" aria-label="F1 Academy"><span>F1A</span></button>
+                    <button type="button" role="option" data-series="fe"><span>FE</span></button>
+                </div>
+            </div>
 
-        <div class="series-switcher" aria-label="Racing series">
-            <a href="/" data-series="f1">F1</a>
-            <a href="/f2" data-series="f2">F2</a>
-            <a href="/f3" data-series="f3">F3</a>
-            <a href="/academy" data-series="academy">F1 Academy</a>
+            <a class="brand" href="/">
+                Racelytic<span>.</span>
+            </a>
         </div>
 
         <button class="header-search-toggle" type="button" aria-label="Search Racelytic" aria-expanded="false" aria-controls="main-navigation">
@@ -27,7 +35,7 @@
                     <strong>Search Racelytic</strong>
                     <button class="global-search-close" type="button" aria-label="Close search">Close</button>
                 </div>
-                <label class="visually-hidden" for="global-search-input">Search Formula 1, Formula 2, Formula 3 and F1 Academy</label>
+                <label class="visually-hidden" for="global-search-input">Search Formula 1, Formula 2, Formula 3, F1 Academy and Formula E</label>
                 <span class="global-search-icon" aria-hidden="true"></span>
                 <input id="global-search-input" type="search" role="combobox" placeholder="Search Racelytic" autocomplete="off" maxlength="80" aria-autocomplete="list" aria-haspopup="listbox" aria-expanded="false" aria-controls="global-search-list" aria-describedby="global-search-status">
                 <div id="global-search-results" class="global-search-results" role="region" aria-label="Search results" hidden></div>

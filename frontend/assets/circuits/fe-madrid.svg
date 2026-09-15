@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="500" height="500" viewBox="0 0 500 500" role="img" aria-labelledby="title-madrid">
+  <title id="title-madrid">Madrid Formula E circuit outline</title>
+  <!-- Simplified from https://results.formulae.fia.com/api/getfile/formula-e/files/results/11_Season%2012%20-%202025-26/06_R06%20Madrid/01_Event%20Information/S12_R06_MAD_Circuit%20Map%20V3.pdf -->
+  <path d="M433.2 199.3 Q459.4 166.3 451.3 157.4 Q443.3 148.4 393.8 170.5 Q344.3 192.6 300.6 236.6 Q256.9 280.6 219.1 272.2 Q181.4 263.9 186.9 287.6 Q192.4 311.3 160.2 297.1 Q128.0 283.0 88.2 299.2 Q48.4 315.5 44.8 325.8 Q41.2 336.1 170.1 344.0 Q298.9 351.9 332.0 345.2 Q365.1 338.4 386.5 299.5 Q407.8 260.6 394.2 257.3 Q380.7 254.0 343.5 284.0 Q306.4 314.0 314.0 287.1 Q321.6 260.3 364.2 246.3 Q406.9 232.3 433.2 199.3 Z" fill="none" stroke="#111318" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

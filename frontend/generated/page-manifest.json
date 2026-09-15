@@ -32,6 +32,14 @@
       "modeClass": "academy-mode",
       "favicon": "/assets/favicon-academy.svg",
       "entity": "team"
+    },
+    "fe": {
+      "name": "Formula E",
+      "shortName": "FE",
+      "path": "/formula-e",
+      "modeClass": "fe-mode",
+      "favicon": "/assets/favicon-fe.svg",
+      "entity": "team"
     }
   },
   "sharedTemplates": {
@@ -675,6 +683,138 @@
       "series": "academy",
       "slug": "about",
       "route": "/academy/about",
+      "template": "f3-about.html"
+    },
+    {
+      "series": "fe",
+      "slug": "database",
+      "route": "/formula-e/database",
+      "template": "f3-database.html"
+    },
+    {
+      "series": "fe",
+      "slug": "seasons",
+      "route": "/formula-e/seasons",
+      "template": "f3-seasons.html"
+    },
+    {
+      "series": "fe",
+      "slug": "season",
+      "route": "/formula-e/season",
+      "template": "f3-season.html"
+    },
+    {
+      "series": "fe",
+      "slug": "races",
+      "route": "/formula-e/races",
+      "template": "f3-races.html"
+    },
+    {
+      "series": "fe",
+      "slug": "race",
+      "route": "/formula-e/race",
+      "template": "f3-race.html"
+    },
+    {
+      "series": "fe",
+      "slug": "drivers",
+      "route": "/formula-e/drivers",
+      "template": "f3-drivers.html"
+    },
+    {
+      "series": "fe",
+      "slug": "driver",
+      "route": "/formula-e/driver",
+      "template": "f3-driver.html"
+    },
+    {
+      "series": "fe",
+      "slug": "teams",
+      "route": "/formula-e/teams",
+      "template": "f3-teams.html"
+    },
+    {
+      "series": "fe",
+      "slug": "team",
+      "route": "/formula-e/team",
+      "template": "f3-team.html"
+    },
+    {
+      "series": "fe",
+      "slug": "circuits",
+      "route": "/formula-e/circuits",
+      "template": "f3-circuits.html"
+    },
+    {
+      "series": "fe",
+      "slug": "circuit",
+      "route": "/formula-e/circuit",
+      "template": "f3-circuit.html"
+    },
+    {
+      "series": "fe",
+      "slug": "chassis",
+      "route": "/formula-e/chassis",
+      "template": "f3-chassis.html"
+    },
+    {
+      "series": "fe",
+      "slug": "analysis",
+      "route": "/formula-e/analysis",
+      "template": "f3-analysis.html"
+    },
+    {
+      "series": "fe",
+      "slug": "season-analysis",
+      "route": "/formula-e/season-analysis",
+      "template": "season-analysis.html"
+    },
+    {
+      "series": "fe",
+      "slug": "season-comparison",
+      "route": "/formula-e/season-comparison",
+      "template": "season-comparison.html"
+    },
+    {
+      "series": "fe",
+      "slug": "race-analysis",
+      "route": "/formula-e/race-analysis",
+      "template": "race-analysis.html"
+    },
+    {
+      "series": "fe",
+      "slug": "driver-comparison",
+      "route": "/formula-e/driver-comparison",
+      "template": "driver-comparison.html"
+    },
+    {
+      "series": "fe",
+      "slug": "driver-form",
+      "route": "/formula-e/driver-form",
+      "template": "driver-form.html"
+    },
+    {
+      "series": "fe",
+      "slug": "teammate-battles",
+      "route": "/formula-e/teammate-battles",
+      "template": "teammate-battles.html"
+    },
+    {
+      "series": "fe",
+      "slug": "circuit-analysis",
+      "route": "/formula-e/circuit-analysis",
+      "template": "circuit-analysis.html"
+    },
+    {
+      "series": "fe",
+      "slug": "records",
+      "route": "/formula-e/records",
+      "template": "records.html"
+    },
+    {
+      "series": "fe",
+      "slug": "about",
+      "route": "/formula-e/about",
       "template": "f3-about.html"
     }
   ]

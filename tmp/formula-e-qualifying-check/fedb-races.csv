@@ -1,0 +1,11 @@
+id,seasonKey,year,round,date,endDate,name,code,circuitId,sourceUrl
+fe-2015-16-r1-beijing,2015-16,2016,1,2015-10-24,,Beijing E-Prix,R1,beijing,https://www.fiaformulae.com/en/results-and-standings?season=2&round=1-beijing
+fe-2015-16-r2-putrajaya,2015-16,2016,2,2015-11-07,,Putrajaya E-Prix,R2,putrajaya,https://www.fiaformulae.com/en/results-and-standings?season=2&round=2-putrajaya
+fe-2015-16-r3-punta-del-este,2015-16,2016,3,2015-12-19,,Punta Del Este E-Prix,R3,punta-del-este,https://www.fiaformulae.com/en/results-and-standings?season=2&round=3-punta-del-este
+fe-2015-16-r4-buenos-aires,2015-16,2016,4,2016-02-06,,Buenos Aires E-Prix,R4,buenos-aires,https://www.fiaformulae.com/en/results-and-standings?season=2&round=4-buenos-aires
+fe-2015-16-r5-mexico-city,2015-16,2016,5,2016-03-12,,Mexico City E-Prix,R5,mexico-city,https://www.fiaformulae.com/en/results-and-standings?season=2&round=5-mexico-city
+fe-2015-16-r6-long-beach,2015-16,2016,6,2016-04-02,,Long Beach E-Prix,R6,long-beach,https://www.fiaformulae.com/en/results-and-standings?season=2&round=6-long-beach
+fe-2015-16-r7-paris,2015-16,2016,7,2016-04-23,,Paris E-Prix,R7,paris,https://www.fiaformulae.com/en/results-and-standings?season=2&round=7-paris
+fe-2015-16-r8-berlin,2015-16,2016,8,2016-05-21,,Berlin E-Prix,R8,berlin,https://www.fiaformulae.com/en/results-and-standings?season=2&round=8-berlin
+fe-2015-16-r9-london,2015-16,2016,9,2016-07-02,,London E-Prix,R9,london,https://www.fiaformulae.com/en/results-and-standings?season=2&round=9-london
+fe-2015-16-r10-london,2015-16,2016,10,2016-07-03,,London E-Prix,R10,london,https://www.fiaformulae.com/en/results-and-standings?season=2&round=10-london

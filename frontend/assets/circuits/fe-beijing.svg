@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="500" height="500" viewBox="0 0 500 500" role="img" aria-labelledby="title-beijing">
+  <title id="title-beijing">Beijing Formula E circuit outline</title>
+  <!-- Simplified from https://commons.wikimedia.org/wiki/Special:Redirect/file/Beijing_Formula_E_Circuit.png -->
+  <path d="M268.8 42.9 Q159.4 41.0 160.7 80.2 Q162.0 119.4 166.6 80.6 Q171.2 41.8 168.6 72.0 Q165.9 102.1 190.5 104.1 Q215.0 106.0 215.9 121.7 Q216.8 137.4 191.4 139.8 Q165.9 142.3 164.3 181.3 Q162.6 220.4 134.5 216.3 Q106.4 212.3 133.8 209.8 Q161.2 207.3 162.4 170.9 Q163.6 134.5 160.7 171.3 Q157.9 208.1 108.4 210.6 Q58.9 213.1 58.8 332.5 Q58.7 451.9 233.3 451.6 Q407.9 451.4 426.5 363.9 Q445.0 276.5 411.6 160.6 Q378.2 44.7 268.8 42.9 Z" fill="none" stroke="#111318" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="500" height="500" viewBox="0 0 500 500" role="img" aria-labelledby="title-marrakesh">
+  <title id="title-marrakesh">Marrakesh Formula E circuit outline</title>
+  <!-- Simplified from https://results.formulae.fia.com/api/getfile/formula-e/files/results/07_Season%208%20-%202021-22/10_R10%20Marrakesh/Event%20Information/S8_R10_MRK_CircuitMap_v2.pdf -->
+  <path d="M113.1 63.2 Q71.9 50.0 86.1 59.4 Q100.3 68.8 70.1 158.9 Q40.0 249.0 66.7 290.5 Q93.4 332.1 76.0 353.3 Q58.7 374.4 80.5 355.0 Q102.4 335.6 90.9 233.4 Q79.5 131.1 103.8 101.7 Q128.0 72.2 171.3 148.5 Q214.7 224.7 325.9 288.5 Q437.1 352.2 426.7 366.8 Q416.3 381.3 399.7 366.8 Q383.1 352.2 382.7 366.4 Q382.4 380.6 271.5 382.4 Q160.6 384.1 160.9 416.3 Q161.3 448.6 163.4 425.0 Q165.4 401.4 218.5 401.8 Q271.5 402.1 273.9 426.0 Q276.3 450.0 276.7 426.0 Q277.0 402.1 364.0 396.2 Q451.0 390.3 433.7 336.6 Q416.3 282.9 405.2 295.7 Q394.2 308.6 298.9 255.2 Q203.6 201.8 179.0 139.1 Q154.4 76.4 113.1 63.2 Z" fill="none" stroke="#111318" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

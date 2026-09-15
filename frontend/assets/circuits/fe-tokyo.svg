@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="500" height="500" viewBox="0 0 500 500" role="img" aria-labelledby="title-tokyo">
+  <title id="title-tokyo">Tokyo Formula E circuit outline</title>
+  <!-- Simplified from https://results.formulae.fia.com/api/getfile/formula-e/files/results/11_Season%2012%20-%202025-26/14_R14%20Tokyo/Event%20Information/S12_TKO_Circuit%20Map%20V3.pdf -->
+  <path d="M369.0 60.6 Q364.3 49.3 322.8 46.6 Q281.3 43.8 286.8 70.0 Q292.3 96.1 281.9 98.5 Q271.4 101.0 282.7 100.7 Q294.0 100.5 298.1 140.3 Q302.2 180.2 207.4 239.0 Q112.6 297.8 124.7 342.6 Q136.8 387.4 125.2 388.5 Q113.7 389.6 125.2 392.9 Q136.8 396.2 125.2 398.2 Q113.7 400.1 125.5 400.1 Q137.3 400.1 154.3 430.0 Q171.4 460.0 243.7 416.0 Q316.0 372.0 324.2 336.0 Q332.5 300.0 346.5 308.8 Q360.5 317.6 363.0 296.5 Q365.4 275.3 376.7 273.6 Q388.0 272.0 376.7 262.9 Q365.4 253.8 364.3 209.6 Q363.2 165.3 373.7 162.9 Q384.1 160.4 373.4 160.1 Q362.7 159.8 364.9 141.7 Q367.1 123.6 353.9 115.6 Q340.7 107.6 340.7 93.9 Q340.7 80.1 357.2 76.0 Q373.7 71.9 369.0 60.6 Z" fill="none" stroke="#111318" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

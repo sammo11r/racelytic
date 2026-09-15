@@ -61,17 +61,19 @@ function initialiseFooter() {
     const footer = document.querySelector('.footer');
     if (!footer) return;
         const requestedSeries = new URLSearchParams(window.location.search).get('series');
-        const activeSeries = document.body.classList.contains('academy-mode') ? 'academy'
+        const activeSeries = document.body.classList.contains('fe-mode') ? 'fe'
+            : document.body.classList.contains('academy-mode') ? 'academy'
             : document.body.classList.contains('f3-mode') ? 'f3'
             : document.body.classList.contains('f2-mode') ? 'f2'
-            : ['f1', 'f2', 'f3', 'academy'].includes(requestedSeries) ? requestedSeries : 'f1';
+            : ['f1', 'f2', 'f3', 'academy', 'fe'].includes(requestedSeries) ? requestedSeries : 'f1';
         const isF2Mode = activeSeries === 'f2';
         const isF3Mode = activeSeries === 'f3';
         const isAcademyMode = activeSeries === 'academy';
+        const isFormulaEMode = activeSeries === 'fe';
         const summary = footer.querySelector('[data-footer-summary]');
         const trademark = footer.querySelector('[data-footer-trademark]');
         const source = footer.querySelector('[data-footer-source]');
-        const seriesBase = activeSeries === 'f1' ? '' : `/${activeSeries}`;
+        const seriesBase = activeSeries === 'f1' ? '' : activeSeries === 'fe' ? '/formula-e' : `/${activeSeries}`;
         const footerRoutes = {
             database: `${seriesBase}/database`,
             analysis: `${seriesBase}/analysis`,
@@ -84,6 +86,7 @@ function initialiseFooter() {
             account: `/account?series=${activeSeries}`
         };
         footer.querySelectorAll('[data-footer-page]').forEach(link => { link.href = footerRoutes[link.dataset.footerPage]; });
+        if (isFormulaEMode) footer.querySelectorAll('[data-footer-page="simulator"], [data-footer-page="games"]').forEach(link => link.remove());
         if (summary) summary.textContent = 'Independent motorsport history, statistics, and championship analysis.';
         if (isF2Mode) {
             const brand = footer.querySelector('.footer-brand');
@@ -102,6 +105,12 @@ function initialiseFooter() {
             if (brand) brand.href = '/academy';
             if (trademark) trademark.textContent = 'Racelytic is unofficial and is not associated with or endorsed by F1 Academy, the Formula 1 companies, the FIA, any team, or any driver. F1 ACADEMY, F1, FORMULA 1 and related marks are trade marks of Formula One Licensing B.V.';
             if (source) source.innerHTML = 'F1 Academy statistics are compiled from published calendars and classifications, then normalised by Racelytic. See <a href="/data-sources#f1-academy">Data sources &amp; licences</a> for provenance and important reuse information. Data may contain errors and is not an official record.';
+        }
+        if (isFormulaEMode) {
+            const brand = footer.querySelector('.footer-brand');
+            if (brand) brand.href = '/formula-e';
+            if (trademark) trademark.textContent = 'Racelytic is unofficial and is not associated with or endorsed by the ABB FIA Formula E World Championship, Formula E Operations, the FIA, any team, manufacturer, or driver. Formula E and related marks belong to their respective owners.';
+            if (source) source.innerHTML = 'Formula E statistics are compiled from official FIA Formula E calendars and classifications, then normalised by Racelytic. See <a href="/data-sources#formula-e">Data sources &amp; licences</a> for provenance and important reuse information. Data may contain errors and is not an official record.';
         }
         footer.querySelector('[data-privacy-settings]')?.addEventListener('click', () => window.RacelyticPrivacy.showAnalyticsChoice(true));
 }

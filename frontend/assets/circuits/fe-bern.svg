@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="500" height="500" viewBox="0 0 500 500" role="img" aria-labelledby="title-bern">
+  <title id="title-bern">Bern Formula E circuit outline</title>
+  <!-- Simplified from https://results.formulae.fia.com/api/getfile/formula-e/files/results/04_Season%205%20-%202018-19/14_R11%20Bern/00_Event%20Information/03_Bern%20Circuit%20Map.pdf -->
+  <path d="M52.3 170.0 Q41.7 156.0 52.7 204.9 Q63.7 253.8 121.5 270.3 Q179.3 286.8 217.8 317.5 Q256.4 348.2 224.0 318.4 Q191.6 288.5 137.4 269.3 Q83.2 250.0 69.4 221.0 Q55.7 192.0 106.3 191.8 Q156.9 191.6 157.7 200.3 Q158.5 208.9 166.8 197.3 Q175.1 185.6 266.3 213.2 Q357.5 240.7 402.0 238.4 Q446.5 236.0 440.1 284.5 Q433.8 333.0 443.5 334.7 Q453.2 336.4 450.9 284.3 Q448.6 232.2 284.5 201.5 Q120.4 170.8 91.7 177.4 Q62.9 184.0 52.3 170.0 Z" fill="none" stroke="#111318" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

@@ -20,7 +20,7 @@ const ROOT = path.join(__dirname, '..');
 const DATA_DIR = path.join(ROOT, 'data');
 const BACKUP_ROOT = path.join(DATA_DIR, '.sync-backups');
 const LOCK_PATH = path.join(DATA_DIR, '.data-sync.lock');
-const ALLOWED_SERIES = ['f1', 'f2', 'f3', 'academy'];
+const ALLOWED_SERIES = ['f1', 'f2', 'f3', 'academy', 'fe'];
 
 function argumentValue(name, args = process.argv.slice(2)) {
   const argument = args.find(value => value.startsWith(`--${name}=`));
@@ -45,7 +45,7 @@ function run(command, args, options = {}) {
 }
 
 function dataFiles() {
-  return fs.readdirSync(DATA_DIR).filter(file => /^(?:f[123]db|fadb)-.*\.csv$/i.test(file));
+  return fs.readdirSync(DATA_DIR).filter(file => /^(?:f[123]db|fadb|fedb)-.*\.csv$/i.test(file));
 }
 
 function createBackup(runId) {
@@ -166,13 +166,19 @@ async function refreshSources(series, year, force) {
     await run(process.execPath, ['scripts/collect-academy-data.js']);
     versions.academy = String(year);
   }
+  if (series.includes('fe')) {
+    const season = Number(argumentValue('formula-e-season') || Math.max(1, year - 2014));
+    await run(process.execPath, ['scripts/collect-formula-e-data.js', `--seasons=1-${season}`]);
+    versions.fe = `season-${season}`;
+  }
   return versions;
 }
 
 async function validateSources(series) {
   await run(process.execPath, ['--test']);
   for (const name of series.filter(value => value !== 'f1')) {
-    await run(process.execPath, ['scripts/audit-f3-data.js', `--series=${name}`, '--csv-only']);
+    if (name === 'fe') await run(process.execPath, ['scripts/audit-formula-e-data.js']);
+    else await run(process.execPath, ['scripts/audit-f3-data.js', `--series=${name}`, '--csv-only']);
   }
 }
 
@@ -207,8 +213,8 @@ async function main(args = process.argv.slice(2)) {
       console.log('Dry run complete: source data passed validation; database was not changed.');
       return;
     }
-    const imported = await importAll();
-    for (const name of series) await run(process.execPath, ['scripts/rebuild-ratings.js', `--series=${name}`]);
+    const imported = await importAll({ series });
+    for (const name of series.filter(value => value !== 'fe')) await run(process.execPath, ['scripts/rebuild-ratings.js', `--series=${name}`]);
     await finishRun(runId, 'succeeded', sourceVersions, imported, null);
     trimBackups();
     console.log(`Data sync ${runId} completed successfully.`);

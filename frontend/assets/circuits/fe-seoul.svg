@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="500" height="500" viewBox="0 0 500 500" role="img" aria-labelledby="title-seoul">
+  <title id="title-seoul">Seoul Formula E circuit outline</title>
+  <!-- Simplified from https://results.formulae.fia.com/api/getfile/formula-e/files/results/07_Season%208%20-%202021-22/15_R15%20Seoul/Event%20Information/S8_R15-16_SEO-CircuitMap-V2.pdf -->
+  <path d="M431.5 285.6 Q460.0 284.0 447.4 283.7 Q434.9 283.4 431.5 250.9 Q428.1 218.4 382.4 212.0 Q336.8 205.5 334.0 193.0 Q331.2 180.4 330.9 192.7 Q330.6 204.9 268.4 206.8 Q206.2 208.6 146.7 254.0 Q87.2 299.4 63.6 306.1 Q40.0 312.8 65.1 308.9 Q90.3 304.9 146.7 261.0 Q203.1 217.2 223.3 211.1 Q243.6 204.9 287.1 208.0 Q330.6 211.1 330.9 224.2 Q331.2 237.4 333.4 224.6 Q335.5 211.7 377.2 215.7 Q418.9 219.6 423.8 251.5 Q428.7 283.4 415.9 285.3 Q403.0 287.1 431.5 285.6 Z" fill="none" stroke="#111318" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

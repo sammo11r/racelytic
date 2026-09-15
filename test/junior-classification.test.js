@@ -3,7 +3,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
-const { juniorClassificationPosition, juniorClassificationStatus, juniorClassificationTime } = require('../backend/junior-classification');
+const { fillTimedClassificationGaps, juniorClassificationPosition, juniorClassificationStatus, juniorClassificationTime } = require('../backend/junior-classification');
 
 test('999 and legacy unclassified markers are not finishing positions', () => {
     for (const value of [999, '999', 1001, null, -1]) assert.equal(juniorClassificationPosition(value), null);
@@ -20,6 +20,17 @@ test('classification codes are never treated as recorded times', () => {
     for (const value of ['CLA', ' cla ', 'Classified', null, '']) assert.equal(juniorClassificationTime(value), null);
     assert.equal(juniorClassificationTime('1:29.137'), '1:29.137');
     assert.equal(juniorClassificationTime('DNF'), 'DNF');
+});
+
+test('timed classifications derive missing gaps from their fastest recorded time', () => {
+    const results = [
+        { timeMillis: 68175, gapMillis: null, gapLaps: null },
+        { timeMillis: 68358, gapMillis: null, gapLaps: null },
+        { timeMillis: 68400, gapMillis: 210, gapLaps: null },
+        { timeMillis: null, gapMillis: null, gapLaps: null }
+    ];
+    assert.equal(fillTimedClassificationGaps(results), results);
+    assert.deepEqual(results.map(result => result.gapMillis), [0, 183, 210, null]);
 });
 
 test('race tables and mobile cards suppress invalid grids and classification-code time fallbacks', () => {
@@ -59,4 +70,23 @@ test('race desktop and mobile results show retirement status, never 999 or bogus
     assert.equal(context.juniorGridMovement(result), '—');
     assert.equal(context.juniorResultFinish({ positionNumber: 999, status: 'DSQ' }), 'DSQ');
     assert.equal(context.juniorResultFinish(result, false), 'NC');
+});
+
+test('Formula E tabs use weekend order and empty lap columns are omitted', () => {
+    const source = fs.readFileSync(path.join(__dirname, '../frontend/js/junior-race-detail.js'), 'utf8').replace(/loadJuniorRaceDetail\(\);\s*$/, '');
+    const context = vm.createContext({ window: { RacelyticJuniorRaceDetail: { series: 'fe', path: '/formula-e', teamPage: 'team' } }, esc: String, fmtNumber: String });
+    vm.runInContext(source, context);
+    context.__sessions = [
+        { code: 'race', name: 'Race', sessionNumber: 5 },
+        { code: 'free-practice-2', name: 'FP2', sessionNumber: 1 },
+        { code: 'grid', name: 'Starting Grid', sessionNumber: 4 },
+        { code: 'qualifying', name: 'Qualifying', sessionNumber: 3 },
+        { code: 'free-practice-1', name: 'FP1', sessionNumber: 2 }
+    ];
+    assert.deepEqual(Array.from(vm.runInContext('__sessions.sort((a, b) => juniorSessionOrder(a) - juniorSessionOrder(b)).map(row => row.code)', context)),
+        ['free-practice-1', 'free-practice-2', 'qualifying', 'grid', 'race']);
+    const result = { driverId: 'test', driverName: 'Test', positionNumber: 1, timeMillis: 68175, gapMillis: 0, laps: null };
+    const html = context.renderJuniorDesktopResults({ name: 'FP1', isRace: false, results: [result] });
+    assert.match(html, /<th>Time<\/th><th>Gap<\/th>/);
+    assert.doesNotMatch(html, /<th>Laps<\/th>/);
 });

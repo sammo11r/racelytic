@@ -1,13 +1,13 @@
 let recordType='drivers',recordEntries=[],recordPage=1;
-const recordTeamLabel = window.location.pathname.startsWith('/f3/') || window.location.pathname.startsWith('/academy/') ? 'Team' : 'Constructor';
-const recordSeries = window.location.pathname.startsWith('/academy/') ? 'academy' : window.location.pathname.startsWith('/f3/') ? 'f3' : window.location.pathname.startsWith('/f2/') ? 'f2' : 'f1';
-if (recordSeries === 'f3' || recordSeries === 'academy') {
+const recordSeries = activeSeriesKey();
+const recordTeamLabel = ['f3', 'academy', 'fe'].includes(recordSeries) ? 'Team' : 'Constructor';
+if (['f3', 'academy', 'fe'].includes(recordSeries)) {
   const teamButton = document.querySelector('[data-record-type="constructors"]');
   if (teamButton) teamButton.textContent = 'Teams';
   const teamLabel = document.querySelector('#record-constructor-label > span');
   if (teamLabel) teamLabel.textContent = 'Team';
   const description = document.querySelector('.analysis-detail-head p');
-  if (description) description.textContent = 'Rank Formula 3 drivers and teams across any season, circuit or nationality.';
+  if (description) description.textContent = `Rank ${activeSeriesName()} drivers and teams across any season, circuit or nationality.`;
 }
 const recordControls=['record-from-year','record-to-year','record-circuit','record-constructor','record-nationality','record-include-sprints'];
 function currentRecordConfiguration(){return{series:recordSeries,type:recordType,category:document.getElementById('record-category').value,fromYear:document.getElementById('record-from-year').value||null,toYear:document.getElementById('record-to-year').value||null,circuitId:document.getElementById('record-circuit').value,constructorId:recordType==='drivers'?document.getElementById('record-constructor').value:'',nationality:document.getElementById('record-nationality').value,includeSprints:document.getElementById('record-include-sprints').checked};}

@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="500" height="500" viewBox="0 0 500 500" role="img" aria-labelledby="title-misano">
+  <title id="title-misano">Misano Formula E circuit outline</title>
+  <!-- Simplified from https://results.formulae.fia.com/api/getfile/formula-e/files/results/09_Season%2010%20-%202023-24/06_R06%20Misano/Event%20Information/S10_R6&amp;R7%20Circuit%20Map%20V2.pdf -->
+  <path d="M262.1 136.0 Q122.1 78.3 127.4 108.7 Q132.7 139.1 192.8 151.0 Q252.9 163.0 273.5 182.2 Q294.0 201.4 217.2 205.1 Q140.4 208.8 117.5 228.9 Q94.6 249.1 95.9 231.7 Q97.2 214.3 70.4 251.5 Q43.7 288.7 79.2 304.6 Q114.8 320.5 241.0 276.8 Q367.3 233.0 396.6 282.4 Q425.9 331.9 392.7 375.2 Q359.6 418.4 372.2 423.9 Q384.9 429.4 419.5 406.9 Q454.1 384.3 455.2 326.4 Q456.3 268.5 429.2 231.1 Q402.1 193.7 262.1 136.0 Z" fill="none" stroke="#111318" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

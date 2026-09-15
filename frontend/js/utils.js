@@ -48,6 +48,7 @@ function resourceUrl(resource, id, { base = activeSeriesBase(), label = '', quer
 }
 function activeSeriesKey() {
   if (window.RacelyticSeries) return window.RacelyticSeries.fromPath().key;
+  if (window.location.pathname === '/formula-e' || window.location.pathname.startsWith('/formula-e/')) return 'fe';
   if (window.location.pathname === '/academy' || window.location.pathname.startsWith('/academy/')) return 'academy';
   if (window.location.pathname === '/f3' || window.location.pathname.startsWith('/f3/')) return 'f3';
   if (window.location.pathname === '/f2' || window.location.pathname.startsWith('/f2/')) return 'f2';
@@ -55,11 +56,11 @@ function activeSeriesKey() {
 }
 function activeSeriesBase() {
   const series = activeSeriesKey();
-  return series === 'f1' ? '' : `/${series}`;
+  return window.RacelyticSeries?.all[series]?.path ?? (series === 'f1' ? '' : series === 'fe' ? '/formula-e' : `/${series}`);
 }
 function activeSeriesName() {
   return window.RacelyticSeries?.all[activeSeriesKey()]?.name
-    || { f1: 'Formula 1', f2: 'Formula 2', f3: 'Formula 3', academy: 'F1 Academy' }[activeSeriesKey()];
+    || { f1: 'Formula 1', f2: 'Formula 2', f3: 'Formula 3', academy: 'F1 Academy', fe: 'Formula E' }[activeSeriesKey()];
 }
 function displayCountryName(value) {
   const raw = String(value || '').trim();
@@ -102,6 +103,7 @@ if (activeSeriesKey() !== 'f1') {
     .observe(seriesLinkRoot, { childList: true, subtree: true });
 }
 function activeSeriesAccent() {
+  if (window.location.pathname === '/formula-e' || window.location.pathname.startsWith('/formula-e/')) return '#00a9ce';
   if (window.location.pathname === '/academy' || window.location.pathname.startsWith('/academy/')) return '#7b2cff';
   if (window.location.pathname === '/f3' || window.location.pathname.startsWith('/f3/')) return '#c95300';
   return window.location.pathname === '/f2' || window.location.pathname.startsWith('/f2/') ? '#1677ff' : '#e32636';

@@ -4,21 +4,22 @@ const os = require('node:os');
 const path = require('node:path');
 const test = require('node:test');
 
-const { inferType, tableNameFromFile } = require('../backend/import/importer');
+const { inferType, selectedFilePrefixes, tableNameFromFile } = require('../backend/import/importer');
 const { canonicalizeConstructorChronology } = require('../backend/constructor-lineage-data');
 const { selectedSeries } = require('../scripts/sync-data');
 const { checksumFor, extractCsvArchive, selectReleaseAssets } = require('../scripts/sync-f1db');
 
-test('supported database update commands also rebuild ratings', () => {
+test('supported database update commands rebuild ratings only for rating-enabled series', () => {
   const packageJson = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'package.json'), 'utf8'));
   const syncSource = fs.readFileSync(path.join(__dirname, '..', 'scripts', 'sync-data.js'), 'utf8');
   assert.equal(packageJson.scripts.postimport, 'npm run rebuild:ratings');
-  assert.match(syncSource, /for \(const name of series\) await run\(process\.execPath, \['scripts\/rebuild-ratings\.js', `--series=\$\{name\}`\]\)/);
+  assert.match(syncSource, /for \(const name of series\.filter\(value => value !== 'fe'\)\) await run\(process\.execPath, \['scripts\/rebuild-ratings\.js', `--series=\$\{name\}`\]\)/);
   assert.ok(syncSource.indexOf("scripts/rebuild-ratings.js") < syncSource.indexOf("finishRun(runId, 'succeeded'"));
 });
 
 test('data sync accepts a unique subset of supported series', () => {
   assert.deepEqual(selectedSeries(['--series=f1,f3,f1']), ['f1', 'f3']);
+  assert.deepEqual(selectedSeries(['--series=fe,fe']), ['fe']);
   assert.throws(() => selectedSeries(['--series=f1,unknown']), /Unsupported series/);
 });
 
@@ -60,8 +61,14 @@ test('safe importer maps series names and retains stable inferred types', () => 
   assert.equal(tableNameFromFile('f1db-races.csv'), 'races');
   assert.equal(tableNameFromFile('f2db-session-results.csv'), 'f2_session_results');
   assert.equal(tableNameFromFile('fadb-drivers.csv'), 'fa_drivers');
+  assert.equal(tableNameFromFile('fedb-season-manufacturer-standings.csv'), 'fe_season_manufacturer_standings');
   assert.equal(inferType('year', ['2025', '2026']), 'BIGINT');
   assert.equal(inferType('points', ['1.5', '2']), 'DECIMAL(20,6)');
+  assert.deepEqual([...selectedFilePrefixes('fe')], ['fedb-']);
+  assert.deepEqual([...selectedFilePrefixes(['f2', 'academy'])], ['f2db-', 'fadb-']);
+  assert.throws(() => selectedFilePrefixes('unknown'), /Unsupported import series/);
+  const packageJson = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'package.json'), 'utf8'));
+  assert.equal(packageJson.scripts['import:formula-e'], 'node backend/import/all.js --series=fe');
 });
 
 test('constructor chronology import collapses repeated parent copies into one chain', () => {

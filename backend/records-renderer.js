@@ -22,7 +22,7 @@ function renderRecordsHtml(pathname) {
         .replaceAll('All constructors', team ? 'All teams' : 'All constructors')
         .replaceAll('Show constructors', team ? 'Show teams' : 'Show constructors')
         .replace('aria-label="Constructors"', `aria-label="${team ? 'Teams' : 'Constructors'}"`)
-        .replace('<label id="fr-sprints-label"', '<label id="fr-format-label">Race format<select id="fr-format"><option value="all">All race formats</option><option value="F">' + (series.key === 'academy' ? 'Standard races' : 'Feature races') + '</option><option value="S">' + (series.key === 'academy' ? 'Reverse-grid races' : 'Sprint races') + '</option></select></label><label id="fr-sprints-label"')
+        .replace('<label id="fr-sprints-label"', '<label id="fr-format-label">Race format<select id="fr-format"><option value="all">All race formats</option><option value="F">' + (series.key === 'fe' ? 'E-Prix races' : series.key === 'academy' ? 'Standard races' : 'Feature races') + '</option>' + (series.key === 'fe' ? '' : '<option value="S">' + (series.key === 'academy' ? 'Reverse-grid races' : 'Sprint races') + '</option>') + '</select></label><label id="fr-sprints-label"')
         .replace('Source: <a href="https://github.com/f1db/f1db">F1DB</a>, as imported into Racelytic. Includes Indianapolis 500 races that counted towards the World Championship. Figures reflect the available archive.', `Source: the imported ${series.name} results archive, from ${minimumSeasonYear(series.key)} onwards. Figures reflect the available archive.`);
 }
 

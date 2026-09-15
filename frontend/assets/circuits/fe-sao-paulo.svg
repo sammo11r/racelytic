@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="500" height="500" viewBox="0 0 500 500" role="img" aria-labelledby="title-sao-paulo">
+  <title id="title-sao-paulo">Sao Paulo Formula E circuit outline</title>
+  <!-- Simplified from https://results.formulae.fia.com/api/getfile/formula-e/files/results/11_Season%2012%20-%202025-26/01_R01%20S%C3%A3o%20Paulo/Event%20Information/S12_SAO_Circuit%20Map%20V2.pdf -->
+  <path d="M384.3 228.4 Q460.0 219.2 451.0 206.6 Q442.0 194.0 345.4 214.7 Q248.8 235.4 253.9 239.4 Q259.1 243.5 251.9 252.9 Q244.7 262.4 237.9 257.2 Q231.0 252.0 177.2 260.7 Q123.4 269.3 122.0 263.6 Q120.7 257.9 120.6 263.8 Q120.4 269.8 80.2 277.3 Q40.0 284.8 54.0 292.4 Q68.1 299.9 108.3 296.0 Q148.5 292.0 146.3 299.0 Q144.0 306.0 147.8 298.8 Q151.5 291.6 193.3 292.6 Q235.1 293.6 246.2 286.9 Q257.3 280.1 259.8 287.0 Q262.2 293.8 262.7 286.6 Q263.1 279.4 290.9 278.3 Q318.7 277.2 313.6 257.4 Q308.5 237.6 384.3 228.4 Z" fill="none" stroke="#111318" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

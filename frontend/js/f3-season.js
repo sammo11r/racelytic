@@ -7,6 +7,7 @@ function renderF3PodiumPlace(id, driver) {
 
 function f3SessionType(session, sessionIndex, sessionCount, year) {
   const name = String(session.name || '').toLowerCase();
+  if (document.body.classList.contains('fe-mode')) return 'F';
   if (document.body.classList.contains('academy-mode')) {
     if (name.includes('reverse')) return 'S';
     if (name.includes('feature') || name.includes('opening')) return 'F';
@@ -27,6 +28,7 @@ function f3SessionType(session, sessionIndex, sessionCount, year) {
 
 function f3SessionLabel(race, session, sessionIndex, sessionCount, year) {
   const code = race.code || `R${race.round}`;
+  if (document.body.classList.contains('fe-mode')) return sessionCount === 1 ? code : `${code} R${sessionIndex + 1}`;
   if (document.body.classList.contains('academy-mode')) {
     return sessionCount === 1 ? code : `${code} R${sessionIndex + 1}`;
   }
@@ -103,9 +105,19 @@ function renderF3ConstructorTable(constructors, raceSessions) {
     }).join('')}<td class="points-column total-points">${fmtNumber(constructor.points)}</td></tr>`).join('');
 }
 
+function renderFormulaEManufacturerTable(manufacturers) {
+  const section = document.getElementById('fe-manufacturer-standings');
+  const body = document.getElementById('fe-manufacturer-body');
+  if (!section || !body || !manufacturers?.length) return;
+  body.innerHTML = manufacturers.map(manufacturer => `
+    <tr><td class="position-column">${esc(manufacturer.position)}</td><td class="name-column"><span class="driver-name">${esc(manufacturer.name)}${manufacturer.champion ? '<small>Manufacturers’ champion</small>' : ''}</span></td><td class="points-column total-points">${fmtNumber(manufacturer.points)}</td></tr>`).join('');
+  section.hidden = false;
+}
+
 function renderF3Season(data) {
-  document.title = `${data.year} Formula 3 Season · Racelytic`;
-  document.getElementById('f3-season-year').textContent = data.year;
+  const seasonLabel = data.label || data.year;
+  document.title = `${seasonLabel} Formula 3 Season · Racelytic`;
+  document.getElementById('f3-season-year').textContent = seasonLabel;
   const academy = document.body.classList.contains('academy-mode');
   const completed = Boolean(data.summary.completed);
   const seriesName = academy ? 'F1 Academy' : 'Formula 3';
@@ -149,6 +161,7 @@ function renderF3Season(data) {
   }));
   setF3StandingsMode(f3StandingsMode);
   renderF3ConstructorTable(data.constructorChampionship || [], raceSessions);
+  renderFormulaEManufacturerTable(data.manufacturerChampionship || []);
   document.getElementById('f3-race-calendar').innerHTML = data.calendar.map(race => `
     <article class="calendar-race f2-calendar-race" data-round="${esc(race.round)}"><div class="calendar-round">${esc(race.round)}</div><div class="calendar-date">${fmtDate(race.date)}</div><div class="calendar-name"><strong>${esc(race.name)}</strong><small>${esc(race.circuitName || race.placeName || '')}</small></div><div class="f2-calendar-sessions">${race.sessions.map(session => `<span${session.cancelled ? ' class="cancelled-session"' : ''}>${esc(session.name)}: ${session.cancelled ? 'Cancelled' : esc(session.winner || 'No winner')}</span>`).join('')}</div></article>`).join('');
   window.renderJuniorSeasonMap?.('f3-season-map', data.calendar, { year: data.year, seriesName });

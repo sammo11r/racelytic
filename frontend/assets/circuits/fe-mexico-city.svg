@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="500" height="500" viewBox="0 0 500 500" role="img" aria-labelledby="title-mexico-city">
+  <title id="title-mexico-city">Mexico City Formula E circuit outline</title>
+  <!-- Simplified from https://results.formulae.fia.com/api/getfile/formula-e/files/results/10_Season%2011%20-%202024-25/02_R02%20Mexico/Event%20Information/S11_R02_MEX_Circuit%20Map%20V1.pdf -->
+  <path d="M51.7 222.3 Q40.0 223.8 76.2 260.5 Q112.4 297.1 184.2 299.1 Q256.0 301.0 266.8 293.5 Q277.5 286.0 282.3 293.7 Q287.1 301.3 340.2 308.8 Q393.3 316.3 410.0 335.3 Q426.8 354.3 443.4 352.5 Q460.0 350.7 441.5 323.7 Q422.9 296.8 384.0 292.2 Q345.1 287.5 357.7 274.2 Q370.3 260.9 368.2 247.0 Q366.1 233.1 378.0 234.7 Q390.0 236.4 363.2 202.9 Q336.5 169.4 281.3 169.1 Q226.1 168.8 225.9 157.9 Q225.8 146.9 224.0 157.9 Q222.2 168.8 183.3 168.8 Q144.4 168.8 142.6 157.1 Q140.8 145.4 140.7 157.1 Q140.5 168.8 116.7 172.1 Q92.9 175.4 78.1 198.1 Q63.3 220.8 51.7 222.3 Z" fill="none" stroke="#111318" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

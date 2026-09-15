@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="500" height="500" viewBox="0 0 500 500" role="img" aria-labelledby="title-valencia">
+  <title id="title-valencia">Valencia Formula E circuit outline</title>
+  <!-- Simplified from https://results.formulae.fia.com/api/getfile/formula-e/files/results/06_Season%207%20-%202020-21/05_R05%20Valencia/Event%20Information/Circuit%20Map.pdf -->
+  <path d="M229.4 327.3 Q40.0 347.8 59.0 361.4 Q78.0 375.1 77.8 359.2 Q77.6 343.3 185.1 344.7 Q292.7 346.1 294.1 360.4 Q295.5 374.7 296.9 359.2 Q298.4 343.7 369.8 327.1 Q441.2 310.6 449.8 225.9 Q458.4 141.2 419.2 163.9 Q380.0 186.5 380.4 231.8 Q380.8 277.1 350.2 279.8 Q319.6 282.4 308.8 267.3 Q298.0 252.2 330.4 190.8 Q362.9 129.4 235.5 134.3 Q108.2 139.2 97.8 166.5 Q87.3 193.9 109.8 220.4 Q132.2 246.9 118.2 206.7 Q104.1 166.5 231.0 150.0 Q358.0 133.5 324.3 195.5 Q290.6 257.6 318.2 281.0 Q345.7 304.5 396.1 221.0 Q446.5 137.6 432.7 222.2 Q418.8 306.9 229.4 327.3 Z" fill="none" stroke="#111318" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

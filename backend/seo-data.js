@@ -2,9 +2,9 @@ const pool = require('./db');
 const { entityPageTitle, publicEntityName, racePageCopy, routeContext } = require('./seo');
 const { resourcePath } = require('./resource-routes');
 const { optionalConstructorLineage } = require('./constructor-lineage');
-const { f2CircuitImageId } = require('../frontend/js/f2-circuit-images');
+const { juniorCircuitImageId } = require('./circuit-archive');
 
-const SERIES_PREFIX = Object.freeze({ f1: '', f2: 'f2_', f3: 'f3_', academy: 'fa_' });
+const SERIES_PREFIX = Object.freeze({ f1: '', f2: 'f2_', f3: 'f3_', academy: 'fa_', fe: 'fe_' });
 const SITEMAP_CACHE_MS = 5 * 60 * 1000;
 let sitemapCache = { expiresAt: 0, routes: [] };
 let sitemapPromise;
@@ -16,7 +16,7 @@ function queryValue(req, name) {
 }
 
 function seriesBase(key) {
-    return key === 'f1' ? '' : `/${key}`;
+    return key === 'f1' ? '' : key === 'fe' ? '/formula-e' : `/${key}`;
 }
 
 async function resolveCommunityMetadata(req, context, id) {
@@ -210,7 +210,7 @@ async function resolveCircuitMetadata(context, id) {
             const location = String(rows[0].placeName || '').split(',').map(part => part.trim()).filter(Boolean);
             rows[0].countryName = location.length > 1 ? location.pop() : '';
             rows[0].placeName = location.join(', ');
-            rows[0].layoutId = id === 'valencia' ? null : f2CircuitImageId(id);
+            rows[0].layoutId = juniorCircuitImageId(id, series);
         }
     }
     if (!rows.length) return { robots: 'noindex, follow', notFound: true };
@@ -400,7 +400,7 @@ async function buildDynamicSitemapRoutes() {
         ['f1', '', 'seasons', 'season', 'year', 'year'], ['f1', '', 'drivers', 'driver', 'id', 'id'],
         ['f1', '', 'constructors', 'constructor', 'id', 'id'], ['f1', '', 'circuits', 'circuit', 'id', 'id'],
         ['f1', '', 'races', 'race', 'id', 'id'], ['f1', '', 'chassis', 'chassis', 'id', 'id'],
-        ...['f2', 'f3', 'academy'].flatMap(series => {
+        ...['f2', 'f3', 'academy', 'fe'].flatMap(series => {
             const prefix = SERIES_PREFIX[series];
             const base = seriesBase(series);
             const teamPage = series === 'f2' ? 'constructor' : 'team';
@@ -410,7 +410,7 @@ async function buildDynamicSitemapRoutes() {
                 [series, base, `${prefix}constructors`, teamPage, 'id', 'id'],
                 [series, base, `${prefix}circuits`, 'circuit', 'id', 'id'],
                 [series, base, `${prefix}races`, 'race', 'id', 'id'],
-                [series, base, `${prefix}chassis`, 'chassis', 'id', 'id']
+                ...(series === 'fe' ? [] : [[series, base, `${prefix}chassis`, 'chassis', 'id', 'id']])
             ];
         })
     ];
