@@ -80,7 +80,18 @@ test('all public API routes remain registered after modularization', () => {
         '/api/search',
         '/api/seasons',
         '/api/seasons/:year',
-        '/api/series-equivalent'
+        '/api/series-equivalent',
+        '/api/wec/entities/:type/:entityId',
+        '/api/wec/events',
+        '/api/wec/events/:eventId',
+        '/api/wec/events/:eventId/entries',
+        '/api/wec/events/:eventId/header',
+        '/api/wec/home',
+        '/api/wec/seasons',
+        '/api/wec/seasons/:year',
+        '/api/wec/seasons/:year/header',
+        '/api/wec/seasons/:year/results',
+        '/api/wec/seasons/:year/standings'
     ]);
 });
 

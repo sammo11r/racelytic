@@ -40,6 +40,8 @@
 .seasons-directory .season-card:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 .seasons-directory .season-card-heading { gap: 12px; min-height: 78px; }
 .seasons-directory .season-year { flex-shrink: 0; }
+.wec-mode .seasons-directory .season-year-divider { color: var(--accent); }
+.wec-mode .seasons-directory .season-year-highlight { color: var(--accent); }
 .seasons-directory .season-card-champion { flex: 1; min-width: 0; max-width: none; gap: 6px; }
 .seasons-directory .season-card-champion > span { font-size: 9px; }
 .seasons-directory .season-card-champion strong {

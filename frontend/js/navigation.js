@@ -22,6 +22,7 @@ function loadHeader() {
         const isF3Mode = activeSeries === 'f3';
         const isAcademyMode = activeSeries === 'academy';
         const isFormulaEMode = activeSeries === 'fe';
+        const isWecMode = activeSeries === 'wec';
         try { localStorage.setItem('racelytic-series', activeSeries); } catch {}
         if (window.location.pathname === '/about') document.title = 'About Racelytic · Racelytic';
 
@@ -75,6 +76,7 @@ function loadHeader() {
         document.body.classList.toggle('f3-mode', isF3Mode);
         document.body.classList.toggle('academy-mode', isAcademyMode);
         document.body.classList.toggle('fe-mode', isFormulaEMode);
+        document.body.classList.toggle('wec-mode', isWecMode);
         if (!isSeriesNeutralPage && activeSeries === 'f1' && !document.title.includes('Formula 1')) {
             document.title = document.title === 'Racelytic'
                 ? 'Formula 1 · Racelytic'
@@ -136,6 +138,13 @@ function loadHeader() {
             '/race-winners-quiz': '/formula-e/race-winners-quiz'
         };
         const reverseFormulaEPagePairs = Object.fromEntries(Object.entries(formulaEPagePairs).map(([f1, fe]) => [fe, f1]));
+        const wecPagePairs = {
+            '/': '/wec',
+            '/database': '/wec',
+            '/seasons': '/wec/seasons',
+            '/races': '/wec/races'
+        };
+        const reverseWecPagePairs = { '/wec': '/', '/wec/seasons': '/seasons', '/wec/races': '/races' };
         const detailPages = {
             '/season': ['season', '/f2/seasons'], '/race': ['race', '/f2/races'],
             '/driver': ['driver', '/f2/drivers'], '/circuit': ['circuit', '/f2/circuits'],
@@ -153,7 +162,7 @@ function loadHeader() {
             '/formula-e/driver': ['driver', '/drivers'], '/formula-e/team': ['constructor', '/constructors'],
             '/formula-e/circuit': ['circuit', '/circuits']
         };
-        const pathDetailMatch = window.location.pathname.match(/^\/(?:f2\/|f3\/|academy\/|formula-e\/)?(seasons|races|drivers|constructors|teams|circuits)\/([^/]+)/);
+        const pathDetailMatch = window.location.pathname.match(/^\/(?:f2\/|f3\/|academy\/|formula-e\/|wec\/)?(seasons|races|drivers|constructors|teams|circuits)\/([^/]+)/);
         const pathDetailTypes = { seasons: 'season', races: 'race', drivers: 'driver', constructors: 'constructor', teams: 'constructor', circuits: 'circuit' };
         const currentDetail = detailPages[window.location.pathname]
             || (pathDetailMatch ? [pathDetailTypes[pathDetailMatch[1]], '', decodeURIComponent(pathDetailMatch[2])] : null);
@@ -162,18 +171,23 @@ function loadHeader() {
             f2: { season: '/f2/seasons', race: '/f2/races', driver: '/f2/drivers', constructor: '/f2/constructors', circuit: '/f2/circuits' },
             f3: { season: '/f3/seasons', race: '/f3/races', driver: '/f3/drivers', constructor: '/f3/teams', circuit: '/f3/circuits' },
             academy: { season: '/academy/seasons', race: '/academy/races', driver: '/academy/drivers', constructor: '/academy/teams', circuit: '/academy/circuits' }
-            ,fe: { season: '/formula-e/seasons', race: '/formula-e/races', driver: '/formula-e/drivers', constructor: '/formula-e/teams', circuit: '/formula-e/circuits' }
+            ,fe: { season: '/formula-e/seasons', race: '/formula-e/races', driver: '/formula-e/drivers', constructor: '/formula-e/teams', circuit: '/formula-e/circuits' },
+            wec: { season: '/wec/seasons', race: '/wec/races', driver: '/wec', constructor: '/wec' }
         };
         const resolveSeriesTarget = async targetSeries => {
             if (isSeriesNeutralPage) return `${window.location.pathname}?series=${targetSeries}`;
-            const canonicalPage = isFormulaEMode
+            const canonicalPage = isWecMode
+                ? reverseWecPagePairs[window.location.pathname]
+                : isFormulaEMode
                 ? reverseFormulaEPagePairs[window.location.pathname]
                 : isAcademyMode
                 ? reverseAcademyPagePairs[window.location.pathname]
                 : isF3Mode
                 ? reverseF3PagePairs[window.location.pathname]
                 : isF2Mode ? reversePagePairs[window.location.pathname] : window.location.pathname;
-            const topLevelTarget = targetSeries === 'fe'
+            const topLevelTarget = targetSeries === 'wec'
+                ? wecPagePairs[canonicalPage]
+                : targetSeries === 'fe'
                 ? formulaEPagePairs[canonicalPage]
                 : targetSeries === 'academy'
                 ? academyPagePairs[canonicalPage]
@@ -181,6 +195,21 @@ function loadHeader() {
                 ? f3PagePairs[canonicalPage]
                 : targetSeries === 'f2' ? pagePairs[canonicalPage] : canonicalPage;
             if (topLevelTarget) return `${topLevelTarget}${window.location.search}${window.location.hash}`;
+            if (targetSeries === 'wec') {
+                const detail = currentDetail;
+                if (detail && ['season', 'race', 'driver', 'constructor'].includes(detail[0])) {
+                    const parameter = detail[0] === 'season' ? 'year' : 'id';
+                    const id = detail[2] || new URLSearchParams(window.location.search).get(parameter);
+                    const parent = seriesDetailParents.wec[detail[0]] || '/wec';
+                    if (!id) return parent;
+                    try {
+                        const equivalent = await fetch(`/api/series-equivalent?target=wec&type=${detail[0]}&id=${encodeURIComponent(id)}&source=${activeSeries}`);
+                        if (equivalent.ok) return (await equivalent.json()).url;
+                    } catch {}
+                    return parent;
+                }
+                return '/wec';
+            }
             if (['f3', 'academy', 'fe'].includes(targetSeries)) {
                 const targetBase = targetSeries === 'academy' ? '/academy' : targetSeries === 'fe' ? '/formula-e' : '/f3';
                 const detail = currentDetail;
@@ -229,7 +258,7 @@ function loadHeader() {
         if (championshipSelect) {
             const activeShortName = championshipSelect.querySelector('[data-active-series-short]');
             const selectableChampionshipOptions = championshipOptionButtons.filter(option => option.dataset.series !== activeSeries);
-            const switcherAbbreviations = { f1: 'F1', f2: 'F2', f3: 'F3', academy: 'F1A', fe: 'FE' };
+            const switcherAbbreviations = { f1: 'F1', f2: 'F2', f3: 'F3', academy: 'F1A', fe: 'FE', wec: 'WEC' };
             if (activeShortName) activeShortName.textContent = switcherAbbreviations[activeSeries] || seriesConfig.shortName;
             championshipSelect.setAttribute('aria-label', `Change championship, currently ${seriesConfig.name}`);
             const closeChampionshipOptions = (returnFocus = false) => {
@@ -281,6 +310,29 @@ function loadHeader() {
             document.addEventListener('click', event => {
                 if (!event.target.closest('.championship-selector')) closeChampionshipOptions();
             });
+        }
+        if (isWecMode) {
+            const navigationDropdowns = [...container.querySelectorAll('.nav-dropdown')];
+            const database = navigationDropdowns[0];
+            const links = [...(database?.querySelectorAll('.dropdown-menu a') || [])];
+            const items = [
+                ['/wec', 'Overview', 'World Endurance Championship archive'],
+                ['/wec/seasons', 'Seasons', 'Championship calendars and classes'],
+                ['/wec/races', 'Races', 'Every WEC endurance event']
+            ];
+            links.forEach((link, index) => {
+                const item = items[index];
+                if (!item) return link.remove();
+                link.href = item[0];
+                link.querySelector('span').textContent = item[1];
+                link.querySelector('small').textContent = item[2];
+            });
+            const title = database?.querySelector('.dropdown-title');
+            if (title) title.textContent = 'WEC DATABASE';
+            navigationDropdowns.slice(1).forEach(dropdown => dropdown.remove());
+            const aboutLink = container.querySelector('a[href="/about"]');
+            if (aboutLink) aboutLink.href = '/about?series=wec';
+            container.querySelectorAll('a[href="/account"]').forEach(link => { link.href = '/account?series=wec'; });
         }
         if (isF3Mode || isAcademyMode || isFormulaEMode) {
             const seriesBase = isAcademyMode ? '/academy' : isFormulaEMode ? '/formula-e' : '/f3';

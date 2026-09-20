@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Explore the champions from a World Endurance Championship season by racing category.">
+  <link rel="icon" href="/assets/favicon-wec.svg" type="image/svg+xml">
+  <title>WEC Season · Racelytic</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/polish.css">
+  <link rel="stylesheet" href="/css/wec-season.css">
+</head>
+<body class="wec-mode">
+  <div id="header"></div>
+  <main class="container page wec-season-page">
+    <header id="wec-season-heading" class="wec-season-hero">
+      <div class="wec-season-heading">
+        <div class="wec-season-title">
+          <div class="eyebrow">CHAMPIONSHIP SUMMARY</div>
+          <h1><span id="wec-season-year">—</span> WEC season</h1>
+        </div>
+        <div class="wec-season-context">
+          <p id="wec-season-name">FIA World Endurance Championship</p>
+          <nav id="wec-season-navigation" class="wec-season-navigation" aria-label="Adjacent seasons"></nav>
+        </div>
+      </div>
+
+      <div id="champions" class="wec-season-champions" aria-labelledby="wec-champions-title">
+        <div class="wec-champions-heading">
+          <span>Season honours</span>
+          <h2 id="wec-champions-title">Champions by category</h2>
+        </div>
+        <div id="wec-champions" class="wec-champion-grid" aria-live="polite"><p class="loading-state">Loading champions…</p></div>
+      </div>
+    </header>
+
+    <section class="wec-season-standings" aria-labelledby="wec-season-standings-title">
+      <div class="section-heading">
+        <div>
+          <div class="eyebrow">CHAMPIONSHIP CLASSIFICATION</div>
+          <h2 id="wec-season-standings-title">Standings</h2>
+        </div>
+      </div>
+      <div class="wec-standings-controls">
+        <div id="wec-standings-types" class="wec-standings-switch" role="group" aria-label="Standing type"></div>
+        <div id="wec-standings-championships" class="wec-standings-pills" role="group" aria-label="Championship"></div>
+      </div>
+      <aside class="wec-standings-legend" aria-label="Standings result legend">
+        <strong>Result legend</strong>
+        <ul>
+          <li><i class="position-1" aria-hidden="true"></i><span>Winner</span></li>
+          <li><i class="position-2" aria-hidden="true"></i><span>Second</span></li>
+          <li><i class="position-3" aria-hidden="true"></i><span>Third</span></li>
+          <li><i class="status-retired" aria-hidden="true"></i><span>Retired</span></li>
+          <li><i class="status-not-classified" aria-hidden="true"></i><span>Not classified</span></li>
+          <li><i class="status-disqualified" aria-hidden="true"></i><span>Disqualified</span></li>
+          <li><i class="status-excluded" aria-hidden="true"></i><span>Excluded</span></li>
+          <li><i class="status-not-started" aria-hidden="true"></i><span>Did not start</span></li>
+          <li><i class="is-absent" aria-hidden="true"></i><span>Did not participate</span></li>
+        </ul>
+      </aside>
+      <div id="wec-season-standings" class="wec-season-standings-frame" aria-live="polite"><p class="loading-state">Loading standings…</p></div>
+    </section>
+
+    <section class="wec-race-results" aria-labelledby="wec-race-results-title">
+      <div class="section-heading">
+        <div>
+          <div class="eyebrow">ROUND BY ROUND</div>
+          <h2 id="wec-race-results-title">Race results</h2>
+        </div>
+      </div>
+      <div id="wec-race-results" class="wec-race-results-frame" aria-live="polite"><p class="loading-state">Loading race results…</p></div>
+    </section>
+  </main>
+  <footer class="footer"><div class="container">Racelytic</div></footer>
+  <script src="/js/header.js"></script>
+  <script src="/js/utils.js"></script>
+  <script src="/js/wec-season.js"></script>
+</body>
+</html>

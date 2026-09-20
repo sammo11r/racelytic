@@ -32,6 +32,7 @@ test('detail canonicals retain only their identity parameter', () => {
 test('detail slugs produce useful server-rendered sharing titles', () => {
     assert.equal(metadataFor('/drivers/max-verstappen').title, 'Max Verstappen — Formula 1 Driver · Racelytic');
     assert.equal(metadataFor('/f3/circuits/spa-francorchamps').title, 'Spa Francorchamps — Formula 3 Circuit · Racelytic');
+    assert.equal(metadataFor('/wec/car-models/ferrari-499p').title, 'Ferrari 499p — World Endurance Championship Car Model · Racelytic');
 });
 
 test('dynamic entity titles prefer the public racing name', () => {

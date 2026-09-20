@@ -1,0 +1,16 @@
+id,name,countryId,placeName,type,direction,latitude,longitude,length,turns,layoutId,layoutVersion,mapSourceUrl,sourceUrl
+lusail,Lusail International Circuit,qatar,Lusail,RACE,CLOCKWISE,25.49,51.454167,5.419,16,lusail-1,current,https://github.com/f1db/f1db,https://www.fiawec.com/en/season/2025
+imola,Autodromo Internazionale Enzo e Dino Ferrari,italy,Imola,RACE,ANTI_CLOCKWISE,44.341111,11.713333,4.909,19,imola-3,current,https://github.com/f1db/f1db,https://www.fiawec.com/en/season/2025
+spa-francorchamps,Circuit de Spa-Francorchamps,belgium,Stavelot,RACE,CLOCKWISE,50.437222,5.971389,7.004,19,spa-francorchamps-4,current,https://github.com/f1db/f1db,https://www.fiawec.com/en/season/2025
+le-mans,Circuit de la Sarthe,france,Le Mans,ROAD,CLOCKWISE,47.95,0.2247,13.626,21,wec-le-mans-24h,2018-present,https://github.com/tobi/track-atlas/tree/main/tracks/circuit-de-la-sarthe,https://www.fiawec.com/en/season/2025
+interlagos,Autodromo Jose Carlos Pace,brazil,Sao Paulo,RACE,ANTI_CLOCKWISE,-23.701111,-46.697222,4.309,15,interlagos-2,current,https://github.com/f1db/f1db,https://www.fiawec.com/en/season/2025
+circuit-of-the-americas,Circuit of the Americas,united-states-of-america,Austin,RACE,ANTI_CLOCKWISE,30.132778,-97.641111,5.513,20,austin-1,current,https://github.com/f1db/f1db,https://www.fiawec.com/en/season/2025
+fuji,Fuji Speedway,japan,Oyama,RACE,CLOCKWISE,35.371667,138.926667,4.563,16,fuji-2,current,https://github.com/f1db/f1db,https://www.fiawec.com/en/season/2025
+bahrain,Bahrain International Circuit,bahrain,Sakhir,RACE,CLOCKWISE,26.0325,50.510556,5.412,15,bahrain-1,current,https://github.com/f1db/f1db,https://www.fiawec.com/en/season/2025
+sebring,Sebring International Raceway,united-states-of-america,Sebring,ROAD,CLOCKWISE,27.454741,-81.348267,8.36,17,sebring-1,current,https://github.com/f1db/f1db,https://www.fiawec.com/en/season/2025
+algarve,Algarve International Circuit,portugal,Portimao,RACE,CLOCKWISE,37.221944,-8.629444,4.653,15,portimao-1,current,https://github.com/f1db/f1db,https://www.fiawec.com/en/season/2025
+monza,Autodromo Nazionale Monza,italy,Monza,RACE,CLOCKWISE,45.620556,9.289444,5.793,11,monza-7,current,https://github.com/f1db/f1db,https://www.fiawec.com/en/season/2025
+silverstone,Silverstone Circuit,united-kingdom,Silverstone,RACE,CLOCKWISE,52.078611,-1.016944,5.891,18,silverstone-8,current,https://github.com/f1db/f1db,https://www.fiawec.com/en/season/2025
+nurburgring,Nurburgring,germany,Nurburg,RACE,CLOCKWISE,50.335556,6.9475,5.148,15,nurburgring-4,current,https://github.com/f1db/f1db,https://www.fiawec.com/en/season/2025
+mexico-city,Autodromo Hermanos Rodriguez,mexico,Mexico City,RACE,CLOCKWISE,19.404197,-99.088747,4.304,17,mexico-city-3,current,https://github.com/f1db/f1db,https://www.fiawec.com/en/season/2025
+shanghai,Shanghai International Circuit,china,Shanghai,RACE,CLOCKWISE,31.338889,121.219722,5.451,16,shanghai-1,current,https://github.com/f1db/f1db,https://www.fiawec.com/en/season/2025

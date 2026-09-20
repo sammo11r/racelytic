@@ -48,6 +48,7 @@ function resourceUrl(resource, id, { base = activeSeriesBase(), label = '', quer
 }
 function activeSeriesKey() {
   if (window.RacelyticSeries) return window.RacelyticSeries.fromPath().key;
+  if (window.location.pathname === '/wec' || window.location.pathname.startsWith('/wec/')) return 'wec';
   if (window.location.pathname === '/formula-e' || window.location.pathname.startsWith('/formula-e/')) return 'fe';
   if (window.location.pathname === '/academy' || window.location.pathname.startsWith('/academy/')) return 'academy';
   if (window.location.pathname === '/f3' || window.location.pathname.startsWith('/f3/')) return 'f3';

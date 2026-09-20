@@ -40,6 +40,14 @@
       "modeClass": "fe-mode",
       "favicon": "/assets/favicon-fe.svg",
       "entity": "team"
+    },
+    "wec": {
+      "name": "World Endurance Championship",
+      "shortName": "WEC",
+      "path": "/wec",
+      "modeClass": "wec-mode",
+      "favicon": "/assets/favicon-wec.svg",
+      "entity": "entry"
     }
   },
   "sharedTemplates": {

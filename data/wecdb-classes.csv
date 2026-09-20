@@ -1,0 +1,55 @@
+id,seasonId,year,code,name,displayOrder,sourceUrl
+wec-2012-lmp1,wec-2012,2012,LMP1,LMP1,1,https://fiawec.alkamelsystems.com/?season=02_2012
+wec-2012-lmp2,wec-2012,2012,LMP2,LMP2,2,https://fiawec.alkamelsystems.com/?season=02_2012
+wec-2012-lmgte-pro,wec-2012,2012,LMGTE PRO,LMGTE Pro,3,https://fiawec.alkamelsystems.com/?season=02_2012
+wec-2012-lmgte-am,wec-2012,2012,LMGTE AM,LMGTE Am,4,https://fiawec.alkamelsystems.com/?season=02_2012
+wec-2012-cdnt,wec-2012,2012,CDNT,Experimental,5,https://fiawec.alkamelsystems.com/?season=02_2012
+wec-2013-lmp1,wec-2013,2013,LMP1,LMP1,1,https://fiawec.alkamelsystems.com/?season=03_2013
+wec-2013-lmp2,wec-2013,2013,LMP2,LMP2,2,https://fiawec.alkamelsystems.com/?season=03_2013
+wec-2013-lmgte-pro,wec-2013,2013,LMGTE PRO,LMGTE Pro,3,https://fiawec.alkamelsystems.com/?season=03_2013
+wec-2013-lmgte-am,wec-2013,2013,LMGTE AM,LMGTE Am,4,https://fiawec.alkamelsystems.com/?season=03_2013
+wec-2014-lmp1,wec-2014,2014,LMP1,LMP1,1,https://fiawec.alkamelsystems.com/?season=04_2014
+wec-2014-lmp2,wec-2014,2014,LMP2,LMP2,2,https://fiawec.alkamelsystems.com/?season=04_2014
+wec-2014-lmgte-pro,wec-2014,2014,LMGTE PRO,LMGTE Pro,3,https://fiawec.alkamelsystems.com/?season=04_2014
+wec-2014-lmgte-am,wec-2014,2014,LMGTE AM,LMGTE Am,4,https://fiawec.alkamelsystems.com/?season=04_2014
+wec-2014-cdnt,wec-2014,2014,CDNT,Experimental,5,https://fiawec.alkamelsystems.com/?season=04_2014
+wec-2015-lmp1,wec-2015,2015,LMP1,LMP1,1,https://fiawec.alkamelsystems.com/?season=05_2015
+wec-2015-lmp2,wec-2015,2015,LMP2,LMP2,2,https://fiawec.alkamelsystems.com/?season=05_2015
+wec-2015-lmgte-pro,wec-2015,2015,LMGTE PRO,LMGTE Pro,3,https://fiawec.alkamelsystems.com/?season=05_2015
+wec-2015-lmgte-am,wec-2015,2015,LMGTE AM,LMGTE Am,4,https://fiawec.alkamelsystems.com/?season=05_2015
+wec-2016-lmp1,wec-2016,2016,LMP1,LMP1,1,https://fiawec.alkamelsystems.com/?season=06_2016
+wec-2016-lmp2,wec-2016,2016,LMP2,LMP2,2,https://fiawec.alkamelsystems.com/?season=06_2016
+wec-2016-lmgte-pro,wec-2016,2016,LMGTE PRO,LMGTE Pro,3,https://fiawec.alkamelsystems.com/?season=06_2016
+wec-2016-lmgte-am,wec-2016,2016,LMGTE AM,LMGTE Am,4,https://fiawec.alkamelsystems.com/?season=06_2016
+wec-2016-cdnt,wec-2016,2016,CDNT,Experimental,5,https://fiawec.alkamelsystems.com/?season=06_2016
+wec-2017-lmp1,wec-2017,2017,LMP1,LMP1,1,https://fiawec.alkamelsystems.com/?season=07_2017
+wec-2017-lmp2,wec-2017,2017,LMP2,LMP2,2,https://fiawec.alkamelsystems.com/?season=07_2017
+wec-2017-lmgte-pro,wec-2017,2017,LMGTE PRO,LMGTE Pro,3,https://fiawec.alkamelsystems.com/?season=07_2017
+wec-2017-lmgte-am,wec-2017,2017,LMGTE AM,LMGTE Am,4,https://fiawec.alkamelsystems.com/?season=07_2017
+wec-2018-2019-lmp1,wec-2018-2019,2018,LMP1,LMP1,1,https://fiawec.alkamelsystems.com/?season=08_2018-2019
+wec-2018-2019-lmp2,wec-2018-2019,2018,LMP2,LMP2,2,https://fiawec.alkamelsystems.com/?season=08_2018-2019
+wec-2018-2019-lmgte-pro,wec-2018-2019,2018,LMGTE PRO,LMGTE Pro,3,https://fiawec.alkamelsystems.com/?season=08_2018-2019
+wec-2018-2019-lmgte-am,wec-2018-2019,2018,LMGTE AM,LMGTE Am,4,https://fiawec.alkamelsystems.com/?season=08_2018-2019
+wec-2019-2020-lmp1,wec-2019-2020,2019,LMP1,LMP1,1,https://fiawec.alkamelsystems.com/?season=09_2019-2020
+wec-2019-2020-lmp2,wec-2019-2020,2019,LMP2,LMP2,2,https://fiawec.alkamelsystems.com/?season=09_2019-2020
+wec-2019-2020-lmgte-pro,wec-2019-2020,2019,LMGTE PRO,LMGTE Pro,3,https://fiawec.alkamelsystems.com/?season=09_2019-2020
+wec-2019-2020-lmgte-am,wec-2019-2020,2019,LMGTE AM,LMGTE Am,4,https://fiawec.alkamelsystems.com/?season=09_2019-2020
+wec-2021-hypercar,wec-2021,2021,HYPERCAR,Hypercar,1,https://fiawec.alkamelsystems.com/?season=10_2021
+wec-2021-lmp2,wec-2021,2021,LMP2,LMP2,2,https://fiawec.alkamelsystems.com/?season=10_2021
+wec-2021-lmgte-pro,wec-2021,2021,LMGTE PRO,LMGTE Pro,3,https://fiawec.alkamelsystems.com/?season=10_2021
+wec-2021-lmgte-am,wec-2021,2021,LMGTE AM,LMGTE Am,4,https://fiawec.alkamelsystems.com/?season=10_2021
+wec-2021-innovative-car,wec-2021,2021,INNOVATIVE CAR,Innovative Car,5,https://fiawec.alkamelsystems.com/Results/10_2021/04_LE%20MANS/378_FIA%20WEC/202108211600_Race/24_Hour%2024/03_Classification_Race_Hour%2024.CSV
+wec-2022-hypercar,wec-2022,2022,HYPERCAR,Hypercar,1,https://www.fia.com/events/world-endurance-championship/season-2022/standings
+wec-2022-lmp2,wec-2022,2022,LMP2,LMP2,2,https://www.fia.com/events/world-endurance-championship/season-2022/standings
+wec-2022-lmgte-pro,wec-2022,2022,LMGTE PRO,LMGTE Pro,3,https://www.fia.com/events/world-endurance-championship/season-2022/standings
+wec-2022-lmgte-am,wec-2022,2022,LMGTE AM,LMGTE Am,4,https://www.fia.com/events/world-endurance-championship/season-2022/standings
+wec-2023-hypercar,wec-2023,2023,HYPERCAR,Hypercar,1,https://www.fiawec.com/en/news/2023-fia-wec-entry-list-sees-record-hypercar-and-lmgte-am-field/7555
+wec-2023-lmp2,wec-2023,2023,LMP2,LMP2,2,https://www.fiawec.com/en/news/2023-fia-wec-entry-list-sees-record-hypercar-and-lmgte-am-field/7555
+wec-2023-lmgte-am,wec-2023,2023,LMGTE AM,LMGTE Am,3,https://www.fiawec.com/en/news/2023-fia-wec-entry-list-sees-record-hypercar-and-lmgte-am-field/7555
+wec-2023-innovative-car,wec-2023,2023,INNOVATIVE CAR,Innovative Car,4,https://fiawec.alkamelsystems.com/Results/12_2023/04_LE%20MANS/474_FIA%20WEC/202306101600_Race/24_Hour%2024/03_Classification_Race_Hour%2024.CSV
+wec-2024-hypercar,wec-2024,2024,HYPERCAR,Hypercar,1,https://www.fia.com/events/world-endurance-championship/season-2024/standings
+wec-2024-lmgt3,wec-2024,2024,LMGT3,LMGT3,2,https://www.fia.com/events/world-endurance-championship/season-2024/standings
+wec-2024-lmp2,wec-2024,2024,LMP2,LMP2 (Le Mans),3,https://www.fia.com/events/world-endurance-championship/season-2024/standings
+wec-2025-hypercar,wec-2025,2025,HYPERCAR,Hypercar,1,https://www.fiawec.com/en/season/2025
+wec-2025-lmgt3,wec-2025,2025,LMGT3,LMGT3,2,https://www.fiawec.com/en/season/2025
+wec-2025-lmp2,wec-2025,2025,LMP2,LMP2 (Le Mans),3,https://www.fiawec.com/en/season/2025

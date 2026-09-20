@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "series": "wec",
+  "resultUnit": "entry",
+  "coverageScope": {
+    "included": [
+      "Final classification for every official race-weekend practice session",
+      "Final classification for every official race-weekend qualifying and Hyperpole session",
+      "Final classification for every official race-weekend warm-up session",
+      "Final race classification",
+      "Official championship standings after every applicable round"
+    ],
+    "excluded": [
+      "Prologue and test sessions",
+      "Interim and hourly race classifications",
+      "Lap-by-lap analysis",
+      "Pit-stop logs",
+      "Weather data"
+    ]
+  },
+  "identity": {
+    "season": "id",
+    "event": "id",
+    "entry": "id",
+    "competitor": "id",
+    "driver": "id"
+  },
+  "foundationFiles": {
+    "wecdb-seasons.csv": ["id", "year", "name", "startDate", "endDate", "status", "sourceUrl"],
+    "wecdb-classes.csv": ["id", "seasonId", "year", "code", "name", "displayOrder", "sourceUrl"],
+    "wecdb-circuits.csv": ["id", "name", "countryId", "placeName", "type", "direction", "latitude", "longitude", "length", "turns", "layoutId", "layoutVersion", "mapSourceUrl", "sourceUrl"],
+    "wecdb-events.csv": ["id", "seasonId", "year", "round", "date", "endDate", "name", "circuitId", "formatType", "scheduledMinutes", "scheduledDistanceKm", "pointsScale", "status", "sourceUrl"]
+  },
+  "classificationFiles": {
+    "wecdb-drivers.csv": ["id", "name", "abbreviation", "nationalityCountryId"],
+    "wecdb-teams.csv": ["id", "name", "countryId"],
+    "wecdb-manufacturers.csv": ["id", "name", "countryId"],
+    "wecdb-car-models.csv": ["id", "manufacturerId", "name", "regulation"],
+    "wecdb-competitors.csv": ["id", "seasonId", "classId", "carNumber", "teamId", "manufacturerId", "carModelId", "championshipEligible"],
+    "wecdb-entries.csv": ["id", "eventId", "seasonId", "classId", "competitorId", "carNumber", "teamId", "manufacturerId", "carModelId", "championshipEligible"],
+    "wecdb-entry-drivers.csv": ["entryId", "eventId", "driverId", "crewOrder", "category", "championshipEligible"],
+    "wecdb-sessions.csv": ["id", "eventId", "seasonId", "name", "type", "classId", "startTimeUtc", "status"],
+    "wecdb-session-results.csv": ["sessionId", "eventId", "entryId", "classId", "overallPosition", "classPosition", "status", "laps", "time", "timeMillis", "gap", "bestLap", "bestLapMillis", "points"]
+  },
+  "standingsFiles": {
+    "wecdb-championships.csv": ["id", "seasonId", "name", "entityType", "classId", "classIds"],
+    "wecdb-standings.csv": ["championshipId", "round", "position", "entityId", "points", "championshipWon"]
+  },
+  "invariants": [
+    "A session result represents one car entry, never one driver.",
+    "An entry may have multiple drivers through wecdb-entry-drivers.csv.",
+    "A competitor identifies one season-long car entry across events.",
+    "Class and overall position are stored independently.",
+    "Official standings are stored per championship and round and are not inferred from finishing positions."
+  ]
+}

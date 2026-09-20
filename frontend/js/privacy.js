@@ -61,15 +61,17 @@ function initialiseFooter() {
     const footer = document.querySelector('.footer');
     if (!footer) return;
         const requestedSeries = new URLSearchParams(window.location.search).get('series');
-        const activeSeries = document.body.classList.contains('fe-mode') ? 'fe'
+        const activeSeries = document.body.classList.contains('wec-mode') ? 'wec'
+            : document.body.classList.contains('fe-mode') ? 'fe'
             : document.body.classList.contains('academy-mode') ? 'academy'
             : document.body.classList.contains('f3-mode') ? 'f3'
             : document.body.classList.contains('f2-mode') ? 'f2'
-            : ['f1', 'f2', 'f3', 'academy', 'fe'].includes(requestedSeries) ? requestedSeries : 'f1';
+            : ['f1', 'f2', 'f3', 'academy', 'fe', 'wec'].includes(requestedSeries) ? requestedSeries : 'f1';
         const isF2Mode = activeSeries === 'f2';
         const isF3Mode = activeSeries === 'f3';
         const isAcademyMode = activeSeries === 'academy';
         const isFormulaEMode = activeSeries === 'fe';
+        const isWecMode = activeSeries === 'wec';
         const summary = footer.querySelector('[data-footer-summary]');
         const trademark = footer.querySelector('[data-footer-trademark]');
         const source = footer.querySelector('[data-footer-source]');
@@ -110,6 +112,17 @@ function initialiseFooter() {
             if (brand) brand.href = '/formula-e';
             if (trademark) trademark.textContent = 'Racelytic is unofficial and is not associated with or endorsed by the ABB FIA Formula E World Championship, Formula E Operations, the FIA, any team, manufacturer, or driver. Formula E and related marks belong to their respective owners.';
             if (source) source.innerHTML = 'Formula E statistics are compiled from official FIA Formula E calendars and classifications, then normalised by Racelytic. See <a href="/data-sources#formula-e">Data sources &amp; licences</a> for provenance and important reuse information. Data may contain errors and is not an official record.';
+        }
+        if (isWecMode) {
+            const brand = footer.querySelector('.footer-brand');
+            if (brand) brand.href = '/wec';
+            const routes = { database: '/wec', analysis: '/wec/seasons' };
+            footer.querySelectorAll('[data-footer-page]').forEach(link => {
+                if (routes[link.dataset.footerPage]) link.href = routes[link.dataset.footerPage];
+                else if (['ratings', 'simulator', 'games', 'community'].includes(link.dataset.footerPage)) link.hidden = true;
+            });
+            if (trademark) trademark.textContent = 'Racelytic is unofficial and is not associated with or endorsed by the FIA World Endurance Championship, the FIA, the ACO, any team, manufacturer, or driver. FIA WEC and related marks belong to their respective owners.';
+            if (source) source.innerHTML = 'World Endurance Championship statistics are compiled from official FIA WEC calendars, session classifications and championship standings, then normalised by Racelytic. See <a href="/data-sources#wec">Data sources &amp; licences</a> for provenance and important reuse information. Data may contain errors and is not an official record.';
         }
         footer.querySelector('[data-privacy-settings]')?.addEventListener('click', () => window.RacelyticPrivacy.showAnalyticsChoice(true));
 }

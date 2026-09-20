@@ -4,6 +4,9 @@ const RESOURCE_ROUTES = Object.freeze({
     driver: Object.freeze({ collection: 'drivers', parameter: 'id' }),
     constructor: Object.freeze({ collection: 'constructors', parameter: 'id' }),
     team: Object.freeze({ collection: 'teams', parameter: 'id' }),
+    manufacturer: Object.freeze({ collection: 'manufacturers', parameter: 'id' }),
+    carModel: Object.freeze({ collection: 'car-models', parameter: 'id' }),
+    entry: Object.freeze({ collection: 'entries', parameter: 'id' }),
     circuit: Object.freeze({ collection: 'circuits', parameter: 'id' }),
     chassis: Object.freeze({ collection: 'chassis', parameter: 'id' })
 });
@@ -37,7 +40,7 @@ function resourcePath(series, resource, id, label = '') {
 
 function matchResourcePath(pathname) {
     const clean = String(pathname || '/').replace(/\/+$/, '') || '/';
-    const match = clean.match(/^\/(?:(f2|f3|academy|formula-e)\/)?(seasons|races|drivers|constructors|teams|circuits|chassis)\/([^/]+)(?:\/([^/]+))?$/);
+    const match = clean.match(/^\/(?:(f2|f3|academy|formula-e|wec)\/)?(seasons|races|drivers|constructors|teams|manufacturers|car-models|entries|circuits|chassis)\/([^/]+)(?:\/([^/]+))?$/);
     if (!match) return null;
     const resource = COLLECTION_TO_RESOURCE[match[2]];
     if (!resource || (match[4] && !RESOURCE_ROUTES[resource].slug)) return null;

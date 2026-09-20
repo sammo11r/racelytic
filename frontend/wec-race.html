@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Explore a World Endurance Championship race, circuit, location and event format.">
+  <link rel="icon" href="/assets/favicon-wec.svg" type="image/svg+xml">
+  <title>WEC Race · Racelytic</title>
+  <link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/polish.css"><link rel="stylesheet" href="/css/wec.css">
+</head>
+<body class="wec-mode" data-wec-view="race">
+  <div id="header"></div>
+  <main class="container page race-detail-page wec-race-detail-page">
+    <section id="wec-race-head" aria-busy="true"><div class="loading-state race-detail-loading">Loading race…</div></section>
+    <section id="wec-race-summary" class="wec-race-summary" aria-labelledby="wec-race-summary-title" aria-busy="true">
+      <div class="section-heading"><div><h2 id="wec-race-summary-title">Race summary</h2></div></div>
+      <div class="loading-state">Loading race summary…</div>
+    </section>
+    <section class="wec-session-explorer" aria-labelledby="wec-session-explorer-title">
+      <div class="section-heading"><div><h2 id="wec-session-explorer-title">Sessions</h2></div><span id="wec-session-note" class="section-note"></span></div>
+      <div id="wec-session-tabs" class="wec-session-tabs" role="tablist" aria-label="WEC event sessions"></div>
+      <div id="wec-class-filters" class="wec-class-filters wec-race-class-filters" role="group" aria-label="Classification view"></div>
+      <div id="wec-race-classification" class="wec-race-classification" role="tabpanel" aria-live="polite" aria-busy="true"><div class="loading-state">Loading classification…</div></div>
+    </section>
+    <details class="wec-event-entries">
+      <summary><span><span class="eyebrow">EVENT FIELD</span><strong>Event entries</strong></span><small id="wec-entry-count">Loading entries…</small></summary>
+      <div id="wec-entry-list" class="wec-entry-list" aria-live="polite"></div>
+    </details>
+    <nav id="wec-race-navigation" class="wec-race-navigation" aria-label="Previous and next WEC race"></nav>
+  </main>
+  <footer class="footer"><div class="container">Racelytic</div></footer>
+  <script src="/js/utils.js"></script><script src="/js/header.js"></script><script src="/js/wec-race.js"></script>
+</body>
+</html>

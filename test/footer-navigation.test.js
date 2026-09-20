@@ -31,11 +31,13 @@ test('footer avoids unsupported F2 and F3 trade mark ownership claims', () => {
   assert.match(privacy, /Formula 3, F3 and related marks belong to their respective owners/);
   assert.match(privacy, /F1 ACADEMY, F1, FORMULA 1 and related marks are trade marks of Formula One Licensing B\.V\./);
   assert.match(privacy, /Formula E and related marks belong to their respective owners/);
+  assert.match(privacy, /FIA WEC and related marks belong to their respective owners/);
 });
 
 test('footer navigation follows the active championship on regular and neutral routes', () => {
   assert.match(privacy, /document\.body\.classList\.contains\('fe-mode'\)/);
-  assert.match(privacy, /\['f1', 'f2', 'f3', 'academy', 'fe'\]\.includes\(requestedSeries\)/);
+  assert.match(privacy, /document\.body\.classList\.contains\('wec-mode'\)/);
+  assert.match(privacy, /\['f1', 'f2', 'f3', 'academy', 'fe', 'wec'\]\.includes\(requestedSeries\)/);
   assert.match(privacy, /activeSeries === 'fe' \? '\/formula-e'/);
   assert.match(privacy, /games: `\$\{seriesBase\}\/games`/);
   assert.doesNotMatch(privacy, /data-footer-page="games"[^\n]*remove\(\)/);

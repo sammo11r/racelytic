@@ -196,7 +196,7 @@ function renderSeasonContent(html, initial) {
 function raceStatus(initial) {
     if (initial.hasResults) return 'completed';
     if (initial.inProgress) return 'in-progress';
-    const date = initial.endDate || initial.date;
+    const date = initial.race?.endDate || initial.race?.date || initial.endDate || initial.date;
     const timestamp = date ? new Date(`${String(date).slice(0, 10)}T23:59:59Z`).getTime() : NaN;
     return Number.isFinite(timestamp) && timestamp >= Date.now() ? 'upcoming' : 'no-result';
 }
@@ -210,6 +210,9 @@ function renderRaceContent(html, initial) {
     const facts = initial.series === 'f1'
         ? [race.laps ? `${formatNumber(race.laps)} laps` : '', race.distance ? `${formatNumber(race.distance)} km` : '',
             race.courseLength ? `${formatNumber(Number(race.courseLength) > 100 ? Number(race.courseLength) / 1000 : race.courseLength)} km circuit` : '', race.turns ? `${formatNumber(race.turns)} turns` : '']
+        : initial.series === 'wec'
+            ? [race.scheduledDistanceKm ? `${formatNumber(race.scheduledDistanceKm)} km` : race.scheduledMinutes ? `${formatNumber(Number(race.scheduledMinutes) / 60)} hours` : '',
+                race.length ? `${formatNumber(race.length)} km circuit` : '', race.turns ? `${formatNumber(race.turns)} turns` : '', race.direction || '']
         : [race.sessionCount ? `${formatNumber(race.sessionCount)} sessions` : '', race.lengthMeters ? `${formatNumber(Number(race.lengthMeters) / 1000)} km circuit` : '',
             race.turns ? `${formatNumber(race.turns)} turns` : '', race.circuitType || '', race.direction || ''];
     const highlight = status === 'completed'
@@ -217,12 +220,15 @@ function renderRaceContent(html, initial) {
         : status === 'in-progress'
             ? '<span>Latest available</span><strong>Weekend session</strong><small>Final race result pending</small>'
         : `<span>${status === 'upcoming' ? initial.series === 'f1' ? 'Race day' : 'Event date' : 'Event date'}</span><strong>${escapeHtml(formatDate(race.date))}</strong><small>${status === 'upcoming' ? initial.series === 'f1' ? 'Start time to be confirmed' : 'Race weekend ahead' : 'Classification unavailable'}</small>`;
-    const id = initial.series === 'f1' ? 'race-head' : 'junior-race-head';
+    const id = initial.series === 'f1' ? 'race-head' : initial.series === 'wec' ? 'wec-race-head' : 'junior-race-head';
     const name = race.displayName || race.name;
-    const head = `<section id="${id}" aria-busy="false"><div class="detail-hero race-detail-hero" data-status="${status}">
+    const circuit = initial.series === 'wec'
+        ? escapeHtml(race.circuitName || 'Circuit')
+        : `<a href="${base}/circuits/${encodeURIComponent(race.circuitId)}">${escapeHtml(race.circuitName || 'Circuit')}</a>`;
+    const head = `<section id="${id}" aria-busy="false"><div class="detail-hero race-detail-hero${initial.series === 'wec' ? ' wec-race-hero' : ''}" data-status="${status}">
     <div class="race-detail-hero-copy"><div class="race-detail-kicker"><span class="race-status-badge ${status}">${statusLabel}</span><a href="${base}/seasons/${encodeURIComponent(race.year)}">Round ${escapeHtml(race.round)} · ${escapeHtml(race.year)}</a></div>
       <h1>${escapeHtml(name)}</h1>
-      <div class="detail-sub"><a href="${base}/circuits/${encodeURIComponent(race.circuitId)}">${escapeHtml(race.circuitName || 'Circuit')}</a>${race.countryName || race.placeName ? ` · ${escapeHtml(race.countryName || race.placeName)}` : ''} · ${escapeHtml(formatDate(race.date))}</div>
+      <div class="detail-sub">${circuit}${race.countryName || race.placeName ? ` · ${escapeHtml(race.countryName || race.placeName)}` : ''} · ${escapeHtml(formatDate(race.date))}</div>
       <div class="race-hero-facts">${facts.filter(Boolean).map(fact => `<span>${escapeHtml(fact)}</span>`).join('')}</div>
     </div><aside class="race-hero-highlight">${highlight}</aside>
   </div></section>`;

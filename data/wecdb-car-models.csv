@@ -1,0 +1,124 @@
+id,manufacturerId,name,regulation
+audi-r18,audi,Audi R18,LMP1
+hpd-arx-03b-honda,hpd,HPD ARX 03B - Honda,LMP2
+morgan-judd,morgan,Morgan - Judd,LMP2
+pescarolo-judd,pescarolo,Pescarolo - Judd,LMP1
+oreca-03-nissan,oreca,Oreca 03 - Nissan,LMP2
+zytek-z11sn-nissan,zytek,Zytek Z11SN - Nissan,LMP2
+hpd-arx-03a-honda,hpd,HPD ARX 03a - Honda,LMP1
+lola-b12-80-coupe-lotus,lola,Lola B12/80 Coupé - Lotus,LMP2
+ferrari-f458-italia,ferrari,Ferrari F458 Italia,LMGTE AM
+porsche-911-rsr-997,porsche,Porsche 911 RSR (997),LMGTE AM
+chevrolet-corvette-c6-zr1,chevrolet,Chevrolet Corvette C6-ZR1,LMGTE AM
+lola-b12-60-coupe-toyota,lola,Lola B12/60 Coupé - Toyota,LMP1
+aston-martin-vantage-v8,aston-martin,Aston Martin Vantage V8,LMGTE AM
+lola-b12-80-coupe-nissan,lola,Lola B12/80 Coupé - Nissan,LMP2
+oak-pescarolo-judd,oak,Oak Pescarolo - Judd,LMP1
+audi-r18-ultra,audi,Audi R18 ultra,LMP1
+audi-r18-e-tron-quattro,audi,Audi R18 e-tron quattro,LMP1
+dome-s102-5-judd,dome,Dome S102.5 - Judd,LMP1
+norma-m200p-judd,norma,Norma M200P - Judd,LMP2
+oreca-03-judd,oreca,Oreca 03 - Judd,LMP2
+lola-b12-80-coupe-judd,lola,Lola B12/80 Coupé - Judd,LMP2
+morgan-nissan,morgan,Morgan - Nissan,LMP2
+ferrari-458-italia,ferrari,Ferrari 458 Italia,LMGTE AM
+norma-mp-2000-judd,norma,Norma MP 2000 - Judd,LMP2
+dome-judd,dome,Dome - Judd,LMP1
+lola-judd,lola,Lola - Judd,LMP2
+toyota-ts-030-hybrid,toyota,Toyota TS 030 - Hybrid,LMP1
+delta-wing-nissan,delta,Delta Wing Nissan,CDNT
+pescarolo-03-judd,pescarolo,Pescarolo 03 - Judd,LMP1
+toyota-ts030-hybrid,toyota,Toyota TS030 - Hybrid,LMP1
+oak-pescarolo-honda,oak,Oak Pescarolo - Honda,LMP1
+porsche-911-rsr,porsche,Porsche 911 RSR,LMGTE AM
+porsche-911-gt3-rsr,porsche,Porsche 911 GT3 RSR,LMGTE AM
+lotus-t128,lotus,Lotus T128,LMP2
+hpd-arx-03c-honda,hpd,HPD ARX 03c - Honda,LMP1
+alpine-nissan,alpine,Alpine - Nissan,LMP2
+viper-gts-r,viper,Viper GTS-R,LMGTE PRO
+lola-b11-40-judd,lola,Lola B11/40 - Judd,LMP2
+toyota-ts-040-hybrid,toyota,Toyota TS 040 - Hybrid,LMP1
+porsche-919-hybrid,porsche,Porsche 919 Hybrid,LMP1
+lola-b12-60-toyota,lola,Lola B12/60 - Toyota,LMP1
+rebellion-r-one-toyota,rebellion,Rebellion R-One - Toyota,LMP1
+ligier-js-p2-nissan,ligier,LIGIER JS P2 - Nissan,LMP2
+alpine-a450b-nissan,alpine,Alpine A450b - Nissan,LMP2
+oreca-03r-nissan,oreca,Oreca 03R - Nissan,LMP2
+ligier-nissan,ligier,Ligier - Nissan,LMP2
+ligier-js-p2-hpd,ligier,Ligier JS P2 - HPD,LMP2
+oreca-03r-judd,oreca,Oreca 03R - Judd,LMP2
+chevrolet-corvette-c7,chevrolet,Chevrolet Corvette C7,LMGTE AM
+nissan-zeod-rc,nissan,Nissan ZEOD RC,CDNT
+clm-p1-01-aer,clm,CLM P1/01 - AER,LMP1
+corvette-c7-r,chevrolet,Corvette C7.R,LMGTE PRO
+dome-s103-nissan,dome,Dome S103 - Nissan,LMP2
+oreca-05-nissan,oreca,Oreca 05 - Nissan,LMP2
+hpd-arx-03b-hpd,hpd,HPD ARX 03B - HPD,LMP2
+gibson-015s-nissan,gibson,Gibson 015S - Nissan,LMP2
+morgan-evo-sard,morgan,Morgan Evo - SARD,LMP2
+strakka-dome-s103-nissan,strakka,Strakka Dome S103 - Nissan,LMP2
+br01-nissan,br01,BR01 - Nissan,LMP2
+chevrolet-corvette-c7r,chevrolet,Chevrolet Corvette C7R,LMGTE PRO
+rebellion-r-one-aer,rebellion,Rebellion R-One - AER,LMP1
+ligier-js-p2-judd,ligier,Ligier JS P2 - Judd,LMP2
+porsche-911-gt3-rsr-997,porsche,Porsche 911 GT3 RSR (997),LMGTE AM
+nissan-gt-r-lm-nismo,nissan,Nissan GT-R LM Nismo,LMP1
+srt-viper-gts-r,srt,Srt VIPER GTS-R,LMGTE AM
+toyota-ts050-hybrid,toyota,Toyota TS050 - Hybrid,LMP1
+alpine-a460-nissan,alpine,Alpine A460 - Nissan,LMP2
+ferrari-488-gte,ferrari,Ferrari 488 GTE,LMGTE AM
+ford-gt,ford,Ford GT,LMGTE AM
+porsche-911-rsr-2016,porsche,Porsche 911 RSR (2016),LMGTE AM
+chevrolet-corvette-c7-z06,chevrolet,Chevrolet Corvette C7-Z06,LMGTE AM
+ligier-js-p2-honda,ligier,Ligier JS P2 - Honda,LMP2
+aston-martin-vantage,aston-martin,Aston Martin Vantage,LMGTE AM
+chevrolet-corvette-c7-r,chevrolet,Chevrolet Corvette C7.R,LMGTE PRO
+aston-martin-v8-vantage,aston-martin,Aston Martin V8 Vantage,LMGTE AM
+morgan-lmp2-nissan,morgan,Morgan LMP2 - Nissan,CDNT
+oreca-07-gibson,oreca,Oreca 07 - Gibson,LMP2
+alpine-a470-gibson,alpine,Alpine A470 - Gibson,LMP2
+porsche-911-rsr-991,porsche,Porsche 911 RSR (991),LMGTE AM
+enso-clm-p1-01-nismo,enso,Enso CLM P1/01 - Nismo,LMP1
+ligier-jsp217-gibson,ligier,Ligier JSP217 - Gibson,LMP2
+dallara-p217-gibson,dallara,Dallara P217 - Gibson,LMP2
+riley-mk30-gibson,riley,Riley MK30 - GIBSON,LMP2
+rebellion-r13-gibson,rebellion,Rebellion R13 - Gibson,LMP1
+br-engineering-br1-aer,br,BR Engineering BR1 - AER,LMP1
+ferrari-488-gte-evo,ferrari,Ferrari 488 GTE Evo,LMGTE AM
+bmw-m8-gte,bmw,BMW M8 GTE,LMGTE PRO
+aston-martin-vantage-amr,aston-martin,Aston Martin Vantage AMR,LMGTE AM
+ferrari-f488-gte,ferrari,Ferrari F488 GTE,LMGTE AM
+br-engineering-br1-gibson,br,BR Engineering BR1 - Gibson,LMP1
+ginetta-g60-lt-p1-mecachrome,ginetta,Ginetta G60-LT-P1 - Mecachrome,LMP1
+aurus-01-gibson,aurus,Aurus 01 - Gibson,LMP2
+enso-clm-p1-01-gibson,enso,ENSO CLM P1/01 - Gibson,LMP1
+ginetta-g60-lt-p1-aer,ginetta,Ginetta G60-LT-P1-AER,LMP1
+porsche-911-rsr-19,porsche,Porsche 911 RSR - 19,LMGTE AM
+ferrari-f488-gte-evo,ferrari,Ferrari F488 GTE EVO,LMGTE PRO
+chevrolet-corvette-c8-r,chevrolet,Chevrolet Corvette C8.R,LMGTE AM
+enso-clm-p1-01,enso,Enso CLM P1/01,LMP1
+toyota-gr010-hybrid,toyota,Toyota GR010 - Hybrid,HYPERCAR
+alpine-a480-gibson,alpine,Alpine A480 - Gibson,HYPERCAR
+glickenhaus-007-lmh,glickenhaus,Glickenhaus 007 LMH,HYPERCAR
+peugeot-9x8,peugeot,Peugeot 9X8,HYPERCAR
+ferrari-499p,ferrari,Ferrari 499P,HYPERCAR
+cadillac-v-series-r,cadillac,Cadillac V-Series.R,HYPERCAR
+porsche-963,porsche,Porsche 963,HYPERCAR
+vanwall-vandervell-680,vanwall,Vanwall Vandervell 680,HYPERCAR
+glickenhaus-007,glickenhaus,Glickenhaus 007,HYPERCAR
+chevrolet-camaro-zl1,chevrolet,Chevrolet Camaro ZL1,INNOVATIVE CAR
+alpine-a424,alpine,Alpine A424,HYPERCAR
+bmw-m-hybrid-v8,bmw,BMW M Hybrid V8,HYPERCAR
+lamborghini-sc63,lamborghini,Lamborghini SC63,HYPERCAR
+porsche-911-gt3-r-lmgt3,porsche,Porsche 911 GT3 R LMGT3,LMGT3
+aston-martin-vantage-amr-lmgt3,aston-martin,Aston Martin Vantage AMR LMGT3,LMGT3
+bmw-m4-lmgt3,bmw,BMW M4 LMGT3,LMGT3
+ferrari-296-lmgt3,ferrari,Ferrari 296 LMGT3,LMGT3
+lamborghini-huracan-lmgt3-evo2,lamborghini,Lamborghini Huracan LMGT3 Evo2,LMGT3
+ford-mustang-lmgt3,ford,Ford Mustang LMGT3,LMGT3
+corvette-z06-lmgt3-r,corvette,Corvette Z06 LMGT3.R,LMGT3
+mclaren-720s-lmgt3-evo,mclaren,McLaren 720S LMGT3 Evo,LMGT3
+lexus-rc-f-lmgt3,lexus,Lexus RC F LMGT3,LMGT3
+isotta-fraschini-tipo6-c,isotta-fraschini,Isotta Fraschini Tipo6-C,HYPERCAR
+aston-martin-valkyrie,aston-martin,Aston Martin Valkyrie,HYPERCAR
+mercedes-amg-lmgt3,mercedes-amg,Mercedes-AMG LMGT3,LMGT3

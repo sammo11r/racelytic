@@ -15,6 +15,9 @@ const PAGE_META = Object.freeze({
     constructor: ['Constructor', 'Explore constructor history, drivers, chassis and race results.'],
     teams: ['Teams', 'Browse team history, drivers, results and championship records.'],
     team: ['Team', 'Explore team history, drivers, seasons and race results.'],
+    manufacturer: ['Manufacturer', 'Explore manufacturer entries, cars, victories and championship history.'],
+    carModel: ['Car Model', 'Explore a race car model and its World Endurance Championship results.'],
+    entry: ['Entry', 'Explore a numbered endurance-racing entry, its crew and race history.'],
     circuits: ['Circuits', 'Browse racing circuits, locations and every event held at each venue.'],
     circuit: ['Circuit', 'Explore circuit details, characteristics and complete race history.'],
     chassis: ['Chassis', 'Explore racing chassis, technical specifications and championship usage.'],
@@ -63,10 +66,11 @@ const PAGE_META = Object.freeze({
 const NOINDEX_PAGES = new Set(['404', 'account', 'ask', 'monitor', 'search']);
 const NEUTRAL_PAGES = new Set(['404', 'about', 'community', 'ratings', 'ratings-leaderboard', 'ratings-compare',
     'ratings-driver', 'ratings-methodology', 'data-sources', 'privacy', 'terms', 'account', 'monitor', 'search']);
-const DETAIL_PARAMS = Object.freeze({ season: 'year', race: 'id', driver: 'id', constructor: 'id', team: 'id', circuit: 'id', chassis: 'id', 'championship-builder': 'id' });
+const DETAIL_PARAMS = Object.freeze({ season: 'year', race: 'id', driver: 'id', constructor: 'id', team: 'id', manufacturer: 'id', carModel: 'id', entry: 'id', circuit: 'id', chassis: 'id', 'championship-builder': 'id' });
 const DETAIL_PARENTS = Object.freeze({
     season: ['seasons', 'Seasons'], race: ['races', 'Races'], driver: ['drivers', 'Drivers'],
-    constructor: ['constructors', 'Constructors'], team: ['teams', 'Teams'], circuit: ['circuits', 'Circuits']
+    constructor: ['constructors', 'Constructors'], team: ['teams', 'Teams'], manufacturer: ['manufacturers', 'Manufacturers'],
+    carModel: ['car-models', 'Car Models'], entry: ['entries', 'Entries'], circuit: ['circuits', 'Circuits']
 });
 
 const JUNIOR_ANALYSIS_DESCRIPTIONS = Object.freeze({
@@ -92,7 +96,7 @@ function routeContext(pathname) {
     const cleanPath = pathname === '/' ? '/' : String(pathname || '/').replace(/\/+$/, '');
     const resource = matchResourcePath(cleanPath);
     if (resource) return { cleanPath, page: resource.resource, resourceId: resource.id, resourceSlug: resource.slug, series: SERIES[resource.series] };
-    const match = cleanPath.match(/^\/(f2|f3|academy|formula-e)(?:\/(.*))?$/);
+    const match = cleanPath.match(/^\/(f2|f3|academy|formula-e|wec)(?:\/(.*))?$/);
     const seriesKey = match?.[1] === 'formula-e' ? 'fe' : match?.[1] || 'f1';
     const ratingMatch = cleanPath.match(/^\/ratings\/(leaderboard|compare|driver|methodology)$/);
     const page = ratingMatch ? `ratings-${ratingMatch[1]}` : match ? match[2] || 'home' : cleanPath.slice(1) || 'home';
@@ -156,9 +160,10 @@ function metadataFor(pathname, query = {}, overrides = {}) {
         title = `${context.series.name} History, Statistics & Analysis · Racelytic`;
         description = `Explore ${context.series.name} history, results, drivers, teams, circuits, analysis, simulators and games with Racelytic.`;
     } else {
-        if (detailName && ['driver', 'constructor', 'team', 'circuit'].includes(context.page)) {
+        if (detailName && ['driver', 'constructor', 'team', 'manufacturer', 'carModel', 'entry', 'circuit'].includes(context.page)) {
             const entityLabel = context.page === 'constructor' ? 'Constructor' : context.page === 'team' ? 'Team'
-                : context.page === 'circuit' ? 'Circuit' : 'Driver';
+                : context.page === 'manufacturer' ? 'Manufacturer' : context.page === 'carModel' ? 'Car Model'
+                    : context.page === 'entry' ? 'Entry' : context.page === 'circuit' ? 'Circuit' : 'Driver';
             title = `${detailName} — ${context.series.name} ${entityLabel} · Racelytic`;
         } else {
             const subject = detailName ? `${detailName} ${pageMeta[0]}` : pageMeta[0];
@@ -216,7 +221,9 @@ function breadcrumbItems(metadata) {
     if (context.series.key !== 'f1') {
         items.push({ '@type': 'ListItem', position: items.length + 1, name: context.series.name, item: `${siteOrigin()}${prefix}` });
     }
-    const parent = DETAIL_PARENTS[context.page];
+    const parent = context.series.key === 'wec' && ['driver', 'team', 'manufacturer', 'carModel', 'entry'].includes(context.page)
+        ? null
+        : DETAIL_PARENTS[context.page];
     if (parent) {
         items.push({ '@type': 'ListItem', position: items.length + 1, name: parent[1], item: `${siteOrigin()}${prefix}/${parent[0]}` });
     }

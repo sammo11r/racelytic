@@ -11,6 +11,7 @@ data/.sync-backups/
 data/.data-sync.lock
 data/.f1db-release.json
 data/.f1db-sync-*/
+data/.wec-cache/
 .venv-replay/
 .venv-formula-e-circuits/
 /tmp/mysql-backup-*/

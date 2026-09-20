@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Browse every FIA World Endurance Championship race in Racelytic.">
+  <link rel="icon" href="/assets/favicon-wec.svg" type="image/svg+xml">
+  <title>WEC Races · Racelytic</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/polish.css">
+</head>
+<body class="wec-mode">
+  <div id="header"></div>
+  <main class="container page races-page wec-races-page">
+    <div class="page-head"><div><div class="eyebrow">WEC RACE ARCHIVE</div><h1>Races</h1><p>Every World Endurance Championship event, circuit and overall winning crew.</p></div></div>
+    <section class="race-filters wec-race-filters" aria-label="WEC race archive filters">
+      <div class="race-filter-primary">
+        <label class="race-search-filter"><span>Filter races</span><input id="wec-race-search" type="search" placeholder="Event, circuit, team or driver"></label>
+        <label><span>Season</span><select id="wec-race-year"><option value="">All seasons</option></select></label>
+        <label class="race-circuit-filter"><span>Circuit</span><input id="wec-race-circuit" type="search" list="wec-race-circuit-options" placeholder="All circuits" autocomplete="off"><datalist id="wec-race-circuit-options"></datalist></label>
+      </div>
+      <details class="race-more-filters" id="wec-race-more-filters" open>
+        <summary>More filters <span id="wec-race-more-filter-count"></span></summary>
+        <div class="race-filter-advanced">
+          <label><span>Status</span><select id="wec-race-status"><option value="">All statuses</option><option value="upcoming">Upcoming</option><option value="completed">Completed</option><option value="no-result">No result</option></select></label>
+          <label><span>Format</span><select id="wec-race-format"><option value="">All formats</option><option value="6h">6 hours</option><option value="8h">8 hours</option><option value="24h">24 hours</option><option value="distance">Distance race</option><option value="other">Other duration</option></select></label>
+          <label><span>Order</span><select id="wec-race-sort"><option value="newest">Newest first</option><option value="oldest">Oldest first</option></select></label>
+        </div>
+      </details>
+      <button id="clear-wec-race-filters" class="button race-clear-filters" type="button" disabled>Clear filters</button>
+    </section>
+    <div id="wec-race-active-filters" class="race-active-filters" aria-label="Active filters"></div>
+    <div id="wec-race-browser-heading" class="race-browser-heading" aria-live="polite"><strong id="wec-race-count">Loading races…</strong><span id="wec-race-filter-note"></span></div>
+    <div id="wec-races" class="race-archive" aria-busy="true"><div class="race-archive-loading">Loading the WEC race archive…</div></div>
+    <nav id="wec-races-pagination" class="pagination race-season-pagination" aria-label="WEC race archive seasons"></nav>
+  </main>
+  <footer class="footer"><div class="container">Racelytic</div></footer>
+  <script src="/js/utils.js"></script>
+  <script src="/js/header.js"></script>
+  <script src="/js/wec-races.js"></script>
+</body>
+</html>

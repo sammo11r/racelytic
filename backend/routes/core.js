@@ -161,18 +161,18 @@ router.get('/api/health', async (req, res) => {
 });
 
 const SERIES_PARENTS = {
-    driver: { f1: '/drivers', f2: '/f2/drivers', f3: '/f3/drivers', academy: '/academy/drivers', fe: '/formula-e/drivers' },
-    constructor: { f1: '/constructors', f2: '/f2/constructors', f3: '/f3/teams', academy: '/academy/teams', fe: '/formula-e/teams' },
-    circuit: { f1: '/circuits', f2: '/f2/circuits', f3: '/f3/circuits', academy: '/academy/circuits', fe: '/formula-e/circuits' },
-    race: { f1: '/races', f2: '/f2/races', f3: '/f3/races', academy: '/academy/races', fe: '/formula-e/races' },
-    season: { f1: '/seasons', f2: '/f2/seasons', f3: '/f3/seasons', academy: '/academy/seasons', fe: '/formula-e/seasons' }
+    driver: { f1: '/drivers', f2: '/f2/drivers', f3: '/f3/drivers', academy: '/academy/drivers', fe: '/formula-e/drivers', wec: '/wec' },
+    constructor: { f1: '/constructors', f2: '/f2/constructors', f3: '/f3/teams', academy: '/academy/teams', fe: '/formula-e/teams', wec: '/wec' },
+    circuit: { f1: '/circuits', f2: '/f2/circuits', f3: '/f3/circuits', academy: '/academy/circuits', fe: '/formula-e/circuits', wec: '/wec' },
+    race: { f1: '/races', f2: '/f2/races', f3: '/f3/races', academy: '/academy/races', fe: '/formula-e/races', wec: '/wec/races' },
+    season: { f1: '/seasons', f2: '/f2/seasons', f3: '/f3/seasons', academy: '/academy/seasons', fe: '/formula-e/seasons', wec: '/wec/seasons' }
 };
 
 router.get('/api/series-equivalent', async (req, res) => {
     const target = String(req.query.target || '').toLowerCase();
     const type = String(req.query.type || '').toLowerCase();
     const id = String(req.query.id || '').trim().slice(0, 120);
-    const validSeries = ['f1', 'f2', 'f3', 'academy', 'fe'];
+    const validSeries = ['f1', 'f2', 'f3', 'academy', 'fe', 'wec'];
     const validTarget = validSeries.includes(target);
     if (!validTarget || !SERIES_PARENTS[type] || !id) {
         return res.status(400).json({ error: 'Invalid series equivalent request.' });
@@ -182,13 +182,13 @@ router.get('/api/series-equivalent', async (req, res) => {
         const equivalentId = await withConnection(async connection => {
             let rows;
             if (type === 'season') {
-                const table = target === 'academy' ? 'fa_seasons' : target === 'fe' ? 'fe_seasons' : target === 'f3' ? 'f3_seasons' : target === 'f2' ? 'f2_seasons' : 'seasons';
+                const table = target === 'wec' ? 'wec_seasons' : target === 'academy' ? 'fa_seasons' : target === 'fe' ? 'fe_seasons' : target === 'f3' ? 'f3_seasons' : target === 'f2' ? 'f2_seasons' : 'seasons';
                 rows = await connection.query(`SELECT year AS id FROM \`${table}\` WHERE year = ? LIMIT 1`, [id]);
             } else if (type === 'driver') {
                 const source = validSeries.includes(String(req.query.source || '').toLowerCase())
                     ? String(req.query.source).toLowerCase()
                     : target === 'f2' ? 'f1' : 'f2';
-                const driverTables = { f1: 'drivers', f2: 'f2_drivers', f3: 'f3_drivers', academy: 'fa_drivers', fe: 'fe_drivers' };
+                const driverTables = { f1: 'drivers', f2: 'f2_drivers', f3: 'f3_drivers', academy: 'fa_drivers', fe: 'fe_drivers', wec: 'wec_drivers' };
                 const sourceTable = driverTables[source];
                 const targetTable = driverTables[target];
                 rows = await connection.query(`
@@ -202,7 +202,7 @@ router.get('/api/series-equivalent', async (req, res) => {
                 const source = validSeries.includes(String(req.query.source || '').toLowerCase())
                     ? String(req.query.source).toLowerCase()
                     : target === 'f2' ? 'f1' : 'f2';
-                const constructorTables = { f1: 'constructors', f2: 'f2_constructors', f3: 'f3_constructors', academy: 'fa_constructors', fe: 'fe_constructors' };
+                const constructorTables = { f1: 'constructors', f2: 'f2_constructors', f3: 'f3_constructors', academy: 'fa_constructors', fe: 'fe_constructors', wec: 'wec_teams' };
                 const sourceTable = constructorTables[source];
                 const targetTable = constructorTables[target];
                 const sourceNames = source === 'f1'
@@ -221,7 +221,7 @@ router.get('/api/series-equivalent', async (req, res) => {
                 const source = validSeries.includes(String(req.query.source || '').toLowerCase())
                     ? String(req.query.source).toLowerCase()
                     : target === 'f2' ? 'f1' : 'f2';
-                const circuitTables = { f1: 'circuits', f2: 'f2_circuits', f3: 'f3_circuits', academy: 'fa_circuits', fe: 'fe_circuits' };
+                const circuitTables = { f1: 'circuits', f2: 'f2_circuits', f3: 'f3_circuits', academy: 'fa_circuits', fe: 'fe_circuits', wec: 'wec_circuits' };
                 const sourceTable = circuitTables[source];
                 const targetTable = circuitTables[target];
                 const circuitNames = source === 'f1'
@@ -240,8 +240,8 @@ router.get('/api/series-equivalent', async (req, res) => {
                 const source = validSeries.includes(String(req.query.source || '').toLowerCase())
                     ? String(req.query.source).toLowerCase()
                     : target === 'f1' ? 'f2' : 'f1';
-                const raceTables = { f1: 'races', f2: 'f2_races', f3: 'f3_races', academy: 'fa_races', fe: 'fe_races' };
-                const circuitTables = { f1: 'circuits', f2: 'f2_circuits', f3: 'f3_circuits', academy: 'fa_circuits', fe: 'fe_circuits' };
+                const raceTables = { f1: 'races', f2: 'f2_races', f3: 'f3_races', academy: 'fa_races', fe: 'fe_races', wec: 'wec_events' };
+                const circuitTables = { f1: 'circuits', f2: 'f2_circuits', f3: 'f3_circuits', academy: 'fa_circuits', fe: 'fe_circuits', wec: 'wec_circuits' };
                 const sourceRaceTable = raceTables[source];
                 const targetRaceTable = raceTables[target];
                 const sourceCircuitTable = circuitTables[source];
@@ -268,7 +268,7 @@ router.get('/api/series-equivalent', async (req, res) => {
 
         const parent = SERIES_PARENTS[type][target];
         if (equivalentId === null) return res.json({ matched: false, url: parent });
-        const targetPath = ['f3', 'academy', 'fe'].includes(target) && type === 'constructor' ? 'team' : type;
+        const targetPath = (['f3', 'academy', 'fe', 'wec'].includes(target) && type === 'constructor') ? 'team' : type;
         res.json({ matched: true, url: resourcePath(target, targetPath, equivalentId) });
     } catch (error) {
         sendError(res, error);

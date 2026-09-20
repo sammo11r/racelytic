@@ -11,11 +11,22 @@ function databasePool() {
 
 const DATA_DIR = path.join(__dirname, '../../data');
 const IMPORT_LOCK = 'racelytic:data-import';
-const SERIES_FILE_PREFIX = Object.freeze({ f1: 'f1db-', f2: 'f2db-', f3: 'f3db-', academy: 'fadb-', fe: 'fedb-' });
+const SERIES_FILE_PREFIX = Object.freeze({ f1: 'f1db-', f2: 'f2db-', f3: 'f3db-', academy: 'fadb-', fe: 'fedb-', wec: 'wecdb-' });
+const TABLE_INDEXES = Object.freeze({
+  wec_events: [['idx_wec_events_season_round', ['seasonId', 'round']], ['idx_wec_events_year_round', ['year', 'round']]],
+  wec_competitors: [['idx_wec_competitors_season', ['seasonId']]],
+  wec_entries: [['idx_wec_entries_event', ['eventId']], ['idx_wec_entries_season', ['seasonId']], ['idx_wec_entries_competitor', ['competitorId']]],
+  wec_entry_drivers: [['idx_wec_entry_drivers_event_entry', ['eventId', 'entryId']], ['idx_wec_entry_drivers_driver_event', ['driverId', 'eventId']]],
+  wec_sessions: [['idx_wec_sessions_event', ['eventId']], ['idx_wec_sessions_season', ['seasonId']]],
+  wec_session_results: [['idx_wec_results_event_session_entry', ['eventId', 'sessionId', 'entryId']], ['idx_wec_results_entry_event', ['entryId', 'eventId']]],
+  wec_championships: [['idx_wec_championships_season', ['seasonId']]],
+  wec_standings: [['idx_wec_standings_championship_round', ['championshipId', 'round']], ['idx_wec_standings_entity', ['entityId']]]
+});
 
 function tableNameFromFile(filename) {
   if (/^fadb-/i.test(filename)) return `fa_${filename.replace(/^fadb-/i, '').replace(/\.csv$/i, '').replace(/-/g, '_')}`;
   if (/^fedb-/i.test(filename)) return `fe_${filename.replace(/^fedb-/i, '').replace(/\.csv$/i, '').replace(/-/g, '_')}`;
+  if (/^wecdb-/i.test(filename)) return `wec_${filename.replace(/^wecdb-/i, '').replace(/\.csv$/i, '').replace(/-/g, '_')}`;
   const match = filename.toLowerCase().match(/^f([123])db-/);
   const series = match && match[1] !== '1' ? `f${match[1]}_` : '';
   return series + filename.replace(/^f[123]db-/i, '').replace(/\.csv$/i, '').replace(/-/g, '_');
@@ -24,6 +35,12 @@ function tableNameFromFile(filename) {
 function identifier(value) {
   if (!/^[a-zA-Z0-9_]+$/.test(value)) throw new Error(`Unsafe SQL identifier: ${value}`);
   return `\`${value}\``;
+}
+
+function indexesForTable(table, columns) {
+  return (TABLE_INDEXES[table] || [])
+    .filter(([, indexColumns]) => indexColumns.every(column => columns.includes(column)))
+    .map(([name, indexColumns]) => `KEY ${identifier(name)} (${indexColumns.map(identifier).join(',')})`);
 }
 
 function isInteger(value) { return /^-?\d+$/.test(value); }
@@ -44,6 +61,7 @@ function inferType(column, values) {
   const clean = values.filter(value => value !== null && value !== undefined && value !== '');
   if (!clean.length) return 'TEXT';
   const name = column.toLowerCase();
+  if (name === 'carnumber') return 'VARCHAR(20)';
   if (name === 'id' || name.endsWith('id') || name.includes('code')) return 'VARCHAR(100)';
   if ((name === 'date' || name.endsWith('date')) && clean.every(isDate)) return 'DATE';
   if ((name === 'year' || name.includes('position') || name.includes('laps') || name.includes('round') || name.includes('number') || name.includes('stops') || name.includes('millis')) && clean.every(isInteger)) return 'BIGINT';
@@ -76,7 +94,7 @@ function selectedFilePrefixes(series) {
 async function loadDatasets(dataDirectory = DATA_DIR, options = {}) {
   const prefixes = selectedFilePrefixes(options.series);
   const files = fs.readdirSync(dataDirectory)
-    .filter(file => /^(?:f[123]db|fadb|fedb)-.*\.csv$/i.test(file))
+    .filter(file => /^(?:f[123]db|fadb|fedb|wecdb)-.*\.csv$/i.test(file))
     .filter(file => !prefixes || [...prefixes].some(prefix => file.toLowerCase().startsWith(prefix)))
     .sort();
   if (!files.length) throw new Error(`No matching database CSV files found in ${dataDirectory}.`);
@@ -102,6 +120,7 @@ async function createTable(connection, table, rows, sourceTable = table) {
   if (sourceTable === 'constructors_chronology') {
     definitions.push('KEY `idx_lineage_id` (`lineageId`)', 'KEY `idx_constructor_id` (`constructorId`)');
   }
+  definitions.push(...indexesForTable(sourceTable, columns));
   await connection.query(`CREATE TABLE ${identifier(table)} (${definitions.join(',')}) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`);
 }
 
@@ -217,6 +236,7 @@ async function importAll(options = {}) {
 module.exports = {
   importAll,
   inferType,
+  indexesForTable,
   loadDatasets,
   normalizedImportValue,
   selectedFilePrefixes,

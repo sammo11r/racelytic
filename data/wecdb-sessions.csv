@@ -1,0 +1,574 @@
+id,eventId,seasonId,name,type,classId,startTimeUtc,status
+wec-2012-r1-sebring-race,wec-2012-r1-sebring,wec-2012,Race,race,,2012-03-17T14:30:00.000Z,completed
+wec-2012-r1-sebring-free-practice-1,wec-2012-r1-sebring,wec-2012,Free Practice 1,practice,,2012-03-15T14:00:00.000Z,completed
+wec-2012-r1-sebring-free-practice-2,wec-2012-r1-sebring,wec-2012,Free Practice 2,practice,,2012-03-15T18:50:00.000Z,completed
+wec-2012-r1-sebring-free-practice-3,wec-2012-r1-sebring,wec-2012,Free Practice 3,practice,,2012-03-15T23:35:00.000Z,completed
+wec-2012-r1-sebring-free-practice-4,wec-2012-r1-sebring,wec-2012,Free Practice 4,practice,,2012-03-16T13:55:00.000Z,completed
+wec-2012-r1-sebring-qualifying-practice,wec-2012-r1-sebring,wec-2012,Qualifying Practice,qualifying,,2012-03-16T19:20:00.000Z,completed
+wec-2012-r2-spa-race,wec-2012-r2-spa,wec-2012,Race,race,,2012-05-05T12:30:00.000Z,completed
+wec-2012-r2-spa-free-practice-1,wec-2012-r2-spa,wec-2012,Free Practice 1,practice,,2012-05-03T09:45:00.000Z,completed
+wec-2012-r2-spa-free-practice-2,wec-2012-r2-spa,wec-2012,Free Practice 2,practice,,2012-05-03T14:50:00.000Z,completed
+wec-2012-r2-spa-free-practice-3,wec-2012-r2-spa,wec-2012,Free Practice 3,practice,,2012-05-04T08:00:00.000Z,completed
+wec-2012-r2-spa-qualifying-practice,wec-2012-r2-spa,wec-2012,Qualifying Practice,qualifying,,2012-05-04T13:10:00.000Z,completed
+wec-2012-r2-spa-warm-up,wec-2012-r2-spa,wec-2012,Warm Up,warm-up,,2012-05-05T08:05:00.000Z,completed
+wec-2012-r3-le-mans-race,wec-2012-r3-le-mans,wec-2012,Race,race,,2012-06-16T13:00:00.000Z,completed
+wec-2012-r3-le-mans-free-practice,wec-2012-r3-le-mans,wec-2012,Free Practice,practice,,2012-06-13T14:00:00.000Z,completed
+wec-2012-r3-le-mans-qualifying-practice-session-1,wec-2012-r3-le-mans,wec-2012,Qualifying Practice Session 1,qualifying,,2012-06-13T20:00:00.000Z,completed
+wec-2012-r3-le-mans-qualifying-practice-session-2,wec-2012-r3-le-mans,wec-2012,Qualifying Practice Session 2,qualifying,,2012-06-14T17:00:00.000Z,completed
+wec-2012-r3-le-mans-qualifying-practice-session-3,wec-2012-r3-le-mans,wec-2012,Qualifying Practice Session 3,qualifying,,2012-06-14T20:00:00.000Z,completed
+wec-2012-r3-le-mans-warm-up,wec-2012-r3-le-mans,wec-2012,Warm Up,warm-up,,2012-06-16T07:00:00.000Z,completed
+wec-2012-r4-silverstone-race,wec-2012-r4-silverstone,wec-2012,Race,race,,2012-08-26T11:00:00.000Z,completed
+wec-2012-r4-silverstone-free-practice-1,wec-2012-r4-silverstone,wec-2012,Free Practice 1,practice,,2012-08-24T10:30:00.000Z,completed
+wec-2012-r4-silverstone-free-practice-2,wec-2012-r4-silverstone,wec-2012,Free Practice 2,practice,,2012-08-24T15:00:00.000Z,completed
+wec-2012-r4-silverstone-free-practice-3,wec-2012-r4-silverstone,wec-2012,Free Practice 3,practice,,2012-08-25T10:00:00.000Z,completed
+wec-2012-r4-silverstone-qualifying-practice,wec-2012-r4-silverstone,wec-2012,Qualifying Practice,qualifying,,2012-08-25T13:50:00.000Z,completed
+wec-2012-r4-silverstone-warm-up,wec-2012-r4-silverstone,wec-2012,Warm Up,warm-up,,2012-08-26T07:55:00.000Z,completed
+wec-2012-r5-sao-paulo-race,wec-2012-r5-sao-paulo,wec-2012,Race,race,,2012-09-15T15:00:00.000Z,completed
+wec-2012-r5-sao-paulo-free-practice-1,wec-2012-r5-sao-paulo,wec-2012,Free Practice 1,practice,,2012-09-13T14:00:00.000Z,completed
+wec-2012-r5-sao-paulo-free-practice-2,wec-2012-r5-sao-paulo,wec-2012,Free Practice 2,practice,,2012-09-13T18:30:00.000Z,completed
+wec-2012-r5-sao-paulo-free-practice-3,wec-2012-r5-sao-paulo,wec-2012,Free Practice 3,practice,,2012-09-14T12:45:00.000Z,completed
+wec-2012-r5-sao-paulo-qualifying-practice,wec-2012-r5-sao-paulo,wec-2012,Qualifying Practice,qualifying,,2012-09-14T17:00:00.000Z,completed
+wec-2012-r5-sao-paulo-warm-up,wec-2012-r5-sao-paulo,wec-2012,Warm Up,warm-up,,2012-09-15T11:00:00.000Z,completed
+wec-2012-r6-bahrain-race,wec-2012-r6-bahrain,wec-2012,Race,race,,2012-09-29T13:00:00.000Z,completed
+wec-2012-r6-bahrain-free-practice-1,wec-2012-r6-bahrain,wec-2012,Free Practice 1,practice,,2012-09-27T13:00:00.000Z,completed
+wec-2012-r6-bahrain-free-practice-2,wec-2012-r6-bahrain,wec-2012,Free Practice 2,practice,,2012-09-27T17:30:00.000Z,completed
+wec-2012-r6-bahrain-free-practice-3,wec-2012-r6-bahrain,wec-2012,Free Practice 3,practice,,2012-09-28T07:50:00.000Z,completed
+wec-2012-r6-bahrain-qualifying-practice,wec-2012-r6-bahrain,wec-2012,Qualifying Practice,qualifying,,2012-09-28T13:00:00.000Z,completed
+wec-2012-r6-bahrain-warm-up,wec-2012-r6-bahrain,wec-2012,Warm Up,warm-up,,2012-09-29T09:25:00.000Z,completed
+wec-2012-r7-fuji-race,wec-2012-r7-fuji,wec-2012,Race,race,,2012-10-14T02:00:00.000Z,completed
+wec-2012-r7-fuji-free-practice-1,wec-2012-r7-fuji,wec-2012,Free Practice 1,practice,,2012-10-12T02:00:00.000Z,completed
+wec-2012-r7-fuji-free-practice-2,wec-2012-r7-fuji,wec-2012,Free Practice 2,practice,,2012-10-12T06:30:00.000Z,completed
+wec-2012-r7-fuji-free-practice-3,wec-2012-r7-fuji,wec-2012,Free Practice 3,practice,,2012-10-13T00:25:00.000Z,completed
+wec-2012-r7-fuji-qualifying-practice,wec-2012-r7-fuji,wec-2012,Qualifying Practice,qualifying,,2012-10-13T04:30:00.000Z,completed
+wec-2012-r7-fuji-warm-up,wec-2012-r7-fuji,wec-2012,Warm Up,warm-up,,2012-10-13T22:55:00.000Z,completed
+wec-2012-r8-shanghai-race,wec-2012-r8-shanghai,wec-2012,Race,race,,2012-10-28T03:00:00.000Z,completed
+wec-2012-r8-shanghai-free-practice-1,wec-2012-r8-shanghai,wec-2012,Free Practice 1,practice,,2012-10-26T02:35:00.000Z,completed
+wec-2012-r8-shanghai-free-practice-2,wec-2012-r8-shanghai,wec-2012,Free Practice 2,practice,,2012-10-26T07:30:00.000Z,completed
+wec-2012-r8-shanghai-free-practice-3,wec-2012-r8-shanghai,wec-2012,Free Practice 3,practice,,2012-10-27T01:15:00.000Z,completed
+wec-2012-r8-shanghai-qualifying-practice,wec-2012-r8-shanghai,wec-2012,Qualifying Practice,qualifying,,2012-10-27T05:25:00.000Z,completed
+wec-2013-r1-silverstone-race,wec-2013-r1-silverstone,wec-2013,Race,race,,2013-04-14T11:00:00.000Z,completed
+wec-2013-r1-silverstone-free-practice-1,wec-2013-r1-silverstone,wec-2013,FREE PRACTICE 1,practice,,2013-04-12T11:25:00.000Z,completed
+wec-2013-r1-silverstone-free-practice-2,wec-2013-r1-silverstone,wec-2013,FREE PRACTICE 2,practice,,2013-04-12T15:30:00.000Z,completed
+wec-2013-r1-silverstone-free-practice-3,wec-2013-r1-silverstone,wec-2013,FREE PRACTICE 3,practice,,2013-04-13T08:00:00.000Z,completed
+wec-2013-r2-spa-race,wec-2013-r2-spa,wec-2013,Race,race,,2013-05-04T12:30:00.000Z,completed
+wec-2013-r2-spa-free-practice-1,wec-2013-r2-spa,wec-2013,Free Practice 1,practice,,2013-05-03T07:00:00.000Z,completed
+wec-2013-r2-spa-free-practice-2,wec-2013-r2-spa,wec-2013,Free Practice 2,practice,,2013-05-03T12:30:00.000Z,completed
+wec-2013-r2-spa-warm-up,wec-2013-r2-spa,wec-2013,Warm up,warm-up,,2013-05-04T07:00:00.000Z,completed
+wec-2013-r3-le-mans-race,wec-2013-r3-le-mans,wec-2013,Race,race,,2013-06-22T13:00:00.000Z,completed
+wec-2013-r3-le-mans-free-practice,wec-2013-r3-le-mans,wec-2013,Free Practice,practice,,2013-06-19T14:00:00.000Z,completed
+wec-2013-r3-le-mans-qualifying-practice-1,wec-2013-r3-le-mans,wec-2013,Qualifying Practice 1,qualifying,,2013-06-19T20:00:00.000Z,completed
+wec-2013-r3-le-mans-qualifying-practice-2,wec-2013-r3-le-mans,wec-2013,Qualifying Practice 2,qualifying,,2013-06-20T17:00:00.000Z,completed
+wec-2013-r3-le-mans-qualifying-practice-3,wec-2013-r3-le-mans,wec-2013,Qualifying Practice 3,qualifying,,2013-06-20T19:30:00.000Z,completed
+wec-2013-r3-le-mans-warm-up,wec-2013-r3-le-mans,wec-2013,Warm Up,warm-up,,2013-06-22T07:00:00.000Z,completed
+wec-2013-r4-sao-paulo-race,wec-2013-r4-sao-paulo,wec-2013,Race,race,,2013-09-01T15:00:00.000Z,completed
+wec-2013-r4-sao-paulo-free-practice-1,wec-2013-r4-sao-paulo,wec-2013,Free Practice 1,practice,,2013-08-30T14:05:00.000Z,completed
+wec-2013-r4-sao-paulo-free-practice-2,wec-2013-r4-sao-paulo,wec-2013,Free Practice 2,practice,,2013-08-30T18:40:00.000Z,completed
+wec-2013-r4-sao-paulo-free-practice-3,wec-2013-r4-sao-paulo,wec-2013,Free Practice 3,practice,,2013-08-31T13:20:00.000Z,completed
+wec-2013-r5-cota-race,wec-2013-r5-cota,wec-2013,Race,race,,2013-09-22T16:00:00.000Z,completed
+wec-2013-r5-cota-free-practice-1,wec-2013-r5-cota,wec-2013,Free Practice 1,practice,,2013-09-20T14:15:00.000Z,completed
+wec-2013-r5-cota-free-practice-2,wec-2013-r5-cota,wec-2013,Free Practice 2,practice,,2013-09-20T20:25:00.000Z,completed
+wec-2013-r5-cota-free-practice-3,wec-2013-r5-cota,wec-2013,Free Practice 3,practice,,2013-09-21T13:40:00.000Z,completed
+wec-2013-r6-fuji-race,wec-2013-r6-fuji,wec-2013,Race,race,,2013-10-20T02:00:00.000Z,completed
+wec-2013-r6-fuji-free-practice-1,wec-2013-r6-fuji,wec-2013,Free Practice 1,practice,,2013-10-18T02:00:00.000Z,completed
+wec-2013-r6-fuji-free-practice-2,wec-2013-r6-fuji,wec-2013,Free Practice 2,practice,,2013-10-18T06:30:00.000Z,completed
+wec-2013-r6-fuji-free-practice-3,wec-2013-r6-fuji,wec-2013,Free Practice 3,practice,,2013-10-19T00:30:00.000Z,completed
+wec-2013-r7-shanghai-race,wec-2013-r7-shanghai,wec-2013,Race,race,,2013-11-09T03:00:00.000Z,completed
+wec-2013-r7-shanghai-free-practice-1,wec-2013-r7-shanghai,wec-2013,Free Practice 1,practice,,2013-11-08T00:00:00.000Z,completed
+wec-2013-r7-shanghai-free-practice-2,wec-2013-r7-shanghai,wec-2013,Free Practice 2,practice,,2013-11-08T04:00:00.000Z,completed
+wec-2013-r8-bahrain-race,wec-2013-r8-bahrain,wec-2013,Race,race,,2013-11-30T12:00:00.000Z,completed
+wec-2013-r8-bahrain-free-practice-1,wec-2013-r8-bahrain,wec-2013,Free Practice 1,practice,,2013-11-28T12:15:00.000Z,completed
+wec-2013-r8-bahrain-free-practice-2,wec-2013-r8-bahrain,wec-2013,Free Practice 2,practice,,2013-11-28T16:30:00.000Z,completed
+wec-2013-r8-bahrain-free-practice-3,wec-2013-r8-bahrain,wec-2013,Free Practice 3,practice,,2013-11-29T07:25:00.000Z,completed
+wec-2014-r1-silverstone-race,wec-2014-r1-silverstone,wec-2014,Race,race,,2014-04-20T11:00:00.000Z,completed
+wec-2014-r1-silverstone-free-practice-1,wec-2014-r1-silverstone,wec-2014,Free Practice 1,practice,,2014-04-18T10:55:00.000Z,completed
+wec-2014-r1-silverstone-free-practice-2,wec-2014-r1-silverstone,wec-2014,Free Practice 2,practice,,2014-04-18T14:55:00.000Z,completed
+wec-2014-r1-silverstone-free-practice-3,wec-2014-r1-silverstone,wec-2014,Free Practice 3,practice,,2014-04-19T08:00:00.000Z,completed
+wec-2014-r2-spa-race,wec-2014-r2-spa,wec-2014,Race,race,,2014-05-03T12:30:00.000Z,completed
+wec-2014-r2-spa-free-practice-1,wec-2014-r2-spa,wec-2014,Free Practice 1,practice,,2014-05-02T07:00:00.000Z,completed
+wec-2014-r2-spa-free-practice-2,wec-2014-r2-spa,wec-2014,Free Practice 2,practice,,2014-05-02T12:15:00.000Z,completed
+wec-2014-r3-le-mans-race,wec-2014-r3-le-mans,wec-2014,Race,race,,2014-06-14T13:00:00.000Z,completed
+wec-2014-r3-le-mans-free-practice,wec-2014-r3-le-mans,wec-2014,Free Practice,practice,,2014-06-11T14:00:00.000Z,completed
+wec-2014-r3-le-mans-qualifying-practice-1,wec-2014-r3-le-mans,wec-2014,Qualifying Practice 1,qualifying,,2014-06-11T20:00:00.000Z,completed
+wec-2014-r3-le-mans-qualifying-practice-2,wec-2014-r3-le-mans,wec-2014,Qualifying Practice 2,qualifying,,2014-06-12T17:00:00.000Z,completed
+wec-2014-r3-le-mans-qualifying-practice-3,wec-2014-r3-le-mans,wec-2014,Qualifying Practice 3,qualifying,,2014-06-12T19:30:00.000Z,completed
+wec-2014-r3-le-mans-warm-up,wec-2014-r3-le-mans,wec-2014,Warm Up,warm-up,,2014-06-14T07:00:00.000Z,completed
+wec-2014-r4-cota-race,wec-2014-r4-cota,wec-2014,Race,race,,2014-09-20T22:00:00.000Z,completed
+wec-2014-r4-cota-free-practice-1,wec-2014-r4-cota,wec-2014,Free Practice 1,practice,,2014-09-18T19:45:00.000Z,completed
+wec-2014-r4-cota-free-practice-2,wec-2014-r4-cota,wec-2014,Free Practice 2,practice,,2014-09-19T00:30:00.000Z,completed
+wec-2014-r4-cota-free-practice-3,wec-2014-r4-cota,wec-2014,Free Practice 3,practice,,2014-09-19T15:20:00.000Z,completed
+wec-2014-r5-fuji-race,wec-2014-r5-fuji,wec-2014,Race,race,,2014-10-12T02:00:00.000Z,completed
+wec-2014-r5-fuji-free-practice-1,wec-2014-r5-fuji,wec-2014,Free Practice 1,practice,,2014-10-10T02:00:00.000Z,completed
+wec-2014-r5-fuji-free-practice-2,wec-2014-r5-fuji,wec-2014,Free Practice 2,practice,,2014-10-10T06:30:00.000Z,completed
+wec-2014-r5-fuji-free-practice-3,wec-2014-r5-fuji,wec-2014,Free Practice 3,practice,,2014-10-11T00:30:00.000Z,completed
+wec-2014-r6-shanghai-race,wec-2014-r6-shanghai,wec-2014,Race,race,,2014-11-02T03:00:00.000Z,completed
+wec-2014-r6-shanghai-free-practice-1,wec-2014-r6-shanghai,wec-2014,Free Practice 1,practice,,2014-10-31T02:45:00.000Z,completed
+wec-2014-r6-shanghai-free-practice-2,wec-2014-r6-shanghai,wec-2014,Free Practice 2,practice,,2014-10-31T07:30:00.000Z,completed
+wec-2014-r6-shanghai-free-practice-3,wec-2014-r6-shanghai,wec-2014,Free Practice 3,practice,,2014-11-01T01:30:00.000Z,completed
+wec-2014-r7-bahrain-race,wec-2014-r7-bahrain,wec-2014,Race,race,,2014-11-15T12:00:00.000Z,completed
+wec-2014-r7-bahrain-free-practice-1,wec-2014-r7-bahrain,wec-2014,Free Practice 1,practice,,2014-11-13T12:15:00.000Z,completed
+wec-2014-r7-bahrain-free-practice-2,wec-2014-r7-bahrain,wec-2014,Free Practice 2,practice,,2014-11-13T16:30:00.000Z,completed
+wec-2014-r7-bahrain-free-practice-3,wec-2014-r7-bahrain,wec-2014,Free Practice 3,practice,,2014-11-14T08:10:00.000Z,completed
+wec-2014-r8-sao-paulo-race,wec-2014-r8-sao-paulo,wec-2014,Race,race,,2014-11-30T15:00:00.000Z,completed
+wec-2014-r8-sao-paulo-free-practice-1,wec-2014-r8-sao-paulo,wec-2014,Free Practice 1,practice,,2014-11-28T15:10:00.000Z,completed
+wec-2014-r8-sao-paulo-free-practice-2,wec-2014-r8-sao-paulo,wec-2014,Free Practice 2,practice,,2014-11-28T19:30:00.000Z,completed
+wec-2014-r8-sao-paulo-free-practice-3,wec-2014-r8-sao-paulo,wec-2014,Free Practice 3,practice,,2014-11-29T12:00:00.000Z,completed
+wec-2015-r1-silverstone-race,wec-2015-r1-silverstone,wec-2015,Race,race,,2015-04-12T11:30:00.000Z,completed
+wec-2015-r1-silverstone-free-practice-1,wec-2015-r1-silverstone,wec-2015,Free Practice 1,practice,,2015-04-10T10:55:00.000Z,completed
+wec-2015-r1-silverstone-free-practice-2,wec-2015-r1-silverstone,wec-2015,Free Practice 2,practice,,2015-04-10T14:55:00.000Z,completed
+wec-2015-r1-silverstone-free-practice-3,wec-2015-r1-silverstone,wec-2015,Free Practice 3,practice,,2015-04-11T08:00:00.000Z,completed
+wec-2015-r2-spa-race,wec-2015-r2-spa,wec-2015,Race,race,,2015-05-02T12:30:00.000Z,completed
+wec-2015-r2-spa-free-practice-1,wec-2015-r2-spa,wec-2015,Free Practice 1,practice,,2015-04-30T10:00:00.000Z,completed
+wec-2015-r2-spa-free-practice-2,wec-2015-r2-spa,wec-2015,Free Practice 2,practice,,2015-04-30T14:30:00.000Z,completed
+wec-2015-r2-spa-free-practice-3,wec-2015-r2-spa,wec-2015,Free Practice 3,practice,,2015-05-01T12:00:00.000Z,completed
+wec-2015-r3-le-mans-race,wec-2015-r3-le-mans,wec-2015,Race,race,,2015-06-13T13:00:00.000Z,completed
+wec-2015-r3-le-mans-free-practice,wec-2015-r3-le-mans,wec-2015,Free Practice,practice,,2015-06-10T14:00:00.000Z,completed
+wec-2015-r3-le-mans-qualifying-practice-1,wec-2015-r3-le-mans,wec-2015,Qualifying Practice 1,qualifying,,2015-06-10T20:00:00.000Z,completed
+wec-2015-r3-le-mans-qualifying-practice-2,wec-2015-r3-le-mans,wec-2015,Qualifying Practice 2,qualifying,,2015-06-11T17:00:00.000Z,completed
+wec-2015-r3-le-mans-qualifying-practice-3,wec-2015-r3-le-mans,wec-2015,Qualifying Practice 3,qualifying,,2015-06-11T19:30:00.000Z,completed
+wec-2015-r3-le-mans-warm-up,wec-2015-r3-le-mans,wec-2015,Warm Up,warm-up,,2015-06-13T07:00:00.000Z,completed
+wec-2015-r4-nurburgring-race,wec-2015-r4-nurburgring,wec-2015,Race,race,,2015-08-30T11:00:00.000Z,completed
+wec-2015-r4-nurburgring-free-practice-1,wec-2015-r4-nurburgring,wec-2015,Free Practice 1,practice,,2015-08-28T10:00:00.000Z,completed
+wec-2015-r4-nurburgring-free-practice-2,wec-2015-r4-nurburgring,wec-2015,Free Practice 2,practice,,2015-08-28T14:30:00.000Z,completed
+wec-2015-r4-nurburgring-free-practice-3,wec-2015-r4-nurburgring,wec-2015,Free Practice 3,practice,,2015-08-29T07:30:00.000Z,completed
+wec-2015-r5-cota-race,wec-2015-r5-cota,wec-2015,Race,race,,2015-09-19T22:00:00.000Z,completed
+wec-2015-r5-cota-free-practice-1,wec-2015-r5-cota,wec-2015,Free Practice 1,practice,,2015-09-17T19:45:00.000Z,completed
+wec-2015-r5-cota-free-practice-2,wec-2015-r5-cota,wec-2015,Free Practice 2,practice,,2015-09-18T01:00:00.000Z,completed
+wec-2015-r5-cota-free-practice-3,wec-2015-r5-cota,wec-2015,Free Practice 3,practice,,2015-09-18T15:30:00.000Z,completed
+wec-2015-r6-fuji-race,wec-2015-r6-fuji,wec-2015,Race,race,,2015-10-11T02:00:00.000Z,completed
+wec-2015-r6-fuji-free-practice-1,wec-2015-r6-fuji,wec-2015,Free Practice 1,practice,,2015-10-09T02:15:00.000Z,completed
+wec-2015-r6-fuji-free-practice-2,wec-2015-r6-fuji,wec-2015,Free Practice 2,practice,,2015-10-09T06:30:00.000Z,completed
+wec-2015-r6-fuji-free-practice-3,wec-2015-r6-fuji,wec-2015,Free Practice 3,practice,,2015-10-10T00:50:00.000Z,completed
+wec-2015-r7-shanghai-race,wec-2015-r7-shanghai,wec-2015,Race,race,,2015-11-01T03:00:00.000Z,completed
+wec-2015-r7-shanghai-free-practice-1,wec-2015-r7-shanghai,wec-2015,Free Practice 1,practice,,2015-10-30T02:47:00.000Z,completed
+wec-2015-r7-shanghai-free-practice-2,wec-2015-r7-shanghai,wec-2015,Free Practice 2,practice,,2015-10-30T07:30:00.000Z,completed
+wec-2015-r7-shanghai-free-practice-3,wec-2015-r7-shanghai,wec-2015,Free Practice 3,practice,,2015-10-31T01:00:00.000Z,completed
+wec-2015-r8-bahrain-race,wec-2015-r8-bahrain,wec-2015,Race,race,,2015-11-21T12:00:00.000Z,completed
+wec-2015-r8-bahrain-free-practice-1,wec-2015-r8-bahrain,wec-2015,Free Practice 1,practice,,2015-11-19T12:15:00.000Z,completed
+wec-2015-r8-bahrain-free-practice-2,wec-2015-r8-bahrain,wec-2015,Free Practice 2,practice,,2015-11-19T16:30:00.000Z,completed
+wec-2015-r8-bahrain-free-practice-3,wec-2015-r8-bahrain,wec-2015,Free Practice 3,practice,,2015-11-20T08:00:00.000Z,completed
+wec-2016-r1-silverstone-race,wec-2016-r1-silverstone,wec-2016,Race,race,,2016-04-17T11:00:00.000Z,completed
+wec-2016-r1-silverstone-free-practice-1,wec-2016-r1-silverstone,wec-2016,Free Practice 1,practice,,2016-04-15T11:15:00.000Z,completed
+wec-2016-r1-silverstone-free-practice-2,wec-2016-r1-silverstone,wec-2016,Free Practice 2,practice,,2016-04-15T15:30:00.000Z,completed
+wec-2016-r2-spa-race,wec-2016-r2-spa,wec-2016,Race,race,,2016-05-07T12:30:00.000Z,completed
+wec-2016-r2-spa-free-practice-1,wec-2016-r2-spa,wec-2016,Free Practice 1,practice,,2016-05-05T10:15:00.000Z,completed
+wec-2016-r2-spa-free-practice-2,wec-2016-r2-spa,wec-2016,Free Practice 2,practice,,2016-05-05T14:30:00.000Z,completed
+wec-2016-r2-spa-free-practice-3,wec-2016-r2-spa,wec-2016,Free Practice 3,practice,,2016-05-06T09:10:00.000Z,completed
+wec-2016-r3-le-mans-race,wec-2016-r3-le-mans,wec-2016,Race,race,,2016-06-18T13:00:00.000Z,completed
+wec-2016-r3-le-mans-free-practice,wec-2016-r3-le-mans,wec-2016,Free Practice,practice,,2016-06-15T14:00:00.000Z,completed
+wec-2016-r3-le-mans-qualifying-practice-1,wec-2016-r3-le-mans,wec-2016,Qualifying Practice 1,qualifying,,2016-06-15T20:00:00.000Z,completed
+wec-2016-r3-le-mans-qualifying-practice-2,wec-2016-r3-le-mans,wec-2016,Qualifying Practice 2,qualifying,,2016-06-16T17:00:00.000Z,completed
+wec-2016-r3-le-mans-qualifying-practice-3,wec-2016-r3-le-mans,wec-2016,Qualifying Practice 3,qualifying,,2016-06-16T20:00:00.000Z,completed
+wec-2016-r3-le-mans-warm-up,wec-2016-r3-le-mans,wec-2016,Warm Up,warm-up,,2016-06-18T07:00:00.000Z,completed
+wec-2016-r4-nurburgring-race,wec-2016-r4-nurburgring,wec-2016,Race,race,,2016-07-24T11:00:00.000Z,completed
+wec-2016-r4-nurburgring-free-practice-1,wec-2016-r4-nurburgring,wec-2016,Free Practice 1,practice,,2016-07-22T10:00:00.000Z,completed
+wec-2016-r4-nurburgring-free-practice-2,wec-2016-r4-nurburgring,wec-2016,Free Practice 2,practice,,2016-07-22T14:30:00.000Z,completed
+wec-2016-r4-nurburgring-free-practice-3,wec-2016-r4-nurburgring,wec-2016,Free Practice 3,practice,,2016-07-23T07:45:00.000Z,completed
+wec-2016-r5-mexico-city-race,wec-2016-r5-mexico-city,wec-2016,Race,race,,2016-09-03T18:30:00.000Z,completed
+wec-2016-r5-mexico-city-free-practice-1,wec-2016-r5-mexico-city,wec-2016,Free Practice 1,practice,,2016-09-01T18:30:00.000Z,completed
+wec-2016-r5-mexico-city-free-practice-2,wec-2016-r5-mexico-city,wec-2016,Free Practice 2,practice,,2016-09-01T23:00:00.000Z,completed
+wec-2016-r5-mexico-city-free-practice-3,wec-2016-r5-mexico-city,wec-2016,Free Practice 3,practice,,2016-09-02T15:00:00.000Z,completed
+wec-2016-r6-cota-race,wec-2016-r6-cota,wec-2016,Race,race,,2016-09-17T22:00:00.000Z,completed
+wec-2016-r6-cota-free-practice-1,wec-2016-r6-cota,wec-2016,Free Practice 1,practice,,2016-09-15T19:45:00.000Z,completed
+wec-2016-r6-cota-free-practice-2,wec-2016-r6-cota,wec-2016,Free Practice 2,practice,,2016-09-16T01:00:00.000Z,completed
+wec-2016-r6-cota-free-practice-3,wec-2016-r6-cota,wec-2016,Free Practice 3,practice,,2016-09-16T15:30:00.000Z,completed
+wec-2016-r7-fuji-race,wec-2016-r7-fuji,wec-2016,Race,race,,2016-10-16T02:00:00.000Z,completed
+wec-2016-r7-fuji-free-practice-1,wec-2016-r7-fuji,wec-2016,Free Practice 1,practice,,2016-10-14T01:45:00.000Z,completed
+wec-2016-r7-fuji-free-practice-2,wec-2016-r7-fuji,wec-2016,Free Practice 2,practice,,2016-10-14T06:30:00.000Z,completed
+wec-2016-r7-fuji-free-practice-3,wec-2016-r7-fuji,wec-2016,Free Practice 3,practice,,2016-10-15T01:00:00.000Z,completed
+wec-2016-r8-shanghai-race,wec-2016-r8-shanghai,wec-2016,Race,race,,2016-11-06T03:00:00.000Z,completed
+wec-2016-r8-shanghai-free-practice-1,wec-2016-r8-shanghai,wec-2016,Free Practice 1,practice,,2016-11-04T02:00:00.000Z,completed
+wec-2016-r8-shanghai-free-practice-2,wec-2016-r8-shanghai,wec-2016,Free Practice 2,practice,,2016-11-04T07:30:00.000Z,completed
+wec-2016-r8-shanghai-free-practice-3,wec-2016-r8-shanghai,wec-2016,Free Practice 3,practice,,2016-11-05T01:00:00.000Z,completed
+wec-2016-r9-bahrain-race,wec-2016-r9-bahrain,wec-2016,Race,race,,2016-11-19T13:00:00.000Z,completed
+wec-2016-r9-bahrain-free-practice-1,wec-2016-r9-bahrain,wec-2016,Free Practice 1,practice,,2016-11-17T12:00:00.000Z,completed
+wec-2016-r9-bahrain-free-practice-2,wec-2016-r9-bahrain,wec-2016,Free Practice 2,practice,,2016-11-17T16:30:00.000Z,completed
+wec-2016-r9-bahrain-free-practice-3,wec-2016-r9-bahrain,wec-2016,Free Practice 3,practice,,2016-11-18T08:30:00.000Z,completed
+wec-2017-r1-silverstone-race,wec-2017-r1-silverstone,wec-2017,Race,race,,2017-04-16T11:00:00.000Z,completed
+wec-2017-r1-silverstone-free-practice-1,wec-2017-r1-silverstone,wec-2017,Free Practice 1,practice,,2017-04-14T10:45:00.000Z,completed
+wec-2017-r1-silverstone-free-practice-2,wec-2017-r1-silverstone,wec-2017,Free Practice 2,practice,,2017-04-14T15:45:00.000Z,completed
+wec-2017-r1-silverstone-free-practice-3,wec-2017-r1-silverstone,wec-2017,Free Practice 3,practice,,2017-04-15T08:40:00.000Z,completed
+wec-2017-r2-spa-race,wec-2017-r2-spa,wec-2017,Race,race,,2017-05-06T12:30:00.000Z,completed
+wec-2017-r2-spa-free-practice-1,wec-2017-r2-spa,wec-2017,Free Practice 1,practice,,2017-05-04T09:45:00.000Z,completed
+wec-2017-r2-spa-free-practice-2,wec-2017-r2-spa,wec-2017,Free Practice 2,practice,,2017-05-04T14:45:00.000Z,completed
+wec-2017-r2-spa-free-practice-3,wec-2017-r2-spa,wec-2017,Free Practice 3,practice,,2017-05-05T08:45:00.000Z,completed
+wec-2017-r3-le-mans-race,wec-2017-r3-le-mans,wec-2017,Race,race,,2017-06-17T13:00:00.000Z,completed
+wec-2017-r3-le-mans-free-practice,wec-2017-r3-le-mans,wec-2017,Free Practice,practice,,2017-06-14T14:00:00.000Z,completed
+wec-2017-r3-le-mans-qualifying-practice-1,wec-2017-r3-le-mans,wec-2017,Qualifying Practice 1,qualifying,,2017-06-14T20:00:00.000Z,completed
+wec-2017-r3-le-mans-qualifying-practice-2,wec-2017-r3-le-mans,wec-2017,Qualifying Practice 2,qualifying,,2017-06-15T17:00:00.000Z,completed
+wec-2017-r3-le-mans-qualifying-practice-3,wec-2017-r3-le-mans,wec-2017,Qualifying Practice 3,qualifying,,2017-06-15T20:00:00.000Z,completed
+wec-2017-r3-le-mans-warm-up,wec-2017-r3-le-mans,wec-2017,Warm Up,warm-up,,2017-06-17T07:00:00.000Z,completed
+wec-2017-r4-nurburgring-race,wec-2017-r4-nurburgring,wec-2017,Race,race,,2017-07-16T11:00:00.000Z,completed
+wec-2017-r4-nurburgring-free-practice-1,wec-2017-r4-nurburgring,wec-2017,Free Practice 1,practice,,2017-07-14T09:35:00.000Z,completed
+wec-2017-r4-nurburgring-free-practice-2,wec-2017-r4-nurburgring,wec-2017,Free Practice 2,practice,,2017-07-14T14:15:00.000Z,completed
+wec-2017-r4-nurburgring-free-practice-3,wec-2017-r4-nurburgring,wec-2017,Free Practice 3,practice,,2017-07-15T07:45:00.000Z,completed
+wec-2017-r5-mexico-city-race,wec-2017-r5-mexico-city,wec-2017,Race,race,,2017-09-03T17:00:00.000Z,completed
+wec-2017-r5-mexico-city-free-practice-1,wec-2017-r5-mexico-city,wec-2017,Free Practice 1,practice,,2017-09-01T22:20:00.000Z,completed
+wec-2017-r5-mexico-city-free-practice-2,wec-2017-r5-mexico-city,wec-2017,Free Practice 2,practice,,2017-09-02T14:30:00.000Z,completed
+wec-2017-r5-mexico-city-free-practice-3,wec-2017-r5-mexico-city,wec-2017,Free Practice 3,practice,,2017-09-02T18:45:00.000Z,completed
+wec-2017-r6-cota-race,wec-2017-r6-cota,wec-2017,Race,race,,2017-09-16T17:00:00.000Z,completed
+wec-2017-r6-cota-free-practice-1,wec-2017-r6-cota,wec-2017,Free Practice 1,practice,,2017-09-14T17:00:00.000Z,completed
+wec-2017-r6-cota-free-practice-2,wec-2017-r6-cota,wec-2017,Free Practice 2,practice,,2017-09-14T21:30:00.000Z,completed
+wec-2017-r6-cota-free-practice-3,wec-2017-r6-cota,wec-2017,Free Practice 3,practice,,2017-09-15T15:00:00.000Z,completed
+wec-2017-r7-fuji-race,wec-2017-r7-fuji,wec-2017,Race,race,,2017-10-15T02:00:00.000Z,completed
+wec-2017-r7-fuji-free-practice-1,wec-2017-r7-fuji,wec-2017,Free Practice 1,practice,,2017-10-13T02:00:00.000Z,completed
+wec-2017-r7-fuji-free-practice-2,wec-2017-r7-fuji,wec-2017,Free Practice 2,practice,,2017-10-13T06:30:00.000Z,completed
+wec-2017-r7-fuji-free-practice-3,wec-2017-r7-fuji,wec-2017,Free Practice 3,practice,,2017-10-14T01:30:00.000Z,completed
+wec-2017-r8-shanghai-race,wec-2017-r8-shanghai,wec-2017,Race,race,,2017-11-05T03:00:00.000Z,completed
+wec-2017-r8-shanghai-free-practice-1,wec-2017-r8-shanghai,wec-2017,Free Practice 1,practice,,2017-11-03T04:30:00.000Z,completed
+wec-2017-r8-shanghai-free-practice-2,wec-2017-r8-shanghai,wec-2017,Free Practice 2,practice,,2017-11-03T07:30:00.000Z,completed
+wec-2017-r8-shanghai-free-practice-3,wec-2017-r8-shanghai,wec-2017,Free Practice 3,practice,,2017-11-04T02:00:00.000Z,completed
+wec-2017-r9-bahrain-race,wec-2017-r9-bahrain,wec-2017,Race,race,,2017-11-18T13:00:00.000Z,completed
+wec-2017-r9-bahrain-free-practice-1,wec-2017-r9-bahrain,wec-2017,Free Practice 1,practice,,2017-11-16T12:00:00.000Z,completed
+wec-2017-r9-bahrain-free-practice-2,wec-2017-r9-bahrain,wec-2017,Free Practice 2,practice,,2017-11-16T16:30:00.000Z,completed
+wec-2017-r9-bahrain-free-practice-3,wec-2017-r9-bahrain,wec-2017,Free Practice 3,practice,,2017-11-17T08:20:00.000Z,completed
+wec-2018-2019-r1-spa-race,wec-2018-2019-r1-spa,wec-2018-2019,Race,race,,2018-05-05T11:30:00.000Z,completed
+wec-2018-2019-r1-spa-free-practice-1,wec-2018-2019-r1-spa,wec-2018-2019,Free Practice 1,practice,,2018-05-03T10:00:00.000Z,completed
+wec-2018-2019-r1-spa-free-practice-2,wec-2018-2019-r1-spa,wec-2018-2019,Free Practice 2,practice,,2018-05-03T14:40:00.000Z,completed
+wec-2018-2019-r1-spa-free-practice-3,wec-2018-2019-r1-spa,wec-2018-2019,Free Practice 3,practice,,2018-05-04T09:00:00.000Z,completed
+wec-2018-2019-r1-spa-qualifying,wec-2018-2019-r1-spa,wec-2018-2019,Qualifying,qualifying,,2018-05-04T13:40:00.000Z,completed
+wec-2018-2019-r2-le-mans-race,wec-2018-2019-r2-le-mans,wec-2018-2019,Race,race,,2018-06-16T13:00:00.000Z,completed
+wec-2018-2019-r2-le-mans-free-practice,wec-2018-2019-r2-le-mans,wec-2018-2019,Free Practice,practice,,2018-06-13T14:00:00.000Z,completed
+wec-2018-2019-r2-le-mans-qualifying-practice-1,wec-2018-2019-r2-le-mans,wec-2018-2019,Qualifying Practice 1,qualifying,,2018-06-13T20:00:00.000Z,completed
+wec-2018-2019-r2-le-mans-qualifying-practice-2,wec-2018-2019-r2-le-mans,wec-2018-2019,Qualifying Practice 2,qualifying,,2018-06-14T17:00:00.000Z,completed
+wec-2018-2019-r2-le-mans-qualifying-practice-3,wec-2018-2019-r2-le-mans,wec-2018-2019,Qualifying Practice 3,qualifying,,2018-06-14T19:30:00.000Z,completed
+wec-2018-2019-r2-le-mans-warm-up,wec-2018-2019-r2-le-mans,wec-2018-2019,Warm Up,warm-up,,2018-06-16T07:00:00.000Z,completed
+wec-2018-2019-r3-silverstone-race,wec-2018-2019-r3-silverstone,wec-2018-2019,Race,race,,2018-08-19T11:00:00.000Z,completed
+wec-2018-2019-r3-silverstone-free-practice-1,wec-2018-2019-r3-silverstone,wec-2018-2019,Free Practice 1,practice,,2018-08-17T11:15:00.000Z,completed
+wec-2018-2019-r3-silverstone-free-practice-2,wec-2018-2019-r3-silverstone,wec-2018-2019,Free Practice 2,practice,,2018-08-17T15:25:00.000Z,completed
+wec-2018-2019-r3-silverstone-free-practice-3,wec-2018-2019-r3-silverstone,wec-2018-2019,Free Practice 3,practice,,2018-08-18T08:00:00.000Z,completed
+wec-2018-2019-r3-silverstone-qualifying,wec-2018-2019-r3-silverstone,wec-2018-2019,Qualifying,qualifying,,2018-08-18T11:40:00.000Z,completed
+wec-2018-2019-r4-fuji-race,wec-2018-2019-r4-fuji,wec-2018-2019,Race,race,,2018-10-14T02:00:00.000Z,completed
+wec-2018-2019-r4-fuji-free-practice-1,wec-2018-2019-r4-fuji,wec-2018-2019,Free Practice 1,practice,,2018-10-12T02:00:00.000Z,completed
+wec-2018-2019-r4-fuji-free-practice-2,wec-2018-2019-r4-fuji,wec-2018-2019,Free Practice 2,practice,,2018-10-12T06:30:00.000Z,completed
+wec-2018-2019-r4-fuji-free-practice-3,wec-2018-2019-r4-fuji,wec-2018-2019,Free Practice 3,practice,,2018-10-13T00:30:00.000Z,completed
+wec-2018-2019-r4-fuji-qualifying,wec-2018-2019-r4-fuji,wec-2018-2019,Qualifying,qualifying,,2018-10-13T05:40:00.000Z,completed
+wec-2018-2019-r5-shanghai-race,wec-2018-2019-r5-shanghai,wec-2018-2019,Race,race,,2018-11-18T03:00:00.000Z,completed
+wec-2018-2019-r5-shanghai-free-practice-1,wec-2018-2019-r5-shanghai,wec-2018-2019,Free Practice 1,practice,,2018-11-16T03:00:00.000Z,completed
+wec-2018-2019-r5-shanghai-free-practice-2,wec-2018-2019-r5-shanghai,wec-2018-2019,Free Practice 2,practice,,2018-11-16T07:30:00.000Z,completed
+wec-2018-2019-r5-shanghai-free-practice-3,wec-2018-2019-r5-shanghai,wec-2018-2019,Free Practice 3,practice,,2018-11-17T01:50:00.000Z,completed
+wec-2018-2019-r5-shanghai-qualifying,wec-2018-2019-r5-shanghai,wec-2018-2019,Qualifying,qualifying,,2018-11-17T06:40:00.000Z,completed
+wec-2018-2019-r6-sebring-race,wec-2018-2019-r6-sebring,wec-2018-2019,Race,race,,2019-03-15T20:00:00.000Z,completed
+wec-2018-2019-r6-sebring-free-practice-1,wec-2018-2019-r6-sebring,wec-2018-2019,Free Practice 1,practice,,2019-03-13T19:00:00.000Z,completed
+wec-2018-2019-r6-sebring-free-practice-2,wec-2018-2019-r6-sebring,wec-2018-2019,Free Practice 2,practice,,2019-03-13T23:45:00.000Z,completed
+wec-2018-2019-r6-sebring-free-practice-3,wec-2018-2019-r6-sebring,wec-2018-2019,Free Practice 3,practice,,2019-03-14T20:15:00.000Z,completed
+wec-2018-2019-r6-sebring-qualifying,wec-2018-2019-r6-sebring,wec-2018-2019,Qualifying,qualifying,,2019-03-15T03:05:00.000Z,completed
+wec-2018-2019-r7-spa-race,wec-2018-2019-r7-spa,wec-2018-2019,Race,race,,2019-05-04T11:30:00.000Z,completed
+wec-2018-2019-r7-spa-free-practice-1,wec-2018-2019-r7-spa,wec-2018-2019,Free Practice 1,practice,,2019-05-02T10:00:00.000Z,completed
+wec-2018-2019-r7-spa-free-practice-2,wec-2018-2019-r7-spa,wec-2018-2019,Free Practice 2,practice,,2019-05-02T14:25:00.000Z,completed
+wec-2018-2019-r7-spa-free-practice-3,wec-2018-2019-r7-spa,wec-2018-2019,Free Practice 3,practice,,2019-05-03T09:00:00.000Z,completed
+wec-2018-2019-r7-spa-qualifying,wec-2018-2019-r7-spa,wec-2018-2019,Qualifying,qualifying,,2019-05-03T13:40:00.000Z,completed
+wec-2018-2019-r8-le-mans-race,wec-2018-2019-r8-le-mans,wec-2018-2019,Race,race,,2019-06-15T13:00:00.000Z,completed
+wec-2018-2019-r8-le-mans-free-practice,wec-2018-2019-r8-le-mans,wec-2018-2019,Free Practice,practice,,2019-06-12T14:00:00.000Z,completed
+wec-2018-2019-r8-le-mans-qualifying-practice-1,wec-2018-2019-r8-le-mans,wec-2018-2019,Qualifying Practice 1,qualifying,,2019-06-12T20:00:00.000Z,completed
+wec-2018-2019-r8-le-mans-qualifying-practice-2,wec-2018-2019-r8-le-mans,wec-2018-2019,Qualifying Practice 2,qualifying,,2019-06-13T17:00:00.000Z,completed
+wec-2018-2019-r8-le-mans-qualifying-practice-3,wec-2018-2019-r8-le-mans,wec-2018-2019,Qualifying Practice 3,qualifying,,2019-06-13T20:00:00.000Z,completed
+wec-2018-2019-r8-le-mans-warm-up,wec-2018-2019-r8-le-mans,wec-2018-2019,Warm Up,warm-up,,2019-06-15T07:00:00.000Z,completed
+wec-2019-2020-r1-silverstone-race,wec-2019-2020-r1-silverstone,wec-2019-2020,Race,race,,2019-09-01T11:00:00.000Z,completed
+wec-2019-2020-r1-silverstone-free-practice-1,wec-2019-2020-r1-silverstone,wec-2019-2020,Free Practice 1,practice,,2019-08-30T10:40:00.000Z,completed
+wec-2019-2020-r1-silverstone-free-practice-2,wec-2019-2020-r1-silverstone,wec-2019-2020,Free Practice 2,practice,,2019-08-30T16:00:00.000Z,completed
+wec-2019-2020-r1-silverstone-free-practice-3,wec-2019-2020-r1-silverstone,wec-2019-2020,Free Practice 3,practice,,2019-08-31T08:00:00.000Z,completed
+wec-2019-2020-r1-silverstone-qualifying-lmgte-pro-lmgte-am,wec-2019-2020-r1-silverstone,wec-2019-2020,Qualifying LMGTE Pro - LMGTE Am,qualifying,,2019-08-31T10:50:00.000Z,completed
+wec-2019-2020-r1-silverstone-qualifying-lmp1-lmp2,wec-2019-2020-r1-silverstone,wec-2019-2020,Qualifying LMP1 - LMP2,qualifying,,2019-08-31T11:20:00.000Z,completed
+wec-2019-2020-r1-silverstone-qualifying,wec-2019-2020-r1-silverstone,wec-2019-2020,Qualifying,qualifying,,2019-08-31T13:40:00.000Z,completed
+wec-2019-2020-r2-fuji-race,wec-2019-2020-r2-fuji,wec-2019-2020,Race,race,,2019-10-06T02:00:00.000Z,completed
+wec-2019-2020-r2-fuji-free-practice-1,wec-2019-2020-r2-fuji,wec-2019-2020,Free Practice 1,practice,,2019-10-04T02:00:00.000Z,completed
+wec-2019-2020-r2-fuji-free-practice-2,wec-2019-2020-r2-fuji,wec-2019-2020,Free Practice 2,practice,,2019-10-04T06:30:00.000Z,completed
+wec-2019-2020-r2-fuji-free-practice-3,wec-2019-2020-r2-fuji,wec-2019-2020,Free Practice 3,practice,,2019-10-05T00:20:00.000Z,completed
+wec-2019-2020-r2-fuji-qualifying,wec-2019-2020-r2-fuji,wec-2019-2020,Qualifying,qualifying,,2019-10-05T05:00:00.000Z,completed
+wec-2019-2020-r3-shanghai-race,wec-2019-2020-r3-shanghai,wec-2019-2020,Race,race,,2019-11-10T04:00:00.000Z,completed
+wec-2019-2020-r3-shanghai-free-practice-1,wec-2019-2020-r3-shanghai,wec-2019-2020,Free Practice 1,practice,,2019-11-08T03:00:00.000Z,completed
+wec-2019-2020-r3-shanghai-free-practice-2,wec-2019-2020-r3-shanghai,wec-2019-2020,Free Practice 2,practice,,2019-11-08T07:30:00.000Z,completed
+wec-2019-2020-r3-shanghai-free-practice-3,wec-2019-2020-r3-shanghai,wec-2019-2020,Free Practice 3,practice,,2019-11-09T01:50:00.000Z,completed
+wec-2019-2020-r3-shanghai-qualifying,wec-2019-2020-r3-shanghai,wec-2019-2020,Qualifying,qualifying,,2019-11-09T06:50:00.000Z,completed
+wec-2019-2020-r4-bahrain-race,wec-2019-2020-r4-bahrain,wec-2019-2020,Race,race,,2019-12-14T12:00:00.000Z,completed
+wec-2019-2020-r4-bahrain-free-practice-1,wec-2019-2020-r4-bahrain,wec-2019-2020,Free Practice 1,practice,,2019-12-12T11:00:00.000Z,completed
+wec-2019-2020-r4-bahrain-free-practice-2,wec-2019-2020-r4-bahrain,wec-2019-2020,Free Practice 2,practice,,2019-12-12T15:30:00.000Z,completed
+wec-2019-2020-r4-bahrain-free-practice-3,wec-2019-2020-r4-bahrain,wec-2019-2020,Free Practice 3,practice,,2019-12-13T08:15:00.000Z,completed
+wec-2019-2020-r4-bahrain-qualifying,wec-2019-2020-r4-bahrain,wec-2019-2020,Qualifying,qualifying,,2019-12-13T14:15:00.000Z,completed
+wec-2019-2020-r5-cota-race,wec-2019-2020-r5-cota,wec-2019-2020,Race,race,,2020-02-23T18:00:00.000Z,completed
+wec-2019-2020-r5-cota-free-practice-1,wec-2019-2020-r5-cota,wec-2019-2020,Free Practice 1,practice,,2020-02-22T14:00:00.000Z,completed
+wec-2019-2020-r5-cota-free-practice-2,wec-2019-2020-r5-cota,wec-2019-2020,Free Practice 2,practice,,2020-02-22T18:45:00.000Z,completed
+wec-2019-2020-r5-cota-qualifying,wec-2019-2020-r5-cota,wec-2019-2020,Qualifying,qualifying,,2020-02-23T00:20:00.000Z,completed
+wec-2019-2020-r6-spa-race,wec-2019-2020-r6-spa,wec-2019-2020,Race,race,,2020-08-15T11:30:00.000Z,completed
+wec-2019-2020-r6-spa-free-practice-1,wec-2019-2020-r6-spa,wec-2019-2020,Free Practice 1,practice,,2020-08-13T14:25:00.000Z,completed
+wec-2019-2020-r6-spa-free-practice-2,wec-2019-2020-r6-spa,wec-2019-2020,Free Practice 2,practice,,2020-08-14T07:30:00.000Z,completed
+wec-2019-2020-r6-spa-free-practice-3,wec-2019-2020-r6-spa,wec-2019-2020,Free Practice 3,practice,,2020-08-14T12:00:00.000Z,completed
+wec-2019-2020-r6-spa-qualifying,wec-2019-2020-r6-spa,wec-2019-2020,Qualifying,qualifying,,2020-08-14T16:40:00.000Z,completed
+wec-2019-2020-r7-le-mans-race,wec-2019-2020-r7-le-mans,wec-2019-2020,Race,race,,2020-09-19T12:30:00.000Z,completed
+wec-2019-2020-r7-le-mans-free-practice-1,wec-2019-2020-r7-le-mans,wec-2019-2020,Free Practice 1,practice,,2020-09-17T08:00:00.000Z,completed
+wec-2019-2020-r7-le-mans-free-practice-2,wec-2019-2020-r7-le-mans,wec-2019-2020,Free Practice 2,practice,,2020-09-17T12:00:00.000Z,completed
+wec-2019-2020-r7-le-mans-qualifying-practice,wec-2019-2020-r7-le-mans,wec-2019-2020,Qualifying Practice,qualifying,,2020-09-17T15:15:00.000Z,completed
+wec-2019-2020-r7-le-mans-free-practice-3,wec-2019-2020-r7-le-mans,wec-2019-2020,Free Practice 3,practice,,2020-09-17T18:00:00.000Z,completed
+wec-2019-2020-r7-le-mans-free-practice-4,wec-2019-2020-r7-le-mans,wec-2019-2020,Free Practice 4,practice,,2020-09-18T08:00:00.000Z,completed
+wec-2019-2020-r7-le-mans-hyperpole,wec-2019-2020-r7-le-mans,wec-2019-2020,Hyperpole,hyperpole,,2020-09-18T09:30:00.000Z,completed
+wec-2019-2020-r7-le-mans-qualifying-after-hyperpole,wec-2019-2020-r7-le-mans,wec-2019-2020,Qualifying - after Hyperpole,hyperpole,,2020-09-18T09:40:00.000Z,completed
+wec-2019-2020-r7-le-mans-warm-up,wec-2019-2020-r7-le-mans,wec-2019-2020,Warm Up,warm-up,,2020-09-19T08:30:00.000Z,completed
+wec-2019-2020-r8-bahrain-race,wec-2019-2020-r8-bahrain,wec-2019-2020,Race,race,,2020-11-14T11:00:00.000Z,completed
+wec-2019-2020-r8-bahrain-free-practice-1,wec-2019-2020-r8-bahrain,wec-2019-2020,Free Practice 1,practice,,2020-11-12T15:00:00.000Z,completed
+wec-2019-2020-r8-bahrain-free-practice-2,wec-2019-2020-r8-bahrain,wec-2019-2020,Free Practice 2,practice,,2020-11-13T06:00:00.000Z,completed
+wec-2019-2020-r8-bahrain-free-practice-3,wec-2019-2020-r8-bahrain,wec-2019-2020,Free Practice 3,practice,,2020-11-13T10:45:00.000Z,completed
+wec-2019-2020-r8-bahrain-qualifying,wec-2019-2020-r8-bahrain,wec-2019-2020,Qualifying,qualifying,,2020-11-13T16:00:00.000Z,completed
+wec-2021-r1-spa-race,wec-2021-r1-spa,wec-2021,Race,race,,2021-05-01T11:30:00.000Z,completed
+wec-2021-r1-spa-free-practice-1,wec-2021-r1-spa,wec-2021,Free Practice 1,practice,,2021-04-29T13:30:00.000Z,completed
+wec-2021-r1-spa-free-practice-2,wec-2021-r1-spa,wec-2021,Free Practice 2,practice,,2021-04-30T07:30:00.000Z,completed
+wec-2021-r1-spa-free-practice-3,wec-2021-r1-spa,wec-2021,Free Practice 3,practice,,2021-04-30T12:00:00.000Z,completed
+wec-2021-r1-spa-qualifying-lmgte-pro-lmgte-am,wec-2021-r1-spa,wec-2021,Qualifying LMGTE Pro - LMGTE Am,qualifying,,2021-04-30T16:20:00.000Z,completed
+wec-2021-r1-spa-qualifying-hypercar-lmp2,wec-2021-r1-spa,wec-2021,Qualifying HYPERCAR - LMP2,qualifying,,2021-04-30T17:02:00.000Z,completed
+wec-2021-r1-spa-qualifying,wec-2021-r1-spa,wec-2021,Qualifying,qualifying,,2021-04-30T17:05:00.000Z,completed
+wec-2021-r2-portimao-race,wec-2021-r2-portimao,wec-2021,Race,race,,2021-06-13T10:00:00.000Z,completed
+wec-2021-r2-portimao-free-practice-1,wec-2021-r2-portimao,wec-2021,Free Practice 1,practice,,2021-06-11T14:15:00.000Z,completed
+wec-2021-r2-portimao-free-practice-2,wec-2021-r2-portimao,wec-2021,Free Practice 2,practice,,2021-06-12T08:35:00.000Z,completed
+wec-2021-r2-portimao-free-practice-3,wec-2021-r2-portimao,wec-2021,Free Practice 3,practice,,2021-06-12T13:00:00.000Z,completed
+wec-2021-r2-portimao-qualifying-lmgte-pro-lmgte-am,wec-2021-r2-portimao,wec-2021,Qualifying LMGTE Pro - LMGTE Am,qualifying,,2021-06-12T17:00:00.000Z,completed
+wec-2021-r2-portimao-qualifying-hypercar-lmp2,wec-2021-r2-portimao,wec-2021,Qualifying HYPERCAR - LMP2,qualifying,,2021-06-12T17:20:00.000Z,completed
+wec-2021-r2-portimao-qualifying,wec-2021-r2-portimao,wec-2021,Qualifying,qualifying,,2021-06-12T17:40:00.000Z,completed
+wec-2021-r3-monza-race,wec-2021-r3-monza,wec-2021,Race,race,,2021-07-18T10:00:00.000Z,completed
+wec-2021-r3-monza-free-practice-1,wec-2021-r3-monza,wec-2021,Free Practice 1,practice,,2021-07-16T13:30:00.000Z,completed
+wec-2021-r3-monza-free-practice-2,wec-2021-r3-monza,wec-2021,Free Practice 2,practice,,2021-07-17T07:30:00.000Z,completed
+wec-2021-r3-monza-free-practice-3,wec-2021-r3-monza,wec-2021,Free Practice 3,practice,,2021-07-17T12:00:00.000Z,completed
+wec-2021-r3-monza-qualifying-lmgte-pro-lmgte-am,wec-2021-r3-monza,wec-2021,Qualifying LMGTE Pro - LMGTE Am,qualifying,,2021-07-17T16:00:00.000Z,completed
+wec-2021-r3-monza-qualifying-hypercar-lmp2,wec-2021-r3-monza,wec-2021,Qualifying HYPERCAR - LMP2,qualifying,,2021-07-17T16:20:00.000Z,completed
+wec-2021-r3-monza-qualifying,wec-2021-r3-monza,wec-2021,Qualifying,qualifying,,2021-07-17T16:40:00.000Z,completed
+wec-2021-r4-le-mans-race,wec-2021-r4-le-mans,wec-2021,Race,race,,2021-08-21T14:00:00.000Z,completed
+wec-2021-r4-le-mans-free-practice-1,wec-2021-r4-le-mans,wec-2021,Free Practice 1,practice,,2021-08-18T12:00:00.000Z,completed
+wec-2021-r4-le-mans-qualifying-practice,wec-2021-r4-le-mans,wec-2021,Qualifying Practice,qualifying,,2021-08-18T17:00:00.000Z,completed
+wec-2021-r4-le-mans-free-practice-2,wec-2021-r4-le-mans,wec-2021,Free Practice 2,practice,,2021-08-18T20:00:00.000Z,completed
+wec-2021-r4-le-mans-free-practice-3,wec-2021-r4-le-mans,wec-2021,Free Practice 3,practice,,2021-08-19T12:00:00.000Z,completed
+wec-2021-r4-le-mans-hyperpole,wec-2021-r4-le-mans,wec-2021,Hyperpole,hyperpole,,2021-08-19T19:00:00.000Z,completed
+wec-2021-r4-le-mans-qualifying-after-hyperpole,wec-2021-r4-le-mans,wec-2021,Qualifying - after Hyperpole,hyperpole,,2021-08-19T19:30:00.000Z,completed
+wec-2021-r4-le-mans-free-practice-4,wec-2021-r4-le-mans,wec-2021,Free Practice 4,practice,,2021-08-19T20:10:00.000Z,completed
+wec-2021-r4-le-mans-warm-up,wec-2021-r4-le-mans,wec-2021,Warm Up,warm-up,,2021-08-21T09:30:00.000Z,completed
+wec-2021-r5-bahrain-6-hours-race,wec-2021-r5-bahrain-6-hours,wec-2021,Race,race,,2021-10-30T08:00:00.000Z,completed
+wec-2021-r5-bahrain-6-hours-free-practice-1,wec-2021-r5-bahrain-6-hours,wec-2021,Free Practice 1,practice,,2021-10-28T12:30:00.000Z,completed
+wec-2021-r5-bahrain-6-hours-free-practice-2,wec-2021-r5-bahrain-6-hours,wec-2021,Free Practice 2,practice,,2021-10-29T05:30:00.000Z,completed
+wec-2021-r5-bahrain-6-hours-free-practice-3,wec-2021-r5-bahrain-6-hours,wec-2021,Free Practice 3,practice,,2021-10-29T09:45:00.000Z,completed
+wec-2021-r5-bahrain-6-hours-qualifying-lmgte-pro-lmgte-am,wec-2021-r5-bahrain-6-hours,wec-2021,Qualifying LMGTE Pro - LMGTE Am,qualifying,,2021-10-29T13:30:00.000Z,completed
+wec-2021-r5-bahrain-6-hours-qualifying-hypercar-lmp2,wec-2021-r5-bahrain-6-hours,wec-2021,Qualifying HYPERCAR - LMP2,qualifying,,2021-10-29T13:50:00.000Z,completed
+wec-2021-r5-bahrain-6-hours-qualifying,wec-2021-r5-bahrain-6-hours,wec-2021,Qualifying,qualifying,,2021-10-29T14:00:00.000Z,completed
+wec-2021-r6-bahrain-8-hours-race,wec-2021-r6-bahrain-8-hours,wec-2021,Race,race,,2021-11-06T11:00:00.000Z,completed
+wec-2021-r6-bahrain-8-hours-free-practice-1,wec-2021-r6-bahrain-8-hours,wec-2021,Free Practice 1,practice,,2021-11-04T14:30:00.000Z,completed
+wec-2021-r6-bahrain-8-hours-free-practice-2,wec-2021-r6-bahrain-8-hours,wec-2021,Free Practice 2,practice,,2021-11-05T06:00:00.000Z,completed
+wec-2021-r6-bahrain-8-hours-free-practice-3,wec-2021-r6-bahrain-8-hours,wec-2021,Free Practice 3,practice,,2021-11-05T10:20:00.000Z,completed
+wec-2021-r6-bahrain-8-hours-qualifying-lmgte-pro-lmgte-am,wec-2021-r6-bahrain-8-hours,wec-2021,Qualifying LMGTE Pro - LMGTE Am,qualifying,,2021-11-05T14:20:00.000Z,completed
+wec-2021-r6-bahrain-8-hours-qualifying-hypercar-lmp2,wec-2021-r6-bahrain-8-hours,wec-2021,Qualifying HYPERCAR - LMP2,qualifying,,2021-11-05T14:40:00.000Z,completed
+wec-2021-r6-bahrain-8-hours-qualifying,wec-2021-r6-bahrain-8-hours,wec-2021,Qualifying,qualifying,,2021-11-05T14:50:00.000Z,completed
+wec-2022-r1-sebring-race,wec-2022-r1-sebring,wec-2022,Race,race,,2022-03-18T16:00:00Z,completed
+wec-2022-r1-sebring-free-practice-1,wec-2022-r1-sebring,wec-2022,Free Practice 1,practice,,2022-03-16T15:05:00.000Z,completed
+wec-2022-r1-sebring-free-practice-2,wec-2022-r1-sebring,wec-2022,Free Practice 2,practice,,2022-03-16T20:40:00.000Z,completed
+wec-2022-r1-sebring-free-practice-3,wec-2022-r1-sebring,wec-2022,Free Practice 3,practice,,2022-03-17T15:55:00.000Z,completed
+wec-2022-r1-sebring-qualifying-lmgte-pro-lmgte-am,wec-2022-r1-sebring,wec-2022,Qualifying LMGTE Pro - LMGTE Am,qualifying,,2022-03-17T23:00:00.000Z,completed
+wec-2022-r1-sebring-qualifying-hypercar-lmp2,wec-2022-r1-sebring,wec-2022,Qualifying HYPERCAR - LMP2,qualifying,,2022-03-17T23:20:00.000Z,completed
+wec-2022-r2-spa-race,wec-2022-r2-spa,wec-2022,Race,race,,2022-05-07T11:00:00Z,completed
+wec-2022-r2-spa-free-practice-1,wec-2022-r2-spa,wec-2022,Free Practice 1,practice,,2022-05-05T13:30:00.000Z,completed
+wec-2022-r2-spa-free-practice-2,wec-2022-r2-spa,wec-2022,Free Practice 2,practice,,2022-05-06T07:05:00.000Z,completed
+wec-2022-r2-spa-free-practice-3,wec-2022-r2-spa,wec-2022,Free Practice 3,practice,,2022-05-06T12:00:00.000Z,completed
+wec-2022-r2-spa-qualifying-lmgte-pro-lmgte-am,wec-2022-r2-spa,wec-2022,Qualifying LMGTE Pro - LMGTE Am,qualifying,,2022-05-06T16:20:00.000Z,completed
+wec-2022-r2-spa-qualifying-hypercar-lmp2,wec-2022-r2-spa,wec-2022,Qualifying HYPERCAR - LMP2,qualifying,,2022-05-06T16:40:00.000Z,completed
+wec-2022-r3-le-mans-race,wec-2022-r3-le-mans,wec-2022,Race,race,,2022-06-11T14:00:00Z,completed
+wec-2022-r3-le-mans-free-practice-1,wec-2022-r3-le-mans,wec-2022,Free Practice 1,practice,,2022-06-08T12:00:00.000Z,completed
+wec-2022-r3-le-mans-qualifying-practice,wec-2022-r3-le-mans,wec-2022,Qualifying Practice,qualifying,,2022-06-08T17:00:00.000Z,completed
+wec-2022-r3-le-mans-free-practice-2,wec-2022-r3-le-mans,wec-2022,Free Practice 2,practice,,2022-06-08T20:00:00.000Z,completed
+wec-2022-r3-le-mans-free-practice-3,wec-2022-r3-le-mans,wec-2022,Free Practice 3,practice,,2022-06-09T13:00:00.000Z,completed
+wec-2022-r3-le-mans-hyperpole,wec-2022-r3-le-mans,wec-2022,Hyperpole,hyperpole,,2022-06-09T18:00:00.000Z,completed
+wec-2022-r3-le-mans-free-practice-4,wec-2022-r3-le-mans,wec-2022,Free Practice 4,practice,,2022-06-09T20:00:00.000Z,completed
+wec-2022-r3-le-mans-warm-up,wec-2022-r3-le-mans,wec-2022,Warm Up,warm-up,,2022-06-11T08:30:00.000Z,completed
+wec-2022-r4-monza-race,wec-2022-r4-monza,wec-2022,Race,race,,2022-07-10T10:00:00Z,completed
+wec-2022-r4-monza-free-practice-1,wec-2022-r4-monza,wec-2022,Free Practice 1,practice,,2022-07-08T13:30:00.000Z,completed
+wec-2022-r4-monza-free-practice-2,wec-2022-r4-monza,wec-2022,Free Practice 2,practice,,2022-07-09T07:00:00.000Z,completed
+wec-2022-r4-monza-free-practice-3,wec-2022-r4-monza,wec-2022,Free Practice 3,practice,,2022-07-09T11:30:00.000Z,completed
+wec-2022-r4-monza-qualifying-lmgte-pro-lmgte-am,wec-2022-r4-monza,wec-2022,Qualifying LMGTE Pro - LMGTE Am,qualifying,,2022-07-09T15:30:00.000Z,completed
+wec-2022-r4-monza-qualifying-hypercar-lmp2,wec-2022-r4-monza,wec-2022,Qualifying HYPERCAR - LMP2,qualifying,,2022-07-09T15:50:00.000Z,completed
+wec-2022-r5-fuji-race,wec-2022-r5-fuji,wec-2022,Race,race,,2022-09-11T02:00:00Z,completed
+wec-2022-r5-fuji-free-practice-1,wec-2022-r5-fuji,wec-2022,Free Practice 1,practice,,2022-09-09T02:00:00.000Z,completed
+wec-2022-r5-fuji-free-practice-2,wec-2022-r5-fuji,wec-2022,Free Practice 2,practice,,2022-09-09T06:35:00.000Z,completed
+wec-2022-r5-fuji-free-practice-3,wec-2022-r5-fuji,wec-2022,Free Practice 3,practice,,2022-09-10T01:20:00.000Z,completed
+wec-2022-r5-fuji-qualifying-lmgte-pro-lmgte-am,wec-2022-r5-fuji,wec-2022,Qualifying LMGTE Pro - LMGTE Am,qualifying,,2022-09-10T05:40:00.000Z,completed
+wec-2022-r5-fuji-qualifying-hypercar-lmp2,wec-2022-r5-fuji,wec-2022,Qualifying HYPERCAR - LMP2,qualifying,,2022-09-10T06:00:00.000Z,completed
+wec-2022-r6-bahrain-race,wec-2022-r6-bahrain,wec-2022,Race,race,,2022-11-12T11:00:00Z,completed
+wec-2022-r6-bahrain-free-practice-1,wec-2022-r6-bahrain,wec-2022,Free Practice 1,practice,,2022-11-10T09:15:00.000Z,completed
+wec-2022-r6-bahrain-free-practice-2,wec-2022-r6-bahrain,wec-2022,Free Practice 2,practice,,2022-11-10T14:30:00.000Z,completed
+wec-2022-r6-bahrain-free-practice-3,wec-2022-r6-bahrain,wec-2022,Free Practice 3,practice,,2022-11-11T08:00:00.000Z,completed
+wec-2022-r6-bahrain-qualifying-lmgte-pro-lmgte-am,wec-2022-r6-bahrain,wec-2022,Qualifying LMGTE Pro - LMGTE Am,qualifying,,2022-11-11T13:50:00.000Z,completed
+wec-2022-r6-bahrain-qualifying-hypercar-lmp2,wec-2022-r6-bahrain,wec-2022,Qualifying HYPERCAR - LMP2,qualifying,,2022-11-11T14:10:00.000Z,completed
+wec-2023-r1-sebring-race,wec-2023-r1-sebring,wec-2023,Race,race,,2023-03-17T16:00:00Z,completed
+wec-2023-r1-sebring-free-practice-1,wec-2023-r1-sebring,wec-2023,Free Practice 1,practice,,2023-03-15T14:55:00.000Z,completed
+wec-2023-r1-sebring-free-practice-2,wec-2023-r1-sebring,wec-2023,Free Practice 2,practice,,2023-03-15T20:35:00.000Z,completed
+wec-2023-r1-sebring-free-practice-3,wec-2023-r1-sebring,wec-2023,Free Practice 3,practice,,2023-03-16T15:55:00.000Z,completed
+wec-2023-r1-sebring-qualifying-lmgte-am,wec-2023-r1-sebring,wec-2023,Qualifying LMGTE Am,qualifying,wec-2023-lmgte-am,2023-03-16T22:30:00.000Z,completed
+wec-2023-r1-sebring-qualifying-lmp2,wec-2023-r1-sebring,wec-2023,Qualifying LMP2,qualifying,wec-2023-lmp2,2023-03-16T22:55:00.000Z,completed
+wec-2023-r1-sebring-qualifying-hypercar,wec-2023-r1-sebring,wec-2023,Qualifying HYPERCAR,qualifying,wec-2023-hypercar,2023-03-16T23:20:00.000Z,completed
+wec-2023-r2-portimao-race,wec-2023-r2-portimao,wec-2023,Race,race,,2023-04-16T11:00:00Z,completed
+wec-2023-r2-portimao-free-practice-1,wec-2023-r2-portimao,wec-2023,Free Practice 1,practice,,2023-04-14T09:30:00.000Z,completed
+wec-2023-r2-portimao-free-practice-2,wec-2023-r2-portimao,wec-2023,Free Practice 2,practice,,2023-04-14T14:30:00.000Z,completed
+wec-2023-r2-portimao-free-practice-3,wec-2023-r2-portimao,wec-2023,Free Practice 3,practice,,2023-04-15T10:15:00.000Z,completed
+wec-2023-r2-portimao-qualifying-lmgte-am,wec-2023-r2-portimao,wec-2023,Qualifying LMGTE Am,qualifying,wec-2023-lmgte-am,2023-04-15T14:30:00.000Z,completed
+wec-2023-r2-portimao-qualifying-lmp2,wec-2023-r2-portimao,wec-2023,Qualifying LMP2,qualifying,wec-2023-lmp2,2023-04-15T14:55:00.000Z,completed
+wec-2023-r2-portimao-qualifying-hypercar,wec-2023-r2-portimao,wec-2023,Qualifying HYPERCAR,qualifying,wec-2023-hypercar,2023-04-15T15:20:00.000Z,completed
+wec-2023-r3-spa-race,wec-2023-r3-spa,wec-2023,Race,race,,2023-04-29T10:45:00Z,completed
+wec-2023-r3-spa-free-practice-1,wec-2023-r3-spa,wec-2023,Free Practice 1,practice,,2023-04-27T09:30:00.000Z,completed
+wec-2023-r3-spa-free-practice-2,wec-2023-r3-spa,wec-2023,Free Practice 2,practice,,2023-04-27T14:20:00.000Z,completed
+wec-2023-r3-spa-free-practice-3,wec-2023-r3-spa,wec-2023,Free Practice 3,practice,,2023-04-28T09:03:00.000Z,completed
+wec-2023-r3-spa-qualifying-lmgte-am,wec-2023-r3-spa,wec-2023,Qualifying LMGTE Am,qualifying,wec-2023-lmgte-am,2023-04-28T15:00:00.000Z,completed
+wec-2023-r3-spa-qualifying-lmp2,wec-2023-r3-spa,wec-2023,Qualifying LMP2,qualifying,wec-2023-lmp2,2023-04-28T15:37:00.000Z,completed
+wec-2023-r3-spa-qualifying-hypercar,wec-2023-r3-spa,wec-2023,Qualifying HYPERCAR,qualifying,wec-2023-hypercar,2023-04-28T16:00:00.000Z,completed
+wec-2023-r4-le-mans-race,wec-2023-r4-le-mans,wec-2023,Race,race,,2023-06-10T14:00:00Z,completed
+wec-2023-r4-le-mans-free-practice-1,wec-2023-r4-le-mans,wec-2023,Free Practice 1,practice,,2023-06-07T12:00:00.000Z,completed
+wec-2023-r4-le-mans-qualifying-practice,wec-2023-r4-le-mans,wec-2023,Qualifying Practice,qualifying,,2023-06-07T17:00:00.000Z,completed
+wec-2023-r4-le-mans-free-practice-2,wec-2023-r4-le-mans,wec-2023,Free Practice 2,practice,,2023-06-07T20:00:00.000Z,completed
+wec-2023-r4-le-mans-free-practice-3,wec-2023-r4-le-mans,wec-2023,Free Practice 3,practice,,2023-06-08T13:00:00.000Z,completed
+wec-2023-r4-le-mans-hyperpole,wec-2023-r4-le-mans,wec-2023,Hyperpole,hyperpole,,2023-06-08T18:00:00.000Z,completed
+wec-2023-r4-le-mans-free-practice-4,wec-2023-r4-le-mans,wec-2023,Free Practice 4,practice,,2023-06-08T20:00:00.000Z,completed
+wec-2023-r4-le-mans-warm-up,wec-2023-r4-le-mans,wec-2023,Warm Up,warm-up,,2023-06-10T10:00:00.000Z,completed
+wec-2023-r5-monza-race,wec-2023-r5-monza,wec-2023,Race,race,,2023-07-09T10:30:00Z,completed
+wec-2023-r5-monza-free-practice-1,wec-2023-r5-monza,wec-2023,Free Practice 1,practice,,2023-07-07T09:30:00.000Z,completed
+wec-2023-r5-monza-free-practice-2,wec-2023-r5-monza,wec-2023,Free Practice 2,practice,,2023-07-07T14:40:00.000Z,completed
+wec-2023-r5-monza-free-practice-3,wec-2023-r5-monza,wec-2023,Free Practice 3,practice,,2023-07-08T08:45:00.000Z,completed
+wec-2023-r5-monza-qualifying-lmgte-am,wec-2023-r5-monza,wec-2023,Qualifying LMGTE Am,qualifying,wec-2023-lmgte-am,2023-07-08T12:40:00.000Z,completed
+wec-2023-r5-monza-qualifying-lmp2,wec-2023-r5-monza,wec-2023,Qualifying LMP2,qualifying,wec-2023-lmp2,2023-07-08T13:10:00.000Z,completed
+wec-2023-r5-monza-qualifying-hypercar,wec-2023-r5-monza,wec-2023,Qualifying HYPERCAR,qualifying,wec-2023-hypercar,2023-07-08T13:30:00.000Z,completed
+wec-2023-r6-fuji-race,wec-2023-r6-fuji,wec-2023,Race,race,,2023-09-10T02:00:00Z,completed
+wec-2023-r6-fuji-free-practice-1,wec-2023-r6-fuji,wec-2023,Free Practice 1,practice,,2023-09-08T02:00:00.000Z,completed
+wec-2023-r6-fuji-free-practice-2,wec-2023-r6-fuji,wec-2023,Free Practice 2,practice,,2023-09-08T06:30:00.000Z,completed
+wec-2023-r6-fuji-free-practice-3,wec-2023-r6-fuji,wec-2023,Free Practice 3,practice,,2023-09-09T01:20:00.000Z,completed
+wec-2023-r6-fuji-qualifying-lmgte-am,wec-2023-r6-fuji,wec-2023,Qualifying LMGTE Am,qualifying,wec-2023-lmgte-am,2023-09-09T05:40:00.000Z,completed
+wec-2023-r6-fuji-qualifying-lmp2,wec-2023-r6-fuji,wec-2023,Qualifying LMP2,qualifying,wec-2023-lmp2,2023-09-09T06:05:00.000Z,completed
+wec-2023-r6-fuji-qualifying-hypercar,wec-2023-r6-fuji,wec-2023,Qualifying HYPERCAR,qualifying,wec-2023-hypercar,2023-09-09T06:30:00.000Z,completed
+wec-2023-r7-bahrain-race,wec-2023-r7-bahrain,wec-2023,Race,race,,2023-11-04T11:00:00Z,completed
+wec-2023-r7-bahrain-free-practice-1,wec-2023-r7-bahrain,wec-2023,Free Practice 1,practice,,2023-11-02T09:15:00.000Z,completed
+wec-2023-r7-bahrain-free-practice-2,wec-2023-r7-bahrain,wec-2023,Free Practice 2,practice,,2023-11-02T14:30:00.000Z,completed
+wec-2023-r7-bahrain-free-practice-3,wec-2023-r7-bahrain,wec-2023,Free Practice 3,practice,,2023-11-03T09:00:00.000Z,completed
+wec-2023-r7-bahrain-qualifying-lmgte-am,wec-2023-r7-bahrain,wec-2023,Qualifying LMGTE Am,qualifying,wec-2023-lmgte-am,2023-11-03T13:15:00.000Z,completed
+wec-2023-r7-bahrain-qualifying-lmp2,wec-2023-r7-bahrain,wec-2023,Qualifying LMP2,qualifying,wec-2023-lmp2,2023-11-03T13:40:00.000Z,completed
+wec-2023-r7-bahrain-qualifying-hypercar,wec-2023-r7-bahrain,wec-2023,Qualifying HYPERCAR,qualifying,wec-2023-hypercar,2023-11-03T14:05:00.000Z,completed
+wec-2024-r1-qatar-race,wec-2024-r1-qatar,wec-2024,Race,race,,2024-03-02T08:00:00Z,completed
+wec-2024-r1-qatar-free-practice-1,wec-2024-r1-qatar,wec-2024,Free Practice 1,practice,,2024-02-29T09:20:00.000Z,completed
+wec-2024-r1-qatar-free-practice-2,wec-2024-r1-qatar,wec-2024,Free Practice 2,practice,,2024-02-29T14:30:00.000Z,completed
+wec-2024-r1-qatar-free-practice-3,wec-2024-r1-qatar,wec-2024,Free Practice 3,practice,,2024-03-01T08:00:00.000Z,completed
+wec-2024-r1-qatar-qualifying-lmgt3,wec-2024-r1-qatar,wec-2024,Qualifying LMGT3,qualifying,wec-2024-lmgt3,2024-03-01T13:00:00.000Z,completed
+wec-2024-r1-qatar-qualifying-hypercar,wec-2024-r1-qatar,wec-2024,Qualifying HYPERCAR,qualifying,wec-2024-hypercar,2024-03-01T13:20:00.000Z,completed
+wec-2024-r1-qatar-hyperpole-lmgt3,wec-2024-r1-qatar,wec-2024,Hyperpole LMGT3,hyperpole,wec-2024-lmgt3,2024-03-01T13:40:00.000Z,completed
+wec-2024-r1-qatar-hyperpole-hypercar,wec-2024-r1-qatar,wec-2024,Hyperpole HYPERCAR,hyperpole,wec-2024-hypercar,2024-03-01T13:58:00.000Z,completed
+wec-2024-r2-imola-race,wec-2024-r2-imola,wec-2024,Race,race,,2024-04-21T11:00:00Z,completed
+wec-2024-r2-imola-free-practice-1,wec-2024-r2-imola,wec-2024,Free Practice 1,practice,,2024-04-19T10:00:00.000Z,completed
+wec-2024-r2-imola-free-practice-2,wec-2024-r2-imola,wec-2024,Free Practice 2,practice,,2024-04-19T15:15:00.000Z,completed
+wec-2024-r2-imola-free-practice-3,wec-2024-r2-imola,wec-2024,Free Practice 3,practice,,2024-04-20T09:10:00.000Z,completed
+wec-2024-r2-imola-qualifying-lmgt3,wec-2024-r2-imola,wec-2024,Qualifying LMGT3,qualifying,wec-2024-lmgt3,2024-04-20T12:45:00.000Z,completed
+wec-2024-r2-imola-hyperpole-lmgt3,wec-2024-r2-imola,wec-2024,Hyperpole LMGT3,hyperpole,wec-2024-lmgt3,2024-04-20T13:05:00.000Z,completed
+wec-2024-r2-imola-qualifying-hypercar,wec-2024-r2-imola,wec-2024,Qualifying HYPERCAR,qualifying,wec-2024-hypercar,2024-04-20T13:25:00.000Z,completed
+wec-2024-r2-imola-hyperpole-hypercar,wec-2024-r2-imola,wec-2024,Hyperpole HYPERCAR,hyperpole,wec-2024-hypercar,2024-04-20T13:45:00.000Z,completed
+wec-2024-r3-spa-race,wec-2024-r3-spa,wec-2024,Race,race,,2024-05-11T11:00:00Z,completed
+wec-2024-r3-spa-free-practice-1,wec-2024-r3-spa,wec-2024,Free Practice 1,practice,,2024-05-09T09:30:00.000Z,completed
+wec-2024-r3-spa-free-practice-2,wec-2024-r3-spa,wec-2024,Free Practice 2,practice,,2024-05-09T15:30:00.000Z,completed
+wec-2024-r3-spa-free-practice-3,wec-2024-r3-spa,wec-2024,Free Practice 3,practice,,2024-05-10T09:00:00.000Z,completed
+wec-2024-r3-spa-qualifying-lmgt3,wec-2024-r3-spa,wec-2024,Qualifying LMGT3,qualifying,wec-2024-lmgt3,2024-05-10T12:45:00.000Z,completed
+wec-2024-r3-spa-hyperpole-lmgt3,wec-2024-r3-spa,wec-2024,Hyperpole LMGT3,hyperpole,wec-2024-lmgt3,2024-05-10T13:08:00.000Z,completed
+wec-2024-r3-spa-qualifying-hypercar,wec-2024-r3-spa,wec-2024,Qualifying HYPERCAR,qualifying,wec-2024-hypercar,2024-05-10T13:50:00.000Z,completed
+wec-2024-r3-spa-hyperpole-hypercar,wec-2024-r3-spa,wec-2024,Hyperpole HYPERCAR,hyperpole,wec-2024-hypercar,2024-05-10T14:13:00.000Z,completed
+wec-2024-r4-le-mans-race,wec-2024-r4-le-mans,wec-2024,Race,race,,2024-06-15T14:00:00Z,completed
+wec-2024-r4-le-mans-free-practice-1,wec-2024-r4-le-mans,wec-2024,Free Practice 1,practice,,2024-06-12T12:00:00.000Z,completed
+wec-2024-r4-le-mans-qualifying-practice,wec-2024-r4-le-mans,wec-2024,Qualifying Practice,qualifying,,2024-06-12T17:00:00.000Z,completed
+wec-2024-r4-le-mans-free-practice-2,wec-2024-r4-le-mans,wec-2024,Free Practice 2,practice,,2024-06-12T20:00:00.000Z,completed
+wec-2024-r4-le-mans-free-practice-3,wec-2024-r4-le-mans,wec-2024,Free Practice 3,practice,,2024-06-13T13:00:00.000Z,completed
+wec-2024-r4-le-mans-hyperpole,wec-2024-r4-le-mans,wec-2024,Hyperpole,hyperpole,,2024-06-13T18:35:00.000Z,completed
+wec-2024-r4-le-mans-free-practice-4,wec-2024-r4-le-mans,wec-2024,Free Practice 4,practice,,2024-06-13T20:30:00.000Z,completed
+wec-2024-r4-le-mans-warm-up,wec-2024-r4-le-mans,wec-2024,Warm Up,warm-up,,2024-06-15T10:00:00.000Z,completed
+wec-2024-r5-sao-paulo-race,wec-2024-r5-sao-paulo,wec-2024,Race,race,,2024-07-14T14:30:00Z,completed
+wec-2024-r5-sao-paulo-free-practice-1,wec-2024-r5-sao-paulo,wec-2024,Free Practice 1,practice,,2024-07-12T13:45:00.000Z,completed
+wec-2024-r5-sao-paulo-free-practice-2,wec-2024-r5-sao-paulo,wec-2024,Free Practice 2,practice,,2024-07-12T17:30:00.000Z,completed
+wec-2024-r5-sao-paulo-free-practice-3,wec-2024-r5-sao-paulo,wec-2024,Free Practice 3,practice,,2024-07-13T13:30:00.000Z,completed
+wec-2024-r5-sao-paulo-qualifying-lmgt3,wec-2024-r5-sao-paulo,wec-2024,Qualifying LMGT3,qualifying,wec-2024-lmgt3,2024-07-13T17:30:00.000Z,completed
+wec-2024-r5-sao-paulo-hyperpole-lmgt3,wec-2024-r5-sao-paulo,wec-2024,Hyperpole LMGT3,hyperpole,wec-2024-lmgt3,2024-07-13T17:50:00.000Z,completed
+wec-2024-r5-sao-paulo-qualifying-hypercar,wec-2024-r5-sao-paulo,wec-2024,Qualifying HYPERCAR,qualifying,wec-2024-hypercar,2024-07-13T18:13:00.000Z,completed
+wec-2024-r5-sao-paulo-hyperpole-hypercar,wec-2024-r5-sao-paulo,wec-2024,Hyperpole HYPERCAR,hyperpole,wec-2024-hypercar,2024-07-13T18:33:00.000Z,completed
+wec-2024-r6-cota-race,wec-2024-r6-cota,wec-2024,Race,race,,2024-09-01T18:00:00Z,completed
+wec-2024-r6-cota-free-practice-1,wec-2024-r6-cota,wec-2024,Free Practice 1,practice,,2024-08-30T17:40:00.000Z,completed
+wec-2024-r6-cota-free-practice-2,wec-2024-r6-cota,wec-2024,Free Practice 2,practice,,2024-08-30T22:10:00.000Z,completed
+wec-2024-r6-cota-free-practice-3,wec-2024-r6-cota,wec-2024,Free Practice 3,practice,,2024-08-31T16:00:00.000Z,completed
+wec-2024-r6-cota-qualifying-lmgt3,wec-2024-r6-cota,wec-2024,Qualifying LMGT3,qualifying,wec-2024-lmgt3,2024-08-31T20:00:00.000Z,completed
+wec-2024-r6-cota-hyperpole-lmgt3,wec-2024-r6-cota,wec-2024,Hyperpole LMGT3,hyperpole,wec-2024-lmgt3,2024-08-31T20:20:00.000Z,completed
+wec-2024-r6-cota-qualifying-hypercar,wec-2024-r6-cota,wec-2024,Qualifying HYPERCAR,qualifying,wec-2024-hypercar,2024-08-31T20:40:00.000Z,completed
+wec-2024-r6-cota-hyperpole-hypercar,wec-2024-r6-cota,wec-2024,Hyperpole HYPERCAR,hyperpole,wec-2024-hypercar,2024-08-31T21:00:00.000Z,completed
+wec-2024-r7-fuji-race,wec-2024-r7-fuji,wec-2024,Race,race,,2024-09-15T02:00:00Z,completed
+wec-2024-r7-fuji-free-practice-1,wec-2024-r7-fuji,wec-2024,Free Practice 1,practice,,2024-09-13T02:00:00.000Z,completed
+wec-2024-r7-fuji-free-practice-2,wec-2024-r7-fuji,wec-2024,Free Practice 2,practice,,2024-09-13T06:30:00.000Z,completed
+wec-2024-r7-fuji-free-practice-3,wec-2024-r7-fuji,wec-2024,Free Practice 3,practice,,2024-09-14T01:20:00.000Z,completed
+wec-2024-r7-fuji-qualifying-lmgt3,wec-2024-r7-fuji,wec-2024,Qualifying LMGT3,qualifying,wec-2024-lmgt3,2024-09-14T05:20:00.000Z,completed
+wec-2024-r7-fuji-hyperpole-lmgt3,wec-2024-r7-fuji,wec-2024,Hyperpole LMGT3,hyperpole,wec-2024-lmgt3,2024-09-14T05:40:00.000Z,completed
+wec-2024-r7-fuji-qualifying-hypercar,wec-2024-r7-fuji,wec-2024,Qualifying HYPERCAR,qualifying,wec-2024-hypercar,2024-09-14T06:00:00.000Z,completed
+wec-2024-r7-fuji-hyperpole-hypercar,wec-2024-r7-fuji,wec-2024,Hyperpole HYPERCAR,hyperpole,wec-2024-hypercar,2024-09-14T06:20:00.000Z,completed
+wec-2024-r8-bahrain-race,wec-2024-r8-bahrain,wec-2024,Race,race,,2024-11-02T11:00:00Z,completed
+wec-2024-r8-bahrain-free-practice-1,wec-2024-r8-bahrain,wec-2024,Free Practice 1,practice,,2024-10-31T09:15:00.000Z,completed
+wec-2024-r8-bahrain-free-practice-2,wec-2024-r8-bahrain,wec-2024,Free Practice 2,practice,,2024-10-31T14:30:00.000Z,completed
+wec-2024-r8-bahrain-free-practice-3,wec-2024-r8-bahrain,wec-2024,Free Practice 3,practice,,2024-11-01T09:00:00.000Z,completed
+wec-2024-r8-bahrain-qualifying-lmgt3,wec-2024-r8-bahrain,wec-2024,Qualifying LMGT3,qualifying,wec-2024-lmgt3,2024-11-01T13:00:00.000Z,completed
+wec-2024-r8-bahrain-hyperpole-lmgt3,wec-2024-r8-bahrain,wec-2024,Hyperpole LMGT3,hyperpole,wec-2024-lmgt3,2024-11-01T13:20:00.000Z,completed
+wec-2024-r8-bahrain-qualifying-hypercar,wec-2024-r8-bahrain,wec-2024,Qualifying HYPERCAR,qualifying,wec-2024-hypercar,2024-11-01T13:40:00.000Z,completed
+wec-2024-r8-bahrain-hyperpole-hypercar,wec-2024-r8-bahrain,wec-2024,Hyperpole HYPERCAR,hyperpole,wec-2024-hypercar,2024-11-01T14:00:00.000Z,completed
+wec-2025-r1-qatar-race,wec-2025-r1-qatar,wec-2025,Race,race,,2025-02-28T11:00:00Z,completed
+wec-2025-r1-qatar-free-practice-1,wec-2025-r1-qatar,wec-2025,Free Practice 1,practice,,2025-02-26T08:30:00.000Z,completed
+wec-2025-r1-qatar-free-practice-2,wec-2025-r1-qatar,wec-2025,Free Practice 2,practice,,2025-02-26T13:50:00.000Z,completed
+wec-2025-r1-qatar-free-practice-3,wec-2025-r1-qatar,wec-2025,Free Practice 3,practice,,2025-02-27T09:00:00.000Z,completed
+wec-2025-r1-qatar-qualifying-lmgt3,wec-2025-r1-qatar,wec-2025,Qualifying LMGT3,qualifying,wec-2025-lmgt3,2025-02-27T14:00:00.000Z,completed
+wec-2025-r1-qatar-hyperpole-lmgt3,wec-2025-r1-qatar,wec-2025,Hyperpole LMGT3,hyperpole,wec-2025-lmgt3,2025-02-27T14:20:00.000Z,completed
+wec-2025-r1-qatar-qualifying-hypercar,wec-2025-r1-qatar,wec-2025,Qualifying HYPERCAR,qualifying,wec-2025-hypercar,2025-02-27T14:40:00.000Z,completed
+wec-2025-r1-qatar-hyperpole-hypercar,wec-2025-r1-qatar,wec-2025,Hyperpole HYPERCAR,hyperpole,wec-2025-hypercar,2025-02-27T15:00:00.000Z,completed
+wec-2025-r2-imola-race,wec-2025-r2-imola,wec-2025,Race,race,,2025-04-20T11:00:00Z,completed
+wec-2025-r2-imola-free-practice-1,wec-2025-r2-imola,wec-2025,Free Practice 1,practice,,2025-04-18T09:15:00.000Z,completed
+wec-2025-r2-imola-free-practice-2,wec-2025-r2-imola,wec-2025,Free Practice 2,practice,,2025-04-18T14:00:00.000Z,completed
+wec-2025-r2-imola-free-practice-3,wec-2025-r2-imola,wec-2025,Free Practice 3,practice,,2025-04-19T08:40:00.000Z,completed
+wec-2025-r2-imola-qualifying-lmgt3,wec-2025-r2-imola,wec-2025,Qualifying LMGT3,qualifying,wec-2025-lmgt3,2025-04-19T12:30:00.000Z,completed
+wec-2025-r2-imola-hyperpole-lmgt3,wec-2025-r2-imola,wec-2025,Hyperpole LMGT3,hyperpole,wec-2025-lmgt3,2025-04-19T12:50:00.000Z,completed
+wec-2025-r2-imola-qualifying-hypercar,wec-2025-r2-imola,wec-2025,Qualifying HYPERCAR,qualifying,wec-2025-hypercar,2025-04-19T13:10:00.000Z,completed
+wec-2025-r2-imola-hyperpole-hypercar,wec-2025-r2-imola,wec-2025,Hyperpole HYPERCAR,hyperpole,wec-2025-hypercar,2025-04-19T13:30:00.000Z,completed
+wec-2025-r3-spa-race,wec-2025-r3-spa,wec-2025,Race,race,,2025-05-10T12:00:00Z,completed
+wec-2025-r3-spa-free-practice-1,wec-2025-r3-spa,wec-2025,Free Practice 1,practice,,2025-05-08T09:33:00.000Z,completed
+wec-2025-r3-spa-free-practice-2,wec-2025-r3-spa,wec-2025,Free Practice 2,practice,,2025-05-08T14:30:00.000Z,completed
+wec-2025-r3-spa-free-practice-3,wec-2025-r3-spa,wec-2025,Free Practice 3,practice,,2025-05-09T09:00:00.000Z,completed
+wec-2025-r3-spa-qualifying-lmgt3,wec-2025-r3-spa,wec-2025,Qualifying LMGT3,qualifying,wec-2025-lmgt3,2025-05-09T12:40:00.000Z,completed
+wec-2025-r3-spa-hyperpole-lmgt3,wec-2025-r3-spa,wec-2025,Hyperpole LMGT3,hyperpole,wec-2025-lmgt3,2025-05-09T13:03:00.000Z,completed
+wec-2025-r3-spa-qualifying-hypercar,wec-2025-r3-spa,wec-2025,Qualifying HYPERCAR,qualifying,wec-2025-hypercar,2025-05-09T13:25:00.000Z,completed
+wec-2025-r3-spa-hyperpole-hypercar,wec-2025-r3-spa,wec-2025,Hyperpole HYPERCAR,hyperpole,wec-2025-hypercar,2025-05-09T13:48:00.000Z,completed
+wec-2025-r4-le-mans-race,wec-2025-r4-le-mans,wec-2025,Race,race,,2025-06-14T14:00:00Z,completed
+wec-2025-r4-le-mans-free-practice-1,wec-2025-r4-le-mans,wec-2025,Free Practice 1,practice,,2025-06-11T12:00:00.000Z,completed
+wec-2025-r4-le-mans-qualifying-lmp2-lmgt3,wec-2025-r4-le-mans,wec-2025,Qualifying LMP2-LMGT3,qualifying,,2025-06-11T16:45:00.000Z,completed
+wec-2025-r4-le-mans-qualifying-hypercar,wec-2025-r4-le-mans,wec-2025,Qualifying HYPERCAR,qualifying,wec-2025-hypercar,2025-06-11T17:30:00.000Z,completed
+wec-2025-r4-le-mans-free-practice-2,wec-2025-r4-le-mans,wec-2025,Free Practice 2,practice,,2025-06-11T20:00:00.000Z,completed
+wec-2025-r4-le-mans-free-practice-3,wec-2025-r4-le-mans,wec-2025,Free Practice 3,practice,,2025-06-12T12:45:00.000Z,completed
+wec-2025-r4-le-mans-hyperpole-1-lmp2-lmgt3,wec-2025-r4-le-mans,wec-2025,Hyperpole 1 LMP2-LMGT3,hyperpole,,2025-06-12T18:00:00.000Z,completed
+wec-2025-r4-le-mans-hyperpole-2-lmp2-lmgt3,wec-2025-r4-le-mans,wec-2025,Hyperpole 2 LMP2-LMGT3,hyperpole,,2025-06-12T18:35:00.000Z,completed
+wec-2025-r4-le-mans-hyperpole-1-hypercar,wec-2025-r4-le-mans,wec-2025,Hyperpole 1 HYPERCAR,hyperpole,wec-2025-hypercar,2025-06-12T19:05:00.000Z,completed
+wec-2025-r4-le-mans-hyperpole-2-hypercar,wec-2025-r4-le-mans,wec-2025,Hyperpole 2 HYPERCAR,hyperpole,wec-2025-hypercar,2025-06-12T19:40:00.000Z,completed
+wec-2025-r4-le-mans-free-practice-4,wec-2025-r4-le-mans,wec-2025,Free Practice 4,practice,,2025-06-12T21:00:00.000Z,completed
+wec-2025-r4-le-mans-warm-up,wec-2025-r4-le-mans,wec-2025,Warm Up,warm-up,,2025-06-14T10:00:00.000Z,completed
+wec-2025-r5-sao-paulo-race,wec-2025-r5-sao-paulo,wec-2025,Race,race,,2025-07-13T14:30:00Z,completed
+wec-2025-r5-sao-paulo-free-practice-1,wec-2025-r5-sao-paulo,wec-2025,Free Practice 1,practice,,2025-07-11T14:17:00.000Z,completed
+wec-2025-r5-sao-paulo-free-practice-2,wec-2025-r5-sao-paulo,wec-2025,Free Practice 2,practice,,2025-07-11T18:45:00.000Z,completed
+wec-2025-r5-sao-paulo-free-practice-3,wec-2025-r5-sao-paulo,wec-2025,Free Practice 3,practice,,2025-07-12T13:10:00.000Z,completed
+wec-2025-r5-sao-paulo-qualifying-lmgt3,wec-2025-r5-sao-paulo,wec-2025,Qualifying LMGT3,qualifying,wec-2025-lmgt3,2025-07-12T17:45:00.000Z,completed
+wec-2025-r5-sao-paulo-hyperpole-lmgt3,wec-2025-r5-sao-paulo,wec-2025,Hyperpole LMGT3,hyperpole,wec-2025-lmgt3,2025-07-12T18:05:00.000Z,completed
+wec-2025-r5-sao-paulo-qualifying-hypercar,wec-2025-r5-sao-paulo,wec-2025,Qualifying HYPERCAR,qualifying,wec-2025-hypercar,2025-07-12T18:25:00.000Z,completed
+wec-2025-r5-sao-paulo-hyperpole-hypercar,wec-2025-r5-sao-paulo,wec-2025,Hyperpole HYPERCAR,hyperpole,wec-2025-hypercar,2025-07-12T18:49:00.000Z,completed
+wec-2025-r6-cota-race,wec-2025-r6-cota,wec-2025,Race,race,,2025-09-07T18:30:00Z,completed
+wec-2025-r6-cota-free-practice-1,wec-2025-r6-cota,wec-2025,Free Practice 1,practice,,2025-09-05T16:30:00.000Z,completed
+wec-2025-r6-cota-free-practice-2,wec-2025-r6-cota,wec-2025,Free Practice 2,practice,,2025-09-05T21:30:00.000Z,completed
+wec-2025-r6-cota-free-practice-3,wec-2025-r6-cota,wec-2025,Free Practice 3,practice,,2025-09-06T16:00:00.000Z,completed
+wec-2025-r6-cota-qualifying-lmgt3,wec-2025-r6-cota,wec-2025,Qualifying LMGT3,qualifying,wec-2025-lmgt3,2025-09-06T20:00:00.000Z,completed
+wec-2025-r6-cota-hyperpole-lmgt3,wec-2025-r6-cota,wec-2025,Hyperpole LMGT3,hyperpole,wec-2025-lmgt3,2025-09-06T20:20:00.000Z,completed
+wec-2025-r6-cota-qualifying-hypercar,wec-2025-r6-cota,wec-2025,Qualifying HYPERCAR,qualifying,wec-2025-hypercar,2025-09-06T20:40:00.000Z,completed
+wec-2025-r6-cota-hyperpole-hypercar,wec-2025-r6-cota,wec-2025,Hyperpole HYPERCAR,hyperpole,wec-2025-hypercar,2025-09-06T21:00:00.000Z,completed
+wec-2025-r7-fuji-race,wec-2025-r7-fuji,wec-2025,Race,race,,2025-09-28T02:00:00Z,completed
+wec-2025-r7-fuji-free-practice-1,wec-2025-r7-fuji,wec-2025,Free Practice 1,practice,,2025-09-26T01:15:00.000Z,completed
+wec-2025-r7-fuji-free-practice-2,wec-2025-r7-fuji,wec-2025,Free Practice 2,practice,,2025-09-26T05:30:00.000Z,completed
+wec-2025-r7-fuji-free-practice-3,wec-2025-r7-fuji,wec-2025,Free Practice 3,practice,,2025-09-27T00:50:00.000Z,completed
+wec-2025-r7-fuji-qualifying-lmgt3,wec-2025-r7-fuji,wec-2025,Qualifying LMGT3,qualifying,wec-2025-lmgt3,2025-09-27T05:20:00.000Z,completed
+wec-2025-r7-fuji-hyperpole-lmgt3,wec-2025-r7-fuji,wec-2025,Hyperpole LMGT3,hyperpole,wec-2025-lmgt3,2025-09-27T05:40:00.000Z,completed
+wec-2025-r7-fuji-qualifying-hypercar,wec-2025-r7-fuji,wec-2025,Qualifying HYPERCAR,qualifying,wec-2025-hypercar,2025-09-27T06:00:00.000Z,completed
+wec-2025-r7-fuji-hyperpole-hypercar,wec-2025-r7-fuji,wec-2025,Hyperpole HYPERCAR,hyperpole,wec-2025-hypercar,2025-09-27T06:20:00.000Z,completed
+wec-2025-r8-bahrain-race,wec-2025-r8-bahrain,wec-2025,Race,race,,2025-11-08T11:00:00Z,completed
+wec-2025-r8-bahrain-free-practice-1,wec-2025-r8-bahrain,wec-2025,Free Practice 1,practice,,2025-11-06T09:15:00.000Z,completed
+wec-2025-r8-bahrain-free-practice-2,wec-2025-r8-bahrain,wec-2025,Free Practice 2,practice,,2025-11-06T14:00:00.000Z,completed
+wec-2025-r8-bahrain-free-practice-3,wec-2025-r8-bahrain,wec-2025,Free Practice 3,practice,,2025-11-07T09:00:00.000Z,completed
+wec-2025-r8-bahrain-qualifying-lmgt3,wec-2025-r8-bahrain,wec-2025,Qualifying LMGT3,qualifying,wec-2025-lmgt3,2025-11-07T13:00:00.000Z,completed
+wec-2025-r8-bahrain-hyperpole-lmgt3,wec-2025-r8-bahrain,wec-2025,Hyperpole LMGT3,hyperpole,wec-2025-lmgt3,2025-11-07T13:20:00.000Z,completed
+wec-2025-r8-bahrain-qualifying-hypercar,wec-2025-r8-bahrain,wec-2025,Qualifying HYPERCAR,qualifying,wec-2025-hypercar,2025-11-07T13:40:00.000Z,completed
+wec-2025-r8-bahrain-hyperpole-hypercar,wec-2025-r8-bahrain,wec-2025,Hyperpole HYPERCAR,hyperpole,wec-2025-hypercar,2025-11-07T14:00:00.000Z,completed

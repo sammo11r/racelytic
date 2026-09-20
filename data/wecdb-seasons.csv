@@ -1,0 +1,14 @@
+id,year,name,startDate,endDate,status,sourceUrl
+wec-2012,2012,2012 FIA World Endurance Championship,2012-03-17,2012-10-28,completed,https://fiawec.alkamelsystems.com/?season=02_2012
+wec-2013,2013,2013 FIA World Endurance Championship,2013-04-14,2013-11-30,completed,https://fiawec.alkamelsystems.com/?season=03_2013
+wec-2014,2014,2014 FIA World Endurance Championship,2014-04-20,2014-11-30,completed,https://fiawec.alkamelsystems.com/?season=04_2014
+wec-2015,2015,2015 FIA World Endurance Championship,2015-04-12,2015-11-21,completed,https://fiawec.alkamelsystems.com/?season=05_2015
+wec-2016,2016,2016 FIA World Endurance Championship,2016-04-17,2016-11-19,completed,https://fiawec.alkamelsystems.com/?season=06_2016
+wec-2017,2017,2017 FIA World Endurance Championship,2017-04-16,2017-11-18,completed,https://fiawec.alkamelsystems.com/?season=07_2017
+wec-2018-2019,2018,2018-2019 FIA World Endurance Championship,2018-05-05,2019-06-15,completed,https://fiawec.alkamelsystems.com/?season=08_2018-2019
+wec-2019-2020,2019,2019-2020 FIA World Endurance Championship,2019-09-01,2020-11-14,completed,https://fiawec.alkamelsystems.com/?season=09_2019-2020
+wec-2021,2021,2021 FIA World Endurance Championship,2021-05-01,2021-11-06,completed,https://fiawec.alkamelsystems.com/?season=10_2021
+wec-2022,2022,2022 FIA World Endurance Championship,2022-03-18,2022-11-12,completed,https://www.fia.com/events/world-endurance-championship/season-2022/standings
+wec-2023,2023,2023 FIA World Endurance Championship,2023-03-17,2023-11-04,completed,https://www.fiawec.com/en/news/2023-fia-wec-entry-list-sees-record-hypercar-and-lmgte-am-field/7555
+wec-2024,2024,2024 FIA World Endurance Championship,2024-03-02,2024-11-02,completed,https://www.fia.com/events/world-endurance-championship/season-2024/standings
+wec-2025,2025,2025 FIA World Endurance Championship,2025-02-28,2025-11-08,completed,https://www.fiawec.com/en/season/2025

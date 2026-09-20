@@ -100,7 +100,7 @@ app.get('/monitor', requireMonitorAuth, (req, res, next) => sendSeoPage(req, res
 
 const publicPages = require('node:fs').readdirSync(frontendDirectory)
     .filter(file => file.endsWith('.html')
-        && !['index.html', 'f2.html', 'f3.html', 'ratings-methodology.html'].includes(file));
+        && !['index.html', 'f2.html', 'f3.html', 'ratings-methodology.html', 'wec.html', 'wec-seasons.html', 'wec-season.html', 'wec-races.html', 'wec-race.html', 'wec-entity.html'].includes(file));
 
 const ratingsPages = {
     '/ratings/leaderboard': ['templates/ratings-explorer.html', 'leaderboard'],
@@ -178,6 +178,16 @@ for (const [route, series] of [['/', 'f1'], ['/f2', 'f2'], ['/f3', 'f3'], ['/aca
     app.get(route, (req, res) => res.type('html').send(applySeo(renderPageShell(renderSeriesHome(series)), req.path, req.query)));
 }
 
+app.get('/wec', (req, res, next) => sendSeoPage(req, res, next, 'wec.html'));
+app.get('/wec/seasons', (req, res, next) => sendSeoPage(req, res, next, 'wec-seasons.html'));
+app.get('/wec/seasons/:resourceId', (req, res, next) => sendSeoPage(req, res, next, 'wec-season.html'));
+app.get('/wec/races', (req, res, next) => sendSeoPage(req, res, next, 'wec-races.html'));
+app.get('/wec/races/:resourceId', (req, res, next) => sendSeoPage(req, res, next, 'wec-race.html'));
+app.get('/wec/races/:resourceId/:slug', (req, res, next) => sendSeoPage(req, res, next, 'wec-race.html'));
+for (const collection of ['drivers', 'teams', 'manufacturers', 'car-models', 'entries']) {
+    app.get(`/wec/${collection}/:resourceId`, (req, res, next) => sendSeoPage(req, res, next, 'wec-entity.html'));
+}
+
 for (const [legacy, target] of [['/index.html', '/'], ['/f2.html', '/f2'], ['/f3.html', '/f3']]) {
     app.get(legacy, (req, res) => res.redirect(308, target));
 }
@@ -252,7 +262,8 @@ for (const [resource, bySeries] of Object.entries(resourceFiles)) {
 }
 
 const sitemapRoutes = [
-    '/', '/f2', '/f3', '/academy', '/formula-e',
+    '/', '/f2', '/f3', '/academy', '/formula-e', '/wec', '/wec/seasons', '/wec/races',
+    '/wec/seasons/2022', '/wec/seasons/2023', '/wec/seasons/2024', '/wec/seasons/2025',
     ...Object.keys(ratingsPages),
     ...publicPages.map(file => `/${file.slice(0, -'.html'.length)}`).filter(route => !/^\/f[23]-/.test(route)),
     ...juniorPages.map(({ route }) => route),
@@ -321,7 +332,7 @@ app.use(express.static(frontendDirectory, {
     }
 }));
 
-for (const route of ['core', 'seasons', 'drivers', 'circuits', 'constructors', 'chassis', 'races', 'records', 'ratings', 'games', 'account', 'points-systems', 'custom-championships', 'community', 'analytics', 'ask']) {
+for (const route of ['core', 'seasons', 'drivers', 'circuits', 'constructors', 'chassis', 'races', 'records', 'ratings', 'games', 'account', 'points-systems', 'custom-championships', 'community', 'analytics', 'ask', 'wec']) {
     const exported = require(`./routes/${route}`);
     app.use(exported.router || exported);
 }

@@ -22,6 +22,10 @@ test('championship dropdown preserves active state and route translation', () =>
     assert.match(navigation, /option\.setAttribute\('aria-selected', String\(active\)\)/);
     assert.match(navigation, /championshipSelect\.addEventListener\('click'/);
     assert.match(navigation, /resolveSeriesTarget\(targetSeries\)/);
+    assert.match(navigation, /'\/seasons': '\/wec\/seasons'/);
+    assert.match(navigation, /reverseWecPagePairs\[window\.location\.pathname\]/);
+    assert.match(navigation, /formula-e\\\/\|wec\\\//);
+    assert.match(navigation, /target=wec&type=\$\{detail\[0\]\}/);
     assert.match(navigation, /\['ArrowDown', 'ArrowUp', 'Home', 'End'\]/);
     assert.match(navigation, /event\.key === 'Escape'/);
 });

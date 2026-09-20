@@ -7,3 +7,5 @@ Licensed under the [Creative Commons Attribution 4.0 International License](http
 ## Formula E outlines
 
 Files prefixed with `fe-` are simplified circuit outlines generated from official Formula E/FIA event maps or historical Wikimedia Commons circuit maps. Each SVG contains its source URL in a comment. The generated outlines are maintained separately from the F1DB artwork above.
+
+`wec-le-mans-24h.svg` is a simplified Produced Work derived from OpenStreetMap geometry distributed by [track-atlas](https://github.com/tobi/track-atlas/tree/main/tracks/circuit-de-la-sarthe). Geometry is © OpenStreetMap contributors and licensed under the [Open Database License](https://opendatacommons.org/licenses/odbl/). Racelytic simplified and reformatted the outline for display.

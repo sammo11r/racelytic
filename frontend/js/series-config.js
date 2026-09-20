@@ -9,10 +9,12 @@
         f3: { key: 'f3', name: 'Formula 3', shortName: 'F3', path: '/f3', modeClass: 'f3-mode', favicon: '/assets/favicon-f3.svg', entity: 'team' },
         academy: { key: 'academy', name: 'F1 Academy', shortName: 'F1 Academy', path: '/academy', modeClass: 'academy-mode', favicon: '/assets/favicon-academy.svg', entity: 'team' },
         fe: { key: 'fe', name: 'Formula E', shortName: 'FE', path: '/formula-e', modeClass: 'fe-mode', favicon: '/assets/favicon-fe.svg', entity: 'team' },
+        wec: { key: 'wec', name: 'World Endurance Championship', shortName: 'WEC', path: '/wec', modeClass: 'wec-mode', favicon: '/assets/favicon-wec.svg', entity: 'entry' },
     };
 
     function fromPath(pathname = typeof window === 'undefined' ? '/' : window.location.pathname) {
-        const key = pathname === '/formula-e' || pathname.startsWith('/formula-e/') ? 'fe'
+        const key = pathname === '/wec' || pathname.startsWith('/wec/') ? 'wec'
+            : pathname === '/formula-e' || pathname.startsWith('/formula-e/') ? 'fe'
             : pathname === '/academy' || pathname.startsWith('/academy/') ? 'academy'
             : pathname === '/f3' || pathname.startsWith('/f3/') ? 'f3'
             : pathname === '/f2' || pathname.startsWith('/f2/') ? 'f2' : 'f1';

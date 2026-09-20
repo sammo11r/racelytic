@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Explore the FIA World Endurance Championship through its seasons, classes, events and shared-driver entries.">
+  <link rel="icon" href="/assets/favicon-wec.svg" type="image/svg+xml">
+  <title>World Endurance Championship · Racelytic</title>
+  <link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/polish.css"><link rel="stylesheet" href="/css/wec.css">
+</head>
+<body class="wec-mode" data-wec-view="home">
+  <div id="header"></div>
+  <main class="container page wec-page">
+    <header class="wec-hero">
+      <div><p class="eyebrow">WORLD ENDURANCE CHAMPIONSHIP</p><h1>One race.<br><span>Many races within it.</span></h1></div>
+      <p>Explore endurance racing by car, crew and class. Racelytic’s WEC archive is built around the shared entries and parallel classifications that make this championship distinct.</p>
+    </header>
+    <section class="wec-foundation" aria-labelledby="wec-foundation-title">
+      <div><p class="eyebrow">THE COMPLETE WEC ERA</p><h2 id="wec-foundation-title">Every championship season since 2012.</h2><p>Follow every race weekend through entry crews, multiclass session classifications and official championship progression.</p></div>
+      <a class="button primary" href="/wec/seasons">Explore seasons</a>
+    </section>
+    <section id="wec-season-summary" class="wec-summary" aria-live="polite"><p class="loading-state">Loading WEC season…</p></section>
+    <section class="wec-home-grid" aria-label="Latest WEC archive highlights">
+      <div>
+        <div class="section-heading"><div><p class="eyebrow">LATEST CLASSIFICATION</p><h2>Last race of the season</h2></div></div>
+        <div id="wec-home-event" class="wec-home-event"><p class="loading-state">Loading latest event…</p></div>
+      </div>
+      <div>
+        <div class="section-heading"><div><p class="eyebrow">CHAMPIONS</p><h2>Season leaders</h2></div></div>
+        <div id="wec-home-leaders" class="wec-home-leaders"><p class="loading-state">Loading champions…</p></div>
+      </div>
+    </section>
+    <section class="wec-model" aria-labelledby="wec-model-title">
+      <div class="section-heading"><div><p class="eyebrow">BUILT FOR ENDURANCE</p><h2 id="wec-model-title">The car is the classified competitor.</h2></div></div>
+      <div class="wec-model-grid"><article><span>01</span><h3>Entry</h3><p>A car number, team, manufacturer and model form one event entry.</p></article><article><span>02</span><h3>Crew</h3><p>Two or three drivers share the entry while retaining individual championship records.</p></article><article><span>03</span><h3>Class</h3><p>Overall and class positions coexist without collapsing prototypes and GT cars.</p></article></div>
+    </section>
+  </main>
+  <footer class="footer"><div class="container">Racelytic</div></footer>
+  <script src="/js/utils.js"></script><script src="/js/header.js"></script><script src="/js/wec.js"></script>
+</body>
+</html>

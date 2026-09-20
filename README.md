@@ -8,6 +8,11 @@ Racelytic is a Formula 1 data and analytics website using:
 - Express
 - Plain HTML, CSS and JavaScript
 
+The archive also contains Formula 2, Formula 3, F1 Academy and Formula E. A native
+World Endurance Championship archive covers every completed championship from 2012 through 2025.
+Unlike the Formula datasets, its classification unit is a car entry
+linked to a multi-driver crew and a competition class.
+
 ## Requirements
 
 - Node.js 24+
@@ -96,6 +101,25 @@ Register a new question family in `backend/ask-intents.js`, map it to a trusted 
 Run JavaScript syntax and local-link checks with `npm run check`.
 
 Run the automated tests with `npm test`.
+
+Refresh the complete official 2012-2025 classifications, validate the WEC archive, and import its isolated tables with:
+
+```bash
+npm run collect:wec
+npm run audit:wec
+npm run import:wec
+```
+
+The versioned field contract is stored in `data/wec-data-contract.json`. Classification
+files deliberately model one result per entry; driver membership belongs in the separate
+entry-driver relation. A season-level competitor keeps each numbered car distinct for team
+championships. The archive includes the final classification for all 573 race-weekend
+practice, qualifying, Hyperpole, warm-up and race sessions, the two Super Seasons,
+historic LMP1 and GTE classes, later Le Mans-only LMP2, innovative entries, and official
+championship points after every round for all 13 completed seasons. Prologue and test sessions,
+interim race-hour snapshots, lap analysis, pit-stop logs and weather feeds are deliberately
+outside this archive scope. Use `npm run collect:wec -- --refresh` to bypass the local source
+cache.
 
 Refresh complete Formula 2 practice, qualifying, grid, and race classifications from Motorsport
 Stats with `npm run import:f2-results`. Use `-- --year=2025` to refresh one
