@@ -3,21 +3,23 @@ const { loadRatingEvents } = require('../backend/rating-data');
 const { calculateRatings, DEFAULT_CONFIGURATION, MODEL_VERSION } = require('../backend/rating-engine');
 const { configuredEvents } = require('../backend/rating-calibration');
 const { calculateJointRatings, F1_JOINT_CONFIGURATION, JOINT_MODEL_VERSION } = require('../backend/joint-rating-model');
+const { calculateWecRatings, WEC_MODEL_VERSION } = require('../backend/wec-rating-model');
 const { ensureRatingsSchema } = require('../backend/ratings');
 
-const VALID_SERIES = ['f1', 'f2', 'f3', 'academy', 'fe'];
+const VALID_SERIES = ['f1', 'f2', 'f3', 'academy', 'fe', 'wec'];
 const requested = process.argv.find(argument => argument.startsWith('--series='))?.split('=')[1];
 const dryRun = process.argv.includes('--dry-run');
 
 function insertSql(count) {
-    const row = `(${Array(35).fill('?').join(',')})`;
+    const row = `(${Array(43).fill('?').join(',')})`;
     return `INSERT INTO app_driver_rating_events
         (model_version, series, event_id, event_date, year, round_number, event_sequence, event_name, session_type,
          driver_id, driver_name, constructor_name, position_number, position_text, rating_before,
          rating_after, rating_change, expected_score, actual_score, expected_position, field_size, completion,
          event_weight, field_strength, effective_evidence, uncertainty_before, uncertainty_after,
          evidence_before, evidence_after,
-         opponents_beaten, higher_rated_beaten, key_rival_id, key_rival_name, key_rival_rating, key_rival_outcome)
+         opponents_beaten, higher_rated_beaten, key_rival_id, key_rival_name, key_rival_rating, key_rival_outcome,
+         class_id, class_code, class_name, class_scope, entry_id, car_number, manufacturer_name, crew_size)
         VALUES ${Array(count).fill(row).join(',')}`;
 }
 
@@ -45,7 +47,9 @@ function values(row) {
         row.expectedScore, row.actualScore, row.expectedPosition, row.fieldSize, row.completion,
         row.eventWeight, row.fieldStrength, row.effectiveEvidence, row.uncertaintyBefore, row.uncertaintyAfter,
         row.evidenceBefore, row.evidenceAfter,
-        row.opponentsBeaten, row.higherRatedBeaten, row.keyRivalId, row.keyRivalName, row.keyRivalRating, row.keyRivalOutcome];
+        row.opponentsBeaten, row.higherRatedBeaten, row.keyRivalId, row.keyRivalName, row.keyRivalRating, row.keyRivalOutcome,
+        row.classId || null, row.classCode || null, row.className || null, row.classScope || null,
+        row.entryId || null, row.carNumber || null, row.manufacturerName || null, row.crewSize || null];
 }
 
 const JOINT_COLUMNS = ['model_version', 'series', 'event_id', 'event_date', 'year', 'round_number', 'event_sequence',
@@ -77,13 +81,16 @@ function jointValues(row) {
 
 async function rebuild(series, connection) {
     const events = await loadRatingEvents(connection, series);
-    const result = calculateRatings(configuredEvents(events, DEFAULT_CONFIGURATION), DEFAULT_CONFIGURATION);
+    const result = series === 'wec'
+        ? calculateWecRatings(events, DEFAULT_CONFIGURATION)
+        : calculateRatings(configuredEvents(events, DEFAULT_CONFIGURATION), DEFAULT_CONFIGURATION);
+    const modelVersion = series === 'wec' ? WEC_MODEL_VERSION : MODEL_VERSION;
     console.log(`${series.toUpperCase()}: ${events.length} events, ${result.rows.length} rating rows`);
     if (dryRun) return;
 
     await connection.beginTransaction();
     try {
-        await connection.query('DELETE FROM app_driver_rating_events WHERE model_version = ? AND series = ?', [MODEL_VERSION, series]);
+        await connection.query('DELETE FROM app_driver_rating_events WHERE model_version = ? AND series = ?', [modelVersion, series]);
         for (let offset = 0; offset < result.rows.length; offset += 200) {
             const batch = result.rows.slice(offset, offset + 200);
             await connection.query(insertSql(batch.length), batch.flatMap(values));
@@ -93,7 +100,7 @@ async function rebuild(series, connection) {
             VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
             ON DUPLICATE KEY UPDATE event_count = VALUES(event_count), rating_row_count = VALUES(rating_row_count),
                 configuration = VALUES(configuration), calculated_at = CURRENT_TIMESTAMP`,
-            [MODEL_VERSION, series, events.length, result.rows.length, JSON.stringify(result.configuration)]);
+            [modelVersion, series, events.length, result.rows.length, JSON.stringify(result.configuration)]);
         await connection.commit();
     } catch (error) {
         await connection.rollback();
@@ -141,7 +148,7 @@ async function main() {
         await pool.end();
     }
     console.log(dryRun ? 'Dry run complete; no ratings were written.'
-        : `Ratings rebuilt with ${MODEL_VERSION}; F1 team-adjusted beta uses ${JOINT_MODEL_VERSION}.`);
+        : `Ratings rebuilt with ${MODEL_VERSION}; WEC uses ${WEC_MODEL_VERSION}; F1 team-adjusted beta uses ${JOINT_MODEL_VERSION}.`);
 }
 
 if (require.main === module) main().catch(async error => {

@@ -4,12 +4,13 @@ const { withConnection, sendError, pool } = require('../route-helpers');
 const { ensureAuthSchema, requireUser } = require('../auth');
 const f1Records = require('../f1-records');
 const juniorRecords = require('../junior-records');
+const wecRecords = require('../wec-records');
 
 const router = express.Router();
 const { isJuniorSeries } = require('../series-config');
 
 function recordConfiguration(input = {}) {
-    return isJuniorSeries(input.series) ? juniorRecords.configuration(input) : f1Records.configuration(input);
+    return input.series === 'wec' ? wecRecords.configuration(input) : isJuniorSeries(input.series) ? juniorRecords.configuration(input) : f1Records.configuration(input);
 }
 
 router.use('/api/records/saved', (req, res, next) => {
@@ -62,12 +63,18 @@ router.delete('/api/records/saved/:id', requireUser, async (req, res) => {
 
 router.get('/api/records/explore', async (req, res) => {
     try {
-        const records = isJuniorSeries(req.query.series) ? juniorRecords : f1Records;
+        const records = req.query.series === 'wec' ? wecRecords : isJuniorSeries(req.query.series) ? juniorRecords : f1Records;
         return res.json(await withConnection(connection => records.explore(connection, req.query)));
     } catch (error) {
         if (error.status === 400) return res.status(400).json({ error: error.message });
         sendError(res, error);
     }
+});
+
+router.get('/api/records/options', async (req, res) => {
+    if (req.query.series !== 'wec') return res.status(400).json({ error: 'Record options are only available for WEC.' });
+    try { return res.json(await withConnection(connection => wecRecords.options(connection))); }
+    catch (error) { sendError(res, error); }
 });
 
 module.exports = router;

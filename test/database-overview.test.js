@@ -84,7 +84,10 @@ test('shared directory keeps the added section gap and responsive card layouts',
 });
 
 async function loadCounts(data, fail = false, series = 'f1') {
-    const elements = ['seasons', 'drivers', 'constructors', 'circuits', 'races', 'chassis'].map(key => ({
+    const keys = series === 'wec'
+        ? ['seasons', 'races', 'drivers', 'teams', 'circuits', 'cars']
+        : ['seasons', 'drivers', 'constructors', 'circuits', 'races', 'chassis'];
+    const elements = keys.map(key => ({
         dataset: { archiveCount: key }, textContent: '—',
         previousElementSibling: { textContent: key === 'constructors' && series !== 'f1' ? 'Teams' : key },
         setAttribute(name, value) { this[name] = value; }
@@ -92,7 +95,7 @@ async function loadCounts(data, fail = false, series = 'f1') {
     const errors = [];
     await vm.runInNewContext(script, {
         getJSON: async url => {
-            assert.equal(url, `/api/dashboard?series=${series}&archive=1`);
+            assert.equal(url, series === 'wec' ? '/api/wec/database' : `/api/dashboard?series=${series}&archive=1`);
             if (fail) throw new Error('Offline');
             return data;
         },
@@ -117,6 +120,12 @@ test('shared counts use the active championship and the visible team label', asy
         assert.deepEqual(errors, []);
         assert.equal(elements.find(element => element.dataset.archiveCount === 'constructors')['aria-label'], '15 teams in the archive');
     }
+});
+
+test('WEC directory uses its endurance archive summary endpoint', async () => {
+    const { elements, errors } = await loadCounts({ seasons: 14, races: 100, drivers: 500, teams: 90, circuits: 20, cars: 70 }, false, 'wec');
+    assert.deepEqual(errors, []);
+    assert.deepEqual(elements.map(element => element.textContent), ['14', '100', '500', '90', '20', '70']);
 });
 
 test('missing or invalid counts retain placeholders without breaking the directory', async () => {

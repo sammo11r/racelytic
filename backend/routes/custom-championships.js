@@ -2,37 +2,12 @@ const crypto = require('node:crypto');
 const express = require('express');
 const { pool, sendError } = require('../route-helpers');
 const { ensureAuthSchema, getUserFromRequest, requireUser } = require('../auth');
+const { configuration } = require('../custom-championship');
 
 const router = express.Router();
 const fields = `c.id, c.user_id AS userId, u.display_name AS ownerName, c.name, c.description,
     c.visibility, c.configuration, c.created_at AS createdAt, c.updated_at AS updatedAt`;
 
-function configuration(input = {}) {
-    const identifiers = (value, limit) => Array.isArray(value)
-        ? [...new Set(value.map(item => String(item).slice(0, 100)).filter(Boolean))].slice(0, limit) : [];
-    const points = input.pointsSystem || {};
-    const scale = value => Array.isArray(value) ? value.slice(0, 30).map(Number).filter(number => Number.isFinite(number) && number >= 0 && number <= 1000) : [];
-    const raceIds = identifiers(input.raceIds, 100);
-    if (!raceIds.length) throw new Error('Add at least one race.');
-    return {
-        series: ['f1', 'f2', 'f3', 'academy', 'fe'].includes(input.series) ? input.series : 'f1',
-        raceIds,
-        driverIds: identifiers(input.driverIds, 1000),
-        constructorIds: identifiers(input.constructorIds, 500),
-        pointsSystem: {
-            id: String(points.id || 'modern').slice(0, 100), name: String(points.name || 'Modern').slice(0, 100),
-            race: scale(points.race), sprint: scale(points.sprint), qualifying: scale(points.qualifying),
-            poleBonus: Number(points.poleBonus || 0), fastestLapBonus: Number(points.fastestLapBonus || 0),
-            fastestLapMaxPosition: points.fastestLapMaxPosition == null ? null : Number(points.fastestLapMaxPosition),
-            countBest: points.countBest == null ? null : Number(points.countBest),
-            bestFirstRounds: points.bestFirstRounds == null ? null : Number(points.bestFirstRounds),
-            firstRoundsWindow: points.firstRoundsWindow == null ? null : Number(points.firstRoundsWindow),
-            bestLastRounds: points.bestLastRounds == null ? null : Number(points.bestLastRounds),
-            lastRoundsWindow: points.lastRoundsWindow == null ? null : Number(points.lastRoundsWindow),
-            sprintCountsTowardRound: points.sprintCountsTowardRound !== false
-        }
-    };
-}
 function serialize(row) { return { ...row, configuration: typeof row.configuration === 'string' ? JSON.parse(row.configuration) : row.configuration, owned: Boolean(row.owned) }; }
 function payload(body) {
     const name = String(body.name || '').trim(), description = String(body.description || '').trim();

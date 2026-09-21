@@ -572,3 +572,51 @@ wec-2025-r8-bahrain-qualifying-lmgt3,wec-2025-r8-bahrain,wec-2025,Qualifying LMG
 wec-2025-r8-bahrain-hyperpole-lmgt3,wec-2025-r8-bahrain,wec-2025,Hyperpole LMGT3,hyperpole,wec-2025-lmgt3,2025-11-07T13:20:00.000Z,completed
 wec-2025-r8-bahrain-qualifying-hypercar,wec-2025-r8-bahrain,wec-2025,Qualifying HYPERCAR,qualifying,wec-2025-hypercar,2025-11-07T13:40:00.000Z,completed
 wec-2025-r8-bahrain-hyperpole-hypercar,wec-2025-r8-bahrain,wec-2025,Hyperpole HYPERCAR,hyperpole,wec-2025-hypercar,2025-11-07T14:00:00.000Z,completed
+wec-2026-r1-imola-race,wec-2026-r1-imola,wec-2026,Race,race,,2026-04-19T11:00:00Z,completed
+wec-2026-r1-imola-free-practice-1,wec-2026-r1-imola,wec-2026,Free Practice 1,practice,,2026-04-17T08:15:00.000Z,completed
+wec-2026-r1-imola-free-practice-2,wec-2026-r1-imola,wec-2026,Free Practice 2,practice,,2026-04-17T13:15:00.000Z,completed
+wec-2026-r1-imola-free-practice-3,wec-2026-r1-imola,wec-2026,Free Practice 3,practice,,2026-04-18T08:30:00.000Z,completed
+wec-2026-r1-imola-qualifying-lmgt3,wec-2026-r1-imola,wec-2026,Qualifying LMGT3,qualifying,wec-2026-lmgt3,2026-04-18T12:30:00.000Z,completed
+wec-2026-r1-imola-hyperpole-lmgt3,wec-2026-r1-imola,wec-2026,Hyperpole LMGT3,hyperpole,wec-2026-lmgt3,2026-04-18T12:50:00.000Z,completed
+wec-2026-r1-imola-qualifying-hypercar,wec-2026-r1-imola,wec-2026,Qualifying HYPERCAR,qualifying,wec-2026-hypercar,2026-04-18T13:10:00.000Z,completed
+wec-2026-r1-imola-hyperpole-hypercar,wec-2026-r1-imola,wec-2026,Hyperpole HYPERCAR,hyperpole,wec-2026-hypercar,2026-04-18T13:30:00.000Z,completed
+wec-2026-r1-imola-qualifying,wec-2026-r1-imola,wec-2026,Qualifying,qualifying,,2026-04-18T14:40:00.000Z,completed
+wec-2026-r2-spa-race,wec-2026-r2-spa,wec-2026,Race,race,,2026-05-09T12:00:00Z,completed
+wec-2026-r2-spa-free-practice-1,wec-2026-r2-spa,wec-2026,Free Practice 1,practice,,2026-05-07T09:00:00.000Z,completed
+wec-2026-r2-spa-free-practice-2,wec-2026-r2-spa,wec-2026,Free Practice 2,practice,,2026-05-07T13:40:00.000Z,completed
+wec-2026-r2-spa-free-practice-3,wec-2026-r2-spa,wec-2026,Free Practice 3,practice,,2026-05-08T08:10:00.000Z,completed
+wec-2026-r2-spa-qualifying-lmgt3,wec-2026-r2-spa,wec-2026,Qualifying LMGT3,qualifying,wec-2026-lmgt3,2026-05-08T12:30:00.000Z,completed
+wec-2026-r2-spa-hyperpole-lmgt3,wec-2026-r2-spa,wec-2026,Hyperpole LMGT3,hyperpole,wec-2026-lmgt3,2026-05-08T12:55:00.000Z,completed
+wec-2026-r2-spa-qualifying-hypercar,wec-2026-r2-spa,wec-2026,Qualifying HYPERCAR,qualifying,wec-2026-hypercar,2026-05-08T13:20:00.000Z,completed
+wec-2026-r2-spa-hyperpole-hypercar,wec-2026-r2-spa,wec-2026,Hyperpole HYPERCAR,hyperpole,wec-2026-hypercar,2026-05-08T13:45:00.000Z,completed
+wec-2026-r2-spa-qualifying,wec-2026-r2-spa,wec-2026,Qualifying,qualifying,,2026-05-08T14:40:00.000Z,completed
+wec-2026-r3-le-mans-race,wec-2026-r3-le-mans,wec-2026,Race,race,,2026-06-13T14:00:00Z,completed
+wec-2026-r3-le-mans-free-practice-1,wec-2026-r3-le-mans,wec-2026,Free Practice 1,practice,,2026-06-10T12:10:00.000Z,completed
+wec-2026-r3-le-mans-qualifying-lmp2-lmgt3,wec-2026-r3-le-mans,wec-2026,Qualifying LMP2-LMGT3,qualifying,,2026-06-10T16:45:00.000Z,completed
+wec-2026-r3-le-mans-qualifying-hypercar,wec-2026-r3-le-mans,wec-2026,Qualifying HYPERCAR,qualifying,wec-2026-hypercar,2026-06-10T17:30:00.000Z,completed
+wec-2026-r3-le-mans-free-practice-2,wec-2026-r3-le-mans,wec-2026,Free Practice 2,practice,,2026-06-10T20:00:00.000Z,completed
+wec-2026-r3-le-mans-free-practice-3,wec-2026-r3-le-mans,wec-2026,Free Practice 3,practice,,2026-06-11T12:45:00.000Z,completed
+wec-2026-r3-le-mans-hyperpole-1-lmp2-lmgt3,wec-2026-r3-le-mans,wec-2026,Hyperpole 1 LMP2-LMGT3,hyperpole,,2026-06-11T18:00:00.000Z,completed
+wec-2026-r3-le-mans-hyperpole-2-lmp2-lmgt3,wec-2026-r3-le-mans,wec-2026,Hyperpole 2 LMP2-LMGT3,hyperpole,,2026-06-11T18:35:00.000Z,completed
+wec-2026-r3-le-mans-hyperpole-1-hypercar,wec-2026-r3-le-mans,wec-2026,Hyperpole 1 HYPERCAR,hyperpole,wec-2026-hypercar,2026-06-11T19:05:00.000Z,completed
+wec-2026-r3-le-mans-hyperpole-2-hypercar,wec-2026-r3-le-mans,wec-2026,Hyperpole 2 HYPERCAR,hyperpole,wec-2026-hypercar,2026-06-11T19:40:00.000Z,completed
+wec-2026-r3-le-mans-free-practice-4,wec-2026-r3-le-mans,wec-2026,Free Practice 4,practice,,2026-06-11T21:05:00.000Z,completed
+wec-2026-r3-le-mans-warm-up,wec-2026-r3-le-mans,wec-2026,Warm Up,warm-up,,2026-06-13T10:00:00.000Z,completed
+wec-2026-r4-sao-paulo-race,wec-2026-r4-sao-paulo,wec-2026,Race,race,,2026-07-12T14:30:00Z,completed
+wec-2026-r4-sao-paulo-free-practice-1,wec-2026-r4-sao-paulo,wec-2026,Free Practice 1,practice,,2026-07-10T14:00:00.000Z,completed
+wec-2026-r4-sao-paulo-free-practice-2,wec-2026-r4-sao-paulo,wec-2026,Free Practice 2,practice,,2026-07-10T18:50:00.000Z,completed
+wec-2026-r4-sao-paulo-free-practice-3,wec-2026-r4-sao-paulo,wec-2026,Free Practice 3,practice,,2026-07-11T13:10:00.000Z,completed
+wec-2026-r4-sao-paulo-qualifying-lmgt3,wec-2026-r4-sao-paulo,wec-2026,Qualifying LMGT3,qualifying,wec-2026-lmgt3,2026-07-11T17:30:00.000Z,completed
+wec-2026-r4-sao-paulo-hyperpole-lmgt3,wec-2026-r4-sao-paulo,wec-2026,Hyperpole LMGT3,hyperpole,wec-2026-lmgt3,2026-07-11T17:50:00.000Z,completed
+wec-2026-r4-sao-paulo-qualifying-hypercar,wec-2026-r4-sao-paulo,wec-2026,Qualifying HYPERCAR,qualifying,wec-2026-hypercar,2026-07-11T18:10:00.000Z,completed
+wec-2026-r4-sao-paulo-hyperpole-hypercar,wec-2026-r4-sao-paulo,wec-2026,Hyperpole HYPERCAR,hyperpole,wec-2026-hypercar,2026-07-11T18:30:00.000Z,completed
+wec-2026-r4-sao-paulo-qualifying,wec-2026-r4-sao-paulo,wec-2026,Qualifying,qualifying,,2026-07-11T20:30:00.000Z,completed
+wec-2026-r5-cota-race,wec-2026-r5-cota,wec-2026,Race,race,,2026-09-06T18:00:00Z,completed
+wec-2026-r5-cota-free-practice-1,wec-2026-r5-cota,wec-2026,Free Practice 1,practice,,2026-09-04T16:30:00.000Z,completed
+wec-2026-r5-cota-free-practice-2,wec-2026-r5-cota,wec-2026,Free Practice 2,practice,,2026-09-04T21:00:00.000Z,completed
+wec-2026-r5-cota-free-practice-3,wec-2026-r5-cota,wec-2026,Free Practice 3,practice,,2026-09-05T16:00:00.000Z,completed
+wec-2026-r5-cota-qualifying-lmgt3,wec-2026-r5-cota,wec-2026,Qualifying LMGT3,qualifying,wec-2026-lmgt3,2026-09-05T20:00:00.000Z,completed
+wec-2026-r5-cota-hyperpole-lmgt3,wec-2026-r5-cota,wec-2026,Hyperpole LMGT3,hyperpole,wec-2026-lmgt3,2026-09-05T20:20:00.000Z,completed
+wec-2026-r5-cota-qualifying-hypercar,wec-2026-r5-cota,wec-2026,Qualifying HYPERCAR,qualifying,wec-2026-hypercar,2026-09-05T20:40:00.000Z,completed
+wec-2026-r5-cota-hyperpole-hypercar,wec-2026-r5-cota,wec-2026,Hyperpole HYPERCAR,hyperpole,wec-2026-hypercar,2026-09-05T21:00:00.000Z,completed
+wec-2026-r5-cota-qualifying,wec-2026-r5-cota,wec-2026,Qualifying,qualifying,,2026-09-05T22:30:00.000Z,completed

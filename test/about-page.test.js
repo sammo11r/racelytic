@@ -24,7 +24,7 @@ for (const [series, html] of [['F1', f1], ['F2', f2], ['F3', f3]]) {
 }
 
 test('About is a series-neutral navigation destination', () => {
-  assert.match(navigation, /seriesNeutralPages = \['\/account', '\/privacy', '\/terms', '\/about', '\/community', '\/ratings'\]/);
+  assert.match(navigation, /seriesNeutralPages = \['\/account', '\/privacy', '\/terms', '\/about', '\/community', '\/ratings', '\/data-sources'\]/);
   assert.match(navigation, /aboutLink\.href = `\/about\?series=\$\{activeSeries\}`/);
   assert.match(navigation, /aboutLink\.href = '\/about\?series=f2'/);
 });
@@ -51,4 +51,5 @@ test('About layout remains compact and responsive', () => {
   assert.match(css, /grid-template-columns: repeat\(2, minmax\(0, 1fr\)\)/);
   assert.match(css, /@media \(max-width: 560px\)/);
   assert.match(css, /\.about-principles-grid \{ grid-template-columns: 1fr; \}/);
+  assert.match(css, /\.wec-mode \.about-principles-grid article > span \{ color: #7fe0ba; \}/);
 });

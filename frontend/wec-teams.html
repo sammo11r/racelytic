@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Browse FIA World Endurance Championship teams, manufacturers, classes, victories, podiums and title records.">
+  <link rel="icon" href="/assets/favicon-wec.svg" type="image/svg+xml">
+  <title>WEC Teams · Racelytic</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/polish.css">
+  <link rel="stylesheet" href="/css/wec.css">
+</head>
+<body class="wec-mode" data-wec-view="teams">
+  <div id="header"></div>
+  <main class="container page wec-page wec-teams-page">
+    <section class="wec-team-browser" aria-labelledby="wec-team-browser-title">
+      <div class="wec-team-browser-title">
+        <div><p class="eyebrow">TEAM ARCHIVE</p><h1 id="wec-team-browser-title">Teams</h1></div>
+        <div class="standings-mode" role="group" aria-label="Team archive view">
+          <button type="button" class="standings-mode-button active" data-wec-team-view="current" aria-pressed="true">Latest recorded grid</button>
+          <button type="button" class="standings-mode-button" data-wec-team-view="all" aria-pressed="false">All teams</button>
+        </div>
+      </div>
+      <div class="wec-team-filter-grid" role="search" aria-label="Filter WEC teams">
+        <label class="wec-team-search"><span>Search</span><input id="wec-team-search" type="search" placeholder="Team, manufacturer, country or class…" autocomplete="off"></label>
+        <label><span>Season</span><select id="wec-team-season"><option value="all">All seasons</option></select></label>
+        <label><span>Class</span><select id="wec-team-class"><option value="all">All classes</option></select></label>
+        <label><span>Manufacturer</span><select id="wec-team-manufacturer"><option value="all">All manufacturers</option></select></label>
+        <label><span>Country</span><select id="wec-team-country"><option value="all">All countries</option></select></label>
+        <label><span>Achievement</span><select id="wec-team-achievement"><option value="all">All teams</option><option value="champions">Title winners</option><option value="overall-winners">Overall winners</option><option value="class-winners">Class winners</option><option value="podiums">Class podium finishers</option></select></label>
+        <label><span>Order by</span><select id="wec-team-sort"><option value="recent">Most recent</option><option value="name">Name A–Z</option><option value="starts">Most entries</option><option value="wins">Most class wins</option><option value="podiums">Most podiums</option><option value="titles">Most titles</option></select></label>
+        <button type="button" id="wec-team-clear" class="button secondary">Clear filters</button>
+      </div>
+    </section>
+    <div class="wec-team-toolbar"><p id="wec-team-count" aria-live="polite">Loading teams…</p><p id="wec-team-status" role="status"></p></div>
+    <div id="wec-teams" class="wec-team-grid" aria-busy="true" aria-label="Loading WEC teams">
+      <article class="wec-team-card wec-team-card-skeleton" aria-hidden="true"></article>
+      <article class="wec-team-card wec-team-card-skeleton" aria-hidden="true"></article>
+      <article class="wec-team-card wec-team-card-skeleton" aria-hidden="true"></article>
+      <article class="wec-team-card wec-team-card-skeleton" aria-hidden="true"></article>
+      <article class="wec-team-card wec-team-card-skeleton" aria-hidden="true"></article>
+      <article class="wec-team-card wec-team-card-skeleton" aria-hidden="true"></article>
+      <article class="wec-team-card wec-team-card-skeleton" aria-hidden="true"></article>
+      <article class="wec-team-card wec-team-card-skeleton" aria-hidden="true"></article>
+    </div>
+  </main>
+  <footer class="footer"><div class="container">Racelytic</div></footer>
+  <script src="/js/utils.js"></script>
+  <script src="/js/wec-archive-scope-model.js"></script>
+  <script src="/js/header.js"></script>
+  <script src="/js/wec-teams.js"></script>
+</body>
+</html>

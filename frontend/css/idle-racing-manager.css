@@ -19,6 +19,9 @@
 .irm-guide-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 10px; margin-top: 12px; }
 .irm-guide-grid article { display: grid; grid-template-columns: 34px minmax(0,1fr); gap: 12px; min-height: 156px; padding: 20px; border: 1px solid rgba(255,255,255,.075); border-radius: 12px; background: #1a1f27; }
 .irm-guide-grid article b { color: var(--accent); font-size: 11px; font-variant-numeric: tabular-nums; }
+.wec-mode .irm-guide-grid article b,
+.wec-mode .irm-team-snapshot article > button,
+.wec-mode .irm-race-card-actions button { color: #67d9a2; }
 .irm-guide-grid h3 { margin: 0; font-size: 16px; letter-spacing: -.025em; }
 .irm-guide-grid p { margin: 8px 0 0; color: #929ba7; font-size: 12px; line-height: 1.6; }
 .irm-guide-tip { display: flex; justify-content: space-between; gap: 24px; align-items: center; margin-top: 12px; padding: 17px 20px; border-left: 3px solid var(--accent); border-radius: 8px; background: rgba(var(--accent-rgb),.075); }
@@ -105,6 +108,7 @@
 .irm-entry-summary strong { display: block; margin-top: 6px; font-size: 12px; }
 .positive { color: #62d69d !important; }
 .irm-start-race { display: flex; justify-content: space-between; align-items: center; width: 100%; min-height: 58px; padding: 0 18px; border: 0; border-radius: 10px; background: var(--accent); color: #fff; text-align: left; box-shadow: 0 12px 28px rgba(var(--accent-rgb),.2); }
+.wec-mode .irm-start-race small { opacity: 1; }
 .irm-start-race span { font-size: 13px; font-weight: 900; text-transform: uppercase; }
 .irm-start-race small { opacity: .75; }
 .irm-start-race:disabled,.irm-service-button:disabled,.irm-upgrade-node:disabled,.irm-market-card > button:disabled,.irm-sponsor-card > button:disabled { cursor: not-allowed; filter: saturate(.2); opacity: .45; }

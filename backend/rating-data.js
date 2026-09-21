@@ -150,8 +150,83 @@ async function loadJuniorEvents(connection, series) {
     return grouped;
 }
 
-async function loadRatingEvents(connection, series) {
-    return series === 'f1' ? loadF1Events(connection) : loadJuniorEvents(connection, series);
+function wecClassScope(code) {
+    const value = String(code || '').toUpperCase();
+    if (value === 'LMP1' || value === 'HYPERCAR') return 'top';
+    if (value === 'LMP2') return 'lmp2';
+    if (value === 'LMGTE PRO') return 'gt-pro';
+    if (value === 'LMGTE AM' || value === 'LMGT3') return 'gt';
+    return 'other';
 }
 
-module.exports = { classified, disqualified, eventDistanceWeight, groupEvents, loadF1Events, loadJuniorEvents, loadRatingEvents, participants, started };
+function wecEntryStatus(row) {
+    const status = String(row.status || '').toLowerCase();
+    const position = Number(row.classPosition);
+    return {
+        started: status !== 'not-started',
+        classified: status === 'classified' && position > 0,
+        disqualified: status === 'disqualified' || status === 'excluded'
+    };
+}
+
+async function loadWecEvents(connection) {
+    const rows = await connection.query(`SELECT events.id AS sourceEventId, CAST(events.date AS CHAR) AS eventDate,
+        events.year, events.round, events.name AS eventName,
+        classes.id AS classId, classes.code AS classCode, classes.name AS className, classes.displayOrder,
+        results.entryId, results.classPosition, results.status, results.laps,
+        entries.carNumber, teams.name AS teamName, manufacturers.name AS manufacturerName,
+        crew.driverId, crew.crewOrder, drivers.name AS driverName
+        FROM wec_sessions sessions
+        JOIN wec_events events ON events.id = sessions.eventId
+        JOIN wec_session_results results ON results.sessionId = sessions.id AND results.eventId = sessions.eventId
+        JOIN wec_classes classes ON classes.id = results.classId
+        JOIN wec_entries entries ON entries.id = results.entryId AND entries.eventId = results.eventId
+        JOIN wec_entry_drivers crew ON crew.entryId = entries.id AND crew.eventId = entries.eventId
+        JOIN wec_drivers drivers ON drivers.id = crew.driverId
+        LEFT JOIN wec_teams teams ON teams.id = entries.teamId
+        LEFT JOIN wec_manufacturers manufacturers ON manufacturers.id = entries.manufacturerId
+        WHERE sessions.type = 'race' AND sessions.status = 'completed' AND events.status = 'completed'
+        ORDER BY events.date, events.round, classes.displayOrder, results.classPosition, crew.crewOrder`);
+    const groups = new Map();
+    for (const row of rows) {
+        const key = `${row.sourceEventId}:${row.classId}`;
+        if (!groups.has(key)) groups.set(key, []);
+        groups.get(key).push(row);
+    }
+    return [...groups.entries()].map(([id, classRows]) => {
+        const first = classRows[0], entries = new Map();
+        const maxLaps = Math.max(0, ...classRows.map(row => Number(row.laps) || 0));
+        for (const row of classRows) {
+            if (!entries.has(row.entryId)) {
+                const state = wecEntryStatus(row);
+                entries.set(row.entryId, {
+                    id: String(row.entryId), carNumber: String(row.carNumber || ''), teamName: row.teamName || '',
+                    manufacturerName: row.manufacturerName || '', positionNumber: Number(row.classPosition) > 0 ? Number(row.classPosition) : null,
+                    finishOrder: Number(row.classPosition) > 0 ? Number(row.classPosition) : 999,
+                    status: row.status || '', laps: Number(row.laps) || 0, ...state, drivers: []
+                });
+            }
+            const entry = entries.get(row.entryId);
+            if (!entry.drivers.some(driver => driver.id === String(row.driverId))) {
+                entry.drivers.push({ id: String(row.driverId), name: row.driverName || row.driverId,
+                    crewOrder: Number(row.crewOrder) || 0 });
+            }
+        }
+        for (const entry of entries.values()) {
+            entry.drivers.sort((a, b) => a.crewOrder - b.crewOrder);
+            entry.completion = entry.classified || entry.disqualified ? 1 : maxLaps ? Math.min(1, entry.laps / maxLaps) : 0;
+        }
+        return { id, sourceEventId: String(first.sourceEventId), series: 'wec', date: first.eventDate,
+            datePrecision: 'date', year: Number(first.year), round: Number(first.round), eventSequence: Number(first.displayOrder) || 0,
+            name: first.eventName, sessionType: 'race', weight: 1,
+            classId: first.classId, classCode: first.classCode, className: first.className,
+            classScope: wecClassScope(first.classCode), entries: [...entries.values()] };
+    });
+}
+
+async function loadRatingEvents(connection, series) {
+    return series === 'f1' ? loadF1Events(connection) : series === 'wec' ? loadWecEvents(connection) : loadJuniorEvents(connection, series);
+}
+
+module.exports = { classified, disqualified, eventDistanceWeight, groupEvents, loadF1Events, loadJuniorEvents,
+    loadRatingEvents, loadWecEvents, participants, started, wecClassScope, wecEntryStatus };

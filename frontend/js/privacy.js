@@ -116,10 +116,12 @@ function initialiseFooter() {
         if (isWecMode) {
             const brand = footer.querySelector('.footer-brand');
             if (brand) brand.href = '/wec';
-            const routes = { database: '/wec', analysis: '/wec/seasons' };
+            const routes = {
+                database: '/wec/database', analysis: '/wec/analysis', simulator: '/wec/simulator',
+                games: '/wec/games', community: '/community?series=wec', ratings: '/ratings?series=wec&class=top'
+            };
             footer.querySelectorAll('[data-footer-page]').forEach(link => {
                 if (routes[link.dataset.footerPage]) link.href = routes[link.dataset.footerPage];
-                else if (['ratings', 'simulator', 'games', 'community'].includes(link.dataset.footerPage)) link.hidden = true;
             });
             if (trademark) trademark.textContent = 'Racelytic is unofficial and is not associated with or endorsed by the FIA World Endurance Championship, the FIA, the ACO, any team, manufacturer, or driver. FIA WEC and related marks belong to their respective owners.';
             if (source) source.innerHTML = 'World Endurance Championship statistics are compiled from official FIA WEC calendars, session classifications and championship standings, then normalised by Racelytic. See <a href="/data-sources#wec">Data sources &amp; licences</a> for provenance and important reuse information. Data may contain errors and is not an official record.';

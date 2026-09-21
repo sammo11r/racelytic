@@ -1,6 +1,10 @@
 (async function loadArchiveCounts() {
   try {
-    const data = await getJSON(`/api/dashboard?series=${encodeURIComponent(activeSeriesKey())}&archive=1`);
+    const series = activeSeriesKey();
+    const endpoint = series === 'wec'
+      ? '/api/wec/database'
+      : `/api/dashboard?series=${encodeURIComponent(series)}&archive=1`;
+    const data = await getJSON(endpoint);
     document.querySelectorAll('[data-archive-count]').forEach(element => {
       const value = data[element.dataset.archiveCount];
       if (value === null || value === undefined || value === '' || !Number.isFinite(Number(value)) || Number(value) < 0) return;

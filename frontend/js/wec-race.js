@@ -63,7 +63,7 @@
     target.innerHTML = `${heading}<div class="wec-winner-cards" aria-label="Race winners">${winners.map(([label, entry]) => `<article class="wec-winner-card" data-class-code="${esc(entry.class.code.toLowerCase())}"><span>${esc(label)} winner</span><div><b>#${esc(entry.carNumber)}</b><h3>${esc(entry.team.name)}</h3></div><p>${esc(crewNames(entry))}</p><small>${esc(entry.manufacturer.name)} · ${esc(entry.carModel.name)}</small></article>`).join('')}</div>
       <div class="wec-race-summary-grid">
       <div class="wec-race-podium"><span>Overall podium</span><ol>${podium.map(entry => `<li><b>${entry.overallPosition}</b><div><strong>#${esc(entry.carNumber)} ${esc(entry.team.name)}</strong><small>${esc(crewNames(entry))}</small></div></li>`).join('')}</ol></div>
-      <dl class="wec-race-key-stats"><div><dt>Winning time</dt><dd>${esc(winner.time || '—')}</dd><small>${fmtNumber(winner.laps)} laps</small></div><div><dt>Margin</dt><dd>${esc(gapLabel(runnerUp?.gap) || '—')}</dd><small>To second overall</small></div><div><dt>Fastest lap</dt><dd>${esc(fastest?.bestLap || '—')}</dd><small>${fastest ? `#${esc(fastest.carNumber)} ${esc(fastest.team.name)}` : 'Not recorded'}</small></div></dl>
+      <dl class="wec-race-key-stats"><div><dt>Winning time</dt><dd>${esc(winner.time || '—')}<small>${fmtNumber(winner.laps)} laps</small></dd></div><div><dt>Margin</dt><dd>${esc(gapLabel(runnerUp?.gap) || '—')}<small>To second overall</small></dd></div><div><dt>Fastest lap</dt><dd>${esc(fastest?.bestLap || '—')}<small>${fastest ? `#${esc(fastest.carNumber)} ${esc(fastest.team.name)}` : 'Not recorded'}</small></dd></div></dl>
     </div>`;
     target.setAttribute('aria-busy', 'false');
   }

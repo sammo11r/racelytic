@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Browse FIA World Endurance Championship drivers, careers, class victories, podiums and championship records.">
+  <link rel="icon" href="/assets/favicon-wec.svg" type="image/svg+xml">
+  <title>WEC Drivers · Racelytic</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/polish.css">
+  <link rel="stylesheet" href="/css/wec.css">
+</head>
+<body class="wec-mode" data-wec-view="drivers">
+  <div id="header"></div>
+  <main class="container page wec-page wec-drivers-page">
+    <section class="wec-driver-browser" aria-labelledby="wec-driver-browser-title">
+      <div class="wec-driver-browser-title">
+        <div>
+          <p class="eyebrow">DATABASE</p>
+          <h1 id="wec-driver-browser-title">Find a driver</h1>
+        </div>
+        <button type="button" id="wec-driver-clear" class="button secondary">Clear filters</button>
+      </div>
+      <div class="wec-driver-filter-grid" role="search" aria-label="Filter WEC drivers">
+        <label class="wec-driver-search"><span>Search</span><input id="wec-driver-search" type="search" placeholder="Driver, country, code or class…" autocomplete="off"></label>
+        <label><span>Era</span><select id="wec-driver-era"><option value="all">All eras</option><option value="hypercar">Hypercar · 2021–present</option><option value="superseason">Super Seasons · 2018–2020</option><option value="lmp1">LMP1 · 2012–2017</option></select></label>
+        <label><span>Class</span><select id="wec-driver-class"><option value="all">All classes</option></select></label>
+        <label><span>Nationality</span><select id="wec-driver-country"><option value="all">All nationalities</option></select></label>
+        <label><span>Achievement</span><select id="wec-driver-achievement"><option value="all">All drivers</option><option value="champions">Title winners</option><option value="overall-winners">Overall winners</option><option value="class-winners">Class winners</option><option value="podiums">Class podium finishers</option></select></label>
+        <label><span>Order by</span><select id="wec-driver-sort"><option value="recent">Most recent</option><option value="name">Name A–Z</option><option value="starts">Most starts</option><option value="wins">Most class wins</option><option value="podiums">Most podiums</option><option value="titles">Most titles</option></select></label>
+      </div>
+    </section>
+
+    <div class="wec-driver-toolbar">
+      <p id="wec-driver-count" aria-live="polite">Loading drivers…</p>
+      <nav id="wec-driver-letters" class="driver-letters" aria-label="Filter by surname initial"></nav>
+    </div>
+    <div id="wec-drivers" class="wec-driver-grid" aria-busy="true" aria-label="Loading WEC drivers">
+      <article class="wec-driver-card wec-driver-card-skeleton" aria-hidden="true"></article>
+      <article class="wec-driver-card wec-driver-card-skeleton" aria-hidden="true"></article>
+      <article class="wec-driver-card wec-driver-card-skeleton" aria-hidden="true"></article>
+      <article class="wec-driver-card wec-driver-card-skeleton" aria-hidden="true"></article>
+      <article class="wec-driver-card wec-driver-card-skeleton" aria-hidden="true"></article>
+      <article class="wec-driver-card wec-driver-card-skeleton" aria-hidden="true"></article>
+    </div>
+  </main>
+  <footer class="footer"><div class="container">Racelytic</div></footer>
+  <script src="/js/utils.js"></script>
+  <script src="/js/wec-archive-scope-model.js"></script>
+  <script src="/js/header.js"></script>
+  <script src="/js/wec-drivers.js"></script>
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Explore recent FIA World Endurance Championship driver form through class results, reliability, crews and entries.">
+  <link rel="icon" href="/assets/favicon-wec.svg" type="image/svg+xml">
+  <title>WEC Driver Form · Racelytic</title>
+  <link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/polish.css"><link rel="stylesheet" href="/css/driver-form.css"><link rel="stylesheet" href="/css/wec.css"><link rel="stylesheet" href="/css/wec-driver-form.css">
+</head>
+<body class="wec-mode" data-wec-view="driver-form"><div id="header"></div>
+<main class="container page analysis-detail-page driver-form-page wec-driver-form-page">
+  <header class="driver-form-head">
+    <div class="driver-form-heading"><div class="eyebrow">WEC · DRIVER FORM</div><h1 id="wec-form-title">Driver form</h1><p id="wec-form-meta">Recent class results, reliability and endurance-racing crews.</p></div>
+    <div class="driver-form-selectors wec-driver-form-selectors">
+      <label><span>Driver</span><select id="wec-form-driver" disabled><option>Loading drivers…</option></select></label>
+      <label><span>Race range</span><select id="wec-form-range"><option value="5">Last 5 races</option><option value="10" selected>Last 10 races</option><option value="20">Last 20 races</option><option value="50">Last 50 races</option><option value="all">All races</option></select></label>
+      <label><span>Form line</span><select id="wec-form-window"><option value="1">Raw results</option><option value="3" selected>3-race average</option><option value="5">5-race average</option></select></label>
+    </div>
+  </header>
+  <p id="wec-driver-form-status" class="analysis-status" role="status">Loading WEC drivers…</p>
+  <section id="wec-driver-form-summary" class="analysis-summary-strip" aria-label="WEC driver form summary"></section>
+  <div id="wec-driver-form-workspace" hidden>
+    <nav class="analysis-visualization-menu" aria-label="WEC driver form views">
+      <label class="analysis-mobile-view" for="wec-form-view">Analysis view<select id="wec-form-view"><option value="trend">Recent form</option><option value="classes">Classes</option><option value="crew">Crew</option><option value="results">Results</option></select></label>
+      <div class="analysis-visualization-tabs driver-form-tabs" role="tablist">
+        <button id="wec-form-tab-trend" type="button" role="tab" aria-controls="wec-form-panel-trend" aria-selected="true" data-wec-form-view="trend">Recent form</button>
+        <button id="wec-form-tab-classes" type="button" role="tab" aria-controls="wec-form-panel-classes" aria-selected="false" tabindex="-1" data-wec-form-view="classes">Classes</button>
+        <button id="wec-form-tab-crew" type="button" role="tab" aria-controls="wec-form-panel-crew" aria-selected="false" tabindex="-1" data-wec-form-view="crew">Crew</button>
+        <button id="wec-form-tab-results" type="button" role="tab" aria-controls="wec-form-panel-results" aria-selected="false" tabindex="-1" data-wec-form-view="results">Results</button>
+      </div>
+    </nav>
+    <div class="analysis-visualization-workspace">
+      <section id="wec-form-panel-trend" role="tabpanel" aria-labelledby="wec-form-tab-trend" data-wec-form-panel="trend"></section>
+      <section id="wec-form-panel-classes" role="tabpanel" aria-labelledby="wec-form-tab-classes" data-wec-form-panel="classes" hidden></section>
+      <section id="wec-form-panel-crew" role="tabpanel" aria-labelledby="wec-form-tab-crew" data-wec-form-panel="crew" hidden></section>
+      <section id="wec-form-panel-results" role="tabpanel" aria-labelledby="wec-form-tab-results" data-wec-form-panel="results" hidden></section>
+    </div>
+  </div>
+</main><footer class="footer"><div class="container">Racelytic</div></footer>
+<script src="/js/utils.js"></script><script src="/js/header.js"></script><script src="/js/wec-driver-form-model.js"></script><script src="/js/wec-driver-form.js"></script>
+</body></html>

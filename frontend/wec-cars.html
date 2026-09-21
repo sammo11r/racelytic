@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Browse every car model raced in the FIA World Endurance Championship, with manufacturers, classes, seasons, teams and results.">
+  <link rel="icon" href="/assets/favicon-wec.svg" type="image/svg+xml">
+  <title>WEC Cars · Racelytic</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/polish.css">
+  <link rel="stylesheet" href="/css/wec.css">
+</head>
+<body class="wec-mode" data-wec-view="cars">
+  <div id="header"></div>
+  <main class="container page wec-page wec-cars-page">
+    <section class="wec-car-browser" aria-labelledby="wec-car-browser-title">
+      <div class="wec-car-browser-title">
+        <div><p class="eyebrow">CAR ARCHIVE</p><h1 id="wec-car-browser-title">Cars</h1></div>
+        <div class="standings-mode" role="group" aria-label="Car archive view">
+          <button type="button" class="standings-mode-button active" data-wec-car-view="all" aria-pressed="true">All cars</button>
+          <button type="button" class="standings-mode-button" data-wec-car-view="current" aria-pressed="false">Latest season</button>
+        </div>
+      </div>
+      <div class="wec-car-filter-grid" role="search" aria-label="Filter WEC cars">
+        <label class="wec-car-search"><span>Search</span><input id="wec-car-search" type="search" placeholder="Car, manufacturer, team or class…" autocomplete="off"></label>
+        <label><span>Season</span><select id="wec-car-season"><option value="all">All seasons</option></select></label>
+        <label><span>Class</span><select id="wec-car-class"><option value="all">All classes</option></select></label>
+        <details class="wec-car-more-filters" open>
+          <summary>More filters</summary>
+          <div>
+            <label><span>Constructor / marque</span><select id="wec-car-manufacturer"><option value="all">All constructors</option></select></label>
+            <label><span>Country</span><select id="wec-car-country"><option value="all">All countries</option></select></label>
+            <label><span>Achievement</span><select id="wec-car-achievement"><option value="all">All cars</option><option value="overall-winners">Overall winners</option><option value="class-winners">Class winners</option><option value="podiums">Class podium finishers</option></select></label>
+            <label><span>Order by</span><select id="wec-car-sort"><option value="recent">Most recent</option><option value="name">Name A–Z</option><option value="starts">Most starts</option><option value="wins">Most class wins</option><option value="podiums">Most podiums</option></select></label>
+            <button type="button" id="wec-car-clear" class="button secondary">Clear filters</button>
+          </div>
+        </details>
+      </div>
+    </section>
+    <div class="wec-car-toolbar"><p id="wec-car-count" aria-live="polite">Loading cars…</p><p id="wec-car-status" role="status"></p></div>
+    <div id="wec-cars" class="wec-car-grid" aria-busy="true" aria-label="Loading WEC cars">
+      <article class="wec-car-card wec-car-card-skeleton" aria-hidden="true"></article>
+      <article class="wec-car-card wec-car-card-skeleton" aria-hidden="true"></article>
+      <article class="wec-car-card wec-car-card-skeleton" aria-hidden="true"></article>
+      <article class="wec-car-card wec-car-card-skeleton" aria-hidden="true"></article>
+      <article class="wec-car-card wec-car-card-skeleton" aria-hidden="true"></article>
+      <article class="wec-car-card wec-car-card-skeleton" aria-hidden="true"></article>
+      <article class="wec-car-card wec-car-card-skeleton" aria-hidden="true"></article>
+      <article class="wec-car-card wec-car-card-skeleton" aria-hidden="true"></article>
+    </div>
+  </main>
+  <footer class="footer"><div class="container">Racelytic</div></footer>
+  <script src="/js/utils.js"></script>
+  <script src="/js/header.js"></script>
+  <script src="/js/wec-cars.js"></script>
+</body>
+</html>

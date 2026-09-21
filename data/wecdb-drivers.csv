@@ -27,7 +27,7 @@ tor-graves,Tor Graves,TG,united-kingdom
 robbie-kerr,Robbie Kerr,RK,united-kingdom
 john-martin,John Martin,JM,australia
 thomas-holzer,Thomas Holzer,TH,germany
-mirco-shultis,Mirco Shultis,MS,germany
+mirco-schultis,Mirco Schultis,MS,germany
 luca-moro,Luca Moro,LM,italy
 marcel-fassler,Marcel Fässler,MF,switzerland
 andre-lotterer,André Lotterer,AL,germany
@@ -44,7 +44,7 @@ patrick-pilet,Patrick Pilet,PP,france
 christian-ried,Christian Ried,CR,germany
 gianluca-roda,Gianluca Roda,GR,italy
 paolo-ruberti,Paolo Ruberti,PR,italy
-jean-phillipe-belloc,Jean-Phillipe Belloc,JB,france
+jean-philippe-belloc,Jean-Philippe Belloc,JB,france
 christophe-bourret,Christophe Bourret,CB,france
 pascal-gibon,Pascal Gibon,PG,france
 nicolas-prost,Nicolas Prost,NP,france
@@ -94,7 +94,7 @@ sam-hancock,Sam Hancock,SH,united-kingdom
 jody-firth,Jody Firth,JF,united-kingdom
 warren-hughes,Warren Hughes,WH,united-kingdom
 brendon-hartley,Brendon Hartley,BH,new-zealand
-david-heinemeir-hansson,David Heinemeir Hansson,DHH,denmark
+david-heinemeier-hansson,David Heinemeier Hansson,DHH,denmark
 bas-leinders,Bas Leinders,BL,belgium
 jack-clarke,Jack Clarke,JC,united-kingdom
 bastien-briere,Bastien Brière,BB,france
@@ -117,16 +117,14 @@ nelson-panciatici,Nelson Panciatici,NP,france
 pierre-ragues,Pierre Ragues,PR,france
 roman-rusinov,Roman Rusinov,RR,russia
 paul-daniels,Paul Daniels,PD,united-kingdom
-mirco-schultis,Mirco Schultis,MS,germany
-renger-van-der-zande,Renger Van Der Zande,RVD,netherlands
+renger-van-der-zande,Renger Van Der Zande,VDZ,netherlands
 philippe-thirion,Philippe Thirion,PT,france
 philippe-haezebrouck,Philippe Haezebrouck,PH,france
 michel-frey,Michel Frey,MF,switzerland
 jonathan-hirschi,Jonathan Hirschi,JH,switzerland
 ralph-meichtry,Ralph Meichtry,RM,switzerland
-jean-philippe-belloc,Jean-Philippe Belloc,JB,france
 brian-vickers,Brian Vickers,BV,united-states-of-america
-alexandrer-sims,Alexandrer Sims,AS,united-kingdom
+alexander-sims,Alexander Sims,AS,united-kingdom
 yelmer-buurman,Yelmer Buurman,YB,netherlands
 romain-iannetta,Romain Iannetta,RI,france
 frederic-fatien,Frédéric Fatien,FF,ivory-coast
@@ -136,12 +134,11 @@ mathias-beche,Mathias Beche,MB,switzerland
 pierre-thiriet,Pierre Thiriet,PT,france
 christophe-tinseau,Christophe Tinseau,CT,france
 jan-charouz,Jan Charouz,JC,czechia
-david-heinemeier-hansson,David Heinemeier Hansson,DHH,denmark
-maxime-martin,Maxime Martin,MM,belgium
+maxime-martin,Maxime Martin,MTN,belgium
 lucas-ordonez,Lucas Ordoñez,LO,spain
 martin-brundle,Martin Brundle,MB,united-kingdom
 alex-brundle,Alex Brundle,AB,united-kingdom
-jordan-taylor,Jordan Taylor,JT,united-states-of-america
+jordan-taylor,Jordan Taylor,JTA,united-states-of-america
 antonio-garcia,Antonio Garcia,AG,spain
 jan-magnussen,Jan Magnussen,JM,denmark
 shinji-nakano,Shinji Nakano,SN,japan
@@ -159,8 +156,6 @@ haruki-kurosawa,Haruki Kurosawa,HK,japan
 scott-tucker,Scott Tucker,ST,united-states-of-america
 christophe-bouchut,Christophe Bouchut,CB,france
 luis-diaz,Luis Diaz,LD,mexico
-alexander-sims,Alexander Sims,AS,united-kingdom
-romain-ianneta,Romain Ianneta,RI,france
 franck-montagny,Franck Montagny,FM,france
 james-walker,James Walker,JW,united-kingdom
 jonny-cocker,Jonny Cocker,JC,united-kingdom
@@ -187,7 +182,6 @@ christoffer-nygaard,Christoffer Nygaard,CN,denmark
 kristian-poulsen,Kristian Poulsen,KP,denmark
 stuart-hall,Stuart Hall,SH,united-kingdom
 marc-rostan,Marc Rostan,MR,united-kingdom
-vincente-potolicchio,Vincente Potolicchio,VP,venezuela
 christijan-albers,Christijan Albers,CA,netherlands
 roald-goethe,Roald Goethe,RG,germany
 jonathan-adam,Jonathan Adam,JA,united-kingdom
@@ -205,11 +199,11 @@ kenji-kobayashi,Kenji Kobayashi,KK,japan
 cong-fu-cheng,Cong Fu Cheng,CFC,china
 matt-bell,Matt Bell,MB,united-states-of-america
 antonio-pizzonia,Antonio Pizzonia,AP,brazil
-martin-plowmann,Martin Plowmann,MP,united-kingdom
+martin-plowman,Martin Plowman,MP,united-kingdom
 chris-dyson,Chris Dyson,CD,united-states-of-america
 michael-marsal,Michael Marsal,MM,united-states-of-america
 tom-kimber-smith,Tom Kimber-Smith,TK,united-kingdom
-alexander-imperatori,Alexander Imperatori,AI,switzerland
+alexandre-imperatori,Alexandre Imperatori,AI,switzerland
 matthew-howson,Matthew Howson,MH,united-kingdom
 jim-ka-to,Jim Ka To,KAT,china
 mike-conway,Mike Conway,MC,united-kingdom
@@ -221,12 +215,9 @@ jamie-campbell-walter,Jamie Campbell-Walter,JC,united-kingdom
 maurizio-mediani,Maurizio Mediani,MM,italy
 jean-marc-merlin,Jean-Marc Merlin,JM,france
 jack-gerber,Jack Gerber,JG,south-africa
-alexander-impertori,Alexander Impertori,AI,switzerland
 paul-dalla-anna,Paul Dalla Anna,PDA,canada
-ronald-goethe,Ronald Goethe,RG,germany
 oliver-turvey,Oliver Turvey,OT,united-kingdom
 lucas-luhr,Lucas Luhr,LL,germany
-martin-plowman,Martin Plowman,MP,united-kingdom
 rob-bell,Rob Bell,RB,united-kingdom
 richie-stanaway,Richie Stanaway,RS,new-zealand
 matteo-malucelli,Matteo Malucelli,MM,italy
@@ -245,7 +236,7 @@ lorenzo-case,Lorenzo Case,LC,italy
 darryl-o-young,Darryl O'Young,DO,canada
 patrick-dempsey,Patrick Dempsey,PD,united-states-of-america
 joe-foster,Joe Foster,JF,united-states-of-america
-ricky-taylor,Ricky Taylor,RT,united-states-of-america
+ricky-taylor,Ricky Taylor,RTA,united-states-of-america
 jonathan-bomarito,Jonathan Bomarito,JB,united-states-of-america
 tommy-kendall,Tommy Kendall,TK,united-states-of-america
 kuno-wittmer,Kuno Wittmer,KW,canada
@@ -270,7 +261,6 @@ bill-auberlen,Bill Auberlen,BA,united-states-of-america
 johnny-mowlem,Johnny Mowlem,JM,united-kingdom
 tony-burgess,Tony Burgess,TB,canada
 archie-hamilton,Archie Hamilton,AH,united-kingdom
-alexandre-imperatori,Alexandre Imperatori,AI,switzerland
 bjorn-wirdheim,Björn Wirdheim,BW,sweden
 davide-rigon,Davide Rigon,DR,italy
 nicki-thiim,Nicki Thiim,NT,denmark
@@ -281,11 +271,9 @@ masayuki-ueda,Masayuki Ueda,MU,japan
 richard-bradley,Richard Bradley,RB,united-kingdom
 hiroshi-koizumi,Hiroshi Koizumi,HK,japan
 tsugio-matsuda,Tsugio Matsuda,TM,japan
-tsuigio-matsuda,Tsuigio Matsuda,TM,japan
 craig-dolby,Craig Dolby,CD,united-kingdom
 mark-shulzhitskiy,Mark Shulzhitskiy,MS,russia
 david-cheng,David Cheng,DC,china
-mark-shulzhitckiy,Mark Shulzhitckiy,MS,russia
 wolfgang-reip,Wolfgang Reip,WR,belgium
 jon-lancaster,Jon Lancaster,JL,united-kingdom
 lucas-auer,Lucas Auer,LA,austria
@@ -293,7 +281,7 @@ mark-webber,Mark Webber,MW,australia
 nick-tandy,Nick Tandy,NT,united-kingdom
 james-calado,James Calado,JC,united-kingdom
 alvaro-parente,Alvaro Parente,AP,portugal
-serguey-zlobin,Serguey Zlobin,SZ,russia
+sergey-zlobin,Sergey Zlobin,SZ,russia
 alex-macdowall,Alex Macdowall,AM,united-kingdom
 stephen-wyatt,Stephen Wyatt,SW,australia
 sam-bird,Sam Bird,SB,united-kingdom
@@ -302,12 +290,11 @@ ben-collins,Ben Collins,BC,united-kingdom
 mirko-venturi,Mirko Venturi,MV,italy
 matthieu-vaxiviere,Matthieu Vaxivière,MV,france
 kirill-ladygin,Kirill Ladygin,KL,russia
-viktor-shaitar,Viktor Shaitar,VS,russia
+victor-shaytar,Victor Shaytar,VS,russia
 anton-ladygin,Anton Ladygin,AL,russia
 fabio-leimer,Fabio Leimer,FL,switzerland
 filipe-albuquerque,Filipe Albuquerque,FA,puerto-rico
 harry-tincknell,Harry Tincknell,HT,united-kingdom
-sergey-zlobin,Sergey Zlobin,SZ,russia
 peter-mann,Peter Mann,PM,united-states-of-america
 raffaele-giammaria,Raffaele Giammaria,RG,italy
 paul-loup-chatin,Paul-Loup Chatin,PC,france
@@ -331,16 +318,12 @@ aleksey-basov,Aleksey Basov,AB,russia
 federico-leo,Federico Leo,FL,italy
 nathanael-berthon,Nathanael Berthon,NB,france
 rodolfo-gonzalez,Rodolfo Gonzalez,RG,spain
-michael-munemman,Michael Munemman,MM,united-kingdom
+michael-munemann,Michael Munemann,MM,united-kingdom
 alessandro-latif,Alessandro Latif,AL,united-kingdom
 james-winslow,James Winslow,JW,united-kingdom
-nicolas-leutwiller,Nicolas Leutwiller,NL,switzerland
-nicik-thiim,Nicik Thiim,NT,denmark
-daryl-o-young,Daryl O'Young,DO,canada
 scott-sharp,Scott Sharp,SS,united-states-of-america
 ed-brown,Ed Brown,EB,united-states-of-america
 jeffrey-segal,Jeffrey Segal,JS,united-states-of-america
-tom-milner,Tom Milner,TM,united-states-of-america
 gustavo-yacaman,Gustavo Yacaman,GY,colombia
 michael-skeen,Michael Skeen,MS,united-states-of-america
 johannes-van-overbeek,Johannes Van Overbeek,JVO,united-states-of-america
@@ -354,8 +337,7 @@ luis-felipe-derani,Luis Felipe Derani,LFD,brazil
 michael-christensen,Michael Christensen,MC,denmark
 marco-sorensen,Marco Sørensen,MS,denmark
 mathias-lauda,Mathias Lauda,ML,austria
-victor-shaytar,Victor Shaytar,VS,russia
-francesco-castellacci,Francesco Castellacci,FC,italy
+francesco-castellacci,Francesco Castellacci,FC,monaco
 marco-seefried,Marco Seefried,MS,germany
 jonathon-fogarty,Jonathon Fogarty,JF,united-states-of-america
 nico-hulkenberg,Nico Hülkenberg,NH,germany
@@ -413,15 +395,12 @@ adam-carroll,Adam Carroll,AC,united-kingdom
 ben-barker,Ben Barker,BB,united-kingdom
 giedo-van-der-garde,Giedo Van Der Garde,GVD,netherlands
 jake-dennis,Jake Dennis,JD,united-kingdom
-devi-markozov,Devi Markozov,DM,russia
-victor-shaitar,Victor Shaitar,VS,russia
 junjin-pu,Junjin Pu,JP,china
 nico-pieter-de-bruijn,Nico Pieter De Bruijn,NPD,netherlands
 memo-rojas,Memo Rojas,MR,mexico
 timothe-buret,Timothé Buret,TB,france
 john-pew,John Pew,JP,united-states-of-america
 oswaldo-negri-jr,Oswaldo Negri Jr,ONJ,brazil
-michael-munemann,Michael Munemann,MM,united-kingdom
 christopher-hoy,Christopher Hoy,CH,united-kingdom
 andrea-pizzitola,Andrea Pizzitola,AP,france
 joey-hand,Joey Hand,JH,united-states-of-america
@@ -469,7 +448,7 @@ yuji-kunimoto,Yuji Kunimoto,YK,japan
 andre-negrao,André Negrão,AN,brazil
 ben-hanley,Ben Hanley,BH,united-kingdom
 nigel-moore,Nigel Moore,NM,united-kingdom
-philip-hanson,Philip Hanson,PH,united-kingdom
+philip-hanson,Philip Hanson,HSO,united-kingdom
 will-owen,Will Owen,WO,united-states-of-america
 hugo-de-sadeleer,Hugo De Sadeleer,HDS,switzerland
 james-allen,James Allen,JA,australia
@@ -487,7 +466,7 @@ felix-rosenqvist,Felix Rosenqvist,FR,sweden
 pierre-nicolet,Pierre Nicolet,PN,france
 tony-kanaan,Tony Kanaan,TK,brazil
 robert-smith,Robert Smith,RS,united-kingdom
-dries-vanthoor,Dries Vanthoor,DV,belgium
+dries-vanthoor,Dries Vanthoor,VAT,belgium
 ross-gunn,Ross Gunn,RG,united-kingdom
 sergey-sirotkin,Sergey Sirotkin,SS,russia
 salih-yoluc,Salih Yoluc,SY,turkey
@@ -515,12 +494,12 @@ nabil-jeffri,Nabil Jeffri,NJ,malaysia
 pastor-maldonado,Pastor Maldonado,PM,venezuela
 erwin-creed,Erwin Creed,EC,france
 romano-ricci,Romano Ricci,RR,france
-antonio-felix-da-costa,Antonio Felix Da Costa,AFD,puerto-rico
+antonio-felix-da-costa,Antonio Felix Da Costa,FDC,puerto-rico
 alexander-lynn,Alexander Lynn,AL,united-kingdom
 martin-tomczyk,Martin Tomczyk,MT,germany
 nicky-catsburg,Nicky Catsburg,NC,netherlands
 euan-alers-hankey,Euan Alers-Hankey,EA,united-kingdom
-charles-eastwood,Charles Eastwood,CE,ireland
+charlie-eastwood,Charlie Eastwood,CE,ireland
 matthew-griffin,Matthew Griffin,MG,ireland
 julien-andlauer,Julien Andlauer,JA,france
 matt-campbell,Matt Campbell,MC,australia
@@ -532,8 +511,8 @@ patrick-lindsey,Patrick Lindsey,PL,united-states-of-america
 egidio-perfetti,Egidio Perfetti,EP,norway
 egor-orudzhev,Egor Orudzhev,EO,russia
 matevos-isaakyan,Matevos Isaakyan,MI,russia
-pietro-fittipaldi,Pietro Fittipaldi,PF,united-states-of-america
-charles-robertson,Charles Robertson,CR,united-kingdom
+pietro-fittipaldi,Pietro Fittipaldi,PF,brazil
+charlie-robertson,Charlie Robertson,CR,united-kingdom
 dean-stoneman,Dean Stoneman,DS,united-kingdom
 oliver-rowland,Oliver Rowland,OR,united-kingdom
 juan-pablo-montoya,Juan Pablo Montoya,JPM,colombia
@@ -550,27 +529,26 @@ jenson-button,Jenson Button,JB,united-kingdom
 paul-di-resta,Paul Di Resta,DIR,united-kingdom
 ate-de-jong,Ate De Jong,ADJ,netherlands
 tacksung-kim,Tacksung Kim,TK,south-korea
-augusto-farfus,Augusto Farfus,AF,brazil
+augusto-farfus,Augusto Farfus,FAF,brazil
 come-ledogar,Côme Ledogar,CL,france
 alexander-davison,Alexander Davison,AD,australia
 nyck-de-vries,Nyck De Vries,DEV,netherlands
 yoshiharu-mori,Yoshiharu Mori,YM,japan
 giorgio-roda-jr,Giorgio Roda Jr,GRJ,italy
 rene-binder,René Binder,RB,austria
-charlie-eastwood,Charlie Eastwood,CE,ireland
 thomas-preining,Thomas Preining,TP,austria
 satoshi-hoshino,Satoshi Hoshino,SH,japan
-riccardo-pera,Riccardo Pera,RP,italy
+riccardo-pera,Riccardo Pera,ERA,italy
 jordan-king,Jordan King,JK,united-kingdom
 bruno-spengler,Bruno Spengler,BS,canada
 stoffel-vandoorne,Stoffel Vandoorne,SV,belgium
-job-van-uitert,Job Van Uitert,JVU,netherlands
+job-van-uitert,Job Van Uitert,VUI,netherlands
 nicolas-jamin,Nicolas Jamin,NJ,france
 john-falb,John Falb,JF,united-states-of-america
 anders-fjordbach,Anders Fjordbach,AF,denmark
 dennis-andersen,Dennis Andersen,DA,denmark
-ryan-cullen,Ryan Cullen,RC,united-kingdom
-mathieu-jaminet,Mathieu Jaminet,MJ,france
+ryan-cullen,Ryan Cullen,RC,ireland
+mathieu-jaminet,Mathieu Jaminet,JMT,france
 dennis-olsen,Dennis Olsen,DO,norway
 jesse-krohn,Jesse Krohn,JK,finland
 rodrigo-baptista,Rodrigo Baptista,RB,brazil
@@ -596,21 +574,19 @@ henning-enqvist,Henning Enqvist,HE,sweden
 konstantin-tereschenko,Konstantin Tereschenko,KT,russia
 felipe-fraga,Felipe Fraga,FF,brazil
 jorg-muller,Jörg Müller,JM,germany
-charlie-robertson,Charlie Robertson,CR,united-kingdom
 antonin-borga,Antonin Borga,AB,switzerland
 kenta-yamashita,Kenta Yamashita,KY,japan
 nicklas-nielsen,Nicklas Nielsen,NN,denmark
 andrew-watson,Andrew Watson,AW,united-kingdom
 david-kolkmann,David Kolkmann,DK,germany
 bonamy-grimes,Bonamy Grimes,BG,united-kingdom
-charles-hollings,Charles Hollings,CH,united-kingdom
+charlie-hollings,Charlie Hollings,CH,united-kingdom
 guy-smith,Guy Smith,GS,united-kingdom
 gian-luca-giraudi,Gian Luca Giraudi,GLG,italy
 ricardo-sanchez,Ricardo Sanchez,RS,mexico
 alexandre-coigny,Alexandre Coigny,AC,switzerland
 luca-ghiotto,Luca Ghiotto,LG,italy
 adrien-de-leener,Adrien De Leener,ADL,belgium
-charlie-hollings,Charlie Hollings,CH,united-kingdom
 larry-ten-voorde,Larry Ten Voorde,LTV,netherlands
 angelo-negro,Angelo Negro,AN,italy
 william-bamber,William Bamber,WB,new-zealand
@@ -620,7 +596,7 @@ laurents-horr,Laurents Hörr,LH,germany
 lucas-legeret,Lucas Légeret,LL,switzerland
 nobuya-yamanaka,Nobuya Yamanaka,NY,japan
 louis-deletraz,Louis Deletraz,LD,switzerland
-mikkel-jensen,Mikkel Jensen,MJ,denmark
+mikkel-jensen,Mikkel Jensen,JSN,denmark
 tatiana-calderon,Tatiana Calderon,TC,colombia
 sophia-florsch,Sophia Flörsch,SF,germany
 beitske-visser,Beitske Visser,BV,netherlands
@@ -632,7 +608,7 @@ richard-heistand,Richard Heistand,RH,united-states-of-america
 maxwell-root,Maxwell Root,MR,united-states-of-america
 francesco-piovanetti,Francesco Piovanetti,FP,united-states-of-america
 vutthikorn-inthraphuvasak,Vutthikorn Inthraphuvasak,VI,thailand
-horst-jr-felbermayr,Horst Jr Felbermayr,HJF,austria
+horst-jr-felbermayr,Horst Jr Felbermayr,JFE,austria
 michele-beretta,Michele Beretta,MB,italy
 max-van-splunteren,Max Van Splunteren,MVS,netherlands
 steve-brooks,Steve Brooks,SB,france
@@ -654,11 +630,9 @@ jaxon-evans,Jaxon Evans,JE,new-zealand
 alessio-picariello,Alessio Picariello,AP,belgium
 dylan-pereira,Dylan Pereira,DP,luxembourg
 colin-noble,Colin Noble,CN,united-kingdom
-phil-hanson,Phil Hanson,PH,united-kingdom
 fabio-scherer,Fabio Scherer,FS,switzerland
 esteban-garcia,Esteban Garcia,EG,switzerland
-sophia-floersch,Sophia Floersch,SF,germany
-rui-andrade,Rui Andrade,RA,angola
+rui-andrade,Rui Andrade,ANR,angola
 patrick-kelly,Patrick Kelly,PK,united-states-of-america
 alessio-rovera,Alessio Rovera,AR,italy
 antonio-fuoco,Antonio Fuoco,AF,italy
@@ -682,7 +656,7 @@ anders-buchardt,Anders Buchardt,AB,norway
 christian-hook,Christian Hook,CH,germany
 brendan-iribe,Brendan Iribe,BI,united-states-of-america
 ollie-millroy,Ollie Millroy,OM,united-kingdom
-ben-barnicoat,Ben Barnicoat,BB,united-kingdom
+ben-barnicoat,Ben Barnicoat,BAN,united-kingdom
 guillermo-rojas,Guillermo Rojas,GR,mexico
 arnold-robin,Arnold Robin,AR,france
 maxime-robin,Maxime Robin,MR,france
@@ -707,7 +681,6 @@ jody-fannin,Jody Fannin,JF,united-kingdom
 david-perel,David Perel,DP,south-africa
 jonathan-aberdein,Jonathan Aberdein,JA,south-africa
 manuel-maldonado,Manuel Maldonado,MM,united-kingdom
-vuttikhorn-inthraphuvasak,Vuttikhorn Inthraphuvasak,VI,thailand
 florian-latorre,Florian Latorre,FL,france
 kush-maini,Kush Maini,KM,india
 oliver-caldwell,Oliver Caldwell,OC,united-kingdom
@@ -758,11 +731,11 @@ mark-kvamme,Mark Kvamme,MK,united-states-of-america
 jason-hart,Jason Hart,JH,united-states-of-america
 michael-fassbender,Michael Fassbender,MF,ireland
 zacharie-robichon,Zacharie Robichon,ZR,canada
-reshad-de-gerus,Reshad De Gerus,RDG,france
+reshad-de-gerus,Reshad De Gerus,DGE,france
 nicolas-varrone,Nicolas Varrone,NV,argentina
 marvin-klein,Marvin Klein,MK,france
 philippe-cimadomo,Philippe Cimadomo,PC,france
-nick-cassidy,Nick Cassidy,NC,new-zealand
+nick-cassidy,Nick Cassidy,CAY,new-zealand
 phillip-hyett,Phillip Hyett,PH,united-states-of-america
 david-beckmann,David Beckmann,DB,germany
 frederick-lubin,Frederick Lubin,FL,united-kingdom
@@ -777,7 +750,7 @@ matthias-kaiser,Matthias Kaiser,MK,liechtenstein
 ahmad-al-harthy,Ahmad Al Harthy,ALH,oman
 michael-dinan,Michael Dinan,MD,united-states-of-america
 casper-stevenson,Casper Stevenson,CS,united-kingdom
-pj-hyett,Pj Hyett,PH,united-states-of-america
+pj-hyett,Pj Hyett,HYE,united-states-of-america
 esteban-guerrieri,Esteban Guerrieri,EG,argentina
 jacques-villeneuve,Jacques Villeneuve,JV,canada
 olli-caldwell,Olli Caldwell,OC,united-kingdom
@@ -800,7 +773,7 @@ naoki-yokomizo,Naoki Yokomizo,NY,japan
 jimmie-johnson,Jimmie Johnson,JJ,united-states-of-america
 donald-yount,Donald Yount,DY,united-states-of-america
 jonas-ried,Jonas Ried,JR,germany
-vladislav-lomko,Vladislav Lomko,VL,france
+vladislav-lomko,Vladislav Lomko,VL,grenada
 simon-pagenaud,Simon Pagenaud,SP,france
 giacomo-petrobelli,Giacomo Petrobelli,GP,italy
 valentin-hasse-clot,Valentin Hasse-Clot,HCL,france
@@ -838,7 +811,7 @@ timur-boguslavskiy,Timur Boguslavskiy,TB,russia
 kelvin-van-der-linde,Kelvin Van Der Linde,VDL,south-africa
 antonio-serravalle,Antonio Serravalle,AS,canada
 carl-wattana-bennett,Carl Wattana Bennett,CWB,thailand
-clemens-schmid,Clemens Schmid,CS,austria
+clemens-schmid,Clemens Schmid,SCM,austria
 alex-palou,Alex Palou,AP,spain
 romain-grosjean,Romain Grosjean,RG,france
 bijoy-garg,Bijoy Garg,BG,united-states-of-america
@@ -856,12 +829,12 @@ ben-tuck,Ben Tuck,BT,united-kingdom
 christopher-mies,Christopher Mies,CM,germany
 conrad-laursen,Conrad Laursen,CL,denmark
 jack-hawksworth,Jack Hawksworth,JH,united-kingdom
-benjamin-hanley,Benjamin Hanley,BH,united-kingdom
+benjamin-hanley,Benjamin Hanley,HLY,united-kingdom
 hiroshi-hamaguchi,Hiroshi Hamaguchi,HH,japan
 jean-baptiste-simmenauer,Jean-Baptiste Simmenauer,JS,france
 maceo-capietto,Maceo Capietto,MC,france
 giammarco-levorato,Giammarco Levorato,GL,italy
-roman-de-angelis,Roman De Angelis,DEA,canada
+roman-de-angelis,Roman De Angelis,DAN,canada
 jonny-edgar,Jonny Edgar,JE,united-kingdom
 finn-gehrsitz,Finn Gehrsitz,FG,germany
 mattia-drudi,Mattia Drudi,MD,italy
@@ -882,7 +855,7 @@ oliver-gray,Oliver Gray,OG,united-kingdom
 theo-pourchaire,Théo Pourchaire,TP,france
 daniel-schneider,Daniel Schneider,DS,brazil
 alexander-quinn,Alexander Quinn,AQ,united-kingdom
-antares-au,Antares Au,AA,hong-kong
+antares-au,Antares Au,AU,hong-kong
 loek-hartog,Loek Hartog,LH,netherlands
 orey-fidani,Orey Fidani,OF,canada
 lars-kern,Lars Kern,LK,germany
@@ -897,6 +870,48 @@ cem-bolukbasi,Cem Bölükbasi,CB,turkey
 andrew-gilbert,Andrew Gilbert,AG,united-kingdom
 lorcan-hanafin,Lorcan Hanafin,LH,united-kingdom
 fran-rueda,Fran Rueda,FR,spain
-anthony-mcintosh,Anthony Mcintosh,AM,united-states-of-america
+anthony-mcintosh,Anthony Mcintosh,MCI,united-states-of-america
 pedro-ebrahim,Pedro Ebrahim,PE,brazil
-laurin-heinrich,Laurin Heinrich,LH,germany
+laurin-heinrich,Laurin Heinrich,HEN,germany
+victor-martins,Victor Martins,MRS,france
+parker-thompson,Parker Thompson,PT,canada
+daniel-harper,Daniel Harper,HAP,united-kingdom
+blake-mcdonald,Blake Mcdonald,BM,united-states-of-america
+ayhancan-guven,Ayhancan Güven,AG,turkey
+benjamin-goethe,Benjamin Goethe,BG,germany
+logan-sargeant,Logan Sargeant,LS,united-states-of-america
+gray-newell,Gray Newell,GN,united-states-of-america
+kobe-pauwels,Kobe Pauwels,KP,belgium
+jonny-adam,Jonny Adam,JA,united-kingdom
+eric-powell,Eric Powell,EP,united-states-of-america
+johannes-zelger,Johannes Zelger,JZ,italy
+thomas-fleming,Thomas Fleming,TF,united-kingdom
+marvin-kirchhofer,Marvin Kirchhöfer,MK,germany
+hadrien-david,Hadrien David,HD,france
+peter-dempsey,Peter Dempsey,PD,ireland
+kobe-pauwells,Kobe Pauwells,KP,belgium
+nicholas-yelloly,Nicholas Yelloly,NY,united-kingdom
+louis-rousset,Louis Rousset,LR,france
+adrien-closmenil,Adrien Closmenil,AC,france
+ian-aguilera,Ian Aguilera,IA,mexico
+theodor-jensen,Theodor Jensen,TJE,denmark
+valerio-rinicella,Valerio Rinicella,VR,italy
+rasmus-lindh,Rasmus Lindh,RL,sweden
+kakunoshin-ohta,Kakunoshin Ohta,KO,japan
+harry-king,Harry King,HK,united-kingdom
+enzo-trulli,Enzo Trulli,ET,italy
+jake-hughes,Jake Hughes,JH,united-kingdom
+tobias-lutke,Tobias Lutke,TL,canada
+horst-felix-felbermayr,Horst Felix Felbermayr,FFE,austria
+edward-pearson,Edward Pearson,EP,united-kingdom
+jack-doohan,Jack Doohan,JD,australia
+dustin-blattner,Dustin Blattner,DB,united-states-of-america
+lorenzo-patrese,Lorenzo Patrese,LP,italy
+dennis-marschall,Dennis Marschall,MSL,germany
+marius-fossard,Marius Fossard,MF,france
+prince-jefri-ibrahim,Prince Jefri Ibrahim,PJI,malaysia
+ben-green,Ben Green,BG,united-kingdom
+abdulla-al-khelaifi,Abdulla Al-Khelaifi,ALK,qatar
+julian-hanses,Julian Hanses,JH,germany
+giuliano-alesi,Giuliano Alesi,GA,france
+richard-verschoor,Richard Verschoor,RV,netherlands

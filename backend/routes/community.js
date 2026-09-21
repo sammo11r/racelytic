@@ -5,7 +5,7 @@ const { configuredItems, filterItems, pointItems } = require('../community');
 
 const router = express.Router();
 const TYPES = new Set(['all', 'points', 'records', 'championships']);
-const SERIES = new Set(['all', 'f1', 'f2', 'f3', 'academy', 'fe']);
+const SERIES = new Set(['all', 'f1', 'f2', 'f3', 'academy', 'fe', 'wec']);
 const SORTS = new Set(['newest', 'updated', 'oldest', 'name']);
 
 router.get('/api/community', async (req, res) => {
@@ -21,10 +21,11 @@ router.get('/api/community', async (req, res) => {
         const requested = type === 'all' ? ['points', 'records', 'championships'] : [type];
         const queries = [];
         if (requested.includes('points')) queries.push(pool.query(`
-            SELECT ps.id, ps.name, u.display_name AS ownerName,
+            SELECT ps.id, ps.name, ps.series, u.display_name AS ownerName,
                 ps.race_points AS racePoints, ps.sprint_points AS sprintPoints,
                 ps.qualifying_points AS qualifyingPoints, ps.pole_bonus AS poleBonus,
                 ps.fastest_lap_bonus AS fastestLapBonus, ps.count_best_rounds AS countBestRounds,
+                ps.extended_multiplier AS extendedMultiplier, ps.le_mans_multiplier AS leMansMultiplier,
                 ps.created_at AS createdAt, ps.updated_at AS updatedAt
             FROM app_points_systems ps JOIN app_users u ON u.id = ps.user_id
             WHERE ps.visibility = 'public' ORDER BY ps.updated_at DESC LIMIT 500

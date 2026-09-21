@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Build a custom World Endurance Championship calendar from classified WEC races, choose a class and eligible field, and recalculate driver, team and manufacturer standings.">
+  <link rel="icon" href="/assets/favicon-wec.svg" type="image/svg+xml">
+  <title>WEC Championship Builder · Racelytic</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/polish.css">
+  <link rel="stylesheet" href="/css/championship-builder.css">
+  <link rel="stylesheet" href="/css/wec.css">
+  <link rel="stylesheet" href="/css/wec-simulator.css">
+</head>
+<body class="wec-mode">
+  <div id="header"></div>
+  <main class="container page championship-builder-page wec-builder-page">
+    <header class="builder-page-heading"><a class="back-link" href="/wec/simulator">← WEC simulator</a><div class="eyebrow">WEC CHAMPIONSHIP BUILDER</div><h1>Build an endurance championship</h1><p>Mix classified races across WEC seasons, choose one class and its eligible field, and see the title table update with your points rules.</p></header>
+    <section class="builder-summary" aria-label="Championship setup summary"><div class="builder-summary-primary"><span>Calendar</span><strong id="builder-summary-races">No races yet</strong><small id="builder-summary-range">Choose a race to begin</small></div><div><span>Class and field</span><strong id="builder-summary-field">No field yet</strong><small id="builder-summary-class">Choose a race to discover classes</small></div><div><span>Scoring</span><strong id="builder-summary-points">WEC-inspired</strong><small id="builder-summary-bonuses">Distance-weighted race points</small></div><div><span>Builder status</span><strong id="builder-summary-status">Start with the calendar</strong><small id="builder-summary-state">Draft saved in this browser</small></div></section>
+    <div class="builder-layout">
+      <div class="builder-main">
+        <section class="builder-panel builder-calendar-panel"><div class="section-heading"><div><div class="eyebrow">1 · CALENDAR</div><h2>Select endurance races</h2></div><span id="builder-race-count" class="section-note">0 races</span></div><div class="builder-race-picker"><label><span>Season</span><select id="builder-year" disabled></select></label><label><span>Race</span><select id="builder-race" disabled></select></label><button id="builder-add-race" type="button" disabled>Add race</button><button id="builder-add-season" type="button" disabled>Add full season</button></div><small id="builder-calendar-message" class="builder-inline-message" aria-live="polite"></small><div id="builder-calendar" class="builder-calendar"><div class="empty-state"><strong>Start with your calendar</strong><span>Add a classified race or a full season above.</span></div></div></section>
+        <section class="builder-panel builder-results"><div class="section-heading"><div><div class="eyebrow">3 · LIVE CLASSIFICATION</div><h2 id="builder-results-title">Custom WEC championship</h2></div><div class="builder-results-actions"><div class="standings-mode" role="group" aria-label="Classification type"><button type="button" class="standings-mode-button active" data-builder-mode="drivers" aria-pressed="true">Drivers</button><button type="button" class="standings-mode-button" data-builder-mode="teams" aria-pressed="false">Teams</button><button type="button" class="standings-mode-button" data-builder-mode="manufacturers" aria-pressed="false">Manufacturers</button></div></div></div><div id="builder-results"><div class="empty-state"><strong>No classification yet</strong><span>Add a race to calculate the championship.</span></div></div><p id="builder-coverage" class="wec-builder-coverage"></p></section>
+      </div>
+      <aside class="builder-panel builder-settings"><div class="section-heading"><div><div class="eyebrow">2 · CHAMPIONSHIP SETUP</div><h2>Class, rules and field</h2></div></div>
+        <label class="builder-points-choice"><span>Class</span><select id="builder-class" disabled><option>Add a race first</option></select><small>Classes are matched by code across seasons. Races without the class score zero.</small></label>
+        <label class="builder-points-choice"><span>Points system</span><select id="builder-points"><option value="weighted">WEC-inspired distance weighting</option><option value="equal">Equal-weight races</option><option value="classic">Classic top-six</option><option value="custom">Custom positional points</option></select><small><a href="/wec/points-systems">Explore and save WEC rules →</a></small></label>
+        <label class="builder-points-choice"><span>Points by class position</span><input id="builder-point-values" type="text" inputmode="decimal" aria-describedby="builder-points-hint"><small id="builder-points-hint">Comma-separated, first place first. Up to 30 positions.</small></label>
+        <div class="wec-builder-multipliers"><label><span>Extended race ×</span><input id="builder-extended" type="number" min="0" max="5" step="0.01"></label><label><span>Le Mans ×</span><input id="builder-le-mans" type="number" min="0" max="5" step="0.01"></label></div>
+        <div id="builder-rule-summary" class="builder-rule-summary"></div>
+        <div id="builder-fields"></div>
+        <section class="builder-save-panel"><div><span>Save and share</span><strong>Championship details</strong></div><input id="builder-id" type="hidden"><label><span>Name</span><input id="builder-name" maxlength="100" value="My custom WEC championship"></label><label><span>Description</span><textarea id="builder-description" maxlength="500" rows="3" placeholder="What makes this championship special?"></textarea></label><label><span>Visibility</span><select id="builder-visibility"><option value="private">Private</option><option value="public">Public · shareable</option></select></label><div class="builder-actions"><button id="builder-save" type="button">Save championship</button><button id="builder-reset" type="button">Reset draft</button><button id="builder-share" type="button" hidden>Share championship</button><small id="builder-message" aria-live="polite"></small></div></section>
+      </aside>
+    </div>
+    <p class="wec-simulator-method">Only classified cars in the selected class score. Each selected crew driver receives that car’s points; a team or manufacturer receives its best classified car per race. Scoring is hypothetical and does not reproduce official bonuses, penalties or participation rules.</p>
+  </main>
+  <footer class="footer"><div class="container">Racelytic</div></footer>
+  <script src="/js/utils.js"></script>
+  <script src="/js/header.js"></script>
+  <script src="/js/wec-simulate-season-model.js"></script>
+  <script src="/js/wec-championship-builder-model.js"></script>
+  <script src="/js/wec-championship-builder.js"></script>
+</body>
+</html>

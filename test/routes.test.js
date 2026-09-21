@@ -74,6 +74,7 @@ test('all public API routes remain registered after modularization', () => {
         '/api/ratings/events',
         '/api/ratings/validation',
         '/api/records/explore',
+        '/api/records/options',
         '/api/records/saved',
         '/api/records/saved',
         '/api/records/saved/:id',
@@ -81,6 +82,13 @@ test('all public API routes remain registered after modularization', () => {
         '/api/seasons',
         '/api/seasons/:year',
         '/api/series-equivalent',
+        '/api/wec/analysis/circuits/:circuitId',
+        '/api/wec/analysis/seasons/:year',
+        '/api/wec/cars',
+        '/api/wec/circuits',
+        '/api/wec/circuits/:circuitId',
+        '/api/wec/database',
+        '/api/wec/drivers',
         '/api/wec/entities/:type/:entityId',
         '/api/wec/events',
         '/api/wec/events/:eventId',
@@ -91,7 +99,8 @@ test('all public API routes remain registered after modularization', () => {
         '/api/wec/seasons/:year',
         '/api/wec/seasons/:year/header',
         '/api/wec/seasons/:year/results',
-        '/api/wec/seasons/:year/standings'
+        '/api/wec/seasons/:year/standings',
+        '/api/wec/teams'
     ]);
 });
 

@@ -23,7 +23,7 @@ async function loadSeriesHome() {
     const leader = data.currentSeason?.leader;
     if (leader) {
       document.getElementById('snapshot-leader').textContent = leader.name;
-      document.getElementById('snapshot-leader-label').textContent = leader.championshipWon ? 'Champion' : 'Championship leader';
+      document.getElementById('snapshot-leader-label').textContent = leader.label || (leader.championshipWon ? 'Champion' : 'Championship leader');
       document.getElementById('snapshot-leader-points').textContent = `${fmtNumber(leader.points)} points`;
     }
 

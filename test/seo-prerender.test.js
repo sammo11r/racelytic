@@ -124,3 +124,30 @@ test('junior race metadata distinguishes repeat venue weekends by round', () => 
     assert.match(second.description, /Silverstone round 5 Formula 2/);
     assert.notEqual(first.title, second.title);
 });
+
+test('WEC detail prerenders expose specific headings before client JavaScript loads', () => {
+    const profile = renderInitialSeoContent(fixture('wec-entity.html'), {
+        kind: 'wec-profile', series: 'wec', profileType: 'carModel',
+        entity: { name: 'Test <Car>', manufacturerName: 'Test Works', regulation: 'Hypercar' }
+    });
+    assert.match(profile, /<h1>Test &lt;Car&gt;<\/h1>/);
+    assert.match(profile, /Test Works · Hypercar/);
+    assert.doesNotMatch(profile, /<h1>Profile<\/h1>/);
+
+    const circuit = renderInitialSeoContent(fixture('wec-circuit.html'), {
+        kind: 'circuit', series: 'wec', circuit: {
+            id: 'test', name: 'Test Circuit', placeName: 'Test City', countryName: 'Testland',
+            type: 'race', direction: 'clockwise', layoutId: 'test-layout'
+        }
+    });
+    assert.match(circuit, /id="wec-circuit-hero" aria-busy="false"/);
+    assert.match(circuit, /<h1>Test Circuit<\/h1>/);
+    assert.match(circuit, /Test City · Testland/);
+
+    const season = renderInitialSeoContent(fixture('wec-season.html'), {
+        kind: 'wec-season', series: 'wec', year: 2026,
+        name: '2026 FIA World Endurance Championship', status: 'ongoing'
+    });
+    assert.match(season, /id="wec-season-year">2026</);
+    assert.match(season, /id="wec-season-name">2026 FIA World Endurance Championship</);
+});

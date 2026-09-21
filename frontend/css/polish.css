@@ -2616,7 +2616,7 @@ body.fe-mode .game-card-featured .game-card-copy > span { color: var(--accent); 
 }
 .quiz-choice-card:hover { border-color: rgba(var(--accent-rgb),.35); box-shadow: 0 18px 42px rgba(16,18,24,.09); transform: translateY(-3px); }
 .quiz-choice-card:focus-visible { outline: 3px solid rgba(var(--accent-rgb),.35); outline-offset: 4px; }
-.quiz-status { padding: 5px 8px; border-radius: 999px; background: #f0f1f3; color: var(--text-muted); font-size: 11px; font-weight: 750; }
+.quiz-status { padding: 5px 8px; border-radius: 999px; background: #f0f1f3; color: #59606d; font-size: 11px; font-weight: 750; }
 .quiz-status.is-progress { background: #fff0c7; color: #7a5200; }
 .quiz-status.is-complete { background: #dff4e6; color: #17633a; }
 .quiz-card-preview { display: flex; position: relative; align-items: end; gap: 7px; height: 74px; margin: 0 0 19px; padding: 12px 17px; overflow: hidden; border-radius: 12px; background: #17191f; }
@@ -2752,6 +2752,7 @@ body.fe-mode .game-card-featured .game-card-copy > span { color: var(--accent); 
 .champions-quiz-page .quiz-table-heading { margin-bottom: 9px; }
 .champions-quiz-page .quiz-table-heading h2 { font-size: 25px; }
 .champions-quiz-page .champions-quiz-table th { padding: 9px 13px; }
+.champions-quiz-page .champions-quiz-table th { color: #59606d; }
 .champions-quiz-page .champions-quiz-table td { padding: 8px 13px; font-size: 12px; line-height: 1.25; }
 .champions-quiz-page .quiz-empty-answer { height: 10px; }
 .champions-quiz-page [hidden] { display: none !important; }
@@ -2976,6 +2977,7 @@ table td { padding: 14px 16px; }
 .analysis-visualization-tabs small { font-size: 12px; }
 .standings-mode-button, .session-variant, .pagination button { font-size: 12px; }
 .pagination-count, .pagination-gap { font-size: 12px; }
+.wec-mode .series-race-archive-card[data-status="completed"] .race-status-badge { color: #555d68; }
 
 .analysis-bar-row a, .analysis-bar-row > strong, .movement-row a,
 .contribution-row a, .attrition-row a, .conversion-row > a,
@@ -3303,6 +3305,7 @@ table td { padding: 14px 16px; }
   font-weight: 850;
   letter-spacing: .13em;
 }
+.wec-mode .about-principles-grid article > span { color: #7fe0ba; }
 .about-principles-grid p { color: #aeb3bd; }
 .about-independence {
   display: grid;
@@ -3824,7 +3827,7 @@ body.f2-mode .home-path-simulator { background: #eef5ff; }
 .global-search-results[hidden] { display: none; }
 .global-search-group + .global-search-group { margin-top: 5px; padding-top: 5px; border-top: 1px solid var(--border); }
 .global-search-scope { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: -7px -7px 5px; padding: 9px 12px; border-bottom: 1px solid var(--border); background: var(--surface-alt); }
-.global-search-scope span { color: var(--text-muted); font-size: 9px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.global-search-scope span { color: var(--text-secondary); font-size: 9px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
 .global-search-scope button,
 .global-search-empty button { padding: 0; border: 0; background: transparent; color: var(--accent-dark); font: inherit; font-size: 10px; font-weight: 800; cursor: pointer; }
 .global-search-scope button:hover,

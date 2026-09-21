@@ -1,10 +1,13 @@
-const SERIES_ORDER = Object.freeze(['f1', 'f2', 'f3', 'academy', 'fe']);
-const SERIES_LABELS = Object.freeze({ f1: 'F1', f2: 'F2', f3: 'F3', academy: 'F1 Academy', fe: 'Formula E' });
+const SERIES_ORDER = Object.freeze(['f1', 'f2', 'f3', 'academy', 'fe', 'wec']);
+const SERIES_LABELS = Object.freeze({ f1: 'F1', f2: 'F2', f3: 'F3', academy: 'F1 Academy', fe: 'Formula E', wec: 'WEC' });
 const GROUPS = Object.freeze([
     ['circuit', 'Circuits', 2],
     ['race', 'Race weekends', 5],
     ['driver', 'Drivers', 4],
     ['team', 'Teams', 3],
+    ['manufacturer', 'Manufacturers', 2],
+    ['car', 'Cars', 2],
+    ['entry', 'Entries', 2],
     ['season', 'Seasons', 4],
     ['page', 'Pages and tools', 3],
     ['chassis', 'Chassis', 2]
@@ -102,6 +105,9 @@ function relevanceDetails(result, query, preferredSeries) {
         ['race', /\b(race|grand prix|gp|weekend)\b/],
         ['driver', /\b(driver|racer)\b/],
         ['team', /\b(team|constructor)\b/],
+        ['manufacturer', /\b(manufacturer|marque)\b/],
+        ['car', /\b(car|model)\b/],
+        ['entry', /\b(entry|number)\b/],
         ['season', /\b(season|championship)\b/],
         ['chassis', /\b(chassis|car)\b/]
     ];

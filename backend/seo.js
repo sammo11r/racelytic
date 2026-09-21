@@ -70,7 +70,7 @@ const DETAIL_PARAMS = Object.freeze({ season: 'year', race: 'id', driver: 'id', 
 const DETAIL_PARENTS = Object.freeze({
     season: ['seasons', 'Seasons'], race: ['races', 'Races'], driver: ['drivers', 'Drivers'],
     constructor: ['constructors', 'Constructors'], team: ['teams', 'Teams'], manufacturer: ['manufacturers', 'Manufacturers'],
-    carModel: ['car-models', 'Car Models'], entry: ['entries', 'Entries'], circuit: ['circuits', 'Circuits']
+    carModel: ['cars', 'Cars'], entry: ['entries', 'Entries'], circuit: ['circuits', 'Circuits']
 });
 
 const JUNIOR_ANALYSIS_DESCRIPTIONS = Object.freeze({
@@ -221,7 +221,7 @@ function breadcrumbItems(metadata) {
     if (context.series.key !== 'f1') {
         items.push({ '@type': 'ListItem', position: items.length + 1, name: context.series.name, item: `${siteOrigin()}${prefix}` });
     }
-    const parent = context.series.key === 'wec' && ['driver', 'team', 'manufacturer', 'carModel', 'entry'].includes(context.page)
+    const parent = context.series.key === 'wec' && ['driver', 'team', 'manufacturer', 'entry'].includes(context.page)
         ? null
         : DETAIL_PARENTS[context.page];
     if (parent) {
@@ -234,6 +234,23 @@ function breadcrumbItems(metadata) {
 function entitySchema(metadata) {
     const initial = metadata.initialContent;
     if (!initial) return null;
+    if (initial.kind === 'wec-profile') {
+        const entity = initial.entity;
+        if (initial.profileType === 'driver') {
+            return { '@type': 'Person', '@id': `${metadata.canonical}#driver`, url: metadata.canonical, name: entity.name };
+        }
+        if (initial.profileType === 'carModel') {
+            return {
+                '@type': 'Product', '@id': `${metadata.canonical}#car`, url: metadata.canonical, name: entity.name,
+                ...(entity.manufacturerName ? { brand: { '@type': 'Brand', name: entity.manufacturerName } } : {}),
+                ...(entity.regulation ? { category: entity.regulation } : {})
+            };
+        }
+        return {
+            '@type': 'SportsOrganization', '@id': `${metadata.canonical}#organization`, url: metadata.canonical,
+            name: entity.name, sport: 'Motorsport'
+        };
+    }
     if (initial.kind === 'ask-answer') {
         return {
             '@type': 'Question', '@id': `${metadata.canonical}#question`, url: metadata.canonical,
@@ -285,8 +302,8 @@ function entitySchema(metadata) {
 
 function renderStructuredData(metadata) {
     const entity = entitySchema(metadata);
-    const pageType = ['driver', 'constructor'].includes(metadata.initialContent?.kind) ? 'ProfilePage'
-        : metadata.initialContent?.kind === 'season' ? 'CollectionPage' : 'WebPage';
+    const pageType = ['driver', 'constructor', 'wec-profile'].includes(metadata.initialContent?.kind) ? 'ProfilePage'
+        : ['season', 'wec-season'].includes(metadata.initialContent?.kind) ? 'CollectionPage' : 'WebPage';
     const webpage = {
         '@type': pageType, '@id': `${metadata.canonical}#webpage`, url: metadata.canonical,
         name: metadata.title, description: metadata.description,

@@ -35,6 +35,7 @@
   else if (path.startsWith('/f3/')) byId('irm-games-link').href = '/f3/games';
   else if (path.startsWith('/academy/')) byId('irm-games-link').href = '/academy/games';
   else if (path.startsWith('/formula-e/')) byId('irm-games-link').href = '/formula-e/games';
+  else if (path.startsWith('/wec/')) byId('irm-games-link').href = '/wec/games';
 
   const offline = engine.calculateOfflineProgress(state);
   state = offline.state;
@@ -444,7 +445,6 @@
 
   function updateFullscreenButton() {
     const fullscreen = document.fullscreenElement === gameRoot;
-    byId('irm-fullscreen').setAttribute('aria-pressed', String(fullscreen));
     byId('irm-fullscreen').setAttribute('aria-checked', String(fullscreen));
     byId('irm-fullscreen-label').textContent = fullscreen ? 'Exit fullscreen' : 'Fullscreen';
     byId('irm-fullscreen').title = fullscreen ? 'Exit fullscreen' : 'Open game in fullscreen';

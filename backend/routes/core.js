@@ -136,6 +136,39 @@ const FORMULA_E_SEARCH_PAGES = F3_SEARCH_PAGES
         url.replace('/f3', '/formula-e')
     ]);
 
+const WEC_SEARCH_PAGES = [
+    ['World Endurance Championship', 'Explore the WEC archive', '/wec'],
+    ['Database', 'Browse the World Endurance Championship archive', '/wec/database'],
+    ['Seasons', 'WEC championship calendars and classes', '/wec/seasons'],
+    ['Races', 'World Endurance Championship events', '/wec/races'],
+    ['Drivers', 'WEC careers, victories and championships', '/wec/drivers'],
+    ['Teams', 'WEC entries, victories and championship history', '/wec/teams'],
+    ['Circuits', 'Endurance tracks and venue history', '/wec/circuits'],
+    ['Cars', 'WEC models, manufacturers and race records', '/wec/cars'],
+    ['Analysis', 'Explore World Endurance Championship data', '/wec/analysis'],
+    ['Season analysis', 'WEC championship progression and title trends', '/wec/season-analysis'],
+    ['Season comparison', 'Compare World Endurance Championship seasons', '/wec/season-comparison'],
+    ['Race analysis', 'Explore a WEC race in detail', '/wec/race-analysis'],
+    ['Driver comparison', 'Compare WEC driver careers', '/wec/driver-comparison'],
+    ['Driver form', 'Recent World Endurance Championship performance', '/wec/driver-form'],
+    ['Circuit analysis', 'WEC performance and history by venue', '/wec/circuit-analysis'],
+    ['Records', 'World Endurance Championship all-time rankings', '/wec/records'],
+    ['Racelytic Ratings', 'WEC crew performance ratings by class', '/ratings?series=wec&class=top'],
+    ['Ratings leaderboard', 'Historical WEC driver ratings within each class', '/ratings/leaderboard?series=wec&class=top'],
+    ['Compare ratings', 'Compare WEC class rating histories', '/ratings/compare?series=wec&class=top'],
+    ['Rating profiles', 'Inspect race-by-race WEC rating changes', '/ratings/driver?series=wec&class=top'],
+    ['Ratings methodology', 'How WEC crew and class ratings work', '/ratings/methodology?series=wec&class=top'],
+    ['Simulator', 'Explore WEC simulation tools', '/wec/simulator'],
+    ['Simulate season', 'Recalculate a World Endurance Championship season', '/wec/simulate-season'],
+    ['Points systems', 'Create and manage WEC scoring rules', '/wec/points-systems'],
+    ['Scenario calculator', 'Project a WEC championship run-in', '/wec/scenario-calculator'],
+    ['Championship builder', 'Create a custom WEC championship', '/wec/championship-builder'],
+    ['Games', 'Play with World Endurance Championship history', '/wec/games'],
+    ['Quizzes', 'Test your WEC knowledge', '/wec/quizzes'],
+    ['Overall race winners quiz', 'Name every driver with an overall WEC race win', '/wec/race-winners-quiz'],
+    ['Winning crews by season quiz', 'Identify every overall WEC race-winning crew in a season', '/wec/season-race-winners-quiz']
+];
+
 // ============================================================
 // Health
 // ============================================================
@@ -161,9 +194,9 @@ router.get('/api/health', async (req, res) => {
 });
 
 const SERIES_PARENTS = {
-    driver: { f1: '/drivers', f2: '/f2/drivers', f3: '/f3/drivers', academy: '/academy/drivers', fe: '/formula-e/drivers', wec: '/wec' },
-    constructor: { f1: '/constructors', f2: '/f2/constructors', f3: '/f3/teams', academy: '/academy/teams', fe: '/formula-e/teams', wec: '/wec' },
-    circuit: { f1: '/circuits', f2: '/f2/circuits', f3: '/f3/circuits', academy: '/academy/circuits', fe: '/formula-e/circuits', wec: '/wec' },
+    driver: { f1: '/drivers', f2: '/f2/drivers', f3: '/f3/drivers', academy: '/academy/drivers', fe: '/formula-e/drivers', wec: '/wec/drivers' },
+    constructor: { f1: '/constructors', f2: '/f2/constructors', f3: '/f3/teams', academy: '/academy/teams', fe: '/formula-e/teams', wec: '/wec/teams' },
+    circuit: { f1: '/circuits', f2: '/f2/circuits', f3: '/f3/circuits', academy: '/academy/circuits', fe: '/formula-e/circuits', wec: '/wec/circuits' },
     race: { f1: '/races', f2: '/f2/races', f3: '/f3/races', academy: '/academy/races', fe: '/formula-e/races', wec: '/wec/races' },
     season: { f1: '/seasons', f2: '/f2/seasons', f3: '/f3/seasons', academy: '/academy/seasons', fe: '/formula-e/seasons', wec: '/wec/seasons' }
 };
@@ -302,7 +335,7 @@ router.get('/api/search', async (req, res) => {
             ? `${fuzzySearch.slice(0, 3).replace(/[!%_]/g, character => `!${character}`)}%`
             : null;
         const resultLimit = count => ` LIMIT ${searchOptions.mode === 'full' ? Math.min(count * 10, 100) : count}`;
-        const validSeries = ['f1', 'f2', 'f3', 'academy', 'fe'];
+        const validSeries = ['f1', 'f2', 'f3', 'academy', 'fe', 'wec'];
         const requestedSeries = validSeries.includes(searchOptions.seriesFilter)
             ? [searchOptions.seriesFilter]
             : validSeries;
@@ -312,7 +345,9 @@ router.get('/api/search', async (req, res) => {
                 f2Seasons: [], f2Drivers: [], f2Constructors: [], f2Circuits: [], f2Races: [], f2Chassis: [],
                 f3Seasons: [], f3Drivers: [], f3Constructors: [], f3Circuits: [], f3Races: [], f3Chassis: [],
                 academySeasons: [], academyDrivers: [], academyConstructors: [], academyCircuits: [], academyRaces: [], academyChassis: [],
-                feSeasons: [], feDrivers: [], feConstructors: [], feCircuits: [], feRaces: []
+                feSeasons: [], feDrivers: [], feConstructors: [], feCircuits: [], feRaces: [],
+                wecSeasons: [], wecDrivers: [], wecTeams: [], wecCircuits: [], wecRaces: [],
+                wecManufacturers: [], wecCars: [], wecEntries: []
             };
             const tasks = [];
             if (requestedSeries.includes('f1')) tasks.push(Promise.all([
@@ -407,6 +442,65 @@ router.get('/api/search', async (req, res) => {
                     WHERE races.name LIKE ? ESCAPE '!' OR CAST(races.year AS CHAR) LIKE ? ESCAPE '!' OR circuits.name LIKE ? ESCAPE '!' OR circuits.placeName LIKE ? ESCAPE '!'
                     ORDER BY races.year DESC, races.round DESC${resultLimit(24)}`, [q, q, q, q])
             ]).then(([feSeasons, feDrivers, feConstructors, feCircuits, feRaces]) => Object.assign(results, { feSeasons, feDrivers, feConstructors, feCircuits, feRaces })));
+            if (requestedSeries.includes('wec')) tasks.push(Promise.all([
+                connection.query(`SELECT id, year, name, status FROM wec_seasons
+                    WHERE CAST(year AS CHAR) LIKE ? ESCAPE '!' OR name LIKE ? ESCAPE '!'
+                    ORDER BY year DESC${resultLimit(6)}`, [q, q]),
+                connection.query(`SELECT drivers.id, drivers.name, drivers.abbreviation,
+                        drivers.nationalityCountryId, countries.name AS countryName
+                    FROM wec_drivers drivers
+                    LEFT JOIN countries ON countries.id = drivers.nationalityCountryId
+                    WHERE drivers.name LIKE ? ESCAPE '!' OR drivers.abbreviation LIKE ? ESCAPE '!'
+                        OR LOWER(SUBSTRING_INDEX(drivers.name, ' ', -1)) LIKE LOWER(?) ESCAPE '!'
+                    ORDER BY drivers.name${resultLimit(8)}`, [q, q, fuzzyPrefix]),
+                connection.query(`SELECT teams.id, teams.name, teams.countryId, countries.name AS countryName
+                    FROM wec_teams teams LEFT JOIN countries ON countries.id = teams.countryId
+                    WHERE teams.name LIKE ? ESCAPE '!'
+                    ORDER BY teams.name${resultLimit(8)}`, [q]),
+                connection.query(`SELECT circuits.id, circuits.name, circuits.placeName, circuits.countryId,
+                        countries.name AS countryName, COUNT(events.id) AS totalRacesHeld
+                    FROM wec_circuits circuits
+                    LEFT JOIN countries ON countries.id = circuits.countryId
+                    LEFT JOIN wec_events events ON events.circuitId = circuits.id
+                    WHERE circuits.name LIKE ? ESCAPE '!' OR circuits.placeName LIKE ? ESCAPE '!'
+                        OR countries.name LIKE ? ESCAPE '!'
+                    GROUP BY circuits.id, circuits.name, circuits.placeName, circuits.countryId, countries.name
+                    ORDER BY totalRacesHeld DESC, circuits.name${resultLimit(8)}`, [q, q, q]),
+                connection.query(`SELECT events.id, events.year, events.name, events.round,
+                        circuits.name AS circuitName, circuits.placeName
+                    FROM wec_events events LEFT JOIN wec_circuits circuits ON circuits.id = events.circuitId
+                    WHERE events.name LIKE ? ESCAPE '!' OR CAST(events.year AS CHAR) LIKE ? ESCAPE '!'
+                        OR circuits.name LIKE ? ESCAPE '!' OR circuits.placeName LIKE ? ESCAPE '!'
+                    ORDER BY events.year DESC, events.round DESC${resultLimit(30)}`, [q, q, q, q]),
+                connection.query(`SELECT manufacturers.id, manufacturers.name, manufacturers.countryId,
+                        countries.name AS countryName
+                    FROM wec_manufacturers manufacturers
+                    LEFT JOIN countries ON countries.id = manufacturers.countryId
+                    WHERE manufacturers.name LIKE ? ESCAPE '!'
+                    ORDER BY manufacturers.name${resultLimit(8)}`, [q]),
+                connection.query(`SELECT cars.id, cars.name, cars.regulation,
+                        manufacturers.id AS manufacturerId, manufacturers.name AS manufacturerName
+                    FROM wec_car_models cars
+                    JOIN wec_manufacturers manufacturers ON manufacturers.id = cars.manufacturerId
+                    WHERE cars.name LIKE ? ESCAPE '!' OR cars.regulation LIKE ? ESCAPE '!'
+                        OR manufacturers.name LIKE ? ESCAPE '!'
+                    ORDER BY cars.name${resultLimit(10)}`, [q, q, q]),
+                connection.query(`SELECT competitors.id, competitors.carNumber, seasons.year,
+                        classes.code AS classCode, teams.name AS teamName,
+                        manufacturers.name AS manufacturerName, cars.name AS carName
+                    FROM wec_competitors competitors
+                    JOIN wec_seasons seasons ON seasons.id = competitors.seasonId
+                    JOIN wec_classes classes ON classes.id = competitors.classId
+                    JOIN wec_teams teams ON teams.id = competitors.teamId
+                    JOIN wec_manufacturers manufacturers ON manufacturers.id = competitors.manufacturerId
+                    JOIN wec_car_models cars ON cars.id = competitors.carModelId
+                    WHERE CONCAT('#', competitors.carNumber) LIKE ? ESCAPE '!'
+                        OR teams.name LIKE ? ESCAPE '!' OR manufacturers.name LIKE ? ESCAPE '!'
+                        OR cars.name LIKE ? ESCAPE '!' OR classes.code LIKE ? ESCAPE '!'
+                        OR CAST(seasons.year AS CHAR) LIKE ? ESCAPE '!'
+                    ORDER BY seasons.year DESC, competitors.carNumber${resultLimit(12)}`, [q, q, q, q, q, q])
+            ]).then(([wecSeasons, wecDrivers, wecTeams, wecCircuits, wecRaces, wecManufacturers, wecCars, wecEntries]) =>
+                Object.assign(results, { wecSeasons, wecDrivers, wecTeams, wecCircuits, wecRaces, wecManufacturers, wecCars, wecEntries })));
             await Promise.all(tasks);
             return results;
         });
@@ -420,7 +514,8 @@ router.get('/api/search', async (req, res) => {
             ...(requestedSeries.includes('f2') ? matchingPages(F2_SEARCH_PAGES, 'F2') : []),
             ...(requestedSeries.includes('f3') ? matchingPages(F3_SEARCH_PAGES, 'F3') : []),
             ...(requestedSeries.includes('academy') ? matchingPages(ACADEMY_SEARCH_PAGES, 'F1 Academy') : []),
-            ...(requestedSeries.includes('fe') ? matchingPages(FORMULA_E_SEARCH_PAGES, 'Formula E') : [])
+            ...(requestedSeries.includes('fe') ? matchingPages(FORMULA_E_SEARCH_PAGES, 'Formula E') : []),
+            ...(requestedSeries.includes('wec') ? matchingPages(WEC_SEARCH_PAGES, 'WEC') : [])
         ];
 
         const rawResults = [
@@ -430,26 +525,34 @@ router.get('/api/search', async (req, res) => {
             ...databaseResults.f3Seasons.map(row => ({ type: 'F3 Season', label: String(row.year), meta: 'Formula 3 season', url: resourcePath('f3', 'season', row.year) })),
             ...databaseResults.academySeasons.map(row => ({ type: 'F1 Academy Season', label: String(row.year), meta: 'F1 Academy season', url: resourcePath('academy', 'season', row.year) })),
             ...databaseResults.feSeasons.map(row => ({ type: 'Formula E Season', label: row.label || String(row.year), meta: 'Formula E season', url: resourcePath('fe', 'season', row.year) })),
+            ...databaseResults.wecSeasons.map(row => ({ type: 'WEC Season', label: String(row.year), aliases: [row.name], meta: row.name || 'World Endurance Championship season', url: resourcePath('wec', 'season', row.year) })),
             ...databaseResults.drivers.map(row => ({ type: 'F1 Driver', label: row.name, meta: searchEntityMeta(row.countryName || row.nationalityCountryId, 'Formula 1 driver'), aliases: [row.fullName, row.abbreviation], prominence: row.totalRaceWins, url: `/drivers/${encodeURIComponent(row.id)}` })),
             ...databaseResults.f2Drivers.map(row => ({ type: 'F2 Driver', label: row.name, meta: searchEntityMeta(row.countryCode, 'Formula 2 driver'), aliases: [row.abbreviation], url: `/f2/drivers/${encodeURIComponent(row.id)}` })),
             ...databaseResults.f3Drivers.map(row => ({ type: 'F3 Driver', label: row.name, meta: searchEntityMeta(row.countryCode, 'Formula 3 driver'), aliases: [row.abbreviation], url: `/f3/drivers/${encodeURIComponent(row.id)}` })),
             ...databaseResults.academyDrivers.map(row => ({ type: 'F1 Academy Driver', label: row.name, meta: searchEntityMeta(row.countryCode, 'F1 Academy driver'), aliases: [row.abbreviation], url: `/academy/drivers/${encodeURIComponent(row.id)}` })),
             ...databaseResults.feDrivers.map(row => ({ type: 'Formula E Driver', label: row.name, meta: searchEntityMeta(row.countryCode, 'Formula E driver'), aliases: [row.abbreviation], url: `/formula-e/drivers/${encodeURIComponent(row.id)}` })),
+            ...databaseResults.wecDrivers.map(row => ({ type: 'WEC Driver', label: row.name, meta: searchEntityMeta(row.countryName || row.nationalityCountryId, 'WEC driver'), aliases: [row.abbreviation], url: resourcePath('wec', 'driver', row.id) })),
             ...databaseResults.constructors.map(row => ({ type: 'F1 Constructor', label: row.name, meta: searchEntityMeta(row.countryName || row.countryId, 'Formula 1 constructor'), aliases: [row.fullName], prominence: row.totalRaceWins, url: `/constructors/${encodeURIComponent(row.id)}` })),
             ...databaseResults.f2Constructors.map(row => ({ type: 'F2 Constructor', label: row.name, meta: searchEntityMeta(row.countryCode, 'Formula 2 constructor'), aliases: [row.abbreviation], url: `/f2/constructors/${encodeURIComponent(row.id)}` })),
             ...databaseResults.f3Constructors.map(row => ({ type: 'F3 Team', label: row.name, meta: searchEntityMeta(row.countryCode, 'Formula 3 team'), aliases: [row.abbreviation], url: `/f3/teams/${encodeURIComponent(row.id)}` })),
             ...databaseResults.academyConstructors.map(row => ({ type: 'F1 Academy Team', label: row.name, meta: searchEntityMeta(row.countryCode, 'F1 Academy team'), aliases: [row.abbreviation], url: `/academy/teams/${encodeURIComponent(row.id)}` })),
             ...databaseResults.feConstructors.map(row => ({ type: 'Formula E Team', label: row.name, meta: 'Formula E team', aliases: [row.abbreviation], url: `/formula-e/teams/${encodeURIComponent(row.id)}` })),
+            ...databaseResults.wecTeams.map(row => ({ type: 'WEC Team', label: row.name, meta: searchEntityMeta(row.countryName || row.countryId, 'WEC team'), url: resourcePath('wec', 'team', row.id) })),
             ...databaseResults.circuits.map(row => ({ type: 'F1 Circuit', label: row.name, meta: row.placeName || 'Formula 1 circuit', aliases: [row.shortName, row.fullName, row.placeName], prominence: row.totalRacesHeld, place: row.placeName, url: `/circuits/${encodeURIComponent(row.id)}` })),
             ...databaseResults.f2Circuits.map(row => ({ type: 'F2 Circuit', label: row.name, meta: row.placeName || 'Formula 2 circuit', aliases: [row.placeName], place: row.placeName, url: `/f2/circuits/${encodeURIComponent(row.id)}` })),
             ...databaseResults.f3Circuits.map(row => ({ type: 'F3 Circuit', label: row.name, meta: row.placeName || 'Formula 3 circuit', aliases: [row.placeName], place: row.placeName, url: `/f3/circuits/${encodeURIComponent(row.id)}` })),
             ...databaseResults.academyCircuits.map(row => ({ type: 'F1 Academy Circuit', label: row.name, meta: row.placeName || 'F1 Academy circuit', aliases: [row.placeName], place: row.placeName, url: `/academy/circuits/${encodeURIComponent(row.id)}` })),
             ...databaseResults.feCircuits.map(row => ({ type: 'Formula E Circuit', label: row.name, meta: row.placeName || 'Formula E circuit', aliases: [row.placeName], place: row.placeName, url: `/formula-e/circuits/${encodeURIComponent(row.id)}` })),
+            ...databaseResults.wecCircuits.map(row => ({ type: 'WEC Circuit', label: row.name, meta: [row.placeName || row.countryName, 'WEC circuit'].filter(Boolean).join(' · '), aliases: [row.placeName, row.countryName], prominence: row.totalRacesHeld, place: row.placeName, url: resourcePath('wec', 'circuit', row.id) })),
             ...databaseResults.races.map(row => ({ type: 'F1 Race', label: row.name, aliases: [row.shortName, row.officialName], meta: `${row.year}${row.placeName ? ` · ${row.placeName}` : ''}`, year: Number(row.year), searchText: `${row.name} ${row.shortName || ''} ${row.officialName} ${row.circuitName || ''} ${row.placeName || ''} ${row.year}`, url: resourcePath('f1', 'race', row.id, row.name) })),
             ...databaseResults.f2Races.map(row => ({ type: 'F2 Race', label: row.name, meta: `${row.year}${row.placeName ? ` · ${row.placeName}` : ''}`, year: Number(row.year), searchText: `${row.name} ${row.circuitName || ''} ${row.placeName || ''} ${row.year}`, url: resourcePath('f2', 'race', row.id, row.name) })),
             ...databaseResults.f3Races.map(row => ({ type: 'F3 Race', label: row.name, meta: `${row.year}${row.placeName ? ` · ${row.placeName}` : ''}`, year: Number(row.year), searchText: `${row.name} ${row.circuitName || ''} ${row.placeName || ''} ${row.year}`, url: resourcePath('f3', 'race', row.id, row.name) })),
             ...databaseResults.academyRaces.map(row => ({ type: 'F1 Academy Race', label: row.name, meta: `${row.year}${row.placeName ? ` · ${row.placeName}` : ''}`, year: Number(row.year), searchText: `${row.name} ${row.circuitName || ''} ${row.placeName || ''} ${row.year}`, url: resourcePath('academy', 'race', row.id, row.name) })),
             ...databaseResults.feRaces.map(row => ({ type: 'Formula E Race', label: row.name, meta: `${row.year}${row.placeName ? ` · ${row.placeName}` : ''}`, year: Number(row.year), searchText: `${row.name} ${row.circuitName || ''} ${row.placeName || ''} ${row.year}`, url: resourcePath('fe', 'race', row.id, row.name) })),
+            ...databaseResults.wecRaces.map(row => ({ type: 'WEC Race', label: row.name, meta: `${row.year}${row.placeName ? ` · ${row.placeName}` : ''}`, year: Number(row.year), searchText: `${row.name} ${row.circuitName || ''} ${row.placeName || ''} ${row.year}`, url: resourcePath('wec', 'race', row.id, row.name) })),
+            ...databaseResults.wecManufacturers.map(row => ({ type: 'WEC Manufacturer', label: row.name, meta: searchEntityMeta(row.countryName || row.countryId, 'WEC manufacturer'), url: resourcePath('wec', 'manufacturer', row.id) })),
+            ...databaseResults.wecCars.map(row => ({ type: 'WEC Car', label: row.name, meta: [row.manufacturerName, row.regulation].filter(Boolean).join(' · '), aliases: [row.manufacturerName], url: resourcePath('wec', 'carModel', row.id) })),
+            ...databaseResults.wecEntries.map(row => ({ type: 'WEC Entry', label: `#${row.carNumber} ${row.teamName}`, meta: `${row.year} · ${row.classCode} · ${row.carName}`, aliases: [row.teamName, row.manufacturerName, row.carName, String(row.carNumber)], searchText: `#${row.carNumber} ${row.teamName} ${row.manufacturerName} ${row.carName} ${row.classCode} ${row.year}`, year: Number(row.year), url: resourcePath('wec', 'entry', row.id) })),
             ...databaseResults.chassis.map(row => ({ type: 'F1 Chassis', label: row.fullName || row.name, meta: row.constructorName || 'Formula 1 chassis', url: `/chassis?search=${encodeURIComponent(row.fullName || row.name)}` })),
             ...databaseResults.f2Chassis.map(row => ({ type: 'F2 Chassis', label: row.name, meta: 'Formula 2 chassis', url: '/f2/chassis' })),
             ...databaseResults.f3Chassis.map(row => ({ type: 'F3 Chassis', label: row.name, meta: 'Formula 3 chassis', url: '/f3/chassis' })),
@@ -457,7 +560,8 @@ router.get('/api/search', async (req, res) => {
         ];
         const tagResult = result => {
             const type = result.type;
-            const series = type.startsWith('Formula E') ? 'fe'
+            const series = type.startsWith('WEC') ? 'wec'
+                : type.startsWith('Formula E') ? 'fe'
                 : type.startsWith('F1 Academy') ? 'academy'
                 : type.startsWith('F3') ? 'f3'
                     : type.startsWith('F2') ? 'f2' : 'f1';
@@ -465,6 +569,9 @@ router.get('/api/search', async (req, res) => {
                 : / Race$/.test(type) ? 'race'
                     : / Driver$/.test(type) ? 'driver'
                         : / Constructor$| Team$/.test(type) ? 'team'
+                            : / Manufacturer$/.test(type) ? 'manufacturer'
+                                : / Car$/.test(type) ? 'car'
+                                    : / Entry$/.test(type) ? 'entry'
                             : / Season$/.test(type) ? 'season'
                                 : / Chassis$/.test(type) ? 'chassis' : 'page';
             return { ...result, series, category };
@@ -483,11 +590,87 @@ router.get('/api/search', async (req, res) => {
 // Dashboard
 // ============================================================
 
+async function wecDashboardData(connection, includeArchive) {
+    const latestRows = await connection.query('SELECT id, year, name FROM wec_seasons ORDER BY year DESC LIMIT 1');
+    if (!latestRows.length) return null;
+    const season = latestRows[0];
+    const [drivers, teams, circuits, seasons, rounds, leaders, latestEvent, nextEvent, archive] = await Promise.all([
+        connection.query('SELECT COUNT(*) AS count FROM wec_drivers'),
+        connection.query('SELECT COUNT(*) AS count FROM wec_teams'),
+        connection.query('SELECT COUNT(*) AS count FROM wec_circuits'),
+        connection.query('SELECT COUNT(*) AS count FROM wec_seasons'),
+        connection.query('SELECT COUNT(*) AS count FROM wec_events WHERE seasonId = ?', [season.id]),
+        connection.query(`
+            SELECT championships.id, championships.name AS championshipName,
+                GROUP_CONCAT(drivers.name ORDER BY drivers.name SEPARATOR ' / ') AS name,
+                MAX(standings.points) AS points, MAX(standings.championshipWon) AS championshipWon
+            FROM wec_championships championships
+            JOIN wec_standings standings ON standings.championshipId = championships.id
+            JOIN (
+                SELECT championshipId, MAX(round) AS latestRound
+                FROM wec_standings GROUP BY championshipId
+            ) latest ON latest.championshipId = standings.championshipId AND latest.latestRound = standings.round
+            JOIN wec_drivers drivers ON drivers.id = standings.entityId
+            WHERE championships.seasonId = ? AND championships.entityType = 'driver' AND standings.position = 1
+            GROUP BY championships.id, championships.name, championships.classId
+            ORDER BY CASE
+                WHEN championships.id LIKE '%-hypercar-drivers' THEN 1
+                WHEN championships.id LIKE '%-lmp1-drivers' THEN 2
+                ELSE 3
+            END, championships.id
+            LIMIT 1
+        `, [season.id]),
+        connection.query(`
+            SELECT id, round, date, name
+            FROM wec_events
+            WHERE seasonId = ? AND status = 'completed'
+            ORDER BY date DESC, round DESC LIMIT 1
+        `, [season.id]),
+        connection.query(`
+            SELECT id, round, date, name
+            FROM wec_events
+            WHERE seasonId = ? AND status <> 'completed' AND date >= CURRENT_DATE()
+            ORDER BY date, round LIMIT 1
+        `, [season.id]),
+        includeArchive
+            ? connection.query(`SELECT (SELECT COUNT(*) FROM wec_events) AS races,
+                (SELECT COUNT(*) FROM wec_car_models) AS chassis`)
+            : Promise.resolve([])
+    ]);
+    const leader = leaders[0];
+    const championshipWon = leader ? ['1', 'true'].includes(String(leader.championshipWon).toLowerCase()) : false;
+    return {
+        drivers: Number(drivers[0].count),
+        constructors: Number(teams[0].count),
+        circuits: Number(circuits[0].count),
+        seasons: Number(seasons[0].count),
+        ...(archive[0] ? { races: Number(archive[0].races), chassis: Number(archive[0].chassis) } : {}),
+        latestSeason: Number(season.year),
+        latestSeasonLabel: String(season.year),
+        currentSeason: {
+            rounds: Number(rounds[0].count),
+            leader: leader ? {
+                name: leader.name,
+                points: Number(leader.points || 0),
+                championshipWon,
+                label: championshipWon ? 'Drivers’ champions' : 'Drivers’ championship leaders'
+            } : null,
+            latestEvent: latestEvent[0] || null,
+            nextEvent: nextEvent[0] || null
+        }
+    };
+}
+
 router.get('/api/dashboard', async (req, res) => {
 
     try {
 
         const series = String(req.query.series || '').toLowerCase();
+        if (series === 'wec') {
+            const data = await withConnection(connection => wecDashboardData(connection, req.query.archive === '1'));
+            if (!data) return res.status(404).json({ error: 'WEC archive not found.' });
+            return res.json(data);
+        }
         const tables = {
             f1: { drivers: 'drivers', constructors: 'constructors', circuits: 'circuits', seasons: 'seasons', races: 'races', chassis: 'chassis', standings: 'seasons_driver_standings', eventName: "COALESCE(NULLIF(grandPrix.fullName, ''), race.officialName)", eventFields: ', grandPrix.shortName, race.officialName', eventJoin: 'LEFT JOIN grands_prix grandPrix ON grandPrix.id = race.grandPrixId' },
             f2: { drivers: 'f2_drivers', constructors: 'f2_constructors', circuits: 'f2_circuits', seasons: 'f2_seasons', races: 'f2_races', chassis: 'f2_chassis', standings: 'f2_season_driver_standings', eventName: 'race.name', eventFields: '', eventJoin: '' },

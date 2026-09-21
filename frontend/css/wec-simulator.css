@@ -1,0 +1,66 @@
+.wec-mode .simulator-example-card { --simulator-example-accent: #7fe0ba; }
+.wec-simulator-directory .simulator-tool-grid { grid-template-columns: repeat(2, minmax(260px, 1fr)); }
+.wec-simulator-method { max-width: 780px; margin: 28px 0 0; color: var(--text-secondary); line-height: 1.65; }
+.wec-simulate-page .simulator-page-heading .back-link { display: inline-block; margin-bottom: 20px; }
+.wec-simulation-controls { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; padding: 22px; }
+.wec-simulation-controls label { display: grid; align-content: start; gap: 7px; font-weight: 700; font-size: 13px; }
+.wec-simulation-controls select, .wec-simulation-controls input { width: 100%; min-height: 44px; padding: 9px 12px; border: 1px solid var(--border); border-radius: 8px; background: #fff; color: var(--text); font: inherit; }
+.wec-simulation-controls small { color: var(--text-secondary); font-weight: 400; }
+.wec-simulation-controls .wec-sim-points { grid-column: span 3; }
+.wec-simulation-note { margin: 0; padding: 16px 22px; border-top: 1px solid var(--border); background: var(--surface-alt); color: var(--text-secondary); line-height: 1.5; }
+.wec-sim-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 15px; }
+.wec-sim-actions label { display: flex; align-items: center; gap: 7px; font-size: 13px; }
+.wec-sim-actions button { padding: 9px 14px; border: 1px solid var(--border); border-radius: 8px; background: #fff; cursor: pointer; }
+.wec-sim-actions button:disabled { cursor: not-allowed; opacity: .6; }
+.wec-sim-summary { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 18px 0; }
+.wec-sim-summary > div { padding: 16px; border: 1px solid var(--border); border-radius: 10px; background: #fff; }
+.wec-sim-summary span, .wec-sim-summary small { display: block; color: var(--text-secondary); }
+.wec-sim-summary strong { display: block; margin: 4px 0; font-size: clamp(18px, 2.4vw, 25px); }
+.wec-sim-table-wrap { overflow-x: auto; }
+.wec-sim-table { width: 100%; min-width: 780px; border-collapse: collapse; font-size: 13px; }
+.wec-sim-table th, .wec-sim-table td { padding: 11px 12px; border-bottom: 1px solid var(--border); text-align: left; white-space: nowrap; }
+.wec-sim-table thead th { background: var(--accent-light); color: var(--text-secondary); }
+.wec-sim-table tbody th { color: var(--text); font-size: 13px; letter-spacing: normal; text-transform: none; }
+.wec-sim-table tbody tr:first-child { background: color-mix(in srgb, var(--accent-light) 55%, white); }
+.wec-sim-table td small { display: block; color: var(--text-secondary); }
+.wec-sim-table .wec-sim-points-cell { font-weight: 800; }
+.wec-sim-table .wec-sim-up { color: #087f5b; font-weight: 700; }
+.wec-sim-table .wec-sim-down { color: #a43b45; font-weight: 700; }
+.wec-scenario-page .scenario-page-heading .back-link { display: inline-block; margin-bottom: 20px; }
+.wec-scenario-page .scenario-setup .wec-scenario-controls { grid-template-columns: minmax(100px, .5fr) minmax(250px, 1.7fr) minmax(220px, 1.3fr) minmax(220px, 1.3fr) auto; }
+.wec-scenario-page .scenario-controls label { display: grid; align-content: start; gap: 8px; }
+.wec-scenario-rules { margin: 0; padding: 16px 22px; border-top: 1px solid var(--border); background: var(--surface-alt); color: var(--text-secondary); font-size: 12px; line-height: 1.55; }
+.wec-scenario-toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0 12px; }
+.wec-scenario-toolbar label { min-width: 220px; flex: 1; }
+.wec-scenario-toolbar input { width: 100%; min-height: 36px; padding: 0 10px; border: 1px solid var(--border); border-radius: 8px; background: #fff; }
+.wec-scenario-toolbar button { min-height: 36px; padding: 0 11px; border: 1px solid var(--border); border-radius: 8px; background: #fff; color: var(--text); font-size: 11px; font-weight: 750; cursor: pointer; }
+.wec-scenario-toolbar button:disabled { cursor: not-allowed; opacity: .5; }
+.wec-scenario-page .scenario-driver-grid { max-height: 640px; overflow-y: auto; }
+.wec-scenario-page .scenario-driver-grid label { min-width: 0; }
+.wec-scenario-page .scenario-driver-grid label > span { min-width: 0; }
+.wec-scenario-page .scenario-driver-grid label.is-unassigned small { color: var(--text-secondary); }
+.wec-scenario-page .scenario-driver-grid strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.wec-scenario-page .scenario-summary strong { white-space: normal; }
+.wec-builder-page .builder-page-heading .back-link { display: inline-block; margin-bottom: 20px; }
+.wec-builder-page .builder-race-picker { grid-template-columns: minmax(90px, .4fr) minmax(210px, 1.5fr) auto auto; }
+.wec-builder-page .builder-calendar-race { grid-template-columns: 30px minmax(0, 1fr) minmax(105px, .45fr) auto; }
+.wec-builder-weight { display: grid; gap: 3px; font-size: 9px; font-weight: 750; }
+.wec-builder-weight select { width: 100%; min-height: 32px; font-size: 11px; }
+.wec-builder-page .builder-points-choice { display: grid; gap: 7px; }
+.wec-builder-page .builder-points-choice select, .wec-builder-page .builder-points-choice input { width: 100%; min-height: 42px; padding: 8px 10px; border: 1px solid var(--border); border-radius: 8px; background: #fff; color: var(--text); }
+.wec-builder-page .builder-points-choice small { color: var(--text-secondary); line-height: 1.4; }
+.wec-builder-multipliers { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 14px; }
+.wec-builder-multipliers label { display: grid; gap: 6px; font-size: 11px; font-weight: 750; }
+.wec-builder-multipliers input { width: 100%; min-height: 42px; padding: 8px 10px; border: 1px solid var(--border); border-radius: 8px; }
+.wec-builder-page .builder-rule-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.wec-builder-page .builder-rule-summary span { color: var(--text-secondary); }
+.wec-builder-error { grid-column: 1 / -1; margin: 0; padding: 12px; color: #a43b45; }
+.wec-builder-coverage { margin: 12px 0 0; color: var(--text-secondary); font-size: 11px; }
+.wec-builder-page .builder-results-actions { flex-wrap: wrap; }
+.wec-builder-page .standings-mode { display: flex; flex-wrap: wrap; }
+.wec-builder-page .builder-field-list label[hidden] { display: none; }
+@media (max-width: 1250px) { .wec-scenario-page .scenario-setup .wec-scenario-controls { grid-template-columns: repeat(2, minmax(0, 1fr)); } .wec-scenario-page .scenario-setup .wec-scenario-controls button { margin-top: 18px; } }
+@media (max-width: 1050px) { .wec-builder-page .builder-race-picker { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 760px) { .wec-simulation-controls { grid-template-columns: repeat(2, minmax(0, 1fr)); } .wec-simulation-controls .wec-sim-points { grid-column: span 2; } .wec-sim-summary { grid-template-columns: 1fr; } }
+@media (max-width: 700px) { .wec-simulator-directory .simulator-tool-grid { grid-template-columns: 1fr; } .wec-scenario-page .scenario-setup .wec-scenario-controls { grid-template-columns: 1fr; } .wec-scenario-page .scenario-setup .wec-scenario-controls button { margin-top: 0; } .wec-scenario-rules { padding: 16px 18px; } .wec-builder-page .builder-race-picker { grid-template-columns: 1fr; } .wec-builder-page .builder-calendar-race { grid-template-columns: 26px minmax(0, 1fr) auto; } .wec-builder-weight { grid-column: 2 / 3; } }
+@media (max-width: 520px) { .wec-simulation-controls { grid-template-columns: 1fr; padding: 18px; } .wec-simulation-controls .wec-sim-points { grid-column: span 1; } .wec-simulation-note { padding: 16px 18px; } }

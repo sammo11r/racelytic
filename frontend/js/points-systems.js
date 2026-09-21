@@ -335,7 +335,7 @@ function editSystem(system = null, options = {}) {
   systemForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-async function loadSystems() { systems = await getJSON('/api/points-systems'); renderSystems(); }
+async function loadSystems() { systems = (await getJSON('/api/points-systems')).filter(system => system.series !== 'wec'); renderSystems(); }
 async function initialise() {
   try {
     const seriesName = isFormulaEPointsPage ? 'Formula E' : isAcademyPointsPage ? 'F1 Academy' : isF3PointsPage ? 'Formula 3' : isF2PointsPage ? 'Formula 2' : 'Formula 1';

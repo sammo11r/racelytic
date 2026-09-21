@@ -25,24 +25,25 @@
 .lights-actions .button { min-width: 150px; }
 .lights-actions small { max-width: 230px; color: #747d89; font-size: 9px; line-height: 1.45; }
 .lights-stats { padding: clamp(22px,3vw,34px); background: #171b22; }
+.wec-mode .lights-stats > .eyebrow { color: #67d9a2; }
 .lights-summary { display: grid; grid-template-columns: repeat(2,1fr); gap: 8px; margin: 20px 0 28px; }
 .lights-summary div { padding: 14px; border: 1px solid rgba(255,255,255,.08); border-radius: 9px; background: rgba(255,255,255,.025); }
-.lights-summary dt { color: #717a86; font-size: 8px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.lights-summary dt { color: #aab1bb; font-size: 8px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
 .lights-summary dd { margin: 7px 0 0; font-size: 17px; font-weight: 850; font-variant-numeric: tabular-nums; }
 .lights-history-head { display: flex; justify-content: space-between; align-items: center; padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,.08); }
 .lights-history-head h3 { margin: 0; font-size: 12px; }
-.lights-history-head button { border: 0; background: transparent; color: #747d89; font-size: 8px; text-transform: uppercase; }
+.lights-history-head button { border: 0; background: transparent; color: #aab1bb; font-size: 8px; text-transform: uppercase; }
 .lights-history { min-height: 135px; margin: 0; padding: 5px 0 20px; list-style: none; }
 .lights-history li { display: grid; grid-template-columns: 35px 1fr auto; gap: 10px; align-items: center; padding: 8px 2px; border-bottom: 1px solid rgba(255,255,255,.055); }
-.lights-history li > span { color: #68717d; font-size: 8px; }
+.lights-history li > span { color: #aab1bb; font-size: 8px; }
 .lights-history li strong { font-size: 11px; font-variant-numeric: tabular-nums; }
 .lights-history li small { font-size: 8px; }
-.lights-history .empty { display: block; padding-top: 25px; color: #68717d; font-size: 9px; text-align: center; }
+.lights-history .empty { display: block; padding-top: 25px; color: #aab1bb; font-size: 9px; text-align: center; }
 .lights-history .elite,.lights-scale .elite { color: #67d9a2; }.lights-history .quick,.lights-scale .quick { color: #7ed8ff; }.lights-history .steady,.lights-scale .steady { color: #f1c45b; }.lights-history .slow,.lights-scale .slow { color: #dc8c62; }
 .lights-scale { display: grid; gap: 7px; padding-top: 18px; border-top: 1px solid rgba(255,255,255,.08); }
 .lights-scale > span { display: grid; grid-template-columns: 7px 1fr auto; gap: 8px; align-items: center; }
 .lights-scale i { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
-.lights-scale b { color: #9ca3ad; font-size: 8px; }.lights-scale small { color: #666f7b; font-size: 8px; }
+.lights-scale b { color: #b9c0c8; font-size: 8px; }.lights-scale small { color: #aab1bb; font-size: 8px; }
 .lights-explainer { display: grid; grid-template-columns: repeat(3,1fr); margin-top: 70px; border-block: 1px solid var(--border); }
 .lights-explainer > div { min-height: 205px; padding: 28px clamp(20px,3vw,38px) 30px 0; }
 .lights-explainer > div + div { padding-left: clamp(20px,3vw,38px); border-left: 1px solid var(--border); }

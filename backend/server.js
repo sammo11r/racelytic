@@ -100,7 +100,7 @@ app.get('/monitor', requireMonitorAuth, (req, res, next) => sendSeoPage(req, res
 
 const publicPages = require('node:fs').readdirSync(frontendDirectory)
     .filter(file => file.endsWith('.html')
-        && !['index.html', 'f2.html', 'f3.html', 'ratings-methodology.html', 'wec.html', 'wec-seasons.html', 'wec-season.html', 'wec-races.html', 'wec-race.html', 'wec-entity.html'].includes(file));
+        && !['index.html', 'f2.html', 'f3.html', 'ratings-methodology.html', 'wec.html', 'wec-database.html', 'wec-analysis.html', 'wec-season-analysis.html', 'wec-season-comparison.html', 'wec-race-analysis.html', 'wec-circuit-analysis.html', 'wec-records.html', 'wec-driver-comparison.html', 'wec-driver-form.html', 'wec-simulator.html', 'wec-simulate-season.html', 'wec-scenario-calculator.html', 'wec-championship-builder.html', 'wec-points-systems.html', 'wec-games.html', 'wec-quizzes.html', 'wec-race-winners-quiz.html', 'wec-season-race-winners-quiz.html', 'wec-seasons.html', 'wec-season.html', 'wec-races.html', 'wec-race.html', 'wec-drivers.html', 'wec-teams.html', 'wec-cars.html', 'wec-circuits.html', 'wec-circuit.html', 'wec-entity.html'].includes(file));
 
 const ratingsPages = {
     '/ratings/leaderboard': ['templates/ratings-explorer.html', 'leaderboard'],
@@ -174,21 +174,51 @@ for (const { route, file, series, slug } of juniorPages) {
     } else app.get(route, (req, res, next) => sendSeoPage(req, res, next, file));
 }
 
-for (const [route, series] of [['/', 'f1'], ['/f2', 'f2'], ['/f3', 'f3'], ['/academy', 'academy'], ['/formula-e', 'fe']]) {
+for (const [route, series] of [['/', 'f1'], ['/f2', 'f2'], ['/f3', 'f3'], ['/academy', 'academy'], ['/formula-e', 'fe'], ['/wec', 'wec']]) {
     app.get(route, (req, res) => res.type('html').send(applySeo(renderPageShell(renderSeriesHome(series)), req.path, req.query)));
 }
 
-app.get('/wec', (req, res, next) => sendSeoPage(req, res, next, 'wec.html'));
+app.get('/wec/database', (req, res, next) => sendSeoPage(req, res, next, 'wec-database.html'));
+app.get('/wec/analysis', (req, res, next) => sendSeoPage(req, res, next, 'wec-analysis.html'));
+app.get('/wec/season-analysis', (req, res, next) => sendSeoPage(req, res, next, 'wec-season-analysis.html'));
+app.get('/wec/season-comparison', (req, res, next) => sendSeoPage(req, res, next, 'wec-season-comparison.html'));
+app.get('/wec/race-analysis', (req, res, next) => sendSeoPage(req, res, next, 'wec-race-analysis.html'));
+app.get('/wec/circuit-analysis', (req, res, next) => sendSeoPage(req, res, next, 'wec-circuit-analysis.html'));
+app.get('/wec/records', (req, res, next) => sendSeoPage(req, res, next, 'wec-records.html'));
+app.get('/wec/driver-comparison', (req, res, next) => sendSeoPage(req, res, next, 'wec-driver-comparison.html'));
+app.get('/wec/driver-form', (req, res, next) => sendSeoPage(req, res, next, 'wec-driver-form.html'));
+app.get('/wec/simulator', (req, res, next) => sendSeoPage(req, res, next, 'wec-simulator.html'));
+app.get('/wec/simulate-season', (req, res, next) => sendSeoPage(req, res, next, 'wec-simulate-season.html'));
+app.get('/wec/scenario-calculator', (req, res, next) => sendSeoPage(req, res, next, 'wec-scenario-calculator.html'));
+app.get('/wec/championship-builder', (req, res, next) => sendSeoPage(req, res, next, 'wec-championship-builder.html'));
+app.get('/wec/points-systems', (req, res, next) => sendSeoPage(req, res, next, 'wec-points-systems.html'));
+app.get('/wec/games', (req, res, next) => sendSeoPage(req, res, next, 'wec-games.html'));
+app.get('/wec/quizzes', (req, res, next) => sendSeoPage(req, res, next, 'wec-quizzes.html'));
+app.get('/wec/race-winners-quiz', (req, res, next) => sendSeoPage(req, res, next, 'wec-race-winners-quiz.html'));
+app.get('/wec/season-race-winners-quiz', (req, res, next) => sendSeoPage(req, res, next, 'wec-season-race-winners-quiz.html'));
+app.get('/wec/idle-racing-manager', (req, res, next) => sendSeoPage(req, res, next, 'idle-racing-manager.html'));
+app.get('/wec/lights-out', (req, res, next) => sendSeoPage(req, res, next, 'lights-out.html'));
 app.get('/wec/seasons', (req, res, next) => sendSeoPage(req, res, next, 'wec-seasons.html'));
 app.get('/wec/seasons/:resourceId', (req, res, next) => sendSeoPage(req, res, next, 'wec-season.html'));
 app.get('/wec/races', (req, res, next) => sendSeoPage(req, res, next, 'wec-races.html'));
 app.get('/wec/races/:resourceId', (req, res, next) => sendSeoPage(req, res, next, 'wec-race.html'));
 app.get('/wec/races/:resourceId/:slug', (req, res, next) => sendSeoPage(req, res, next, 'wec-race.html'));
-for (const collection of ['drivers', 'teams', 'manufacturers', 'car-models', 'entries']) {
+app.get('/wec/drivers', (req, res, next) => sendSeoPage(req, res, next, 'wec-drivers.html'));
+app.get('/wec/teams', (req, res, next) => sendSeoPage(req, res, next, 'wec-teams.html'));
+app.get('/wec/cars', (req, res, next) => sendSeoPage(req, res, next, 'wec-cars.html'));
+app.get('/wec/cars/:resourceId', (req, res, next) => sendSeoPage(req, res, next, 'wec-entity.html'));
+app.get('/wec/car-models/:resourceId', (req, res) => {
+    const queryIndex = req.originalUrl.indexOf('?');
+    const query = queryIndex === -1 ? '' : req.originalUrl.slice(queryIndex);
+    res.redirect(308, `/wec/cars/${encodeURIComponent(req.params.resourceId)}${query}`);
+});
+app.get('/wec/circuits', (req, res, next) => sendSeoPage(req, res, next, 'wec-circuits.html'));
+app.get('/wec/circuits/:resourceId', (req, res, next) => sendSeoPage(req, res, next, 'wec-circuit.html'));
+for (const collection of ['drivers', 'teams', 'manufacturers', 'entries']) {
     app.get(`/wec/${collection}/:resourceId`, (req, res, next) => sendSeoPage(req, res, next, 'wec-entity.html'));
 }
 
-for (const [legacy, target] of [['/index.html', '/'], ['/f2.html', '/f2'], ['/f3.html', '/f3']]) {
+for (const [legacy, target] of [['/index.html', '/'], ['/f2.html', '/f2'], ['/f3.html', '/f3'], ['/wec.html', '/wec']]) {
     app.get(legacy, (req, res) => res.redirect(308, target));
 }
 
@@ -262,7 +292,7 @@ for (const [resource, bySeries] of Object.entries(resourceFiles)) {
 }
 
 const sitemapRoutes = [
-    '/', '/f2', '/f3', '/academy', '/formula-e', '/wec', '/wec/seasons', '/wec/races',
+    '/', '/f2', '/f3', '/academy', '/formula-e', '/wec', '/wec/database', '/wec/analysis', '/wec/season-analysis', '/wec/season-comparison', '/wec/race-analysis', '/wec/circuit-analysis', '/wec/records', '/wec/driver-comparison', '/wec/driver-form', '/wec/simulator', '/wec/simulate-season', '/wec/scenario-calculator', '/wec/championship-builder', '/wec/points-systems', '/wec/seasons', '/wec/races', '/wec/drivers', '/wec/teams', '/wec/cars', '/wec/circuits',
     '/wec/seasons/2022', '/wec/seasons/2023', '/wec/seasons/2024', '/wec/seasons/2025',
     ...Object.keys(ratingsPages),
     ...publicPages.map(file => `/${file.slice(0, -'.html'.length)}`).filter(route => !/^\/f[23]-/.test(route)),

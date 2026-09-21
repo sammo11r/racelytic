@@ -35,6 +35,28 @@ test('full search can filter results to one series', () => {
     assert.equal(response.groups[0].results[0].series, 'f2');
 });
 
+test('WEC is a first-class search scope', () => {
+    const response = buildSearchResponse([
+        { category: 'page', series: 'f1', label: 'Games', meta: 'Formula 1 games', url: '/games' },
+        { category: 'page', series: 'wec', label: 'Games', meta: 'WEC games', url: '/wec/games' }
+    ], { query: 'games', mode: 'full', preferredSeries: 'wec', seriesFilter: 'wec' });
+    assert.equal(response.total, 1);
+    assert.equal(response.bestMatch.url, '/wec/games');
+    assert.equal(response.bestMatch.series, 'wec');
+});
+
+test('WEC manufacturers, cars and entries keep distinct search groups', () => {
+    const response = buildSearchResponse([
+        { category: 'manufacturer', series: 'wec', type: 'WEC Manufacturer', label: 'Ferrari', meta: 'Italy · WEC manufacturer', url: '/wec/manufacturers/ferrari' },
+        { category: 'car', series: 'wec', type: 'WEC Car', label: 'Ferrari 499P', meta: 'Ferrari · Hypercar', url: '/wec/cars/ferrari-499p' },
+        { category: 'entry', series: 'wec', type: 'WEC Entry', label: '#51 Ferrari AF Corse', meta: '2026 · Hypercar', url: '/wec/entries/wec-2026-hypercar-51' }
+    ], { query: 'ferrari', mode: 'full', preferredSeries: 'wec', seriesFilter: 'wec' });
+
+    assert.equal(response.bestMatch.url, '/wec/manufacturers/ferrari');
+    assert.deepEqual(response.groups.map(group => group.key), ['manufacturer', 'car', 'entry']);
+    assert.equal(response.total, 3);
+});
+
 test('exact and prefix matches rank above incidental metadata matches', () => {
     const exact = { category: 'circuit', label: 'Melbourne', meta: 'Australia' };
     const incidental = { category: 'race', label: 'Australian Grand Prix', meta: '2026', searchText: 'Australian Grand Prix Melbourne' };

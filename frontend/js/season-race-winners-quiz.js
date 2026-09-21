@@ -4,9 +4,11 @@ let raceRows = [];
 const revealedRaces = new Map();
 let quizGaveUp = false;
 let newRaceIds = new Set();
-const QUIZ_SERIES = location.pathname.startsWith('/formula-e/') ? 'fe' : location.pathname.startsWith('/academy/') ? 'academy' : location.pathname.startsWith('/f3/') ? 'f3' : location.pathname.startsWith('/f2/') ? 'f2' : 'f1';
+const QUIZ_SERIES = location.pathname.startsWith('/wec/') ? 'wec' : location.pathname.startsWith('/formula-e/') ? 'fe' : location.pathname.startsWith('/academy/') ? 'academy' : location.pathname.startsWith('/f3/') ? 'f3' : location.pathname.startsWith('/f2/') ? 'f2' : 'f1';
 const QUIZ_ENTITY_LABEL = document.body.dataset.quizEntityLabel || 'Constructor';
 const QUIZ_EVENT_LABEL = document.body.dataset.quizEventLabel || 'Grand Prix';
+const QUIZ_ANSWER_LABEL = document.body.dataset.quizAnswerLabel || 'Winner';
+const QUIZ_ANSWER_PLURAL = document.body.dataset.quizAnswerPlural || 'winning drivers';
 const seriesQuery = separator => QUIZ_SERIES === 'f1' ? '' : `${separator}series=${QUIZ_SERIES}`;
 const progressKey = () => `racelytic-quiz-${QUIZ_SERIES === 'f1' ? '' : `${QUIZ_SERIES}-`}season-race-winners-${selectedYear}`;
 const seasonLabel = year => QUIZ_SERIES === 'fe' ? `${Number(year) - 1}–${String(year).slice(-2)}` : String(year);
@@ -19,16 +21,16 @@ function restoreProgress() {
   revealedRaces.clear(); quizGaveUp = false;
   try { const saved = JSON.parse(localStorage.getItem(progressKey()) || 'null'); const ids = new Set(raceRows.map(row => row.raceId)); saved?.answers?.forEach(([id, name]) => { if (ids.has(String(id)) && typeof name === 'string') revealedRaces.set(String(id), name); }); quizGaveUp = Boolean(saved?.gaveUp); } catch (_) {}
 }
-function answerCell(name, length) { return `<span class="quiz-column-sizer" aria-hidden="true">${'M'.repeat(length)}</span>${name ? `<span class="quiz-answer-overlay">${esc(name)}</span>` : '<span class="quiz-empty-answer quiz-answer-overlay" aria-label="Not yet answered"></span>'}`; }
+function answerCell(name, length) { return `<span class="quiz-column-sizer" aria-hidden="true">${'M'.repeat(length)}</span>${name ? `<span class="quiz-answer-overlay">${esc(name)}</span>` : '<span class="quiz-empty-answer quiz-answer-overlay"><span class="visually-hidden">Not yet answered</span></span>'}`; }
 function updateStatus() {
   const found = revealedRaces.size, total = raceRows.length, names = [...new Set(revealedRaces.values())];
   document.getElementById('quiz-score').textContent = `${found} / ${total}`; document.getElementById('quiz-progress-fill').style.width = `${total ? found / total * 100 : 0}%`;
   document.getElementById('guessed-answer-count').textContent = names.length; document.getElementById('guessed-answers').innerHTML = names.map(name => `<span>${esc(name)}</span>`).join('');
   const completion = document.getElementById('quiz-completion'); completion.hidden = found !== total;
-  if (!completion.hidden) { document.getElementById('quiz-completion-label').textContent = quizGaveUp ? 'Answers revealed' : 'Quiz complete'; document.getElementById('quiz-completion-title').textContent = quizGaveUp ? `${seasonLabel(selectedYear)} calendar completed` : 'Perfect score'; document.getElementById('quiz-completion-copy').textContent = quizGaveUp ? `You found ${names.length} winning drivers before revealing the remaining races.` : `You completed all ${total} race winners from the ${seasonLabel(selectedYear)} season.`; }
+  if (!completion.hidden) { document.getElementById('quiz-completion-label').textContent = quizGaveUp ? 'Answers revealed' : 'Quiz complete'; document.getElementById('quiz-completion-title').textContent = quizGaveUp ? `${seasonLabel(selectedYear)} calendar completed` : 'Perfect score'; document.getElementById('quiz-completion-copy').textContent = quizGaveUp ? `You found ${names.length} ${QUIZ_ANSWER_PLURAL} before revealing the remaining races.` : `You completed all ${total} race winners from the ${seasonLabel(selectedYear)} season.`; }
 }
 function renderBoard() {
-  document.getElementById('season-race-winners-quiz-board').innerHTML = `<div class="quiz-column-table table-wrap"><table class="champions-quiz-table season-winners-table"><thead><tr><th>Rd</th><th>${esc(QUIZ_EVENT_LABEL)}</th><th>Winner</th><th>${esc(QUIZ_ENTITY_LABEL)}</th></tr></thead><tbody>${raceRows.map(row => {
+  document.getElementById('season-race-winners-quiz-board').innerHTML = `<div class="quiz-column-table table-wrap" tabindex="0"><table class="champions-quiz-table season-winners-table"><thead><tr><th>Rd</th><th>${esc(QUIZ_EVENT_LABEL)}</th><th>${esc(QUIZ_ANSWER_LABEL)}</th><th>${esc(QUIZ_ENTITY_LABEL)}</th></tr></thead><tbody>${raceRows.map(row => {
     const name = revealedRaces.get(row.raceId); return `<tr data-race-id="${esc(row.raceId)}" class="${name ? 'is-revealed' : ''}${newRaceIds.has(row.raceId) ? ' is-new-answer' : ''}"><td><strong>${row.round}</strong></td><td>${esc(row.raceName)}</td><td class="quiz-driver-cell">${answerCell(name, row.driverNameLength)}</td><td>${row.constructors.map(esc).join(' / ') || '—'}</td></tr>`;
   }).join('')}</tbody></table></div>`; updateStatus();
 }

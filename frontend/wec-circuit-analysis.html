@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Analyse FIA World Endurance Championship circuit specialists, class winners, race formats and reliability.">
+  <link rel="icon" href="/assets/favicon-wec.svg" type="image/svg+xml">
+  <title>WEC Circuit Analysis · Racelytic</title>
+  <link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/polish.css"><link rel="stylesheet" href="/css/season-analysis.css"><link rel="stylesheet" href="/css/wec.css"><link rel="stylesheet" href="/css/wec-circuit-analysis.css">
+</head>
+<body class="wec-mode" data-wec-view="circuit-analysis"><div id="header"></div>
+<main class="container page analysis-detail-page wec-circuit-analysis-page">
+  <header class="wec-ca-head" id="wec-ca-head">
+    <div><div class="eyebrow">WEC · CIRCUIT ANALYSIS</div><h1 id="wec-ca-title">Circuit analysis</h1><p id="wec-ca-meta">Choose a venue to explore its endurance-racing history.</p><a id="wec-ca-circuit-link" hidden>Explore circuit history ↗</a></div>
+    <figure id="wec-ca-layout" hidden></figure>
+  </header>
+  <form id="wec-ca-filters" class="wec-ca-filters">
+    <label class="wec-ca-circuit-control"><span>Circuit</span><select id="wec-ca-circuit" disabled><option>Loading circuits…</option></select></label>
+    <label><span>Era</span><select id="wec-ca-era"><option value="all">All WEC seasons</option><option value="2012-2015">2012–2015</option><option value="2016-2020">2016–2020</option><option value="2021-2026">2021–present</option></select></label>
+    <label><span>Class</span><select id="wec-ca-class" disabled><option value="all">All classes</option></select></label>
+    <button type="button" id="wec-ca-share" class="button secondary">Copy link</button>
+  </form>
+  <p id="wec-ca-status" class="analysis-status" role="status">Loading WEC circuits…</p>
+  <section id="wec-ca-summary" class="analysis-summary-strip wec-ca-summary" aria-label="Circuit summary"></section>
+  <section id="wec-ca-empty" class="wec-ca-empty" hidden><h2>No classified races in this selection</h2><p>Choose another era or class to continue.</p><button type="button" id="wec-ca-reset" class="button secondary">Show all seasons and classes</button></section>
+  <div id="wec-ca-workspace" hidden>
+    <nav class="analysis-visualization-menu" aria-label="Circuit analysis views">
+      <label class="analysis-mobile-view" for="wec-ca-view">Analysis view<select id="wec-ca-view"><option value="specialists">Specialists</option><option value="history">Race history</option><option value="reliability">Reliability</option></select></label>
+      <div class="analysis-visualization-tabs" role="tablist">
+        <button type="button" id="wec-ca-tab-specialists" role="tab" aria-controls="wec-ca-panel-specialists" aria-selected="true" data-wec-ca-view="specialists">Specialists</button>
+        <button type="button" id="wec-ca-tab-history" role="tab" aria-controls="wec-ca-panel-history" aria-selected="false" tabindex="-1" data-wec-ca-view="history">Race history</button>
+        <button type="button" id="wec-ca-tab-reliability" role="tab" aria-controls="wec-ca-panel-reliability" aria-selected="false" tabindex="-1" data-wec-ca-view="reliability">Reliability</button>
+      </div>
+    </nav>
+    <div class="analysis-visualization-workspace">
+      <section id="wec-ca-panel-specialists" role="tabpanel" aria-labelledby="wec-ca-tab-specialists" class="analysis-chart-section">
+        <div class="section-heading"><div><h2>Who succeeds here?</h2><p class="analysis-method">Results are measured within class. Every driver in a classified crew shares its result.</p></div><div class="wec-ca-ranking-controls"><label>Rank by<select id="wec-ca-metric"><option value="wins">Class wins</option><option value="podiums">Class podiums</option><option value="winRate">Win percentage</option><option value="averageFinish">Average class finish</option></select></label><label>Minimum starts<select id="wec-ca-minimum"><option value="1" selected>1 start</option><option value="3">3 starts</option><option value="5">5 starts</option></select></label></div></div>
+        <div id="wec-ca-rankings" class="wec-ca-rankings"></div>
+      </section>
+      <section id="wec-ca-panel-history" role="tabpanel" aria-labelledby="wec-ca-tab-history" class="analysis-chart-section" hidden>
+        <div class="section-heading"><div><h2>Race history</h2><p class="analysis-method">Overall and class winners across formats and eras.</p></div></div><div id="wec-ca-history"></div>
+      </section>
+      <section id="wec-ca-panel-reliability" role="tabpanel" aria-labelledby="wec-ca-tab-reliability" class="analysis-chart-section" hidden>
+        <div class="section-heading"><div><h2>Distance and reliability</h2><p class="analysis-method">Classified finish rate and completed distance relative to each class leader.</p></div></div><div id="wec-ca-reliability"></div>
+      </section>
+    </div>
+    <details class="wec-ca-method"><summary>Data &amp; methodology</summary><p>Each car contributes one race result. Class wins and podiums follow the official class classification; all crew members receive that entry result. DNS and withdrawn entries are excluded from starts. Completion compares laps completed with the leading lap total in the same class and event. Changing class names are preserved rather than merged across eras.</p></details>
+  </div>
+</main><footer class="footer"><div class="container">Racelytic</div></footer>
+<script src="/js/utils.js"></script><script src="/js/header.js"></script><script src="/js/wec-circuit-analysis-model.js"></script><script src="/js/wec-circuit-analysis.js"></script>
+</body></html>

@@ -1,6 +1,7 @@
 const pool = require('../backend/db');
 const { loadRatingEvents } = require('../backend/rating-data');
 const { calculateRatings, configuration, DEFAULT_CONFIGURATION, MODEL_VERSION } = require('../backend/rating-engine');
+const { calculateWecRatings, WEC_MODEL_VERSION } = require('../backend/wec-rating-model');
 const { comparisonMetrics, evaluateRatings, eventNormalizedMetrics, pairedBootstrapDelta } = require('../backend/rating-evaluation');
 const { teammateEvents } = require('../backend/rating-models');
 const { calculateJointRatings, competitiveControl, jointRateCandidates, jointStructureCandidates,
@@ -10,7 +11,8 @@ const { candidateGrid, configuredEvents, dynamicsCandidateGrid, holdoutCalibrati
     rollingUncertaintyCalibration } = require('../backend/rating-calibration');
 const { ensureRatingsSchema } = require('../backend/ratings');
 
-const SERIES = ['f1', 'f2', 'f3', 'academy', 'fe'];
+const DEFAULT_SERIES = ['f1', 'f2', 'f3', 'academy', 'fe'];
+const SERIES = [...DEFAULT_SERIES, 'wec'];
 const HOLDOUT_SPLITS = Object.freeze({
     f1: { tuningFromYear: 2000, holdoutYear: 2022 },
     f2: { tuningFromYear: 2017, holdoutYear: 2023 },
@@ -86,7 +88,7 @@ function numericArgument(name) {
 
 function selectedSeries() {
     const value = argument('series');
-    if (!value) return SERIES;
+    if (!value) return DEFAULT_SERIES;
     if (!SERIES.includes(value)) throw new Error(`Unknown series: ${value}`);
     return [value];
 }
@@ -186,7 +188,9 @@ function nestedJointSummary(series, report) {
 
 async function evaluate(connection, series, config) {
     const events = await loadRatingEvents(connection, series);
-    const result = calculateRatings(configuredEvents(events, config), { ...config, collectComparisons: true });
+    const result = series === 'wec'
+        ? calculateWecRatings(events, { ...config, collectComparisons: true })
+        : calculateRatings(configuredEvents(events, config), { ...config, collectComparisons: true });
     const requestedSamples = numericArgument('bootstrap-samples');
     return evaluateRatings(result, { fromYear: numericArgument('from-year'), toYear: numericArgument('to-year'),
         bootstrapSamples: requestedSamples == null ? 1000 : requestedSamples,
@@ -431,7 +435,8 @@ async function main() {
             if (process.argv.includes('--save')) {
                 await connection.query(`INSERT INTO app_rating_evaluations
                     (model_version, series, configuration, metrics) VALUES (?, ?, ?, ?)`,
-                    [MODEL_VERSION, series, JSON.stringify(evaluation.configuration), JSON.stringify(evaluation)]);
+                    [series === 'wec' ? WEC_MODEL_VERSION : MODEL_VERSION, series,
+                        JSON.stringify(evaluation.configuration), JSON.stringify(evaluation)]);
             }
         }
     } finally {

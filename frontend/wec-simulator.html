@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Explore WEC simulation tools built around endurance classes, crews and race distances.">
+  <link rel="icon" href="/assets/favicon-wec.svg" type="image/svg+xml">
+  <title>WEC Simulator · Racelytic</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/polish.css">
+  <link rel="stylesheet" href="/css/database-overview.css">
+  <link rel="stylesheet" href="/css/simulator-overview.css">
+  <link rel="stylesheet" href="/css/wec.css">
+  <link rel="stylesheet" href="/css/wec-simulator.css">
+</head>
+<body class="wec-mode">
+  <div id="header"></div>
+  <main class="container page database-directory simulator-directory wec-simulator-directory">
+    <header class="database-directory-heading simulator-directory-heading">
+      <div class="simulator-directory-intro"><div class="eyebrow">WEC SIMULATOR</div><h1>Rewrite the points, not the race</h1><p>Recalculate a single-class WEC championship with a different points scale and choose how much longer races count.</p></div>
+      <a class="simulator-example-card" href="/wec/simulate-season?year=2025&amp;preset=equal"><div class="simulator-example-kicker"><span>START HERE</span><span>2025 SEASON</span></div><p>What changes when every endurance race is worth the same?</p><strong>Try equal-weight scoring <span aria-hidden="true">→</span></strong></a>
+    </header>
+    <section class="simulator-tool-group" aria-labelledby="wec-simulator-tools-title">
+      <h2 class="eyebrow database-navigation-title" id="wec-simulator-tools-title">CHOOSE A SIMULATION</h2>
+      <nav class="database-category-grid simulator-tool-grid" aria-labelledby="wec-simulator-tools-title">
+        <a class="database-category simulator-tool-card" href="/wec/simulate-season"><span class="simulator-tool-meta">Class-aware · Drivers, teams and manufacturers</span><div class="database-category-heading"><h3>Recalculate a season</h3></div><p>Change positional points and Le Mans weighting, then compare your table with official standings.</p><strong class="database-category-action">Simulate a season <span aria-hidden="true">→</span></strong></a>
+        <a class="database-category simulator-tool-card" href="/wec/scenario-calculator"><span class="simulator-tool-meta">Official cutoff · Predicted endurance results</span><div class="database-category-heading"><h3>Scenario calculator</h3></div><p>Choose where the official standings stop, edit the remaining class finishes and project the title race.</p><strong class="database-category-action">Build a scenario <span aria-hidden="true">→</span></strong></a>
+        <a class="database-category simulator-tool-card" href="/wec/championship-builder"><span class="simulator-tool-meta">Custom calendar · Class-specific scoring</span><div class="database-category-heading"><h3>Championship builder</h3></div><p>Mix WEC races across seasons, choose the eligible crews and teams, and build a new title table.</p><strong class="database-category-action">Build a championship <span aria-hidden="true">→</span></strong></a>
+        <a class="database-category simulator-tool-card" href="/wec/points-systems"><span class="simulator-tool-meta">Reusable rules · Endurance weighting</span><div class="database-category-heading"><h3>Points systems</h3></div><p>Compare WEC scoring presets and create positional rules for all three simulator tools.</p><strong class="database-category-action">Explore points systems <span aria-hidden="true">→</span></strong></a>
+      </nav>
+    </section>
+    <p class="wec-simulator-method">Results remain attached to the classified car and its crew. These tools model positional scoring; they do not reconstruct bonuses, penalties or sporting decisions.</p>
+  </main>
+  <footer class="footer"><div class="container">Racelytic</div></footer>
+  <script src="/js/header.js"></script>
+</body>
+</html>

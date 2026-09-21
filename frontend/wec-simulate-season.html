@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Recalculate a class-specific World Endurance Championship season with custom positional points and race-distance weighting.">
+  <link rel="icon" href="/assets/favicon-wec.svg" type="image/svg+xml">
+  <title>Simulate a WEC Season · Racelytic</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/polish.css">
+  <link rel="stylesheet" href="/css/simulator-season.css">
+  <link rel="stylesheet" href="/css/wec.css">
+  <link rel="stylesheet" href="/css/wec-simulator.css">
+</head>
+<body class="wec-mode">
+  <div id="header"></div>
+  <main class="container page simulator-page wec-simulate-page">
+    <header class="simulator-page-heading"><a class="back-link" href="/wec/simulator">← WEC simulator</a><div class="eyebrow">SIMULATE A WEC SEASON</div><h1>Recalculate a class championship</h1><p>Keep every classified entry and crew in place. Change only the points awarded for each finish and the weight of longer events.</p></header>
+    <section class="simulator-workspace" aria-label="Simulation settings">
+      <div class="wec-simulation-controls">
+        <label><span>Season</span><select id="wec-sim-season" disabled><option>Loading seasons…</option></select></label>
+        <label><span>Championship</span><select id="wec-sim-championship" disabled><option>Choose a season</option></select></label>
+        <label><span>Scoring preset</span><select id="wec-sim-preset"><option value="weighted">WEC-inspired distance weighting</option><option value="equal">Equal-weight races</option><option value="classic">Classic top-six</option><option value="custom">Custom rules</option></select><small><a href="/wec/points-systems">Explore and save WEC rules →</a></small></label>
+        <label class="wec-sim-points"><span>Points by class position</span><input id="wec-sim-points" type="text" inputmode="decimal" autocomplete="off" aria-describedby="wec-sim-points-hint"><small id="wec-sim-points-hint">Comma-separated, first place first. Up to 30 positions.</small></label>
+        <label><span>Extended-race multiplier</span><input id="wec-sim-extended" type="number" min="0" max="5" step="0.01"></label>
+        <label><span>Le Mans multiplier</span><input id="wec-sim-le-mans" type="number" min="0" max="5" step="0.01"></label>
+      </div>
+      <p class="wec-simulation-note">Only single-class championships are listed. A classified car scores once; every driver in its crew receives that result. Team and manufacturer championships use their best classified car per race.</p>
+    </section>
+    <section class="simulator-results" aria-labelledby="wec-sim-results-title">
+      <div class="section-heading"><div><div class="eyebrow">ALTERNATE STANDINGS</div><h2 id="wec-sim-results-title">Championship table</h2></div><div class="wec-sim-actions"><label><input id="wec-sim-changed" type="checkbox"> Changed positions only</label><button id="wec-sim-share" type="button" disabled>Copy link</button></div></div>
+      <p id="wec-sim-status" class="section-note" role="status">Loading WEC seasons…</p>
+      <div id="wec-sim-summary" class="wec-sim-summary" aria-live="polite"></div>
+      <div id="wec-sim-table" class="table-wrap wec-sim-table-wrap"></div>
+    </section>
+    <p class="wec-simulator-method">These are hypothetical positional standings, not an official recalculation. Bonuses, shared drives beyond the recorded crew, penalties, half points, ties under official regulations and race strategy are not modelled. Official points remain visible for reference.</p>
+  </main>
+  <footer class="footer"><div class="container">Racelytic</div></footer>
+  <script src="/js/utils.js"></script>
+  <script src="/js/header.js"></script>
+  <script src="/js/wec-simulate-season-model.js"></script>
+  <script src="/js/wec-simulate-season.js"></script>
+</body>
+</html>

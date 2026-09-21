@@ -9,11 +9,69 @@
 </head>
 <body class="wec-mode" data-wec-view="entity">
   <div id="header"></div>
-  <main class="container page wec-page">
-    <a class="back-link" href="/wec/seasons">← WEC seasons</a>
-    <header id="wec-entity-heading" class="wec-page-head"><p class="eyebrow">WEC ARCHIVE PROFILE</p><h1>Profile</h1><p>Loading profile…</p></header>
-    <section id="wec-entity-stats" class="wec-entity-stats" aria-label="Career summary"></section>
-    <section aria-labelledby="wec-entity-history-title"><div class="section-heading"><div><p class="eyebrow">RACE HISTORY</p><h2 id="wec-entity-history-title">WEC appearances</h2></div><div id="wec-entity-filters" class="wec-class-filters" aria-label="Appearance class"></div></div><div id="wec-entity-history" class="wec-calendar" aria-live="polite"><p class="loading-state">Loading appearances…</p></div></section>
+  <main class="container page wec-page wec-entity-page">
+    <a id="wec-entity-back-link" class="back-link" href="/wec/seasons">← WEC seasons</a>
+
+    <div id="wec-driver-profile" class="wec-driver-profile" hidden>
+      <div id="wec-driver-head" aria-busy="true"><section class="detail-hero profile-hero driver-profile-hero driver-detail-skeleton" aria-hidden="true"><div><b></b><span></span><em></em></div></section></div>
+      <section class="detail-section driver-plain-section"><div class="section-heading"><div><div class="eyebrow">CAREER</div><h2>At a glance</h2></div></div><div id="wec-driver-stats" class="detail-stat-grid driver-stat-grid" aria-busy="true"></div></section>
+      <section class="detail-section driver-plain-section driver-timeline-section"><div class="section-heading driver-timeline-heading"><div><div class="eyebrow">CAREER TIMELINE</div><h2>Season by season</h2></div><div class="driver-timeline-actions"><div id="wec-driver-career-span" class="section-note"></div><button id="wec-driver-timeline-previous" type="button" aria-label="Earlier seasons" disabled>←</button><button id="wec-driver-timeline-next" type="button" aria-label="Later seasons" disabled>→</button></div></div><div id="wec-driver-seasons" class="driver-timeline-card" aria-busy="true"></div></section>
+      <section class="detail-section driver-plain-section wec-driver-connections-section"><div class="section-heading"><div><div class="eyebrow">ENDURANCE CAREER</div><h2>Teams, cars and crews</h2></div></div><div id="wec-driver-connections" class="wec-driver-connections" aria-busy="true"></div></section>
+      <section class="detail-section driver-plain-section driver-results-section"><div class="section-heading"><div><div class="eyebrow">RESULTS</div><h2>Race history</h2></div><div class="section-note">Complete WEC record</div></div>
+        <div class="wec-driver-result-filters" role="search" aria-label="Filter WEC race history">
+          <label class="wec-driver-result-search"><span>Search</span><input id="wec-driver-result-search" type="search" placeholder="Race, team, manufacturer or car…" autocomplete="off"></label>
+          <label><span>Season</span><select id="wec-driver-result-season"><option value="">All seasons</option></select></label>
+          <label><span>Class</span><select id="wec-driver-result-class"><option value="">All classes</option></select></label>
+          <label><span>Result</span><select id="wec-driver-result-outcome"><option value="all">All results</option><option value="overall-wins">Overall wins</option><option value="class-wins">Class wins</option><option value="podiums">Class podiums</option><option value="retirements">Retirements</option><option value="le-mans">Le Mans</option></select></label>
+          <button id="wec-driver-result-clear" type="button" class="button secondary">Clear</button>
+        </div>
+        <div id="wec-driver-result-count" class="browser-count" aria-live="polite">Loading race history…</div>
+        <div id="wec-driver-results" class="wec-driver-results" aria-busy="true"></div>
+      </section>
+    </div>
+
+    <div id="wec-team-profile" class="wec-team-profile" hidden>
+      <div id="wec-team-head" aria-busy="true"><section class="detail-hero profile-hero driver-profile-hero driver-detail-skeleton" aria-hidden="true"><div><b></b><span></span><em></em></div></section></div>
+      <section id="wec-team-overview" class="detail-section driver-plain-section"><div class="section-heading"><div><div class="eyebrow">CAREER</div><h2>At a glance</h2></div></div><div id="wec-team-stats" class="detail-stat-grid driver-stat-grid" aria-busy="true"></div></section>
+      <section id="wec-team-seasons-section" class="detail-section driver-plain-section driver-timeline-section"><div class="section-heading driver-timeline-heading"><div><div class="eyebrow">TEAM TIMELINE</div><h2>Season by season</h2></div><div class="driver-timeline-actions"><div id="wec-team-career-span" class="section-note"></div><button id="wec-team-timeline-previous" type="button" aria-label="Earlier seasons" disabled>←</button><button id="wec-team-timeline-next" type="button" aria-label="Later seasons" disabled>→</button></div></div><div id="wec-team-seasons" class="driver-timeline-card" aria-busy="true"></div></section>
+      <section id="wec-team-connections-section" class="detail-section driver-plain-section wec-driver-connections-section"><div class="section-heading"><div><div class="eyebrow">TEAM HISTORY</div><h2>Drivers, manufacturers and cars</h2></div></div><div id="wec-team-connections" class="wec-driver-connections" aria-busy="true"></div></section>
+      <section id="wec-team-championships-section" class="detail-section driver-plain-section"><div class="section-heading"><div><div class="eyebrow">HONOURS</div><h2>Championship record</h2></div><div id="wec-team-championship-count" class="section-note"></div></div><div id="wec-team-championships" class="wec-team-championships" aria-busy="true"></div></section>
+      <section id="wec-team-results-section" class="detail-section driver-plain-section driver-results-section"><div class="section-heading"><div><div class="eyebrow">RESULTS</div><h2>Race history</h2></div><div class="section-note">Grouped by event</div></div>
+        <div class="wec-driver-result-filters wec-team-result-filters" role="search" aria-label="Filter WEC team race history">
+          <label class="wec-driver-result-search"><span>Search</span><input id="wec-team-result-search" type="search" placeholder="Race, circuit, driver, manufacturer or car…" autocomplete="off"></label>
+          <label><span>Season</span><select id="wec-team-result-season"><option value="">All seasons</option></select></label>
+          <label><span>Class</span><select id="wec-team-result-class"><option value="">All classes</option></select></label>
+          <label><span>Result</span><select id="wec-team-result-outcome"><option value="all">All results</option><option value="overall-wins">Overall wins</option><option value="class-wins">Class wins</option><option value="podiums">Class podiums</option><option value="retirements">Retirements</option><option value="le-mans">Le Mans</option></select></label>
+          <button id="wec-team-result-clear" type="button" class="button secondary">Clear</button>
+        </div>
+        <div id="wec-team-result-count" class="browser-count" aria-live="polite">Loading race history…</div>
+        <div id="wec-team-results" class="wec-team-results" aria-busy="true"></div>
+      </section>
+    </div>
+
+    <div id="wec-car-profile" class="wec-car-profile" hidden>
+      <div id="wec-car-head" aria-busy="true"><section class="detail-hero profile-hero driver-profile-hero driver-detail-skeleton" aria-hidden="true"><div><b></b><span></span><em></em></div></section></div>
+      <section class="detail-section driver-plain-section"><div class="section-heading"><div><div class="eyebrow">WEC RECORD</div><h2>At a glance</h2></div></div><div id="wec-car-stats" class="detail-stat-grid driver-stat-grid" aria-busy="true"></div></section>
+      <section class="detail-section driver-plain-section driver-timeline-section"><div class="section-heading driver-timeline-heading"><div><div class="eyebrow">MODEL TIMELINE</div><h2>Season by season</h2></div><div class="driver-timeline-actions"><div id="wec-car-career-span" class="section-note"></div><button id="wec-car-timeline-previous" type="button" aria-label="Earlier seasons" disabled>←</button><button id="wec-car-timeline-next" type="button" aria-label="Later seasons" disabled>→</button></div></div><div id="wec-car-seasons" class="driver-timeline-card" aria-busy="true"></div></section>
+      <section class="detail-section driver-plain-section wec-driver-connections-section"><div class="section-heading"><div><div class="eyebrow">PADDOCK CONNECTIONS</div><h2>Teams, drivers and related cars</h2></div></div><div id="wec-car-connections" class="wec-driver-connections" aria-busy="true"></div></section>
+      <section class="detail-section driver-plain-section driver-results-section"><div class="section-heading"><div><div class="eyebrow">RESULTS</div><h2>Race history</h2></div><div class="section-note">Grouped by event</div></div>
+        <div class="wec-driver-result-filters wec-car-result-filters" role="search" aria-label="Filter WEC car race history">
+          <label class="wec-driver-result-search"><span>Search</span><input id="wec-car-result-search" type="search" placeholder="Race, team or car number…" autocomplete="off"></label>
+          <label><span>Season</span><select id="wec-car-result-season"><option value="">All seasons</option></select></label>
+          <label><span>Team</span><select id="wec-car-result-team"><option value="">All teams</option></select></label>
+          <label><span>Result</span><select id="wec-car-result-outcome"><option value="all">All results</option><option value="overall-wins">Overall wins</option><option value="class-wins">Class wins</option><option value="podiums">Class podiums</option><option value="retirements">Retirements</option><option value="le-mans">Le Mans</option></select></label>
+          <button id="wec-car-result-clear" type="button" class="button secondary">Clear</button>
+        </div>
+        <div id="wec-car-result-count" class="browser-count" aria-live="polite">Loading race history…</div>
+        <div id="wec-car-results" class="wec-team-results" aria-busy="true"></div>
+      </section>
+    </div>
+
+    <div id="wec-generic-profile">
+      <header id="wec-entity-heading" class="wec-page-head"><p class="eyebrow">WEC ARCHIVE PROFILE</p><h1>Profile</h1><p>Loading profile…</p></header>
+      <section id="wec-entity-stats" class="wec-entity-stats" aria-label="Career summary"></section>
+      <section aria-labelledby="wec-entity-history-title"><div class="section-heading"><div><p class="eyebrow">RACE HISTORY</p><h2 id="wec-entity-history-title">WEC appearances</h2></div><div id="wec-entity-filters" class="wec-class-filters" aria-label="Appearance class"></div></div><div id="wec-entity-history" class="wec-calendar" aria-live="polite"><p class="loading-state">Loading appearances…</p></div></section>
+    </div>
   </main>
   <footer class="footer"><div class="container">Racelytic</div></footer>
   <script src="/js/utils.js"></script><script src="/js/header.js"></script><script src="/js/wec.js"></script>

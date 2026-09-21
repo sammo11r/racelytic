@@ -51,6 +51,34 @@ const CHAMPIONSHIPS_2025 = [
   { tableId: 72, id: 'wec-2025-lmgt3-drivers', name: 'FIA Endurance Trophy for LMGT3 Drivers', entityType: 'driver', classId: 'wec-2025-lmgt3' },
 ];
 
+const EVENTS_2026 = [
+  ['wec-2026-r1-imola', '01_IMOLA', '2026-04-19T11:00:00Z', 2, 'standard', 'https://fiawec.alkamelsystems.com/Results/15_2026/01_IMOLA/645_FIA%20WEC/202604191300_Race/06_Hour%206/03_Classification_Race_Hour%206.CSV'],
+  ['wec-2026-r2-spa', '02_SPA FRANCORCHAMPS', '2026-05-09T12:00:00Z', 2, 'standard', 'https://fiawec.alkamelsystems.com/Results/15_2026/02_SPA%20FRANCORCHAMPS/653_FIA%20WEC/202605091400_Race/06_Hour%206/03_Classification_Race_Hour%206.CSV'],
+  ['wec-2026-r3-le-mans', '03_LE MANS', '2026-06-13T14:00:00Z', 2, 'le-mans', 'https://fiawec.alkamelsystems.com/Results/15_2026/03_LE%20MANS/657_FIA%20WEC/202606131600_Race/24_Hour%2024/03_Classification_Race_Hour%2024.CSV'],
+  ['wec-2026-r4-sao-paulo', '04_SAO PAULO', '2026-07-12T14:30:00Z', -3, 'standard', 'https://fiawec.alkamelsystems.com/Results/15_2026/04_SAO%20PAULO/666_FIA%20WEC/202607121130_Race/06_Hour%206/03_Classification_Race_Hour%206.CSV'],
+  ['wec-2026-r5-cota', '05_CIRCUIT OF THE AMERICAS', '2026-09-06T18:00:00Z', -5, 'standard', 'https://fiawec.alkamelsystems.com/Results/15_2026/05_CIRCUIT%20OF%20THE%20AMERICAS/673_FIA%20WEC/202609061300_Race/06_Hour%206/03_Classification_Race_Hour%206_Final.CSV'],
+  ['wec-2026-r6-fuji', '', '2026-09-27T00:00:00Z', 9, 'standard', ''],
+  ['wec-2026-r7-barcelona', '', '2026-10-18T00:00:00Z', 2, 'standard', ''],
+  ['wec-2026-r8-monza', '', '2026-11-08T00:00:00Z', 1, 'standard', ''],
+].map(([id, directory, startTimeUtc, utcOffsetHours, pointsScale, sourceUrl], index) => ({
+  id, directory, startTimeUtc, utcOffsetHours, pointsScale, sourceUrl, timingSeasonKey: index < 5 ? '15_2026' : '',
+  status: index < 5 ? 'completed' : 'upcoming',
+  entryListUrl: [
+    'https://fiawec.alkamelsystems.com/Results/15_2026/01_IMOLA/00_Event%20Info/4_Provisional%20Entry%20List%20v2.pdf',
+    'https://fiawec.alkamelsystems.com/Results/15_2026/02_SPA%20FRANCORCHAMPS/00_Event%20Info/Provisional%20Entry%20List%20v1.pdf',
+    'https://fiawec.alkamelsystems.com/Results/15_2026/03_LE%20MANS/00_Event%20Info/Provisional%20Entry%20List%20v4.pdf',
+    'https://fiawec.alkamelsystems.com/Results/15_2026/04_SAO%20PAULO/00_Event%20Info/Provisional%20Entry%20List%20v1.pdf',
+    'https://fiawec.alkamelsystems.com/Results/15_2026/05_CIRCUIT%20OF%20THE%20AMERICAS/00_Event%20Info/Entry%20List%20v1.pdf',
+  ][index] || '',
+}));
+
+const CHAMPIONSHIPS_2026 = [
+  { tableId: 65, id: 'wec-2026-hypercar-manufacturers', name: 'FIA Hypercar World Endurance Manufacturers’ Championship', entityType: 'manufacturer', classId: 'wec-2026-hypercar' },
+  { tableId: 55, id: 'wec-2026-hypercar-drivers', name: 'FIA Hypercar World Endurance Drivers’ Championship', entityType: 'driver', classId: 'wec-2026-hypercar' },
+  { tableId: 73, id: 'wec-2026-lmgt3-teams', name: 'FIA Endurance Trophy for LMGT3 Teams', entityType: 'competitor', classId: 'wec-2026-lmgt3' },
+  { tableId: 72, id: 'wec-2026-lmgt3-drivers', name: 'FIA Endurance Trophy for LMGT3 Drivers', entityType: 'driver', classId: 'wec-2026-lmgt3' },
+];
+
 const EVENTS_2024 = [
   ['wec-2024-r1-qatar', '01_LOSAIL', '2024-r01-losail', 3, 37, '2024-03-02T08:00:00Z', 'extended', 'https://fiawec.alkamelsystems.com/Results/13_2024/01_LOSAIL/517_FIA%20WEC/202403021100_Race/10_Hour%2010/03_Classification_Race_Hour%2010.CSV'],
   ['wec-2024-r2-imola', '02_IMOLA', '2024-r02-imola', 2, 37, '2024-04-21T11:00:00Z', 'standard', 'https://fiawec.alkamelsystems.com/Results/13_2024/02_IMOLA/526_FIA%20WEC/202404211300_Race/Hour%206/03_Classification_Race_Hour%206.CSV'],
@@ -106,6 +134,7 @@ const CIRCUITS = [
   { id: 'sebring', name: 'Sebring International Raceway', countryId: 'united-states-of-america', placeName: 'Sebring', type: 'ROAD', direction: 'CLOCKWISE', latitude: 27.454741, longitude: -81.348267, length: 8.36, turns: 17, layoutId: 'sebring-1', layoutVersion: 'current', mapSourceUrl: F1DB_CIRCUIT_SOURCE },
   { id: 'algarve', name: 'Algarve International Circuit', countryId: 'portugal', placeName: 'Portimao', type: 'RACE', direction: 'CLOCKWISE', latitude: 37.221944, longitude: -8.629444, length: 4.653, turns: 15, layoutId: 'portimao-1', layoutVersion: 'current', mapSourceUrl: F1DB_CIRCUIT_SOURCE },
   { id: 'monza', name: 'Autodromo Nazionale Monza', countryId: 'italy', placeName: 'Monza', type: 'RACE', direction: 'CLOCKWISE', latitude: 45.620556, longitude: 9.289444, length: 5.793, turns: 11, layoutId: 'monza-7', layoutVersion: 'current', mapSourceUrl: F1DB_CIRCUIT_SOURCE },
+  { id: 'catalunya', name: 'Circuit de Barcelona-Catalunya', countryId: 'spain', placeName: 'Montmeló', type: 'RACE', direction: 'CLOCKWISE', latitude: 41.57, longitude: 2.261111, length: 4.657, turns: 14, layoutId: 'catalunya-6', layoutVersion: 'current', mapSourceUrl: F1DB_CIRCUIT_SOURCE },
   { id: 'silverstone', name: 'Silverstone Circuit', countryId: 'united-kingdom', placeName: 'Silverstone', type: 'RACE', direction: 'CLOCKWISE', latitude: 52.078611, longitude: -1.016944, length: 5.891, turns: 18, layoutId: 'silverstone-8', layoutVersion: 'current', mapSourceUrl: F1DB_CIRCUIT_SOURCE },
   { id: 'nurburgring', name: 'Nurburgring', countryId: 'germany', placeName: 'Nurburg', type: 'RACE', direction: 'CLOCKWISE', latitude: 50.335556, longitude: 6.9475, length: 5.148, turns: 15, layoutId: 'nurburgring-4', layoutVersion: 'current', mapSourceUrl: F1DB_CIRCUIT_SOURCE },
   { id: 'mexico-city', name: 'Autodromo Hermanos Rodriguez', countryId: 'mexico', placeName: 'Mexico City', type: 'RACE', direction: 'CLOCKWISE', latitude: 19.404197, longitude: -99.088747, length: 4.304, turns: 17, layoutId: 'mexico-city-3', layoutVersion: 'current', mapSourceUrl: F1DB_CIRCUIT_SOURCE },
@@ -119,6 +148,7 @@ const EVENT_DETAILS = [
   ['fuji', '6 Hours of Fuji', 'fuji', 'duration', 360, ''], ['bahrain', '8 Hours of Bahrain', 'bahrain', 'duration', 480, ''],
   ['sebring', '1000 Miles of Sebring', 'sebring', 'distance', '', 1609], ['portimao', '6 Hours of Portimao', 'algarve', 'duration', 360, ''],
   ['monza', '6 Hours of Monza', 'monza', 'duration', 360, ''],
+  ['barcelona', '6 Hours of Barcelona', 'catalunya', 'duration', 360, ''],
 ];
 
 const SEASONS = [
@@ -126,9 +156,10 @@ const SEASONS = [
   { year: 2023, id: 'wec-2023', sourceUrl: 'https://www.fiawec.com/en/news/2023-fia-wec-entry-list-sees-record-hypercar-and-lmgte-am-field/7555', events: EVENTS_2023, championships: CHAMPIONSHIPS_2023, standings: 'pdf', classes: [['HYPERCAR', 'Hypercar'], ['LMP2', 'LMP2'], ['LMGTE AM', 'LMGTE Am'], ['INNOVATIVE CAR', 'Innovative Car']] },
   { year: 2024, id: 'wec-2024', sourceUrl: 'https://www.fia.com/events/world-endurance-championship/season-2024/standings', events: EVENTS_2024, championships: CHAMPIONSHIPS_2024, standings: 'pdf', classes: [['HYPERCAR', 'Hypercar'], ['LMGT3', 'LMGT3'], ['LMP2', 'LMP2 (Le Mans)']] },
   { year: 2025, id: 'wec-2025', sourceUrl: 'https://www.fiawec.com/en/season/2025', events: EVENTS_2025, championships: CHAMPIONSHIPS_2025, standings: 'html', classes: [['HYPERCAR', 'Hypercar'], ['LMGT3', 'LMGT3'], ['LMP2', 'LMP2 (Le Mans)']] },
+  { year: 2026, id: 'wec-2026', sourceUrl: 'https://www.fiawec.com/en/season/2026', events: EVENTS_2026, completedRounds: 5, status: 'ongoing', championships: CHAMPIONSHIPS_2026, standings: 'html', classes: [['HYPERCAR', 'Hypercar'], ['LMGT3', 'LMGT3'], ['LMP2', 'LMP2 (Le Mans)']] },
 ];
-const EVENTS = EVENTS_2025;
-const CHAMPIONSHIPS = CHAMPIONSHIPS_2025;
+const EVENTS = EVENTS_2026;
+const CHAMPIONSHIPS = CHAMPIONSHIPS_2026;
 
 const MANUFACTURER_BY_MODEL = {
   'Alpine A424': 'Alpine', 'Alpine A480 - Gibson': 'Alpine', 'Aston Martin Valkyrie': 'Aston Martin', 'Aston Martin Vantage AMR LMGT3': 'Aston Martin',
@@ -172,6 +203,68 @@ const LEGACY_CREW_OVERRIDES = {
   'wec-2013-r3-le-mans:95': ['Allan Simonsen', 'Christoffer Nygaard', 'Kristian Poulsen'],
 };
 
+// Official classifications and championship files sometimes use shortened names,
+// transliteration variants or plain typos for the same driver. Keep one archive
+// identity so career profiles are not split across multiple URLs.
+const DRIVER_ALIASES = {
+  'vincente-potolicchio': 'vicente-potolicchio',
+  'mirco-shultis': 'mirco-schultis',
+  'jean-phillipe-belloc': 'jean-philippe-belloc',
+  'david-heinemeir-hansson': 'david-heinemeier-hansson',
+  'david-heinemeier': 'david-heinemeier-hansson',
+  'alexandrer-sims': 'alexander-sims',
+  'romain-ianneta': 'romain-iannetta',
+  'tom-milner': 'tommy-milner',
+  'ronald-goethe': 'roald-goethe',
+  'martin-plowmann': 'martin-plowman',
+  'alexander-imperatori': 'alexandre-imperatori',
+  'alexander-impertori': 'alexandre-imperatori',
+  'daryl-o-young': 'darryl-o-young',
+  'nicik-thiim': 'nicki-thiim',
+  'tsuigio-matsuda': 'tsugio-matsuda',
+  'mark-shulzhitckiy': 'mark-shulzhitskiy',
+  'serguey-zlobin': 'sergey-zlobin',
+  'viktor-shaitar': 'victor-shaytar',
+  'victor-shaitar': 'victor-shaytar',
+  'nicolas-leutwiller': 'nicolas-leutwiler',
+  'michael-munemman': 'michael-munemann',
+  'devi-markozov': 'david-markozov',
+  'phil-hanson': 'philip-hanson',
+  'charles-eastwood': 'charlie-eastwood',
+  'charles-robertson': 'charlie-robertson',
+  'charles-hollings': 'charlie-hollings',
+  'sophia-floersch': 'sophia-florsch',
+  'vuttikhorn-inthraphuvasak': 'vutthikorn-inthraphuvasak',
+};
+
+const DRIVER_CANONICAL_NAMES = {
+  'vicente-potolicchio': 'Vicente Potolicchio',
+  'mirco-schultis': 'Mirco Schultis',
+  'jean-philippe-belloc': 'Jean-Philippe Belloc',
+  'david-heinemeier-hansson': 'David Heinemeier Hansson',
+  'alexander-sims': 'Alexander Sims',
+  'romain-iannetta': 'Romain Iannetta',
+  'tommy-milner': 'Tommy Milner',
+  'roald-goethe': 'Roald Goethe',
+  'martin-plowman': 'Martin Plowman',
+  'alexandre-imperatori': 'Alexandre Imperatori',
+  'darryl-o-young': "Darryl O'Young",
+  'nicki-thiim': 'Nicki Thiim',
+  'tsugio-matsuda': 'Tsugio Matsuda',
+  'mark-shulzhitskiy': 'Mark Shulzhitskiy',
+  'sergey-zlobin': 'Sergey Zlobin',
+  'victor-shaytar': 'Victor Shaytar',
+  'nicolas-leutwiler': 'Nicolas Leutwiler',
+  'michael-munemann': 'Michael Munemann',
+  'david-markozov': 'David Markozov',
+  'philip-hanson': 'Philip Hanson',
+  'charlie-eastwood': 'Charlie Eastwood',
+  'charlie-robertson': 'Charlie Robertson',
+  'charlie-hollings': 'Charlie Hollings',
+  'sophia-florsch': 'Sophia Flörsch',
+  'vutthikorn-inthraphuvasak': 'Vutthikorn Inthraphuvasak',
+};
+
 const MANUFACTURER_COUNTRIES = {
   audi: 'germany', hpd: 'united-states-of-america', morgan: 'united-kingdom', pescarolo: 'france', oreca: 'france', zytek: 'united-kingdom',
   lola: 'united-kingdom', ferrari: 'italy', porsche: 'germany', chevrolet: 'united-states-of-america', 'aston-martin': 'united-kingdom', oak: 'france',
@@ -181,10 +274,11 @@ const MANUFACTURER_COUNTRIES = {
   bmw: 'germany', ginetta: 'united-kingdom', aurus: 'russia', glickenhaus: 'united-states-of-america', peugeot: 'france', cadillac: 'united-states-of-america',
   vanwall: 'united-kingdom', lamborghini: 'italy', corvette: 'united-states-of-america', mclaren: 'united-kingdom', lexus: 'japan',
   'isotta-fraschini': 'italy', 'mercedes-amg': 'germany',
+  genesis: 'south-korea',
 };
 
 const DRIVER_COUNTRY_FALLBACKS = {
-  'mirco-shultis': 'germany', 'jean-phillipe-belloc': 'france', 'michael-waltrip': 'united-states-of-america',
+  'mirco-schultis': 'germany', 'jean-philippe-belloc': 'france', 'michael-waltrip': 'united-states-of-america',
   'bill-binnie': 'united-states-of-america', 'francois-jakubowski': 'france', 'daniil-kvyat': 'russia',
   'timur-boguslavskiy': 'russia',
 };
@@ -236,6 +330,7 @@ const TEAM_COUNTRY_FALLBACKS = {
   'team-sofrev-asp': 'france', 'nissan-motorsports-global': 'japan', 'ibanez-racing': 'spain', 'nissan-motorsports': 'japan',
   'riley-motorsports-ti-auto': 'united-states-of-america', 'eurasia-motorsport': 'hong-kong', 'hub-auto-racing': 'taiwan',
   'racing-team-india-eurasia': 'india', 'manthey-purerxcing': 'germany', 'clx-pure-rxcing': 'switzerland',
+  'clx-motorsport': 'switzerland', 'rd-limited': 'france',
 };
 
 const DRIVER_CATEGORY = { P: 'platinum', G: 'gold', S: 'silver', B: 'bronze' };
@@ -274,6 +369,11 @@ function slug(value) {
     .replace(/&/g, ' and ').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 }
 
+function canonicalDriverId(value) {
+  const id = slug(value);
+  return DRIVER_ALIASES[id] || id;
+}
+
 function milliseconds(value) {
   if (!value) return '';
   const parts = String(value).replace(/'/g, ':').split(':').map(Number);
@@ -285,6 +385,11 @@ function milliseconds(value) {
 
 function displayName(value) {
   return String(value || '').trim().toLowerCase().replace(/(^|[\s'-])\p{L}/gu, match => match.toUpperCase());
+}
+
+function canonicalDriverName(value) {
+  const id = canonicalDriverId(value);
+  return DRIVER_CANONICAL_NAMES[id] || displayName(value);
 }
 
 function editDistance(left, right) {
@@ -362,7 +467,7 @@ async function entryListMetadata(countries, additionalSources = []) {
           const match = item.text.replace(/°$/, '').match(/^(.+?)\s+\(([A-Z]{3})\)$/u);
           if (match) {
             const categoryCode = items.slice(index + 1).find(candidate => /^[PGSB]$/.test(candidate.text))?.text;
-            drivers.set(`${source.seasonId}:${slug(match[1])}`, {
+            drivers.set(`${source.seasonId}:${canonicalDriverId(match[1])}`, {
               countryId: countries.get(match[2]) || '', category: DRIVER_CATEGORY[categoryCode] || '',
             });
             continue;
@@ -372,7 +477,7 @@ async function entryListMetadata(countries, additionalSources = []) {
           if (countryIndex < 0) continue;
           const category = items.slice(countryIndex + 1).find(candidate => candidate.column - items[countryIndex].column < 40 && /^[PGSB]$/.test(candidate.text));
           if (!category || !/[\p{L}]{2}/u.test(item.text)) continue;
-          drivers.set(`${source.seasonId}:${slug(item.text.replace(/^\*+/, ''))}`, {
+          drivers.set(`${source.seasonId}:${canonicalDriverId(item.text.replace(/^\*+/, ''))}`, {
             countryId: countries.get(items[countryIndex].text.toUpperCase()) || '', category: DRIVER_CATEGORY[category.text] || '',
           });
         }
@@ -403,7 +508,7 @@ async function entryListMetadata(countries, additionalSources = []) {
           const category = categoryItems[index]?.text.toLowerCase();
           if (!Object.values(DRIVER_CATEGORY).includes(category)) continue;
           for (const driverName of [name, displayOrderName]) {
-            drivers.set(`${seasonId}:${slug(driverName)}`, { countryId: '', category });
+            drivers.set(`${seasonId}:${canonicalDriverId(driverName)}`, { countryId: '', category });
           }
         }
       }
@@ -652,6 +757,19 @@ async function discoverClassificationUrl(event) {
 }
 
 async function discoverSessionSources(event) {
+  if (event.timingSeasonKey) {
+    const html = await timingPage({ season: event.timingSeasonKey, evvent: event.directory }, `${event.id}-timing-index.html`);
+    const prefix = event.sourceUrl.replace(/\/\d{12}_Race\/[\s\S]*$/i, '/');
+    return officialLinks(html).filter(url => url.startsWith(prefix) && /\/\d+_Classification[^/]*\.CSV$/i.test(url))
+      .map(url => {
+        const match = url.match(/\/(\d{12})_([^/]+)\/\d+_Classification/i);
+        if (!match) return null;
+        const name = decodeURIComponent(match[2]);
+        return /^(?:Free Practice|Qualifying|Hyperpole|Warm Up)/i.test(name) && !/test/i.test(name)
+          ? { timestamp: match[1], name, url } : null;
+      }).filter(Boolean).filter((source, index, all) => all.findIndex(other => slug(other.name) === slug(source.name)) === index)
+      .sort((left, right) => left.timestamp.localeCompare(right.timestamp));
+  }
   const indexUrl = `https://wecengine.com/events/${event.archiveSlug}`;
   const html = await cachedText(`${event.id}-sources.html`, indexUrl);
   const urls = [...html.matchAll(/href="(https:\/\/fiawec\.alkamelsystems\.com\/[^"?]+\.CSV)"/gi)]
@@ -747,8 +865,8 @@ function parseStandings(html, season = SEASONS[1]) {
         if (carNumber) entityIds = [competitorId(championship.classId.endsWith('hypercar') ? 'HYPERCAR' : 'LMGT3', carNumber, season.id)];
         pointsStart = 4;
       } else {
-        entityIds = [...cells[3].html.matchAll(/<a[^>]*>([\s\S]*?)<\/a>/gi)].map(match => slug(textFromHtml(match[1])));
-        if (!entityIds.length) entityIds = cells[3].text.split(/\s*\/\s*/).map(slug).filter(Boolean);
+        entityIds = [...cells[3].html.matchAll(/<a[^>]*>([\s\S]*?)<\/a>/gi)].map(match => canonicalDriverId(textFromHtml(match[1])));
+        if (!entityIds.length) entityIds = cells[3].text.split(/\s*\/\s*/).map(canonicalDriverId).filter(Boolean);
         pointsStart = 4;
       }
       const eventPoints = cells.slice(pointsStart, -1).map(cell => [...cell.text.matchAll(/\d+(?:\.\d+)?/g)].reduce((sum, match) => sum + Number(match[0]), 0));
@@ -756,11 +874,13 @@ function parseStandings(html, season = SEASONS[1]) {
       if (Math.abs(eventPoints.reduce((sum, value) => sum + value, 0) - totalPoints) > 0.01) throw new Error(`${championship.id}/${entityIds[0]}: event points do not match the official total`);
       for (const entityId of [...new Set(entityIds)]) entities.push({ entityId, finalPosition, eventPoints });
     }
-    for (let round = 1; round <= season.events.length; round += 1) {
+    for (let round = 1; round <= (season.completedRounds || season.events.length); round += 1) {
       const totals = entities.map(entity => ({ ...entity, points: entity.eventPoints.slice(0, round).reduce((sum, value) => sum + value, 0) }));
       for (const entity of totals) {
-        const position = round === season.events.length ? entity.finalPosition : 1 + totals.filter(other => other.points > entity.points).length;
-        standings.push({ championshipId: championship.id, round, position, entityId: entity.entityId, points: entity.points, championshipWon: round === season.events.length && entity.finalPosition === 1 });
+        const position = round === (season.completedRounds || season.events.length)
+          ? entity.finalPosition : 1 + totals.filter(other => other.points > entity.points).length;
+        standings.push({ championshipId: championship.id, round, position, entityId: entity.entityId, points: entity.points,
+          championshipWon: season.status !== 'ongoing' && round === season.events.length && entity.finalPosition === 1 });
       }
     }
   }
@@ -890,8 +1010,8 @@ async function parsePdfStandings(championship, season, context = {}) {
         const name = items.filter(item => item.x >= 74 && item.x < totalItem.x - 5
           && !/^[A-Z]{3}$/.test(item.text) && !/^\d+(?:[.,]\d+)?$/.test(item.text)).sort((a, b) => a.x - b.x)[0]?.text;
         if (!name) continue;
-        entityId = championship.entityType === 'manufacturer' ? manufacturerIdFromText(name) : slug(name);
-        if (championship.entityType === 'driver') entityId = ({ 'tom-dillman': 'tom-dillmann', 'david-heinemeier': 'david-heinemeier-hansson' })[entityId] || entityId;
+        entityId = championship.entityType === 'manufacturer' ? manufacturerIdFromText(name) : canonicalDriverId(name);
+        if (championship.entityType === 'driver' && entityId === 'tom-dillman') entityId = 'tom-dillmann';
       }
       if (!entityId) continue;
       const eventPoints = Array.from({ length: standingRounds.length }, () => 0);
@@ -963,6 +1083,8 @@ async function collect() {
   const teamCountryByEcmId = new Map();
 
   const upsertDriver = (driverId, name, details = {}) => {
+    driverId = canonicalDriverId(driverId);
+    name = DRIVER_CANONICAL_NAMES[driverId] || name;
     const existing = drivers.get(driverId) || {};
     drivers.set(driverId, {
       id: driverId,
@@ -971,6 +1093,7 @@ async function collect() {
       nationalityCountryId: details.countryId || existing.nationalityCountryId || '',
     });
     if (details.ecmCountryId && details.countryId) countryByEcmId.set(details.ecmCountryId, details.countryId);
+    return driverId;
   };
   const addCrew = row => {
     const identity = `${row.entryId}:${row.driverId}`;
@@ -988,11 +1111,11 @@ async function collect() {
     if (teamEcmCountryId) teamCountryByEcmId.set(entry.teamId, teamEcmCountryId);
     for (let index = 1; index <= 6; index += 1) {
       const rawName = [row[`DRIVER${index}_FIRSTNAME`], row[`DRIVER${index}_SECONDNAME`]].filter(Boolean).join(' ');
-      const driverId = slug(rawName);
+      let driverId = canonicalDriverId(rawName);
       if (!driverId) continue;
-      const name = displayName(rawName);
+      const name = canonicalDriverName(rawName);
       const details = driverDetails(row, index, countries);
-      upsertDriver(driverId, name, details);
+      driverId = upsertDriver(driverId, name, details);
       const crew = crewsByIdentity.get(`${entry.id}:${driverId}`);
       if (crew) crew.category ||= details.category;
     }
@@ -1000,6 +1123,7 @@ async function collect() {
 
   for (const season of collectionSeasons) {
     for (const event of season.events) {
+      if (event.status === 'upcoming') continue;
       const classificationUrl = await discoverClassificationUrl(event);
       const rows = (await parseRows(await cachedText(`${event.id}.csv`, classificationUrl)))
         .filter(row => String(row.NUMBER || '').trim());
@@ -1032,10 +1156,10 @@ async function collect() {
           const listedName = row[`DRIVER_${index}`] || [row[`DRIVER${index}_FIRSTNAME`], row[`DRIVER${index}_SECONDNAME`]].filter(Boolean).join(' ');
           const rawName = slug(listedName) ? listedName : LEGACY_CREW_OVERRIDES[`${event.id}:${carNumber}`]?.[index - 1];
           if (!rawName) continue;
-          const driverId = slug(rawName);
+          let driverId = canonicalDriverId(rawName);
           if (!driverId) continue;
-          const name = displayName(rawName);
-          upsertDriver(driverId, name);
+          const name = canonicalDriverName(rawName);
+          driverId = upsertDriver(driverId, name);
           addCrew({ entryId, eventId: event.id, driverId, crewOrder: index, category: '', championshipEligible });
         }
 
@@ -1048,7 +1172,7 @@ async function collect() {
       const expectedSupportingSessions = season.year === 2025 ? (event.id.endsWith('le-mans') ? 11 : 7)
         : season.year === 2024 ? 7 : season.year === 2023 ? (event.id.endsWith('le-mans') ? 7 : 6)
           : (event.id.endsWith('le-mans') ? 7 : 5);
-      if (!event.sessionSources && sessionSources.length !== expectedSupportingSessions) throw new Error(`${event.id}: expected ${expectedSupportingSessions} supporting session sources, found ${sessionSources.length}`);
+      if (!event.sessionSources && !event.timingSeasonKey && sessionSources.length !== expectedSupportingSessions) throw new Error(`${event.id}: expected ${expectedSupportingSessions} supporting session sources, found ${sessionSources.length}`);
       for (const source of sessionSources) {
         const sessionRows = (await parseRows(await cachedText(`${event.id}-${slug(source.name)}.csv`, source.url)))
           .filter(row => String(row.NUMBER || '').trim());
@@ -1084,10 +1208,10 @@ async function collect() {
             for (let index = 1; index <= 6; index += 1) {
               const rawName = [row[`DRIVER${index}_FIRSTNAME`], row[`DRIVER${index}_SECONDNAME`]].filter(Boolean).join(' ');
               if (!rawName) continue;
-              const driverId = slug(rawName);
+              let driverId = canonicalDriverId(rawName);
               if (!driverId) continue;
-              const name = displayName(rawName);
-              upsertDriver(driverId, name);
+              const name = canonicalDriverName(rawName);
+              driverId = upsertDriver(driverId, name);
               addCrew({ entryId, eventId: event.id, driverId, crewOrder: index, category: '', championshipEligible });
             }
           }
@@ -1095,10 +1219,10 @@ async function collect() {
           classCode = classId.slice(season.id.length + 1);
           championshipEligible = entry.championshipEligible;
           const sessionDriverName = String(row.DRIVER || '').trim();
-          const sessionDriverId = slug(sessionDriverName);
+          let sessionDriverId = canonicalDriverId(sessionDriverName);
           if (sessionDriverId && !crews.some(crew => crew.entryId === entry.id && crew.driverId === sessionDriverId)) {
-            const name = displayName(sessionDriverName);
-            upsertDriver(sessionDriverId, name);
+            const name = canonicalDriverName(sessionDriverName);
+            sessionDriverId = upsertDriver(sessionDriverId, name);
             const crewOrder = crews.filter(crew => crew.entryId === entry.id).length + 1;
             addCrew({ entryId: entry.id, eventId: event.id, driverId: sessionDriverId, crewOrder, category: '', championshipEligible });
           }
@@ -1127,7 +1251,7 @@ async function collect() {
     team.countryId ||= countryByEcmId.get(ecmCountryId) || entryList.teams.get(team.id) || TEAM_COUNTRY_FALLBACKS[team.id] || '';
   }
   for (const [identity, details] of entryList.drivers) {
-    const driverId = identity.slice(identity.indexOf(':') + 1);
+    const driverId = canonicalDriverId(identity.slice(identity.indexOf(':') + 1));
     const driver = drivers.get(driverId);
     if (driver) driver.nationalityCountryId ||= details.countryId;
   }
@@ -1143,8 +1267,10 @@ async function collect() {
   }
   for (const [identity, details] of entryList.drivers) {
     if (!details.category) continue;
-    if (!categoriesBySeasonDriver.has(identity)) categoriesBySeasonDriver.set(identity, new Set());
-    categoriesBySeasonDriver.get(identity).add(details.category);
+    const separator = identity.indexOf(':');
+    const canonicalIdentity = `${identity.slice(0, separator)}:${canonicalDriverId(identity.slice(separator + 1))}`;
+    if (!categoriesBySeasonDriver.has(canonicalIdentity)) categoriesBySeasonDriver.set(canonicalIdentity, new Set());
+    categoriesBySeasonDriver.get(canonicalIdentity).add(details.category);
   }
   const categorizedIdentitiesBySeason = new Map();
   for (const [identity, categories] of categoriesBySeasonDriver) {
@@ -1185,7 +1311,7 @@ async function collect() {
   const unknown = standings.filter(row => !knownEntities.has(row.entityId));
   if (unknown.length) throw new Error(`Unknown standings entities: ${[...new Set(unknown.map(row => `${row.championshipId}/${row.entityId}`))].join(', ')}`);
 
-  const seasonRows = collectionSeasons.map(season => ({ id: season.id, year: season.year, name: `${season.label || season.year} FIA World Endurance Championship`, startDate: season.events[0].startTimeUtc.slice(0, 10), endDate: season.events.at(-1).startTimeUtc.slice(0, 10), status: 'completed', sourceUrl: season.sourceUrl }));
+  const seasonRows = collectionSeasons.map(season => ({ id: season.id, year: season.year, name: `${season.label || season.year} FIA World Endurance Championship`, startDate: season.events[0].startTimeUtc.slice(0, 10), endDate: season.events.at(-1).startTimeUtc.slice(0, 10), status: season.status || 'completed', sourceUrl: season.sourceUrl }));
   const classRows = collectionSeasons.flatMap(season => season.classes.map(([code, name], index) => ({
     id: classIdFor(season.id, code), seasonId: season.id, year: season.year, code, name, displayOrder: index + 1,
     sourceUrl: code === 'INNOVATIVE CAR' ? season.events.find(event => event.id.endsWith('le-mans')).sourceUrl : season.sourceUrl,
@@ -1193,7 +1319,7 @@ async function collect() {
   const circuitRows = CIRCUITS.map(circuit => ({ ...circuit, sourceUrl: SEASONS.at(-1).sourceUrl }));
   const eventRows = collectionSeasons.flatMap(season => season.events.map((event, index) => {
     const detail = EVENT_DETAILS.find(([key]) => event.id.endsWith(key));
-    return { id: event.id, seasonId: season.id, year: season.year, round: index + 1, date: event.startTimeUtc.slice(0, 10), endDate: event.id.includes('le-mans') ? new Date(new Date(event.startTimeUtc).getTime() + 86400000).toISOString().slice(0, 10) : event.startTimeUtc.slice(0, 10), name: event.eventName || detail[1], circuitId: event.circuitId || detail[2], formatType: event.formatType || detail[3], scheduledMinutes: event.scheduledMinutes ?? detail[4], scheduledDistanceKm: event.scheduledDistanceKm ?? detail[5], pointsScale: event.pointsScale, status: 'completed', sourceUrl: season.sourceUrl };
+    return { id: event.id, seasonId: season.id, year: season.year, round: index + 1, date: event.startTimeUtc.slice(0, 10), endDate: event.id.includes('le-mans') ? new Date(new Date(event.startTimeUtc).getTime() + 86400000).toISOString().slice(0, 10) : event.startTimeUtc.slice(0, 10), name: event.eventName || detail[1], circuitId: event.circuitId || detail[2], formatType: event.formatType || detail[3], scheduledMinutes: event.scheduledMinutes ?? detail[4], scheduledDistanceKm: event.scheduledDistanceKm ?? detail[5], pointsScale: event.pointsScale, status: event.status || 'completed', sourceUrl: season.sourceUrl };
   }));
   writeCsv('wecdb-seasons.csv', ['id', 'year', 'name', 'startDate', 'endDate', 'status', 'sourceUrl'], seasonRows);
   writeCsv('wecdb-classes.csv', ['id', 'seasonId', 'year', 'code', 'name', 'displayOrder', 'sourceUrl'], classRows);
@@ -1217,4 +1343,4 @@ async function collect() {
 
 if (require.main === module) collect().catch(error => { console.error(error); process.exitCode = 1; });
 
-module.exports = { CHAMPIONSHIPS, EVENTS, MANUFACTURER_BY_MODEL, SEASONS, championshipClassIds, championshipPdfMatches, competitorId, milliseconds, parseRows, parseStandings, parsePdfStandings, slug, tableRows };
+module.exports = { CHAMPIONSHIPS, EVENTS, MANUFACTURER_BY_MODEL, SEASONS, canonicalDriverId, canonicalDriverName, championshipClassIds, championshipPdfMatches, competitorId, milliseconds, parseRows, parseStandings, parsePdfStandings, slug, tableRows };

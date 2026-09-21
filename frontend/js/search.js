@@ -3,7 +3,7 @@ const searchPageInput = document.getElementById('search-page-input');
 const searchPageSeries = document.getElementById('search-page-series');
 const searchPageStatus = document.getElementById('search-page-status');
 const searchPageResults = document.getElementById('search-page-results');
-const searchSeriesLabels = { f1: 'F1', f2: 'F2', f3: 'F3', academy: 'F1 Academy' };
+const searchSeriesLabels = { f1: 'F1', f2: 'F2', f3: 'F3', academy: 'F1 Academy', fe: 'Formula E', wec: 'WEC' };
 const validSearchSeries = new Set(['all', ...Object.keys(searchSeriesLabels)]);
 let fullSearchController;
 

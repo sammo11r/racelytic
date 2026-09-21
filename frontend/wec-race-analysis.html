@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Analyse a FIA World Endurance Championship race through its class battles, classification, pace and race distance.">
+  <link rel="icon" href="/assets/favicon-wec.svg" type="image/svg+xml">
+  <title>WEC Race Analysis · Racelytic</title>
+  <link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/polish.css"><link rel="stylesheet" href="/css/season-analysis.css"><link rel="stylesheet" href="/css/race-analysis.css"><link rel="stylesheet" href="/css/wec.css"><link rel="stylesheet" href="/css/wec-race-analysis.css">
+</head>
+<body class="wec-mode" data-wec-view="race-analysis"><div id="header"></div>
+<main class="container page analysis-detail-page race-analysis-page wec-race-analysis-page">
+  <header class="race-analysis-head">
+    <div class="race-analysis-heading"><div class="eyebrow">WEC · RACE ANALYSIS</div><h1 id="wec-race-analysis-title">Race analysis</h1><p id="wec-race-analysis-meta">Choose a completed endurance race.</p></div>
+    <div class="race-analysis-selectors wec-race-analysis-selectors">
+      <label><span>Season</span><select id="wec-race-analysis-year" disabled><option>Loading…</option></select></label>
+      <label><span>Race</span><select id="wec-race-analysis-race" disabled><option>Loading…</option></select></label>
+      <label><span>Class shown</span><select id="wec-race-analysis-class" disabled><option>Overall field</option></select></label>
+    </div>
+  </header>
+  <p id="wec-race-analysis-status" class="analysis-status" role="status">Loading WEC races…</p>
+  <section id="wec-race-analysis-summary" class="analysis-summary-strip" aria-label="Race summary"></section>
+  <div id="wec-race-analysis-workspace" hidden>
+    <nav class="analysis-visualization-menu" aria-label="WEC race analysis views">
+      <label class="analysis-mobile-view" for="wec-race-analysis-view">Analysis view
+        <select id="wec-race-analysis-view"><option value="flow">Qualifying to finish</option><option value="results">Results</option><option value="points">Race points</option><option value="distance">Race distance</option></select>
+      </label>
+      <div class="analysis-visualization-tabs" role="tablist" aria-label="WEC race analysis visualization">
+        <button id="wec-race-tab-flow" type="button" role="tab" aria-controls="wec-race-panel-flow" aria-selected="true" data-wec-race-view="flow">Qualifying to finish</button>
+        <button id="wec-race-tab-results" type="button" role="tab" aria-controls="wec-race-panel-results" aria-selected="false" tabindex="-1" data-wec-race-view="results">Results</button>
+        <button id="wec-race-tab-points" type="button" role="tab" aria-controls="wec-race-panel-points" aria-selected="false" tabindex="-1" data-wec-race-view="points">Race points</button>
+        <button id="wec-race-tab-distance" type="button" role="tab" aria-controls="wec-race-panel-distance" aria-selected="false" tabindex="-1" data-wec-race-view="distance">Race distance</button>
+      </div>
+    </nav>
+    <div class="analysis-visualization-workspace">
+      <section id="wec-race-panel-flow" role="tabpanel" aria-labelledby="wec-race-tab-flow" data-wec-race-panel="flow" class="analysis-chart-section">
+        <div class="section-heading"><div><h2>Qualifying to finish</h2><p class="analysis-method">Net class-position change from the final qualifying result to the race finish; this is not an overtake count.</p></div><span id="wec-race-selection-count"></span></div>
+        <div class="race-flow-options"><div class="analysis-presets" aria-label="Entry selection presets"><button type="button" data-wec-race-preset="ten">Top 10 per class</button><button type="button" data-wec-race-preset="points">Points scorers</button><button type="button" data-wec-race-preset="all">All entries</button></div></div>
+        <details id="wec-race-entry-picker"><summary>Choose entries <span id="wec-race-entry-picker-count"></span></summary><label for="wec-race-entry-search">Search entries<input id="wec-race-entry-search" type="search" placeholder="Number, team or car" autocomplete="off"></label><div id="wec-race-entry-list" class="race-driver-list"></div></details>
+        <div id="wec-race-flow-chart" class="wec-race-flow-chart"></div>
+        <p class="analysis-method">Qualifying positions combine the last recorded qualifying or Hyperpole result for every entry. Missing positions are omitted.</p>
+        <div id="wec-race-flow-readout" class="analysis-round-readout" aria-live="polite"></div>
+      </section>
+      <section id="wec-race-panel-results" role="tabpanel" aria-labelledby="wec-race-tab-results" data-wec-race-panel="results" class="analysis-chart-section" hidden>
+        <div class="section-heading"><div><h2>Race results</h2><p class="analysis-method">One result per car, with its complete driver crew.</p></div><span>Sortable classification</span></div>
+        <label class="wec-race-entry-search" for="wec-race-result-search">Entry filter<input id="wec-race-result-search" type="search" placeholder="Number, team, car or driver" autocomplete="off"></label>
+        <div id="wec-race-result-table" class="table-wrap" tabindex="0" aria-label="WEC race results; sortable columns"></div>
+      </section>
+      <section id="wec-race-panel-points" role="tabpanel" aria-labelledby="wec-race-tab-points" data-wec-race-panel="points" class="analysis-chart-section" hidden>
+        <div class="section-heading"><div><h2>Race points</h2><p class="analysis-method">Official points awarded to each entry, kept separate by class.</p></div><span>Entry contribution shown directly</span></div>
+        <div id="wec-race-points-chart" class="wec-race-analysis-chart"></div>
+      </section>
+      <section id="wec-race-panel-distance" role="tabpanel" aria-labelledby="wec-race-tab-distance" data-wec-race-panel="distance" class="analysis-chart-section" hidden>
+        <div class="section-heading"><div><h2>Race distance</h2><p class="analysis-method">Laps completed as a share of the leading distance in each class, with official status preserved.</p></div><span>Class-normalized</span></div>
+        <div id="wec-race-distance-chart" class="wec-race-analysis-chart"></div>
+      </section>
+    </div>
+  </div>
+</main><footer class="footer"><div class="container">Racelytic</div></footer>
+<script src="/js/utils.js"></script><script src="/js/header.js"></script><script src="/js/wec-race-analysis-model.js"></script><script src="/js/wec-race-analysis.js"></script>
+</body></html>

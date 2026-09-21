@@ -138,6 +138,10 @@ async function main() {
         for (const event of dataset.events) {
             const eventEntries = entries.filter(row => row.eventId === event.id);
             const raceSessions = sessions.filter(row => row.eventId === event.id && row.type === 'race');
+            if (event.status === 'upcoming') {
+                if (eventEntries.length || raceSessions.length) throw new Error(`${event.id} has results before its race.`);
+                continue;
+            }
             if (raceSessions.length !== 1) throw new Error(`${event.id} has ${raceSessions.length} race sessions instead of one.`);
             const raceRows = eventResults.get(raceSessions[0].id) || [];
             if (!raceRows.length || raceRows.length > eventEntries.length) throw new Error(`${event.id} has invalid race classification coverage.`);
@@ -157,12 +161,15 @@ async function main() {
             }
         }
         const champions = standings.filter(row => row.championshipWon === 'true');
+        const seasonsById = new Map(dataset.seasons.map(row => [row.id, row]));
         for (const championship of championships) {
-            if (champions.filter(row => row.championshipId === championship.id).length < 1) throw new Error(`${championship.id} has no champion.`);
+            const seasonComplete = seasonsById.get(championship.seasonId)?.status === 'completed';
+            if (seasonComplete && champions.filter(row => row.championshipId === championship.id).length < 1) throw new Error(`${championship.id} has no champion.`);
+            if (!seasonComplete && champions.some(row => row.championshipId === championship.id)) throw new Error(`${championship.id} awards an in-progress title.`);
             const championshipRows = standings.filter(row => row.championshipId === championship.id);
             const finalRound = Math.max(...championshipRows.map(row => Number(row.round)));
-            if (finalRound !== Math.max(...dataset.events.filter(row => row.seasonId === championship.seasonId).map(row => Number(row.round)))) {
-                throw new Error(`${championship.id} does not reach the final season round.`);
+            if (finalRound !== Math.max(...dataset.events.filter(row => row.seasonId === championship.seasonId && row.status === 'completed').map(row => Number(row.round)))) {
+                throw new Error(`${championship.id} does not reach the latest completed round.`);
             }
             if (championshipRows.some(row => row.championshipWon === 'true' && Number(row.round) !== finalRound)) throw new Error(`${championship.id} awards a title before its final round.`);
             const scope = new Set(String(championship.classIds || championship.classId).split('|').filter(Boolean));

@@ -47,22 +47,32 @@
   }
 
   function renderChampions() {
+    const showLeaders = state.data.season.status !== 'completed';
     const groups = new Map();
     state.data.championships.forEach(championship => {
-      const champions = championship.standings.filter(row => row.championshipWon);
-      if (!champions.length) return;
+      const honours = championship.standings.filter(row => showLeaders ? row.position === 1 : row.championshipWon);
+      if (!honours.length) return;
       const category = className(championship.classId, championship);
       if (!groups.has(category)) groups.set(category, []);
-      groups.get(category).push({ championship, champions });
+      groups.get(category).push({ championship, honours });
     });
+    const heading = byId('wec-champions-title');
+    const eyebrow = heading.previousElementSibling;
+    heading.textContent = showLeaders ? 'Current leaders by category' : 'Champions by category';
+    eyebrow.textContent = showLeaders ? 'Championship leaders' : 'Season honours';
     byId('wec-champions').innerHTML = groups.size ? [...groups.entries()].map(([category, titles], index) => `
       <article class="wec-champion-card${index === 0 ? ' is-primary' : ''}">
         <div class="wec-champion-category"><span>${String(index + 1).padStart(2, '0')}</span><h3>${esc(category)}</h3></div>
-        <dl>${titles.map(({ championship, champions }) => {
+        <dl>${titles.map(({ championship, honours }) => {
           const collection = entityCollection(championship);
-          return `<div class="wec-champion-title wec-champion-title--${esc(championship.entityType)}"><dt>${esc(titleLabel(championship))}</dt><dd>${champions.map(row => `<a href="${entityPath(collection, row.entityId)}">${row.carNumber ? `<span>#${esc(row.carNumber)}</span>` : ''}${esc(row.entityName || row.entityId)}</a>`).join('<i> / </i>')}</dd></div>`;
+          return `<div class="wec-champion-title wec-champion-title--${esc(championship.entityType)}"><dt>${esc(titleLabel(championship))}</dt><dd>${honours.map(row => `<a href="${entityPath(collection, row.entityId)}">${row.carNumber ? `<span>#${esc(row.carNumber)}</span>` : ''}${esc(row.entityName || row.entityId)}</a>`).join('<i> / </i>')}${showLeaders ? `<small>${esc(rowPoints(honours[0].points))} pts</small>` : ''}</dd></div>`;
         }).join('')}</dl>
-      </article>`).join('') : '<p class="empty-state">Official champions are not available for this season.</p>';
+      </article>`).join('') : `<p class="empty-state">${showLeaders ? 'Current championship leaders are not available yet.' : 'Official champions are not available for this season.'}</p>`;
+  }
+
+  function rowPoints(value) {
+    const points = Number(value);
+    return Number.isInteger(points) ? String(points) : points.toFixed(1).replace(/\.0$/, '');
   }
 
   function renderRaceResults(data) {
@@ -121,7 +131,7 @@
     const params = new URLSearchParams(window.location.search);
     const type = params.get('standings');
     const championshipId = params.get('championship');
-    if (type === 'driver' || type === 'manufacturer') state.seasonStandingType = type;
+    if (type === 'driver' || type === 'manufacturer' || type === 'team' || type === 'competitor') state.seasonStandingType = type;
     if (championshipId) state.seasonStandingId = championshipId;
   }
 
@@ -135,7 +145,7 @@
   function renderSeasonStandingControls(resetChampionship = false) {
     const availableTypes = [...new Set(state.seasonStandings.championships.map(item => item.entityType))];
     if (!availableTypes.includes(state.seasonStandingType)) state.seasonStandingType = availableTypes[0] || 'manufacturer';
-    const typeLabels = { driver: 'Drivers', manufacturer: 'Manufacturers' };
+    const typeLabels = { driver: 'Drivers', manufacturer: 'Manufacturers', team: 'Team trophies', competitor: 'Team entries' };
     byId('wec-standings-types').innerHTML = availableTypes.map(type => `<button type="button" data-standing-type="${esc(type)}" aria-pressed="${type === state.seasonStandingType}">${esc(typeLabels[type] || type)}</button>`).join('');
     const titles = state.seasonStandings.championships.filter(item => item.entityType === state.seasonStandingType);
     if (resetChampionship || !titles.some(item => item.id === state.seasonStandingId)) state.seasonStandingId = titles[0]?.id || '';
@@ -149,14 +159,19 @@
       return;
     }
     const eventHeadings = state.seasonStandings.events.map(event => `<th scope="col" class="wec-standing-event" title="${esc(event.name)}"><span>${esc(standingsEventCode(event))}</span><small>R${esc(event.round)}</small></th>`).join('');
+    const entityTypeLabel = { driver: 'Driver', manufacturer: 'Manufacturer', team: 'Team', competitor: 'Team entry' }[championship.entityType] || 'Entry';
+    const entityCollection = { driver: 'drivers', manufacturer: 'manufacturers', team: 'teams', competitor: 'entries' }[championship.entityType] || 'teams';
     const rows = championship.standings.map(row => {
       const results = state.seasonStandings.events.map(event => {
         const result = standingResult(row.results[event.id]);
         return `<td class="wec-standing-result ${result.className}" title="${esc(result.title)}">${esc(result.label)}</td>`;
       }).join('');
+      const entityName = championship.entityType === 'competitor'
+        ? `${row.carNumber ? `<span class="wec-standing-car-number">#${esc(row.carNumber)}</span>` : ''}${esc(row.entityName || row.entityId)}`
+        : esc(row.entityName || row.entityId);
       return `<tr>
         <td class="wec-standing-position">${esc(row.position)}</td>
-        <th scope="row"><a href="${entityPath(championship.entityType === 'driver' ? 'drivers' : 'manufacturers', row.entityId)}">${esc(row.entityName || row.entityId)}</a></th>
+        <th scope="row"><a href="${entityPath(entityCollection, row.entityId)}">${entityName}</a></th>
         ${championship.entityType === 'driver' ? `<td class="wec-standing-team">${esc(row.teamName || '—')}</td>` : ''}
         ${results}
         <td class="wec-standing-points">${esc(row.points)}</td>
@@ -164,7 +179,7 @@
     }).join('');
     byId('wec-season-standings').innerHTML = `<table class="wec-season-standings-table">
       <caption>${esc(championship.name)}</caption>
-      <thead><tr><th scope="col">Pos</th><th scope="col">${championship.entityType === 'driver' ? 'Driver' : 'Manufacturer'}</th>${championship.entityType === 'driver' ? '<th scope="col">Team</th>' : ''}${eventHeadings}<th scope="col">Points</th></tr></thead>
+      <thead><tr><th scope="col">Pos</th><th scope="col">${entityTypeLabel}</th>${championship.entityType === 'driver' ? '<th scope="col">Team</th>' : ''}${eventHeadings}<th scope="col">Points</th></tr></thead>
       <tbody>${rows}</tbody>
     </table>`;
   }

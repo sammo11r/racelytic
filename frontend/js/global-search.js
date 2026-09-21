@@ -102,9 +102,9 @@
         const renderSearchResults = (payload, query) => {
             if (!searchResults) return;
             const groups = payload?.groups || [];
-            const seriesLabel = { f1: 'F1', f2: 'F2', f3: 'F3', academy: 'Academy' };
+            const seriesLabel = { f1: 'F1', f2: 'F2', f3: 'F3', academy: 'F1 Academy', fe: 'Formula E', wec: 'WEC' };
             let resultIndex = 0;
-            const scopeLabel = searchAllSeries ? 'All series' : ({ f1: 'F1', f2: 'F2', f3: 'F3', academy: 'F1 Academy' }[activeSeries] || 'Current series');
+            const scopeLabel = searchAllSeries ? 'All series' : (seriesLabel[activeSeries] || 'Current series');
             const scopeControls = `<div class="global-search-scope" aria-label="Search scope">
                 <span>Searching ${safeText(scopeLabel)}</span>
                 <button type="button" data-search-scope="${searchAllSeries ? 'current' : 'all'}">${searchAllSeries ? 'Current series only' : 'Search all series'}</button>

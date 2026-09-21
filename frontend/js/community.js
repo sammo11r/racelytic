@@ -5,7 +5,7 @@ const communityElements = {
   sort: document.getElementById('community-sort'), more: document.getElementById('community-more'),
   clear: document.getElementById('community-clear')
 };
-const communitySeriesNames = { all: 'All series', f1: 'Formula 1', f2: 'Formula 2', f3: 'Formula 3', academy: 'F1 Academy', fe: 'Formula E' };
+const communitySeriesNames = { all: 'All series', f1: 'Formula 1', f2: 'Formula 2', f3: 'Formula 3', academy: 'F1 Academy', fe: 'Formula E', wec: 'World Endurance Championship' };
 let communitySearchTimer;
 
 function communityBase(series, page) {
@@ -17,10 +17,10 @@ function communityBase(series, page) {
 function contextualSeries() {
   if (communityState.series !== 'all') return communityState.series;
   const requested = new URLSearchParams(location.search).get('series');
-  if (['f1', 'f2', 'f3', 'academy', 'fe'].includes(requested)) return requested;
+  if (['f1', 'f2', 'f3', 'academy', 'fe', 'wec'].includes(requested)) return requested;
   try {
     const remembered = localStorage.getItem('racelytic-series');
-    if (['f1', 'f2', 'f3', 'academy', 'fe'].includes(remembered)) return remembered;
+    if (['f1', 'f2', 'f3', 'academy', 'fe', 'wec'].includes(remembered)) return remembered;
   } catch {}
   return 'f1';
 }
@@ -35,7 +35,7 @@ function recordUrl(configuration = {}) {
   Object.entries(configuration).forEach(([key, value]) => {
     if (key !== 'series' && value !== null && value !== undefined && value !== '' && value !== false) query.set(key, String(value));
   });
-  const series = ['f2', 'f3', 'academy', 'fe'].includes(configuration.series) ? configuration.series : 'f1';
+  const series = ['f2', 'f3', 'academy', 'fe', 'wec'].includes(configuration.series) ? configuration.series : 'f1';
   return `${communityBase(series, 'records')}?${query}`;
 }
 
@@ -56,6 +56,7 @@ function categoryLabel(category = 'wins') {
 
 function creationPresentation(item) {
   if (item.type === 'points') {
+    if (item.series === 'wec') return { description: `WEC class points ${item.racePoints?.join('–') || 'custom'}`, facts: [`Extended ×${fmtNumber(item.extendedMultiplier || 1)}`, `Le Mans ×${fmtNumber(item.leMansMultiplier || 1)}`], action: 'View & remix' };
     const race = item.racePoints?.length ? item.racePoints.slice(0, 10).join('–') : 'Custom race scoring';
     const facts = [`${item.racePoints?.length || 0} scoring places`];
     if (item.sprintPoints?.length) facts.push('Sprint points');
@@ -72,7 +73,9 @@ function creationPresentation(item) {
     return { description: `A saved historical ranking for ${subject.toLocaleLowerCase()}, ready to reopen with the creator’s filters.`, facts, action: 'Open record view' };
   }
   const config = item.configuration || {};
-  const facts = [`${fmtNumber(config.raceIds?.length || 0)} races`, `${fmtNumber(config.driverIds?.length || 0)} drivers`, config.pointsSystem?.name || 'Custom scoring'];
+  const facts = item.series === 'wec'
+    ? [config.classCode || 'WEC class', `${fmtNumber(config.raceIds?.length || 0)} races`, `${fmtNumber(config.driverIds?.length || 0)} drivers`, config.pointsSystem?.name || 'Custom scoring']
+    : [`${fmtNumber(config.raceIds?.length || 0)} races`, `${fmtNumber(config.driverIds?.length || 0)} drivers`, config.pointsSystem?.name || 'Custom scoring'];
   return { description: item.description || 'A custom calendar, field and scoring system built from historical race results.', facts, action: 'Open & remix' };
 }
 

@@ -9,11 +9,11 @@ test('validates and normalizes a reusable points system', () => {
         poleBonus: 1, fastestLapBonus: 1, fastestLapMaxPosition: 10,
         countBestRounds: 8, sprintCountsTowardRound: false, visibility: 'public'
     }), {
-        name: 'My system', racePoints: [10, 6, 4], sprintPoints: [3, 2, 1], qualifyingPoints: [2, 1],
+        name: 'My system', series: 'all', racePoints: [10, 6, 4], sprintPoints: [3, 2, 1], qualifyingPoints: [2, 1],
         poleBonus: 1, fastestLapBonus: 1, fastestLapMaxPosition: 10,
         countBestRounds: 8, bestFirstRounds: null, firstRoundsWindow: null,
         bestLastRounds: null, lastRoundsWindow: null, sprintCountsTowardRound: false,
-        visibility: 'public', tieBreaker: 'countback'
+        visibility: 'public', tieBreaker: 'countback', extendedMultiplier: 1, leMansMultiplier: 1
     });
 });
 

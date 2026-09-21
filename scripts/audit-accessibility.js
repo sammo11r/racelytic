@@ -5,7 +5,9 @@ const axePath = require.resolve('axe-core/axe.min.js');
 const base = process.env.ACCESSIBILITY_AUDIT_URL || 'http://localhost:3000';
 const browserPath = process.env.ACCESSIBILITY_AUDIT_BROWSER || 'C:/Program Files/Google/Chrome/Application/chrome.exe';
 const routes = ['/', '/constructors', '/drivers', '/ask', '/community', '/games', '/analysis', '/simulator-overview', '/points-systems',
-  '/ratings', '/ratings/leaderboard?series=f1', '/ratings/compare?series=f1', '/ratings/driver?series=f1', '/ratings/methodology?series=f1'];
+  '/ratings', '/ratings/leaderboard?series=f1', '/ratings/compare?series=f1', '/ratings/driver?series=f1', '/ratings/methodology?series=f1',
+  '/wec/season-comparison', '/wec/race-analysis', '/wec/simulate-season', '/wec/scenario-calculator', '/wec/championship-builder',
+  '/wec/games', '/wec/quizzes', '/wec/race-winners-quiz', '/wec/season-race-winners-quiz'];
 const viewports = [{ name: 'desktop', width: 1280, height: 900 }, { name: 'mobile', width: 390, height: 844 }];
 
 function conciseViolation(violation) {

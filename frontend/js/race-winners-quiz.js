@@ -6,10 +6,10 @@ let quizGaveUp = false;
 let renderedColumnCount = 0;
 let measuredTableWidth = 0;
 let newlyRevealedSlots = new Set();
-const QUIZ_SERIES = document.body.classList.contains('fe-mode') ? 'fe' : document.body.classList.contains('f2-mode') ? 'f2' : 'f1';
+const QUIZ_SERIES = document.body.classList.contains('wec-mode') ? 'wec' : document.body.classList.contains('fe-mode') ? 'fe' : document.body.classList.contains('f2-mode') ? 'f2' : 'f1';
 const QUIZ_PROGRESS_KEY = QUIZ_SERIES === 'f1' ? 'racelytic-quiz-race-winners' : `racelytic-quiz-${QUIZ_SERIES}-race-winners`;
 const quizApi = path => `${path}${QUIZ_SERIES === 'f1' ? '' : `?series=${QUIZ_SERIES}`}`;
-const CHAMPIONSHIP_NAME = { f1: 'Formula 1', f2: 'Formula 2', fe: 'Formula E' }[QUIZ_SERIES];
+const CHAMPIONSHIP_NAME = { f1: 'Formula 1', f2: 'Formula 2', fe: 'Formula E', wec: 'WEC' }[QUIZ_SERIES];
 const seasonLabel = year => QUIZ_SERIES === 'fe' ? `${Number(year) - 1}–${String(year).slice(-2)}` : String(year);
 
 function saveQuizProgress() {
@@ -50,11 +50,11 @@ function responsiveColumnCount(board, itemCount) {
 function driverCellContent(driver, nameLength) {
   return `<span class="quiz-column-sizer" aria-hidden="true">${'M'.repeat(nameLength)}</span>${driver
     ? `<span class="quiz-answer-overlay">${esc(driver)}</span>`
-    : '<span class="quiz-empty-answer quiz-answer-overlay" aria-label="Not yet answered"></span>'}`;
+    : '<span class="quiz-empty-answer quiz-answer-overlay"><span class="visually-hidden">Not yet answered</span></span>'}`;
 }
 
 function nationCellContent(row) {
-  if (QUIZ_SERIES === 'f1') return esc(row.countryName || '—');
+  if (QUIZ_SERIES === 'f1' || QUIZ_SERIES === 'wec') return esc(row.countryName || '—');
   if (!row.countryCode) return '—';
   const code = String(row.countryCode).toUpperCase();
   return esc(new Intl.DisplayNames(['en'], { type: 'region' }).of(code) || code);
@@ -114,16 +114,16 @@ function renderWinnerBoard() {
   const columns = Array.from({ length: columnCount }, (_, index) => rows.slice(index * columnSize, (index + 1) * columnSize)).filter(column => column.length);
 
   board.classList.add('is-measuring');
-  board.innerHTML = columns.map(column => `<div class="quiz-column-table table-wrap">
+  board.innerHTML = columns.map(column => `<div class="quiz-column-table table-wrap" tabindex="0">
     <table class="champions-quiz-table race-winners-table${QUIZ_SERIES === 'f2' ? ' f2-race-winners-table' : ''}">
-      <thead><tr><th>Wins</th><th>Driver</th><th>Nation</th>${QUIZ_SERIES === 'f2' ? '<th>Feature</th><th>Sprint</th>' : QUIZ_SERIES === 'fe' ? '<th>First season</th><th>Latest season</th>' : '<th>First win</th>'}</tr></thead>
+      <thead><tr><th>Wins</th><th>Driver</th><th>Nation</th>${QUIZ_SERIES === 'f2' ? '<th>Feature</th><th>Sprint</th>' : QUIZ_SERIES === 'fe' || QUIZ_SERIES === 'wec' ? '<th>First season</th><th>Latest season</th>' : '<th>First win</th>'}</tr></thead>
       <tbody>${column.map(row => {
         const name = revealedWinners.get(row.slot);
         return `<tr data-slot="${row.slot}" class="${name ? 'is-revealed' : ''}${newlyRevealedSlots.has(row.slot) ? ' is-new-answer' : ''}">
           <td><strong>${fmtNumber(row.wins)}</strong></td>
           <td class="quiz-driver-cell">${driverCellContent(name, row.driverNameLength)}</td>
           <td>${nationCellContent(row)}</td>
-          ${QUIZ_SERIES === 'f2' ? `<td>${fmtNumber(row.featureWins)}</td><td>${fmtNumber(row.sprintWins)}</td>` : QUIZ_SERIES === 'fe' ? `<td>${esc(seasonLabel(row.firstWinYear))}</td><td>${esc(seasonLabel(row.lastWinYear))}</td>` : `<td>${esc(row.firstWinYear)}</td>`}
+          ${QUIZ_SERIES === 'f2' ? `<td>${fmtNumber(row.featureWins)}</td><td>${fmtNumber(row.sprintWins)}</td>` : QUIZ_SERIES === 'fe' || QUIZ_SERIES === 'wec' ? `<td>${esc(seasonLabel(row.firstWinYear))}</td><td>${esc(seasonLabel(row.lastWinYear))}</td>` : `<td>${esc(row.firstWinYear)}</td>`}
         </tr>`;
       }).join('')}</tbody>
     </table>

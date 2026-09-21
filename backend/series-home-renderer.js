@@ -50,6 +50,16 @@ const SERIES_HOME_CONFIG = Object.freeze({
         entityLabel: 'Teams',
         archiveTitle: 'Twelve seasons.|One connected archive.',
         archiveCopy: 'Official seasons, entrants, session classifications and standings connect every Formula E driver, team, circuit and E-Prix to the analysis, simulator and games.'
+    },
+    wec: {
+        ...SERIES.wec,
+        description: 'Explore, analyse, simulate and play with every FIA World Endurance Championship season since 2012 in Racelytic.',
+        headline: 'One race.', subheadline: 'Many races within it.',
+        introduction: 'Explore endurance racing by car, crew and class. Follow every FIA World Endurance Championship season since 2012, compare drivers across multiclass careers, revisit each race and recalculate championships while keeping shared entries and parallel classifications intact.',
+        askExample: '', askEnabled: false,
+        entityLabel: 'Teams',
+        archiveTitle: 'Every WEC season.|Every class, crew and entry.',
+        archiveCopy: 'Calendars, entry crews, session classifications and championship standings connect the complete WEC era to Racelytic’s analysis, simulator and games.'
     }
 });
 
@@ -118,6 +128,16 @@ const SERIES_HOME_PREVIEWS = {
         comparisonMetrics: [['wins', 'Race wins'], ['podiums', 'Podiums']],
         champions: [{ year: '2014–15', dataYear: 2015, name: 'Nelson Piquet Jr.', id: 'nelson-piquet-jr' }, { year: '2019–20', name: null }, { year: '2025–26', dataYear: 2026, name: 'Pascal Wehrlein', id: 'pascal-wehrlein' }],
         quizHref: '/formula-e/champions-quiz', quizAction: 'Name the champions'
+    },
+    wec: {
+        year: 2025,
+        question: 'How do four wins build a world title?',
+        copy: 'Ferrari opened the season with four consecutive overall victories and converted that start into the 2025 manufacturers’ championship.',
+        contenders: [{ name: 'Ferrari', id: 'ferrari', points: 245, wins: 4 }, { name: 'Toyota', id: 'toyota', points: 171, wins: 1 }],
+        note: '2025 Hypercar manufacturers · Official final standings and overall race wins.',
+        href: '/wec/season-analysis?year=2025', action: 'Explore Ferrari’s title season',
+        drivers: [{ id: 'sebastien-buemi', name: 'Buemi', wins: 27, podiums: 57 }, { id: 'brendon-hartley', name: 'Hartley', wins: 24, podiums: 54 }],
+        comparisonMetrics: [['wins', 'Race wins'], ['podiums', 'Class podiums']]
     }
 };
 

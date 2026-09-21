@@ -1,8 +1,14 @@
 (function initialiseRatingsOverview() {
-  const names = { f1: 'Formula 1', f2: 'Formula 2', f3: 'Formula 3', academy: 'F1 Academy', fe: 'Formula E' };
+  const names = { f1: 'Formula 1', f2: 'Formula 2', f3: 'Formula 3', academy: 'F1 Academy', fe: 'Formula E', wec: 'World Endurance Championship' };
   const query = new URLSearchParams(location.search);
   const series = Object.hasOwn(names, query.get('series')) ? query.get('series') : 'f1';
   const model = series === 'f1' && query.get('model') === 'team-adjusted' ? 'team-adjusted' : '';
+  const classScope = series === 'wec' && ['top', 'lmp2', 'gt-pro', 'gt'].includes(query.get('class')) ? query.get('class') : series === 'wec' ? 'top' : '';
+  if (series === 'wec' && query.get('class') !== classScope) {
+    query.set('class', classScope);
+    history.replaceState({}, '', `${location.pathname}?${query}${location.hash}`);
+  }
+  document.body.classList.toggle('wec-mode', series === 'wec');
   const elements = {
     freshness: document.getElementById('ratings-overview-freshness'),
     leaders: document.getElementById('ratings-overview-leaders'),
@@ -12,12 +18,29 @@
     search: document.getElementById('ratings-overview-search'),
     results: document.getElementById('ratings-overview-search-results')
   };
+  const classControl = document.getElementById('ratings-overview-class-control');
+  const classSelect = document.getElementById('ratings-overview-class');
+  if (series === 'wec') {
+    classControl.hidden = false;
+    classSelect.value = classScope;
+    classSelect.addEventListener('change', () => {
+      const target = new URL(location.href);
+      target.searchParams.set('class', classSelect.value);
+      location.assign(`${target.pathname}?${target.searchParams}`);
+    });
+    const heading = document.querySelector('.database-directory-heading');
+    heading.querySelector('h1').textContent = 'Follow WEC performance within each class';
+    const paragraphs = heading.querySelectorAll('p');
+    if (paragraphs[0]) paragraphs[0].textContent = 'Explore crew based ratings built from class results. Each entry’s strength is the mean of its drivers’ ratings, and every crew member receives the car’s result.';
+    if (paragraphs[1]) paragraphs[1].textContent = 'Hypercar, LMP2, GTE Pro and GT histories use separate rating pools so drivers are compared with relevant class rivals.';
+  }
   let drivers = [];
 
   const destination = (path, extra = {}) => {
     const target = new URL(path, location.origin);
     target.searchParams.set('series', series);
     if (model) target.searchParams.set('model', model);
+    if (classScope) target.searchParams.set('class', classScope);
     Object.entries(extra).forEach(([key, value]) => target.searchParams.set(key, value));
     return `${target.pathname}?${target.searchParams}`;
   };
@@ -43,7 +66,7 @@
     const term = elements.search.value.trim().toLocaleLowerCase();
     elements.results.replaceChildren();
     if (!term) return;
-    const matches = drivers.filter(driver => `${driver.driverName} ${driver.constructorName || ''}`.toLocaleLowerCase().includes(term)).slice(0, 8);
+    const matches = drivers.filter(driver => `${driver.driverName} ${driver.constructorName || ''} ${driver.manufacturerName || ''} ${driver.carNumber || ''}`.toLocaleLowerCase().includes(term)).slice(0, 8);
     const list = document.createElement('ul');
     matches.forEach(driver => list.append(driverRow(driver, `${driver.constructorName || 'Team unavailable'} · rank #${driver.rank}`)));
     if (!matches.length) {
@@ -60,6 +83,7 @@
     api.searchParams.set('minEvents', '3');
     api.searchParams.set('limit', '1000');
     if (model) api.searchParams.set('model', model);
+    if (classScope) api.searchParams.set('class', classScope);
     try {
       const response = await fetch(api, { cache: 'no-store' });
       if (!response.ok) throw new Error('Ratings unavailable');

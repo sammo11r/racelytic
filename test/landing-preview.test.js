@@ -56,3 +56,26 @@ for (const [series, prefix] of [['f2', 'f2db'], ['f3', 'f3db'], ['academy', 'fad
         }
     });
 }
+
+test('WEC landing examples match the official manufacturers standings and driver careers', async () => {
+    const example = SERIES_HOME_PREVIEWS.wec;
+    const standings = await rowsFrom('wecdb-standings.csv', row => row.championshipId === 'wec-2025-hypercar-manufacturers' && Number(row.round) === 8);
+    assert.deepEqual(standings.sort((a, b) => Number(a.position) - Number(b.position)).slice(0, 2)
+        .map(row => ({ id: row.entityId, points: Number(row.points) })),
+    example.contenders.map(({ id, points }) => ({ id, points })));
+
+    const [crew, sessions, results] = await Promise.all([
+        rowsFrom('wecdb-entry-drivers.csv', row => example.drivers.some(driver => driver.id === row.driverId)),
+        rowsFrom('wecdb-sessions.csv', row => row.type === 'race'),
+        rowsFrom('wecdb-session-results.csv', () => true)
+    ]);
+    const raceSessionByEvent = new Map(sessions.map(row => [row.eventId, row.id]));
+    const resultByEntry = new Map(results.map(row => [`${row.eventId}|${row.sessionId}|${row.entryId}`, row]));
+    for (const driver of example.drivers) {
+        const appearances = crew.filter(row => row.driverId === driver.id);
+        const classified = appearances.map(row => resultByEntry.get(`${row.eventId}|${raceSessionByEvent.get(row.eventId)}|${row.entryId}`))
+            .filter(result => result?.status === 'classified');
+        assert.equal(classified.filter(result => Number(result.classPosition) === 1).length, driver.wins);
+        assert.equal(classified.filter(result => Number(result.classPosition) >= 1 && Number(result.classPosition) <= 3).length, driver.podiums);
+    }
+});

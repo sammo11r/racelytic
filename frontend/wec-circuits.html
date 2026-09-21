@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Explore every FIA World Endurance Championship circuit, from the current calendar to historic endurance venues.">
+  <link rel="icon" href="/assets/favicon-wec.svg" type="image/svg+xml">
+  <title>WEC Circuits · Racelytic</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/polish.css">
+  <link rel="stylesheet" href="/css/wec.css">
+</head>
+<body class="wec-mode" data-wec-view="circuits">
+  <div id="header"></div>
+  <main class="container page wec-page wec-circuits-page">
+    <section class="wec-circuit-browser" aria-labelledby="wec-circuit-browser-title">
+      <div class="wec-circuit-browser-title">
+        <div>
+          <p class="eyebrow">CIRCUIT ARCHIVE</p>
+          <h1 id="wec-circuit-browser-title">Find a venue</h1>
+        </div>
+        <div class="standings-mode" role="group" aria-label="Circuit archive view">
+          <button type="button" class="standings-mode-button active" data-wec-circuit-view="current" aria-pressed="true">Current calendar</button>
+          <button type="button" class="standings-mode-button" data-wec-circuit-view="all" aria-pressed="false">All venues</button>
+        </div>
+      </div>
+      <div class="wec-circuit-filter-grid" role="search" aria-label="Filter WEC circuits">
+        <label class="wec-circuit-search"><span>Search</span><input id="wec-circuit-search" type="search" placeholder="Circuit, city or country…" autocomplete="off"></label>
+        <label><span>Season</span><select id="wec-circuit-season"><option value="all">All seasons</option></select></label>
+        <label><span>Country</span><select id="wec-circuit-country"><option value="all">All countries</option></select></label>
+        <label><span>Race format</span><select id="wec-circuit-format"><option value="all">All formats</option><option value="24h">24 hours</option><option value="8h">8 hours</option><option value="6h">6 hours</option><option value="distance">Distance race</option></select></label>
+        <label><span>Order by</span><select id="wec-circuit-sort"><option value="recent">Most recent</option><option value="name">Name A–Z</option><option value="races">Most races hosted</option><option value="length">Longest lap</option></select></label>
+        <button type="button" id="wec-circuit-clear" class="button secondary">Clear filters</button>
+      </div>
+    </section>
+
+    <div class="wec-circuit-toolbar">
+      <p id="wec-circuit-count" aria-live="polite">Loading circuits…</p>
+      <p id="wec-circuit-status" role="status"></p>
+    </div>
+    <div id="wec-circuits" class="wec-circuit-grid" aria-busy="true" aria-label="Loading WEC circuits">
+      <article class="wec-circuit-card wec-circuit-card-skeleton" aria-hidden="true"></article>
+      <article class="wec-circuit-card wec-circuit-card-skeleton" aria-hidden="true"></article>
+      <article class="wec-circuit-card wec-circuit-card-skeleton" aria-hidden="true"></article>
+      <article class="wec-circuit-card wec-circuit-card-skeleton" aria-hidden="true"></article>
+      <article class="wec-circuit-card wec-circuit-card-skeleton" aria-hidden="true"></article>
+      <article class="wec-circuit-card wec-circuit-card-skeleton" aria-hidden="true"></article>
+    </div>
+  </main>
+  <footer class="footer"><div class="container">Racelytic</div></footer>
+  <script src="/js/utils.js"></script>
+  <script src="/js/header.js"></script>
+  <script src="/js/wec-circuits.js"></script>
+</body>
+</html>

@@ -8,10 +8,11 @@ function parseJson(value, fallback) {
 function pointItems(rows) {
     return rows.map(row => ({
         type: 'points', id: row.id, name: row.name, ownerName: row.ownerName,
-        series: 'all', createdAt: row.createdAt, updatedAt: row.updatedAt,
+        series: row.series === 'wec' ? 'wec' : 'all', createdAt: row.createdAt, updatedAt: row.updatedAt,
         racePoints: parseJson(row.racePoints, []), sprintPoints: parseJson(row.sprintPoints, []),
         qualifyingPoints: parseJson(row.qualifyingPoints, []), poleBonus: Number(row.poleBonus || 0),
-        fastestLapBonus: Number(row.fastestLapBonus || 0), countBestRounds: row.countBestRounds
+        fastestLapBonus: Number(row.fastestLapBonus || 0), countBestRounds: row.countBestRounds,
+        extendedMultiplier: Number(row.extendedMultiplier ?? 1), leMansMultiplier: Number(row.leMansMultiplier ?? 1)
     }));
 }
 
@@ -21,7 +22,7 @@ function configuredItems(rows, type) {
         return {
             type, id: row.id, name: row.name, ownerName: row.ownerName,
             description: type === 'championships' ? row.description || '' : '',
-            series: ['f2', 'f3', 'academy', 'fe'].includes(configuration.series) ? configuration.series : 'f1',
+            series: ['f2', 'f3', 'academy', 'fe', 'wec'].includes(configuration.series) ? configuration.series : 'f1',
             configuration, createdAt: row.createdAt, updatedAt: row.updatedAt
         };
     });

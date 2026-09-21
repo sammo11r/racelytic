@@ -32,7 +32,7 @@ test('detail canonicals retain only their identity parameter', () => {
 test('detail slugs produce useful server-rendered sharing titles', () => {
     assert.equal(metadataFor('/drivers/max-verstappen').title, 'Max Verstappen — Formula 1 Driver · Racelytic');
     assert.equal(metadataFor('/f3/circuits/spa-francorchamps').title, 'Spa Francorchamps — Formula 3 Circuit · Racelytic');
-    assert.equal(metadataFor('/wec/car-models/ferrari-499p').title, 'Ferrari 499p — World Endurance Championship Car Model · Racelytic');
+    assert.equal(metadataFor('/wec/cars/ferrari-499p').title, 'Ferrari 499p — World Endurance Championship Car Model · Racelytic');
 });
 
 test('dynamic entity titles prefer the public racing name', () => {
@@ -81,6 +81,21 @@ test('race structured data exposes an event, circuit and date', () => {
     assert.match(html, /"startDate":"2025-08-03"/);
     assert.match(html, /"name":"Hungaroring"/);
     assert.match(html, /"name":"Races","item":"https:\/\/racelytic\.com\/races"/);
+});
+
+test('WEC profiles expose entity-specific structured data', () => {
+    const driver = renderStructuredData(metadataFor('/wec/drivers/test-driver', {}, {
+        initialContent: { kind: 'wec-profile', series: 'wec', profileType: 'driver', entity: { name: 'Test Driver' } }
+    }));
+    assert.match(driver, /"@type":"ProfilePage"/);
+    assert.match(driver, /"@type":"Person"/);
+
+    const car = renderStructuredData(metadataFor('/wec/cars/test-car', {}, {
+        initialContent: { kind: 'wec-profile', series: 'wec', profileType: 'carModel', entity: { name: 'Test Car', manufacturerName: 'Test Works', regulation: 'Hypercar' } }
+    }));
+    assert.match(car, /"@type":"Product"/);
+    assert.match(car, /"@type":"Brand"/);
+    assert.match(car, /"category":"Hypercar"/);
 });
 
 test('project-level metadata stays series neutral', () => {

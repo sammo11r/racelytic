@@ -1,7 +1,7 @@
 const accountById = id => document.getElementById(id);
 const accountSeries = (() => {
   const requested = new URLSearchParams(location.search).get('series');
-  if (['f1', 'f2', 'f3', 'academy', 'fe'].includes(requested)) return requested;
+  if (['f1', 'f2', 'f3', 'academy', 'fe', 'wec'].includes(requested)) return requested;
   if (document.body.classList.contains('academy-mode')) return 'academy';
   if (document.body.classList.contains('f3-mode')) return 'f3';
   if (document.body.classList.contains('f2-mode')) return 'f2';
@@ -14,7 +14,7 @@ let communityRecords = [];
 let communityChampionships = [];
 let communityType = 'all';
 
-function pointsUrl() { return `${accountBase}/points-systems#your-systems`; }
+function pointsUrl(series = accountSeries) { return `${series === 'f1' ? '' : series === 'fe' ? '/formula-e' : `/${series}`}/points-systems#your-systems`; }
 function recordsUrl() { return `${accountBase}/records`; }
 function builderUrl(series = accountSeries) {
   return series === 'f1' ? '/championship-builder' : series === 'fe' ? '/formula-e/championship-builder' : `/${series}/championship-builder`;
@@ -108,7 +108,7 @@ function renderPoints(systems) {
   const container = accountById('saved-systems');
   accountById('points-system-count').textContent = fmtNumber(systems.length);
   if (!systems.length) return emptyState(container, 'You have not created a custom points system yet.', pointsUrl(), 'Create one');
-  container.innerHTML = systems.slice(0, 6).map(system => `<a class="account-item-card" href="${esc(pointsUrl())}"><span>${esc(system.visibility)} POINTS SYSTEM</span><strong>${esc(system.name)}</strong><small>${esc(system.racePoints.join('–'))}${system.qualifyingPoints?.length ? ' · qualifying points' : ''}</small><b>Manage →</b></a>`).join('');
+  container.innerHTML = systems.slice(0, 6).map(system => `<a class="account-item-card" href="${esc(pointsUrl(system.series === 'wec' ? 'wec' : accountSeries))}"><span>${esc(system.visibility)} POINTS SYSTEM</span><strong>${esc(system.name)}</strong><small>${esc(system.racePoints.join('–'))}${system.qualifyingPoints?.length ? ' · qualifying points' : ''}</small><b>Manage →</b></a>`).join('');
 }
 
 function renderRecords(records) {
@@ -139,7 +139,7 @@ function recordDetail(record) {
 
 function communityItems() {
   return [
-    ...communitySystems.map(system => ({ type: 'points', label: 'Points system', name: system.name, owner: system.ownerName, detail: `${system.racePoints.join('–')} · scoring rules`, url: pointsUrl() })),
+    ...communitySystems.map(system => ({ type: 'points', label: 'Points system', name: system.name, owner: system.ownerName, detail: `${system.racePoints.join('–')} · scoring rules`, url: pointsUrl(system.series === 'wec' ? 'wec' : accountSeries) })),
     ...communityRecords.map(record => ({ type: 'records', label: 'Record', name: record.name, owner: record.ownerName, detail: recordDetail(record), url: savedRecordUrl(record.configuration) })),
     ...communityChampionships.map(championship => ({ type: 'championships', label: 'Championship', name: championship.name, owner: championship.ownerName, detail: `${championship.configuration.raceIds.length} races · ${championship.configuration.driverIds.length} drivers`, url: `${builderUrl(championship.configuration.series)}?id=${encodeURIComponent(championship.id)}` }))
   ];

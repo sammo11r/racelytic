@@ -44,7 +44,11 @@ async function resolveDriverMetadata(context, id) {
     if (series === 'wec') {
         rows = await pool.query('SELECT name FROM wec_drivers WHERE id = ?', [id]);
         if (!rows.length) return { robots: 'noindex, follow', notFound: true };
-        return { title: entityPageTitle(rows[0].name, context.series.name, 'Driver'), description: `${rows[0].name} FIA World Endurance Championship results, teams and season history.` };
+        return {
+            title: entityPageTitle(rows[0].name, context.series.name, 'Driver'),
+            description: `${rows[0].name} FIA World Endurance Championship results, teams and season history.`,
+            initialContent: { kind: 'wec-profile', series, profileType: 'driver', entity: { id, name: rows[0].name } }
+        };
     }
     if (series === 'f1') {
         rows = await pool.query(`
@@ -118,7 +122,11 @@ async function resolveConstructorMetadata(context, id) {
     if (series === 'wec') {
         rows = await pool.query('SELECT name FROM wec_teams WHERE id = ?', [id]);
         if (!rows.length) return { robots: 'noindex, follow', notFound: true };
-        return { title: entityPageTitle(rows[0].name, context.series.name, 'Team'), description: `${rows[0].name} FIA World Endurance Championship entries and race results.` };
+        return {
+            title: entityPageTitle(rows[0].name, context.series.name, 'Team'),
+            description: `${rows[0].name} FIA World Endurance Championship entries and race results.`,
+            initialContent: { kind: 'wec-profile', series, profileType: 'team', entity: { id, name: rows[0].name } }
+        };
     }
     if (series === 'f1') {
         rows = await pool.query(`
@@ -199,6 +207,19 @@ async function resolveCircuitMetadata(context, id) {
             ) history ON history.circuitId = circuits.id
             WHERE circuits.id = ?
         `, [id]);
+    } else if (series === 'wec') {
+        rows = await pool.query(`
+            SELECT circuits.id, circuits.name, circuits.type, circuits.direction, circuits.placeName,
+                   countries.name AS countryName, circuits.length, circuits.turns, circuits.layoutId,
+                   COUNT(DISTINCT events.id) AS totalRacesHeld,
+                   MIN(events.year) AS firstHeldYear, MAX(events.year) AS lastHeldYear
+            FROM wec_circuits circuits
+            LEFT JOIN countries ON countries.id = circuits.countryId
+            LEFT JOIN wec_events events ON events.circuitId = circuits.id
+            WHERE circuits.id = ?
+            GROUP BY circuits.id, circuits.name, circuits.type, circuits.direction, circuits.placeName,
+                     countries.name, circuits.length, circuits.turns, circuits.layoutId
+        `, [id]);
     } else {
         const prefix = SERIES_PREFIX[series];
         rows = await pool.query(`
@@ -244,7 +265,8 @@ async function resolveSeasonMetadata(context, id) {
         if (!rows.length) return { robots: 'noindex, follow', notFound: true };
         return {
             title: `${rows[0].name} · Racelytic`,
-            description: `${id} World Endurance Championship calendar, competition classes and archive coverage across ${Number(rows[0].eventCount || 0)} events.`
+            description: `${id} World Endurance Championship calendar, competition classes and archive coverage across ${Number(rows[0].eventCount || 0)} events.`,
+            initialContent: { kind: 'wec-season', series, year: Number(id), name: rows[0].name, status: rows[0].status }
         };
     }
     const prefix = SERIES_PREFIX[series];
@@ -403,7 +425,11 @@ async function resolveEntityMetadata(req, context, page, id) {
     if (page === 'chassis') return resolveChassisMetadata(context, id);
     if (context.series.key === 'wec' && page === 'manufacturer') {
         const rows = await pool.query('SELECT name FROM wec_manufacturers WHERE id = ?', [id]);
-        return rows.length ? { title: entityPageTitle(rows[0].name, context.series.name, 'Manufacturer'), description: `${rows[0].name} FIA World Endurance Championship entries and results.` } : { robots: 'noindex, follow', notFound: true };
+        return rows.length ? {
+            title: entityPageTitle(rows[0].name, context.series.name, 'Manufacturer'),
+            description: `${rows[0].name} FIA World Endurance Championship entries and results.`,
+            initialContent: { kind: 'wec-profile', series: 'wec', profileType: 'manufacturer', entity: { id, name: rows[0].name } }
+        } : { robots: 'noindex, follow', notFound: true };
     }
     if (context.series.key === 'wec' && page === 'carModel') {
         const rows = await pool.query(`
@@ -412,14 +438,22 @@ async function resolveEntityMetadata(req, context, page, id) {
             JOIN wec_manufacturers manufacturers ON manufacturers.id = carModels.manufacturerId
             WHERE carModels.id = ?
         `, [id]);
-        return rows.length ? {
-            title: entityPageTitle(rows[0].name, context.series.name, 'Car Model'),
-            description: `${rows[0].manufacturerName} ${rows[0].name} FIA World Endurance Championship race history${rows[0].regulation ? ` in the ${rows[0].regulation} regulations` : ''}.`
-        } : { robots: 'noindex, follow', notFound: true };
+        if (!rows.length) return { robots: 'noindex, follow', notFound: true };
+        const car = rows[0];
+        const fullName = car.name.toLowerCase().startsWith(car.manufacturerName.toLowerCase()) ? car.name : `${car.manufacturerName} ${car.name}`;
+        return {
+            title: entityPageTitle(car.name, context.series.name, 'Car Model'),
+            description: `${fullName} FIA World Endurance Championship race history${car.regulation ? ` in the ${car.regulation} regulations` : ''}.`,
+            initialContent: { kind: 'wec-profile', series: 'wec', profileType: 'carModel', entity: { id, name: car.name, manufacturerName: car.manufacturerName, regulation: car.regulation } }
+        };
     }
     if (context.series.key === 'wec' && page === 'entry') {
         const rows = await pool.query(`SELECT teams.name, competitors.carNumber FROM wec_competitors competitors JOIN wec_teams teams ON teams.id = competitors.teamId WHERE competitors.id = ?`, [id]);
-        return rows.length ? { title: `#${rows[0].carNumber} ${rows[0].name} · WEC Entry · Racelytic`, description: `WEC race history for the #${rows[0].carNumber} ${rows[0].name} entry.` } : { robots: 'noindex, follow', notFound: true };
+        return rows.length ? {
+            title: `#${rows[0].carNumber} ${rows[0].name} · WEC Entry · Racelytic`,
+            description: `WEC race history for the #${rows[0].carNumber} ${rows[0].name} entry.`,
+            initialContent: { kind: 'wec-profile', series: 'wec', profileType: 'entry', entity: { id, name: `#${rows[0].carNumber} ${rows[0].name}`, teamName: rows[0].name, carNumber: rows[0].carNumber } }
+        } : { robots: 'noindex, follow', notFound: true };
     }
     const prefix = SERIES_PREFIX[context.series.key];
     const entity = page === 'team' ? 'constructor' : page;
@@ -484,6 +518,7 @@ async function buildDynamicSitemapRoutes() {
         ['wec', '/wec', 'wec_seasons', 'season', 'year', 'year'],
         ['wec', '/wec', 'wec_events', 'race', 'id', 'id'],
         ['wec', '/wec', 'wec_drivers', 'driver', 'id', 'id'],
+        ['wec', '/wec', 'wec_circuits', 'circuit', 'id', 'id'],
         ['wec', '/wec', 'wec_teams', 'team', 'id', 'id'],
         ['wec', '/wec', 'wec_manufacturers', 'manufacturer', 'id', 'id'],
         ['wec', '/wec', 'wec_car_models', 'carModel', 'id', 'id'],

@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en"><head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Compare two FIA World Endurance Championship seasons across title fights, class results, consistency and championship fields.">
+  <link rel="icon" href="/assets/favicon-wec.svg" type="image/svg+xml"><title>WEC Season Comparison · Racelytic</title>
+  <link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/polish.css"><link rel="stylesheet" href="/css/season-analysis.css"><link rel="stylesheet" href="/css/f1-season-comparison.css"><link rel="stylesheet" href="/css/wec.css"><link rel="stylesheet" href="/css/wec-season-comparison.css">
+</head><body class="wec-mode" data-wec-view="season-comparison"><div id="header"></div>
+<main class="container page analysis-detail-page season-analysis-page season-comparison-page wec-season-comparison-page">
+  <header class="analysis-detail-head"><div>
+    <div class="eyebrow">WEC · SEASON COMPARISON</div>
+    <div class="comparison-title-row"><h1>Two endurance seasons, side by side</h1><div class="comparison-years" aria-label="Seasons to compare">
+      <select id="comparison-season-one" class="comparison-year first-year" aria-label="First season" disabled><option value="">—</option></select>
+      <button type="button" id="swap-seasons" aria-label="Swap seasons and championships" title="Swap seasons and championships" disabled>↔</button>
+      <select id="comparison-season-two" class="comparison-year second-year" aria-label="Second season" disabled><option value="">—</option></select>
+    </div></div>
+    <p>Compare championship battles across classes and eras without flattening endurance racing into one overall table.</p>
+  </div></header>
+  <p id="comparison-status" class="analysis-status" role="status">Loading WEC seasons…</p>
+  <div id="comparison-loaded" hidden>
+    <div class="wec-comparison-championships" aria-label="Championships to compare">
+      <label for="comparison-championship-one"><span id="championship-one-year">First season</span> championship<select id="comparison-championship-one" disabled></select></label>
+      <label for="comparison-championship-two"><span id="championship-two-year">Second season</span> championship<select id="comparison-championship-two" disabled></select></label>
+    </div>
+    <div id="comparison-season-heads" class="comparison-season-context" aria-label="Compared championships"></div>
+    <section id="season-analysis-workspace" aria-label="WEC season comparison">
+      <nav class="analysis-visualization-menu" aria-label="Comparison views">
+        <label class="analysis-mobile-view" for="comparison-view">Comparison view<select id="comparison-view"><option value="overview">Overview</option><option value="progression">Progression</option><option value="competition">Title fight</option><option value="field">Championship field</option></select></label>
+        <div class="analysis-visualization-tabs comparison-tabs" role="tablist" aria-label="WEC season comparison">
+          <button id="tab-overview" type="button" role="tab" aria-controls="panel-overview" aria-selected="true" data-comparison-view="overview">Overview</button>
+          <button id="tab-progression" type="button" role="tab" aria-controls="panel-progression" aria-selected="false" tabindex="-1" data-comparison-view="progression">Progression</button>
+          <button id="tab-competition" type="button" role="tab" aria-controls="panel-competition" aria-selected="false" tabindex="-1" data-comparison-view="competition">Title fight</button>
+          <button id="tab-field" type="button" role="tab" aria-controls="panel-field" aria-selected="false" tabindex="-1" data-comparison-view="field">Championship field</button>
+        </div>
+      </nav>
+      <div class="comparison-scope"><label for="comparison-basis">Compare<select id="comparison-basis"><option value="available">Available season results</option><option value="matched">Through the same round</option></select></label><label id="comparison-round-label" for="comparison-round" hidden>Through round<select id="comparison-round"></select></label><p id="comparison-scope-note" class="analysis-method"></p></div>
+      <div class="analysis-visualization-workspace">
+        <section id="panel-overview" role="tabpanel" aria-labelledby="tab-overview" data-comparison-panel="overview"><h2>Championship overview</h2><div id="comparison-overview" class="table-wrap" tabindex="0" aria-label="WEC championship comparison metrics; scroll horizontally for more columns"></div><p class="analysis-method">Differences are second season minus first—not a rating. Percentages make championships with different field sizes and points scales easier to compare.</p></section>
+        <section id="panel-progression" role="tabpanel" aria-labelledby="tab-progression" data-comparison-panel="progression" hidden><h2>Points progression</h2><p class="analysis-method">Each champion or comparison leader’s official cumulative points as a share of their total at the selected cutoff. This compares when points were earned, not the absolute scoring scales.</p><div id="comparison-progression-legend" class="comparison-chart-legend"></div><div id="comparison-progression-chart" class="interactive-chart"></div><div id="comparison-progression-readout" class="analysis-round-readout" aria-live="polite"></div></section>
+        <section id="panel-competition" role="tabpanel" aria-labelledby="tab-competition" data-comparison-panel="competition" hidden><h2>The title fight</h2><div id="comparison-competition-metrics" class="table-wrap" tabindex="0" aria-label="WEC title fight comparison metrics; scroll horizontally for more columns"></div><h3>Lead after each round</h3><p class="analysis-method">Gap between the first two classified championship entities as a percentage of the leader’s points. Official standings positions decide the leader; equal points are shown as a tie.</p><div id="comparison-margin-legend" class="comparison-chart-legend"></div><div id="comparison-margin-chart" class="interactive-chart"></div><div id="comparison-margin-readout" class="analysis-round-readout" aria-live="polite"></div></section>
+        <section id="panel-field" role="tabpanel" aria-labelledby="tab-field" data-comparison-panel="field" hidden><div class="comparison-field-head"><h2>Championship fields</h2><label for="comparison-field-size">Show<select id="comparison-field-size"><option value="all">Full field</option><option value="ten">Top ten by standing</option></select></label></div><p class="analysis-method">Each championship remains a separate field. Averages use positive class positions; lower finish spread means more consistent classified results. For manufacturers, each round uses that manufacturer’s best classified car.</p><div id="comparison-fields" class="comparison-fields"></div></section>
+        <details class="comparison-methodology"><summary>Definitions and data notes</summary><div id="comparison-data-notes"></div><p>Race-result measures use the class scope attached to each selected championship. Non-classified rate includes recorded starts without a positive class position; did-not-start records are excluded from the denominator. Disqualified and excluded entries remain unclassified.</p><p>Matched-round mode uses official cumulative championship standings through the same round number. Raw point totals remain dependent on the rules and race lengths of each season, so normalized charts and rates are the safer cross-era comparison.</p></details>
+      </div>
+    </section>
+  </div>
+</main><footer class="footer"><div class="container">Racelytic</div></footer>
+<script src="/js/utils.js"></script><script src="/js/header.js"></script><script src="/js/wec-season-comparison-model.js"></script><script src="/js/wec-season-comparison.js"></script>
+</body></html>

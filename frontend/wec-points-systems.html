@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Compare WEC-inspired positional scoring and endurance-race weights, then create reusable custom rules for WEC simulation tools.">
+  <link rel="icon" href="/assets/favicon-wec.svg" type="image/svg+xml">
+  <title>WEC Points Systems · Racelytic</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/polish.css">
+  <link rel="stylesheet" href="/css/points-systems.css">
+  <link rel="stylesheet" href="/css/wec.css">
+  <link rel="stylesheet" href="/css/wec-points-systems.css">
+</head>
+<body class="wec-mode">
+  <div id="header"></div>
+  <nav class="points-local-nav" aria-label="WEC points-system sections"><div class="container"><a href="#wec-points-presets">Scoring presets</a><a href="#wec-points-compare">Compare systems</a><a href="#your-systems">Your systems</a></div></nav>
+  <main class="container page points-library-page wec-points-page">
+    <header class="points-page-heading"><div class="eyebrow">WEC CHAMPIONSHIP RULES</div><h1>Shape the value of endurance</h1><p>Choose positional points and how much extended races and Le Mans count. Compare model presets, create your own rules, and use them in every WEC simulator tool.</p></header>
+    <section id="wec-points-presets" class="points-history" aria-labelledby="wec-points-presets-title"><div class="section-heading"><div><div class="eyebrow">STARTING POINTS</div><h2 id="wec-points-presets-title">Scoring presets</h2></div></div><p class="points-section-intro">These are hypothetical modeling presets, not a reconstruction of every season’s official regulations. All use class finishing positions; bonuses, penalties and participation points are outside these tools.</p><div id="wec-points-preset-grid" class="wec-points-card-grid"></div></section>
+    <section id="wec-points-compare" class="points-compare" aria-labelledby="wec-points-compare-title"><div class="section-heading"><div><div class="eyebrow">SIDE BY SIDE</div><h2 id="wec-points-compare-title">Compare scoring rules</h2></div><button class="button secondary" id="wec-points-copy" type="button">Copy comparison link</button></div><div class="points-compare-controls"><label><span>First system</span><select id="wec-points-first"></select></label><span aria-hidden="true">vs</span><label><span>Second system</span><select id="wec-points-second"></select></label></div><div id="wec-points-comparison" class="points-compare-result" tabindex="0" aria-live="polite"></div></section>
+    <section id="wec-points-login" class="points-login-prompt" hidden><div><strong>Sign in to save custom WEC rules</strong><span>Presets and public systems are available now. An account lets you save and reuse your own.</span></div><a class="button primary" href="/account?series=wec">Sign in or create account</a></section>
+    <section id="your-systems" class="points-custom" aria-labelledby="wec-your-systems-title"><div class="section-heading"><div><div class="eyebrow">YOUR LIBRARY</div><h2 id="wec-your-systems-title">WEC points systems</h2></div><button class="button primary" id="wec-points-new" type="button" hidden>New points system</button></div><div id="wec-points-owned" class="wec-points-card-grid"></div>
+      <form id="wec-points-form" class="wec-points-form" hidden novalidate><input id="wec-points-id" type="hidden"><div class="points-form-heading"><div><span>WEC RULESET</span><h3 id="wec-points-form-title">Create points system</h3></div><button id="wec-points-close" type="button" class="text-link">Close editor</button></div><div class="wec-points-form-grid"><div><label><span>Name</span><input id="wec-points-name" maxlength="100" required placeholder="My endurance points"></label><label><span>Class-position points</span><input id="wec-points-positions" type="text" inputmode="decimal" aria-describedby="wec-points-position-note"><small id="wec-points-position-note">Comma-separated, first place first. Up to 30 positions.</small></label><div class="wec-points-multipliers"><label><span>Extended race multiplier</span><input id="wec-points-extended" type="number" min="0" max="5" step="0.01"></label><label><span>Le Mans multiplier</span><input id="wec-points-le-mans" type="number" min="0" max="5" step="0.01"></label></div><label><span>Visibility</span><select id="wec-points-visibility"><option value="private">Private</option><option value="public">Public · shareable</option></select></label></div><aside class="points-live-preview"><div class="eyebrow">LIVE PREVIEW</div><h3 id="wec-points-preview-name">Untitled points system</h3><p id="wec-points-preview-status" role="status"></p><div id="wec-points-preview-scores"></div><div id="wec-points-preview-links" class="points-use-links"></div><div class="points-form-actions"><button class="button primary" type="submit">Save points system</button><button class="button secondary" id="wec-points-delete" type="button" hidden>Delete system</button></div><p id="wec-points-message" class="account-message" aria-live="polite"></p></aside></div></form>
+      <section class="points-community"><div class="section-heading"><div><div class="eyebrow">PUBLIC SYSTEMS</div><h2>Community WEC rules</h2></div><label class="points-community-search"><span>Search</span><input id="wec-points-search" type="search" placeholder="Search public rules"></label></div><div id="wec-points-public" class="wec-points-card-grid"></div></section>
+    </section>
+  </main>
+  <footer class="footer"><div class="container">Racelytic</div></footer>
+  <script src="/js/utils.js"></script>
+  <script src="/js/header.js"></script>
+  <script src="/js/wec-simulate-season-model.js"></script>
+  <script src="/js/wec-points-systems.js"></script>
+</body>
+</html>

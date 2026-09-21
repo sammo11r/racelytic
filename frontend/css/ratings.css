@@ -187,6 +187,7 @@ body[data-ratings-view="leaderboard"] .ratings-hero-copy { max-width: 800px; }
 body[data-ratings-view="leaderboard"] .ratings-hero h1 { margin: 8px 0 12px; font-size: clamp(38px, 5vw, 60px); line-height: 1; letter-spacing: -.055em; }
 body[data-ratings-view="leaderboard"] .ratings-hero-copy > p { max-width: 760px; font-size: 14px; line-height: 1.55; }
 body[data-ratings-view="leaderboard"] .ratings-hero-note { display: none; }
+.wec-mode .ratings-content .pagination-count { color: #555d68; }
 body[data-ratings-view="leaderboard"] .ratings-explorer { padding-top: 26px; }
 body[data-ratings-view="leaderboard"] .ratings-heading { justify-content: flex-end; }
 body[data-ratings-view="leaderboard"] .ratings-heading > div:first-child { display: none; }
@@ -536,6 +537,17 @@ body[data-ratings-view="compare"] .ratings-heading,
 body[data-ratings-view="driver"] .ratings-heading { display: flex; }
 body[data-ratings-view="compare"] .ratings-controls,
 body[data-ratings-view="driver"] .ratings-controls { display: none; }
+body.wec-mode[data-ratings-view="compare"] .ratings-controls,
+body.wec-mode[data-ratings-view="driver"] .ratings-controls {
+  display: grid;
+  grid-template-columns: minmax(210px, 300px);
+  align-content: center;
+  padding: 13px;
+}
+body.wec-mode[data-ratings-view="compare"] .ratings-year-control,
+body.wec-mode[data-ratings-view="compare"] .ratings-min-events-control,
+body.wec-mode[data-ratings-view="driver"] .ratings-year-control,
+body.wec-mode[data-ratings-view="driver"] .ratings-min-events-control { display: none; }
 
 .ratings-timeline-season-picker { display: grid; gap: 3px; }
 .ratings-timeline-season-picker > span { color: #626975; font-size: 8px; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; }

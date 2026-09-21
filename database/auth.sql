@@ -48,6 +48,7 @@ CREATE TABLE IF NOT EXISTS app_points_systems (
     id CHAR(36) NOT NULL,
     user_id CHAR(36) NOT NULL,
     name VARCHAR(100) NOT NULL,
+    series VARCHAR(12) NOT NULL DEFAULT 'all',
     race_points JSON NOT NULL,
     sprint_points JSON NOT NULL,
     qualifying_points JSON NULL,
@@ -62,6 +63,8 @@ CREATE TABLE IF NOT EXISTS app_points_systems (
     sprint_counts_toward_round TINYINT(1) NOT NULL DEFAULT 1,
     visibility ENUM('private', 'public') NOT NULL DEFAULT 'private',
     tie_breaker VARCHAR(30) NOT NULL DEFAULT 'countback',
+    extended_multiplier DECIMAL(4,2) NOT NULL DEFAULT 1.00,
+    le_mans_multiplier DECIMAL(4,2) NOT NULL DEFAULT 1.00,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
@@ -76,6 +79,9 @@ ALTER TABLE app_points_systems ADD COLUMN IF NOT EXISTS best_first_rounds SMALLI
 ALTER TABLE app_points_systems ADD COLUMN IF NOT EXISTS first_rounds_window SMALLINT NULL AFTER best_first_rounds;
 ALTER TABLE app_points_systems ADD COLUMN IF NOT EXISTS best_last_rounds SMALLINT NULL AFTER first_rounds_window;
 ALTER TABLE app_points_systems ADD COLUMN IF NOT EXISTS last_rounds_window SMALLINT NULL AFTER best_last_rounds;
+ALTER TABLE app_points_systems ADD COLUMN IF NOT EXISTS series VARCHAR(12) NOT NULL DEFAULT 'all' AFTER name;
+ALTER TABLE app_points_systems ADD COLUMN IF NOT EXISTS extended_multiplier DECIMAL(4,2) NOT NULL DEFAULT 1.00 AFTER tie_breaker;
+ALTER TABLE app_points_systems ADD COLUMN IF NOT EXISTS le_mans_multiplier DECIMAL(4,2) NOT NULL DEFAULT 1.00 AFTER extended_multiplier;
 
 CREATE TABLE IF NOT EXISTS app_saved_records (
     id CHAR(36) NOT NULL,

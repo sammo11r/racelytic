@@ -166,6 +166,34 @@ function renderCircuitContent(html, initial) {
         .replace(/(<a id="circuit-analysis-link"[^>]+href=")[^"]*(")/, `$1${base}/circuit-analysis?id=${encodeURIComponent(circuit.id)}$2`);
 }
 
+function renderWecCircuitContent(html, initial) {
+    const circuit = initial.circuit;
+    const place = [circuit.placeName, circuit.countryName].filter(Boolean).join(' · ');
+    const metadata = [circuit.type ? `${titleCase(circuit.type)} circuit` : '', circuit.direction ? titleCase(circuit.direction) : ''].filter(Boolean);
+    const map = circuit.layoutId
+        ? `<img id="wec-circuit-detail-map" src="/assets/circuits/${encodeURIComponent(circuit.layoutId)}.svg" alt="Track outline of ${escapeHtml(circuit.name)}" decoding="async">`
+        : '<span>Layout unavailable</span>';
+    const hero = `<div id="wec-circuit-hero" aria-busy="false"><section class="wec-circuit-detail-hero"><div><p class="eyebrow">WEC CIRCUIT</p><h1>${escapeHtml(circuit.name)}</h1><p>${escapeHtml(place)}</p><div class="wec-circuit-detail-meta">${metadata.map(value => `<span>${escapeHtml(value)}</span>`).join('')}</div></div><figure>${map}<figcaption>Current / last recorded layout</figcaption></figure></section></div>`;
+    return html.replace(/<div id="wec-circuit-hero" aria-busy="true"><div class="wec-circuit-detail-skeleton wec-circuit-hero-skeleton" aria-hidden="true"><\/div><\/div>/, hero);
+}
+
+function renderWecProfileContent(html, initial) {
+    const labels = { driver: 'WEC DRIVER', team: 'WEC TEAM', manufacturer: 'WEC MANUFACTURER', carModel: 'WEC CAR', entry: 'WEC ENTRY' };
+    const descriptions = {
+        driver: 'Driver results, teams and season history.',
+        team: 'Team entries, victories and championship history.',
+        manufacturer: 'Manufacturer entries and race results.',
+        carModel: [initial.entity.manufacturerName, initial.entity.regulation].filter(Boolean).join(' · '),
+        entry: 'Numbered entry, crew and race history.'
+    };
+    const heading = `<header id="wec-entity-heading" class="wec-page-head"><p class="eyebrow">${labels[initial.profileType] || 'WEC ARCHIVE PROFILE'}</p><h1>${escapeHtml(initial.entity.name)}</h1><p>${escapeHtml(descriptions[initial.profileType] || 'World Endurance Championship archive profile.')}</p></header>`;
+    return html.replace(/<header id="wec-entity-heading" class="wec-page-head">[\s\S]*?<\/header>/, heading);
+}
+
+function renderWecSeasonContent(html, initial) {
+    return replaceElementText(replaceElementText(html, 'wec-season-year', initial.year), 'wec-season-name', initial.name);
+}
+
 function replaceElementText(html, id, value) {
     return html.replace(new RegExp(`(<[^>]+id="${id}"[^>]*>)[^<]*(<\\/[^>]+>)`), `$1${escapeHtml(value)}$2`);
 }
@@ -245,9 +273,11 @@ function renderChassisContent(html, initial) {
 
 function renderInitialSeoContent(html, initial) {
     if (!initial) return html;
+    if (initial.kind === 'wec-profile') return renderWecProfileContent(html, initial);
+    if (initial.kind === 'wec-season') return renderWecSeasonContent(html, initial);
     if (initial.kind === 'driver') return renderDriverContent(html, initial);
     if (initial.kind === 'constructor') return renderConstructorContent(html, initial);
-    if (initial.kind === 'circuit') return renderCircuitContent(html, initial);
+    if (initial.kind === 'circuit') return initial.series === 'wec' ? renderWecCircuitContent(html, initial) : renderCircuitContent(html, initial);
     if (initial.kind === 'season') return renderSeasonContent(html, initial);
     if (initial.kind === 'race') return renderRaceContent(html, initial);
     if (initial.kind === 'chassis') return renderChassisContent(html, initial);

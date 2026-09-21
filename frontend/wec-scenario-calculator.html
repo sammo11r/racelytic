@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Predict WEC class championship run-ins from official standings and explore how endurance-race results change the title outlook.">
+  <link rel="icon" href="/assets/favicon-wec.svg" type="image/svg+xml">
+  <title>WEC Scenario Calculator · Racelytic</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/polish.css">
+  <link rel="stylesheet" href="/css/scenario-calculator.css">
+  <link rel="stylesheet" href="/css/wec.css">
+  <link rel="stylesheet" href="/css/wec-simulator.css">
+</head>
+<body class="wec-mode">
+  <div id="header"></div>
+  <main class="container page scenario-page wec-scenario-page">
+    <header class="scenario-page-heading"><a class="back-link" href="/wec/simulator">← WEC simulator</a><div class="eyebrow">WEC CHAMPIONSHIP SCENARIOS</div><h1>Rewrite the class title run-in</h1><p>Start from the official standings after any round, then predict class finishes in the remaining endurance races.</p></header>
+    <section class="scenario-setup" aria-label="Scenario settings">
+      <div class="scenario-controls wec-scenario-controls">
+        <label><span>Season</span><select id="wec-scenario-season" disabled><option>Loading seasons…</option></select></label>
+        <label><span>Championship</span><select id="wec-scenario-championship" disabled><option>Choose a season</option></select></label>
+        <label><span>Official standings after</span><select id="wec-scenario-cutoff" disabled><option>Choose a championship</option></select></label>
+        <label><span>Projected points system</span><select id="wec-scenario-preset"><option value="weighted">WEC-inspired distance weighting</option><option value="equal">Equal-weight races</option><option value="classic">Classic top-six</option></select><small><a href="/wec/points-systems">Explore WEC rules →</a></small></label>
+        <button id="wec-scenario-reset" type="button" disabled>Reset scenario</button>
+      </div>
+      <p class="wec-scenario-rules">Past points remain official. Predicted races use the chosen positional scale and each event’s distance multiplier. Shared-crew drivers may receive the same class finish.</p>
+    </section>
+    <p id="wec-scenario-status" class="section-note" role="status">Loading WEC seasons…</p>
+    <section id="wec-scenario-summary" class="scenario-summary" aria-label="Projected championship outlook"></section>
+    <section class="scenario-workspace">
+      <div class="scenario-editor">
+        <div class="section-heading"><div><div class="eyebrow">PREDICTED CLASSIFICATION</div><h2>Edit an endurance race</h2></div><label class="scenario-race-choice"><span>Race</span><select id="wec-scenario-race" disabled></select></label></div>
+        <div class="wec-scenario-toolbar"><label><span class="sr-only">Filter competitors</span><input id="wec-scenario-filter" type="search" placeholder="Find a driver, team or manufacturer"></label><button id="wec-scenario-official" type="button" disabled>Use recorded result</button><button id="wec-scenario-clear" type="button" disabled>Clear this race</button></div>
+        <div id="wec-scenario-grid"><div class="empty-state">Choose a season to begin.</div></div>
+      </div>
+      <aside class="scenario-outlook"><div class="section-heading"><div><div class="eyebrow">TITLE OUTLOOK</div><h2>Projected standings</h2></div></div><div id="wec-scenario-standings"></div></aside>
+    </section>
+    <p class="wec-simulator-method">A finish is a class position, not an overall position. Unassigned or non-classified entries score zero. This is a hypothetical model: bonuses, penalties, partial points and official tie regulations are not reconstructed. For driver championships, assign the same finish to crewmates and keep unrelated cars in a plausible order.</p>
+  </main>
+  <footer class="footer"><div class="container">Racelytic</div></footer>
+  <script src="/js/utils.js"></script>
+  <script src="/js/header.js"></script>
+  <script src="/js/wec-simulate-season-model.js"></script>
+  <script src="/js/wec-scenario-model.js"></script>
+  <script src="/js/wec-scenario-calculator.js"></script>
+</body>
+</html>

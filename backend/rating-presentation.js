@@ -5,7 +5,8 @@ const EVIDENCE_THRESHOLDS = Object.freeze({
     f2: Object.freeze({ measured: 8, stable: 30 }),
     f3: Object.freeze({ measured: 8, stable: 24 }),
     academy: Object.freeze({ measured: 6, stable: 16 }),
-    fe: Object.freeze({ measured: 8, stable: 30 })
+    fe: Object.freeze({ measured: 8, stable: 30 }),
+    wec: Object.freeze({ measured: 6, stable: 20 })
 });
 
 function evidenceThresholds(series) {

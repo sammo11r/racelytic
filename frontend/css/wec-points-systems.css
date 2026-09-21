@@ -1,0 +1,33 @@
+.wec-points-page .points-history { margin-top: 44px; }
+.wec-points-card-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-top: 18px; }
+.wec-points-card { display: grid; align-content: start; gap: 11px; min-width: 0; padding: 20px; border: 1px solid var(--border); border-radius: 13px; background: var(--surface); box-shadow: var(--shadow-small); }
+.wec-points-card > span { color: var(--accent); font-size: 10px; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; }
+.wec-points-card h3 { margin: 0; font-size: 20px; }
+.wec-points-card p { margin: 0; color: var(--text-secondary); font-size: 12px; line-height: 1.55; }
+.wec-points-card dl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 0; }
+.wec-points-card dl > div { min-width: 0; padding: 10px; border-radius: 8px; background: var(--surface-alt); }
+.wec-points-card dt { color: var(--text-secondary); font-size: 9px; font-weight: 800; text-transform: uppercase; }
+.wec-points-card dd { overflow-wrap: anywhere; margin: 4px 0 0; font-size: 12px; font-weight: 750; }
+.wec-points-card-actions { display: flex; flex-wrap: wrap; gap: 7px; margin-top: auto; }
+.wec-points-card-actions a, .wec-points-card-actions button { min-height: 35px; padding: 8px 10px; border: 1px solid var(--border); border-radius: 7px; background: #fff; color: var(--text); font: inherit; font-size: 11px; font-weight: 750; text-decoration: none; cursor: pointer; }
+.wec-points-card-actions a:first-child { border-color: var(--accent); background: var(--accent); color: #fff; }
+.wec-points-card-actions a:hover, .wec-points-card-actions button:hover { border-color: var(--accent); }
+.wec-points-page .points-compare, .wec-points-page .points-custom { margin-top: 54px; }
+.wec-points-form { margin-top: 20px; padding: 22px; border: 1px solid var(--border); border-radius: 13px; background: var(--surface); }
+.wec-points-form-grid { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(280px, .8fr); gap: 22px; margin-top: 18px; }
+.wec-points-form-grid > div:first-child { display: grid; align-content: start; gap: 16px; }
+.wec-points-form-grid label { display: grid; gap: 7px; font-size: 11px; font-weight: 750; }
+.wec-points-form-grid label > span { color: var(--text-muted); font-size: 9px; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; }
+.wec-points-form-grid input, .wec-points-form-grid select { width: 100%; min-height: 43px; padding: 8px 11px; border: 1px solid var(--border); border-radius: 8px; background: #fff; color: var(--text); font: inherit; }
+.wec-points-form-grid small { color: var(--text-secondary); font-weight: 400; }
+.wec-points-multipliers { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.wec-points-form .points-live-preview { position: static; min-width: 0; }
+.wec-points-form .points-live-preview > p { font-size: 12px; line-height: 1.5; }
+.wec-points-form .points-live-preview [id$="scores"] { display: grid; gap: 8px; margin: 15px 0; }
+.wec-points-form .points-live-preview [id$="scores"] > div { padding: 10px; border-radius: 8px; background: var(--surface-alt); }
+.wec-points-form .points-live-preview [id$="scores"] span { display: block; color: var(--text-muted); font-size: 9px; text-transform: uppercase; }
+.wec-points-form .points-live-preview [id$="scores"] strong { display: block; margin-top: 3px; font-size: 12px; }
+.wec-points-form .points-use-links { margin: 10px 0; }
+.wec-points-empty { grid-column: 1 / -1; padding: 25px; border: 1px dashed var(--border); border-radius: 10px; color: var(--text-secondary); }
+@media (max-width: 1000px) { .wec-points-card-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 700px) { .wec-points-card-grid, .wec-points-form-grid, .wec-points-multipliers { grid-template-columns: 1fr; } .wec-points-form { padding: 18px; } }

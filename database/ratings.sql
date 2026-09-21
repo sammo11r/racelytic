@@ -34,10 +34,19 @@ CREATE TABLE IF NOT EXISTS app_driver_rating_events (
     key_rival_name VARCHAR(160) NULL,
     key_rival_rating DECIMAL(10,3) NULL,
     key_rival_outcome VARCHAR(12) NULL,
+    class_id VARCHAR(100) NULL,
+    class_code VARCHAR(40) NULL,
+    class_name VARCHAR(100) NULL,
+    class_scope VARCHAR(24) NULL,
+    entry_id VARCHAR(160) NULL,
+    car_number VARCHAR(12) NULL,
+    manufacturer_name VARCHAR(160) NULL,
+    crew_size SMALLINT NULL,
     PRIMARY KEY (model_version, series, event_id, driver_id),
     KEY app_rating_driver_timeline (model_version, series, driver_id, event_date),
     KEY app_rating_event_date (model_version, series, event_date),
-    KEY app_rating_year (model_version, series, year)
+    KEY app_rating_year (model_version, series, year),
+    KEY app_rating_class (model_version, series, class_scope, event_date)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 ALTER TABLE app_driver_rating_events ADD COLUMN IF NOT EXISTS event_weight DECIMAL(7,4) NULL;
@@ -54,6 +63,15 @@ ALTER TABLE app_driver_rating_events ADD COLUMN IF NOT EXISTS key_rival_id VARCH
 ALTER TABLE app_driver_rating_events ADD COLUMN IF NOT EXISTS key_rival_name VARCHAR(160) NULL;
 ALTER TABLE app_driver_rating_events ADD COLUMN IF NOT EXISTS key_rival_rating DECIMAL(10,3) NULL;
 ALTER TABLE app_driver_rating_events ADD COLUMN IF NOT EXISTS key_rival_outcome VARCHAR(12) NULL;
+ALTER TABLE app_driver_rating_events ADD COLUMN IF NOT EXISTS class_id VARCHAR(100) NULL;
+ALTER TABLE app_driver_rating_events ADD COLUMN IF NOT EXISTS class_code VARCHAR(40) NULL;
+ALTER TABLE app_driver_rating_events ADD COLUMN IF NOT EXISTS class_name VARCHAR(100) NULL;
+ALTER TABLE app_driver_rating_events ADD COLUMN IF NOT EXISTS class_scope VARCHAR(24) NULL;
+ALTER TABLE app_driver_rating_events ADD COLUMN IF NOT EXISTS entry_id VARCHAR(160) NULL;
+ALTER TABLE app_driver_rating_events ADD COLUMN IF NOT EXISTS car_number VARCHAR(12) NULL;
+ALTER TABLE app_driver_rating_events ADD COLUMN IF NOT EXISTS manufacturer_name VARCHAR(160) NULL;
+ALTER TABLE app_driver_rating_events ADD COLUMN IF NOT EXISTS crew_size SMALLINT NULL;
+ALTER TABLE app_driver_rating_events ADD INDEX IF NOT EXISTS app_rating_class (model_version, series, class_scope, event_date);
 
 CREATE TABLE IF NOT EXISTS app_rating_runs (
     model_version VARCHAR(20) NOT NULL,

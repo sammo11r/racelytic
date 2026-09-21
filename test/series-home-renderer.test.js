@@ -4,7 +4,7 @@ const { SERIES_HOME_CONFIG, SERIES_HOME_PREVIEWS, renderSeriesHome } = require('
 const { seriesPageRoutes } = require('../backend/series-pages');
 
 test('all championship landing pages use the shared template configuration', () => {
-    assert.deepEqual(Object.keys(SERIES_HOME_CONFIG), ['f1', 'f2', 'f3', 'academy', 'fe']);
+    assert.deepEqual(Object.keys(SERIES_HOME_CONFIG), ['f1', 'f2', 'f3', 'academy', 'fe', 'wec']);
 
     for (const [key, config] of Object.entries(SERIES_HOME_CONFIG)) {
         assert.equal(config.key, key);
@@ -35,6 +35,7 @@ test('series-specific capabilities and identity stay distinct', () => {
     const f3 = renderSeriesHome('f3');
     const academy = renderSeriesHome('academy');
     const fe = renderSeriesHome('fe');
+    const wec = renderSeriesHome('wec');
 
     assert.match(f1, /href="\/simulator\?year=2008&amp;points=1991-2002"/);
     assert.doesNotMatch(f2 + f3 + academy, /href="\/simulate-race"/);
@@ -45,6 +46,11 @@ test('series-specific capabilities and identity stay distinct', () => {
     assert.match(fe, /href="\/formula-e\/seasons"/);
     assert.match(fe, /href="\/formula-e\/champions-quiz"/);
     assert.doesNotMatch(fe, /\/formula-e\/ask/);
+    assert.match(wec, /class="wec-mode"/);
+    assert.match(wec, /href="\/wec\/season-analysis\?year=2025"/);
+    assert.match(wec, /href="\/wec\/driver-comparison\?first=sebastien-buemi&amp;second=brendon-hartley"/);
+    assert.match(wec, /href="\/wec\/lights-out"/);
+    assert.doesNotMatch(wec, /\/wec\/ask/);
     assert.ok(new Set(seriesPageRoutes().map(page => page.route)).has('/formula-e/simulator'));
     assert.match(academy, /href="\/account\?series=academy"/);
     assert.match(f2, /href="\/f2\/champions-quiz"/);
@@ -84,7 +90,7 @@ test('every hero leads with its own two-tone motto and no eyebrow or buttons', (
     const f1Hero = hero('f1');
     assert.doesNotMatch(f1Hero, /class="eyebrow"|class="hero-actions"|latest-season-link/);
     assert.match(f1Hero, /<h1>.*<span>.*<\/span><\/h1>/);
-    for (const key of ['f2', 'f3', 'academy']) {
+    for (const key of ['f2', 'f3', 'academy', 'wec']) {
         assert.doesNotMatch(hero(key), /class="eyebrow"|class="hero-actions"|latest-season-link/);
         assert.ok(hero(key).includes(SERIES_HOME_CONFIG[key].headline));
         assert.ok(hero(key).includes(SERIES_HOME_CONFIG[key].subheadline));
@@ -95,7 +101,7 @@ test('every current-season section uses its accent label as the accessible headi
     const f1 = renderSeriesHome('f1');
     assert.match(f1, /<h2 class="eyebrow" id="season-snapshot-title">CURRENT SEASON<\/h2>/);
     assert.doesNotMatch(f1, /The championship at a glance/);
-    for (const key of ['f2', 'f3', 'academy']) {
+    for (const key of ['f2', 'f3', 'academy', 'wec']) {
         assert.match(renderSeriesHome(key), /<h2 class="eyebrow" id="season-snapshot-title">CURRENT SEASON<\/h2>/);
         assert.doesNotMatch(renderSeriesHome(key), /The championship at a glance/);
     }
@@ -121,7 +127,7 @@ test('every series closes with a compact account invitation preserving its champ
     assert.match(f1, /href="\/account\?series=f1&amp;tab=register">Create an account/);
     assert.match(f1, /class="home-account-signin" href="\/account\?series=f1">Sign in/);
     assert.doesNotMatch(f1, /YOUR RACELYTIC|One account\. Every series/);
-    for (const key of ['f2', 'f3', 'academy']) {
+    for (const key of ['f2', 'f3', 'academy', 'wec']) {
         const html = renderSeriesHome(key);
         assert.match(html, /home-community-compact/);
         assert.doesNotMatch(html, /One account\. Every series|YOUR RACELYTIC/);
@@ -174,4 +180,47 @@ const { resourceUrl } = require('./frontend-resource-routes');
     assert.equal(elements.get('snapshot-season-link').href, '/seasons/2026');
     assert.equal(elements.get('snapshot-season').textContent, 2026);
     assert.equal(elements.get('snapshot-leader').textContent, 'Test driver');
+});
+
+test('WEC snapshot keeps endurance labels and routes in the shared landing script', async () => {
+    const fs = require('node:fs');
+    const path = require('node:path');
+    const vm = require('node:vm');
+    const { resourceUrl } = require('./frontend-resource-routes');
+    const elements = new Map();
+    const stats = Array.from({ length: 4 }, () => ({}));
+    const requests = [];
+    const context = {
+        document: {
+            body: { dataset: { seriesHome: 'wec' } },
+            querySelectorAll: selector => selector === '#series-stats .metric strong' ? stats : [],
+            getElementById: id => {
+                if (id === 'latest-season-link') return null;
+                if (!elements.has(id)) elements.set(id, {});
+                return elements.get(id);
+            }
+        },
+        getJSON: async url => {
+            requests.push(url);
+            return {
+                seasons: 14, drivers: 916, constructors: 235, circuits: 16, latestSeason: 2026,
+                currentSeason: {
+                    rounds: 8,
+                    leader: { name: 'René Rast / Robin Frijns', points: 75, label: 'Drivers’ championship leaders' },
+                    latestEvent: { id: 'wec-2026-r5-cota', name: 'Lone Star Le Mans', round: 5, date: '2026-09-06' }
+                }
+            };
+        },
+        fmtNumber: String,
+        fmtDate: value => value,
+        displayRaceName: event => event.name,
+        resourceUrl,
+        console: { error: assert.fail }
+    };
+    await vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../frontend/js/series-home.js'), 'utf8'), context);
+    assert.deepEqual(requests, ['/api/dashboard?series=wec']);
+    assert.equal(elements.get('snapshot-season-link').href, '/wec/seasons/2026');
+    assert.equal(elements.get('snapshot-leader-label').textContent, 'Drivers’ championship leaders');
+    assert.match(elements.get('snapshot-event-link').href, /^\/wec\/races\/wec-2026-r5-cota\//);
+    assert.deepEqual(stats.map(item => item.textContent), ['14', '916', '235', '16']);
 });

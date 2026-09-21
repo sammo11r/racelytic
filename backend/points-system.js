@@ -53,12 +53,22 @@ function validatePointsSystem(input) {
     }
 
     const visibility = input.visibility === 'public' ? 'public' : 'private';
+    const series = input.series === 'wec' ? 'wec' : 'all';
+    const multiplier = (value, label) => {
+        const number = value === undefined || value === null ? 1 : Number(value);
+        if (!Number.isFinite(number) || number < 0 || number > 5 || Math.abs(Math.round(number * 100) - number * 100) > 1e-8) {
+            throw new Error(`${label} must be between 0 and 5 with at most two decimal places.`);
+        }
+        return number;
+    };
     return {
-        name, racePoints, sprintPoints, qualifyingPoints, poleBonus, fastestLapBonus,
+        name, series, racePoints, sprintPoints, qualifyingPoints, poleBonus, fastestLapBonus,
         fastestLapMaxPosition, countBestRounds, bestFirstRounds, firstRoundsWindow,
         bestLastRounds, lastRoundsWindow,
         sprintCountsTowardRound: input.sprintCountsTowardRound !== false,
-        visibility, tieBreaker: 'countback'
+        visibility, tieBreaker: 'countback',
+        extendedMultiplier: multiplier(input.extendedMultiplier, 'Extended-race multiplier'),
+        leMansMultiplier: multiplier(input.leMansMultiplier, 'Le Mans multiplier')
     };
 }
 
@@ -69,6 +79,7 @@ function serialize(row) {
         userId: row.userId,
         ownerName: row.ownerName,
         name: row.name,
+        series: row.series || 'all',
         racePoints: json(row.racePoints),
         sprintPoints: json(row.sprintPoints),
         qualifyingPoints: json(row.qualifyingPoints),
@@ -83,6 +94,8 @@ function serialize(row) {
         sprintCountsTowardRound: Boolean(row.sprintCountsTowardRound),
         visibility: row.visibility,
         tieBreaker: row.tieBreaker,
+        extendedMultiplier: Number(row.extendedMultiplier ?? 1),
+        leMansMultiplier: Number(row.leMansMultiplier ?? 1),
         createdAt: row.createdAt,
         updatedAt: row.updatedAt
     };

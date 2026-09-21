@@ -25,17 +25,19 @@
 .wec-champion-card > * { position: relative; z-index: 1; }
 .wec-champion-category { display: flex; gap: 10px; align-items: baseline; margin-bottom: 20px; }
 .wec-champion-category > span { color: var(--accent); font: 850 11px/1 'Barlow Condensed', sans-serif; }
-.wec-champion-card.is-primary .wec-champion-category > span { color: rgba(255,255,255,.68); }
+.wec-champion-card.is-primary .wec-champion-category > span { color: #fff; }
 .wec-champion-card h3 { margin: 0; font-size: 24px; }
 .wec-champion-card dl { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 15px 18px; margin: 0; }
 .wec-champion-card dl div { display: grid; align-content: start; gap: 5px; }
-.wec-champion-card dt { color: var(--text-muted); font-size: 9px; font-weight: 850; letter-spacing: .09em; text-transform: uppercase; }
+.wec-champion-card dt { color: var(--text-secondary); font-size: 9px; font-weight: 850; letter-spacing: .09em; text-transform: uppercase; }
 .wec-champion-card dd { margin: 0; font-weight: 800; line-height: 1.35; }
+.wec-champion-card dd small { display: block; margin-top: 4px; color: var(--text-secondary); font-size: 10px; font-weight: 700; }
 .wec-champion-card dd a { color: inherit; text-decoration: none; }
 .wec-champion-card dd a:hover { color: var(--accent-dark); text-decoration: underline; text-underline-offset: 3px; }
 .wec-champion-card dd a span { margin-right: 5px; color: var(--accent-dark); }
 .wec-champion-card dd i { color: var(--text-muted); font-style: normal; font-weight: 500; }
-.wec-champion-card.is-primary dt, .wec-champion-card.is-primary dd i { color: rgba(255,255,255,.66); }
+.wec-champion-card.is-primary dt, .wec-champion-card.is-primary dd i { color: #fff; }
+.wec-champion-card.is-primary dd small { color: #fff; }
 .wec-champion-card.is-primary dd a:hover { color: #fff; }
 .wec-champion-card.is-primary dd a span { color: rgba(255,255,255,.76); }
 .wec-race-results { margin-top: 32px; }
@@ -48,7 +50,7 @@
 .wec-race-results-table th, .wec-race-results-table td { padding: 16px 17px; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); text-align: left; vertical-align: top; }
 .wec-race-results-table tr > :last-child { border-right: 0; }
 .wec-race-results-table tbody tr:last-child > * { border-bottom: 0; }
-.wec-race-results-table thead th { background: var(--surface-alt); color: var(--text-muted); font-size: 9px; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; white-space: nowrap; }
+.wec-race-results-table thead th { background: var(--surface-alt); color: #555d68; font-size: 9px; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; white-space: nowrap; }
 .wec-race-results-table thead th:first-child { width: 46px; text-align: center; }
 .wec-race-results-table thead th:nth-child(2) { min-width: 190px; }
 .wec-race-results-table thead th:nth-child(n+3) { min-width: 210px; }
@@ -84,17 +86,18 @@
 .wec-season-standings-table th, .wec-season-standings-table td { height: 54px; padding: 11px 13px; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); text-align: left; vertical-align: middle; }
 .wec-season-standings-table tr > :last-child { border-right: 0; }
 .wec-season-standings-table tbody tr:last-child > * { border-bottom: 0; }
-.wec-season-standings-table thead th { height: 58px; background: var(--surface-alt); color: var(--text-muted); font-size: 9px; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; white-space: nowrap; }
+.wec-season-standings-table thead th { height: 58px; background: var(--surface-alt); color: #555d68; font-size: 9px; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; white-space: nowrap; }
 .wec-season-standings-table thead th.wec-standing-event { min-width: 58px; text-align: center; }
 .wec-season-standings-table thead th span, .wec-season-standings-table thead th small { display: block; }
 .wec-season-standings-table thead th span { color: var(--accent-dark); font-size: 11px; }
-.wec-season-standings-table thead th small { margin-top: 3px; font-size: 8px; }
+.wec-season-standings-table thead th small { margin-top: 3px; color: #555d68; font-size: 8px; }
 .wec-season-standings-table tbody th { min-width: 180px; font-size: 13px; }
 .wec-season-standings-table tr > :first-child { position: sticky; z-index: 2; left: 0; width: 52px; background: var(--surface); }
 .wec-season-standings-table tr > :nth-child(2) { position: sticky; z-index: 2; left: 52px; background: var(--surface); box-shadow: 8px 0 12px -13px rgba(17,19,24,.8); }
 .wec-season-standings-table thead tr > :first-child, .wec-season-standings-table thead tr > :nth-child(2) { z-index: 3; background: var(--surface-alt); }
 .wec-season-standings-table tbody th a { color: inherit; text-decoration: none; }
 .wec-season-standings-table tbody th a:hover { color: var(--accent-dark); text-decoration: underline; text-underline-offset: 3px; }
+.wec-standing-car-number { display: inline-block; min-width: 34px; margin-right: 7px; color: var(--accent-dark); font-weight: 900; font-variant-numeric: tabular-nums; }
 .wec-standing-position { width: 52px; color: var(--accent-dark); font: 850 18px/1 'Barlow Condensed', sans-serif; text-align: center !important; }
 .wec-standing-team { min-width: 145px; color: var(--text-secondary); }
 .wec-standing-result { min-width: 58px; font-weight: 800; text-align: center !important; font-variant-numeric: tabular-nums; }

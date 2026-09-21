@@ -20,6 +20,7 @@ test('supported database update commands rebuild ratings only for rating-enabled
 test('data sync accepts a unique subset of supported series', () => {
   assert.deepEqual(selectedSeries(['--series=f1,f3,f1']), ['f1', 'f3']);
   assert.deepEqual(selectedSeries(['--series=fe,fe']), ['fe']);
+  assert.deepEqual(selectedSeries(['--series=wec,wec']), ['wec']);
   assert.throws(() => selectedSeries(['--series=f1,unknown']), /Unsupported series/);
 });
 
@@ -69,6 +70,7 @@ test('safe importer maps series names and retains stable inferred types', () => 
   assert.throws(() => selectedFilePrefixes('unknown'), /Unsupported import series/);
   const packageJson = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'package.json'), 'utf8'));
   assert.equal(packageJson.scripts['import:formula-e'], 'node backend/import/all.js --series=fe');
+  assert.equal(packageJson.scripts['import:wec'], 'node backend/import/all.js --series=wec');
 });
 
 test('constructor chronology import collapses repeated parent copies into one chain', () => {

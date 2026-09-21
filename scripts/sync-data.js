@@ -20,7 +20,7 @@ const ROOT = path.join(__dirname, '..');
 const DATA_DIR = path.join(ROOT, 'data');
 const BACKUP_ROOT = path.join(DATA_DIR, '.sync-backups');
 const LOCK_PATH = path.join(DATA_DIR, '.data-sync.lock');
-const ALLOWED_SERIES = ['f1', 'f2', 'f3', 'academy', 'fe'];
+const ALLOWED_SERIES = ['f1', 'f2', 'f3', 'academy', 'fe', 'wec'];
 
 function argumentValue(name, args = process.argv.slice(2)) {
   const argument = args.find(value => value.startsWith(`--${name}=`));
@@ -171,6 +171,10 @@ async function refreshSources(series, year, force) {
     await run(process.execPath, ['scripts/collect-formula-e-data.js', `--seasons=1-${season}`]);
     versions.fe = `season-${season}`;
   }
+  if (series.includes('wec')) {
+    await run(process.execPath, ['scripts/collect-wec-data.js']);
+    versions.wec = String(year);
+  }
   return versions;
 }
 
@@ -178,6 +182,7 @@ async function validateSources(series) {
   await run(process.execPath, ['--test']);
   for (const name of series.filter(value => value !== 'f1')) {
     if (name === 'fe') await run(process.execPath, ['scripts/audit-formula-e-data.js']);
+    else if (name === 'wec') await run(process.execPath, ['scripts/audit-wec-data.js']);
     else await run(process.execPath, ['scripts/audit-f3-data.js', `--series=${name}`, '--csv-only']);
   }
 }

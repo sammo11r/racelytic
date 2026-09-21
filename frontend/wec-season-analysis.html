@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Explore WEC championship progression, title leads, points distribution, results and consistency by season and class.">
+  <link rel="icon" href="/assets/favicon-wec.svg" type="image/svg+xml"><title>WEC Season Analysis · Racelytic</title>
+  <link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/polish.css"><link rel="stylesheet" href="/css/season-analysis.css"><link rel="stylesheet" href="/css/wec.css"><link rel="stylesheet" href="/css/wec-analysis.css">
+</head>
+<body class="wec-mode" data-wec-view="season-analysis"><div id="header"></div>
+<main class="container page analysis-detail-page season-analysis-page wec-season-analysis-page">
+  <header class="analysis-detail-head">
+    <div><div class="eyebrow">WEC · SEASON <select id="analysis-season" aria-label="Season" disabled><option value="">Loading…</option></select></div><h1>A championship in motion</h1><p>Explore title fights, class results and consistency across an endurance season.</p></div>
+    <label class="wec-championship-select" for="analysis-championship">Championship<select id="analysis-championship" disabled><option value="">Loading…</option></select></label>
+  </header>
+  <p id="analysis-status" class="analysis-status" role="status">Loading WEC season analysis…</p>
+  <section id="wec-analysis-summary" class="analysis-summary-strip" aria-label="Championship summary"></section>
+  <div id="season-analysis-workspace" hidden>
+    <nav class="analysis-visualization-menu" aria-label="Analysis views">
+      <label class="analysis-mobile-view" for="analysis-view">Analysis view<select id="analysis-view"><option value="progression">Progression</option><option value="margin">Championship lead</option><option value="distribution">Points share</option><option value="heatmap">Results</option><option value="averages">Averages</option></select></label>
+      <div class="analysis-visualization-tabs" role="tablist" aria-label="WEC season analysis visualization">
+        <button type="button" id="tab-progression" role="tab" aria-controls="panel-progression" aria-selected="true" data-wec-visual-button="progression">Progression</button>
+        <button type="button" id="tab-margin" role="tab" aria-controls="panel-margin" aria-selected="false" tabindex="-1" data-wec-visual-button="margin">Championship lead</button>
+        <button type="button" id="tab-distribution" role="tab" aria-controls="panel-distribution" aria-selected="false" tabindex="-1" data-wec-visual-button="distribution">Points share</button>
+        <button type="button" id="tab-heatmap" role="tab" aria-controls="panel-heatmap" aria-selected="false" tabindex="-1" data-wec-visual-button="heatmap">Results</button>
+        <button type="button" id="tab-averages" role="tab" aria-controls="panel-averages" aria-selected="false" tabindex="-1" data-wec-visual-button="averages">Averages</button>
+      </div>
+    </nav>
+    <div class="analysis-visualization-workspace">
+      <section id="panel-progression" role="tabpanel" aria-labelledby="tab-progression" data-wec-visual="progression" class="analysis-chart-section">
+        <div class="section-heading"><h2>Championship progression</h2><span id="selection-count"></span></div>
+        <div class="analysis-driver-controls"><div class="analysis-presets" aria-label="Selection presets"><button type="button" data-preset="contenders">Title contenders</button><button type="button" data-preset="five">Top five</button><button type="button" data-preset="all">All</button><button type="button" data-preset="clear">Clear</button></div>
+          <details id="entity-picker"><summary>Choose entries <span id="entity-picker-count"></span></summary><label for="entity-search">Search<input id="entity-search" type="search" placeholder="Name" autocomplete="off"></label><div id="progression-legend" class="progression-legend"></div></details>
+        </div>
+        <div id="season-progression-chart" class="interactive-chart"></div>
+        <p class="analysis-method">Tap or focus a round for all selected contenders. Endpoint labels show their latest official totals.</p>
+        <div id="round-readout" class="analysis-round-readout" aria-live="polite"></div>
+      </section>
+      <section id="panel-margin" role="tabpanel" aria-labelledby="tab-margin" data-wec-visual="margin" class="analysis-chart-section" hidden>
+        <div class="section-heading"><h2>Championship lead</h2></div><p class="analysis-method">Gap between the first two classified entities after each recorded round. Ties are shown explicitly.</p>
+        <div id="winning-margin-chart" class="interactive-chart"></div><div id="lead-readout" class="analysis-round-readout" aria-live="polite"></div><h3 class="analysis-subheading">Lead changes</h3><ol id="lead-changes" class="analysis-lead-changes"></ol>
+      </section>
+      <section id="panel-distribution" role="tabpanel" aria-labelledby="tab-distribution" data-wec-visual="distribution" class="analysis-chart-section" hidden>
+        <div class="section-heading"><h2>Points share</h2></div><p class="analysis-method">Each classified entity’s share of the official final championship points total.</p><div id="points-distribution-chart"></div>
+      </section>
+      <section id="panel-heatmap" role="tabpanel" aria-labelledby="tab-heatmap" data-wec-visual="heatmap" class="analysis-chart-section" hidden>
+        <div class="section-heading"><h2>Class results</h2><span id="heatmap-scope"></span></div><p class="analysis-method">Positions are class classifications. For manufacturer championships, each round shows that manufacturer’s best classified car.</p><div id="results-heatmap" class="results-heatmap-wrap" tabindex="0" aria-label="WEC class results; scroll horizontally for more rounds"></div><p id="heatmap-readout" class="analysis-cell-readout" aria-live="polite">Select a result for details.</p>
+      </section>
+      <section id="panel-averages" role="tabpanel" aria-labelledby="tab-averages" data-wec-visual="averages" class="analysis-chart-section" hidden>
+        <div class="section-heading"><h2>Average class positions &amp; consistency</h2></div><p class="analysis-method">Means use positive class positions. Finish spread is population standard deviation; a lower number means more consistent class results. Non-classified rate includes recorded race starts without a positive class position.</p><div id="average-position-table" class="table-wrap" tabindex="0" aria-label="WEC championship averages; sortable columns"></div>
+      </section>
+    </div>
+  </div>
+</main><footer class="footer"><div class="container">Racelytic</div></footer>
+<script src="/js/utils.js"></script><script src="/js/header.js"></script><script src="/js/wec-season-analysis.js"></script>
+</body></html>

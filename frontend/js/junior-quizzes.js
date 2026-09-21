@@ -1,4 +1,4 @@
-const QUIZ_SERIES = location.pathname.startsWith('/formula-e/') ? 'fe' : location.pathname.startsWith('/academy/') ? 'academy' : location.pathname.startsWith('/f3/') ? 'f3' : 'f2';
+const QUIZ_SERIES = location.pathname.startsWith('/wec/') ? 'wec' : location.pathname.startsWith('/formula-e/') ? 'fe' : location.pathname.startsWith('/academy/') ? 'academy' : location.pathname.startsWith('/f3/') ? 'f3' : 'f2';
 const seasonLabel = year => QUIZ_SERIES === 'fe' ? `${Number(year) - 1}–${String(year).slice(-2)}` : String(year);
 
 function storedProgress(key) {

@@ -22,7 +22,8 @@ function params() {
 }
 const resourceCollections = Object.freeze({
   season: 'seasons', race: 'races', driver: 'drivers', constructor: 'constructors',
-  team: 'teams', circuit: 'circuits', chassis: 'chassis'
+  team: 'teams', manufacturer: 'manufacturers', carModel: 'cars', entry: 'entries',
+  circuit: 'circuits', chassis: 'chassis'
 });
 function resourceId(resource) {
   const collection = resourceCollections[resource];

@@ -8,7 +8,7 @@ function loadHeader() {
         const requestedSeries = new URLSearchParams(window.location.search).get('series');
         let rememberedSeries = '';
         try { rememberedSeries = localStorage.getItem('racelytic-series') || ''; } catch {}
-        const seriesNeutralPages = ['/account', '/privacy', '/terms', '/about', '/community', '/ratings'];
+        const seriesNeutralPages = ['/account', '/privacy', '/terms', '/about', '/community', '/ratings', '/data-sources'];
         const isSeriesNeutralPage = seriesNeutralPages.includes(window.location.pathname)
             || window.location.pathname.startsWith('/ratings/');
         const seriesKeys = Object.keys(window.RacelyticSeries.all);
@@ -140,11 +140,34 @@ function loadHeader() {
         const reverseFormulaEPagePairs = Object.fromEntries(Object.entries(formulaEPagePairs).map(([f1, fe]) => [fe, f1]));
         const wecPagePairs = {
             '/': '/wec',
-            '/database': '/wec',
+            '/database': '/wec/database',
+            '/analysis': '/wec/analysis',
+            '/season-analysis': '/wec/season-analysis',
+            '/season-comparison': '/wec/season-comparison',
+            '/race-analysis': '/wec/race-analysis',
+            '/circuit-analysis': '/wec/circuit-analysis',
+            '/records': '/wec/records',
+            '/driver-comparison': '/wec/driver-comparison',
+            '/driver-form': '/wec/driver-form',
+            '/simulator-overview': '/wec/simulator',
+            '/simulator': '/wec/simulate-season',
+            '/scenario-calculator': '/wec/scenario-calculator',
+            '/championship-builder': '/wec/championship-builder',
+            '/points-systems': '/wec/points-systems',
+            '/games': '/wec/games',
+            '/quizzes': '/wec/quizzes',
+            '/race-winners-quiz': '/wec/race-winners-quiz',
+            '/season-race-winners-quiz': '/wec/season-race-winners-quiz',
+            '/idle-racing-manager': '/wec/idle-racing-manager',
+            '/lights-out': '/wec/lights-out',
             '/seasons': '/wec/seasons',
-            '/races': '/wec/races'
+            '/races': '/wec/races',
+            '/drivers': '/wec/drivers',
+            '/constructors': '/wec/teams',
+            '/circuits': '/wec/circuits',
+            '/chassis': '/wec/cars'
         };
-        const reverseWecPagePairs = { '/wec': '/', '/wec/seasons': '/seasons', '/wec/races': '/races' };
+        const reverseWecPagePairs = Object.fromEntries(Object.entries(wecPagePairs).map(([f1, wec]) => [wec, f1]));
         const detailPages = {
             '/season': ['season', '/f2/seasons'], '/race': ['race', '/f2/races'],
             '/driver': ['driver', '/f2/drivers'], '/circuit': ['circuit', '/f2/circuits'],
@@ -172,7 +195,7 @@ function loadHeader() {
             f3: { season: '/f3/seasons', race: '/f3/races', driver: '/f3/drivers', constructor: '/f3/teams', circuit: '/f3/circuits' },
             academy: { season: '/academy/seasons', race: '/academy/races', driver: '/academy/drivers', constructor: '/academy/teams', circuit: '/academy/circuits' }
             ,fe: { season: '/formula-e/seasons', race: '/formula-e/races', driver: '/formula-e/drivers', constructor: '/formula-e/teams', circuit: '/formula-e/circuits' },
-            wec: { season: '/wec/seasons', race: '/wec/races', driver: '/wec', constructor: '/wec' }
+            wec: { season: '/wec/seasons', race: '/wec/races', driver: '/wec/drivers', circuit: '/wec/circuits', constructor: '/wec/teams' }
         };
         const resolveSeriesTarget = async targetSeries => {
             if (isSeriesNeutralPage) return `${window.location.pathname}?series=${targetSeries}`;
@@ -197,7 +220,7 @@ function loadHeader() {
             if (topLevelTarget) return `${topLevelTarget}${window.location.search}${window.location.hash}`;
             if (targetSeries === 'wec') {
                 const detail = currentDetail;
-                if (detail && ['season', 'race', 'driver', 'constructor'].includes(detail[0])) {
+                if (detail && ['season', 'race', 'driver', 'circuit', 'constructor'].includes(detail[0])) {
                     const parameter = detail[0] === 'season' ? 'year' : 'id';
                     const id = detail[2] || new URLSearchParams(window.location.search).get(parameter);
                     const parent = seriesDetailParents.wec[detail[0]] || '/wec';
@@ -316,9 +339,13 @@ function loadHeader() {
             const database = navigationDropdowns[0];
             const links = [...(database?.querySelectorAll('.dropdown-menu a') || [])];
             const items = [
-                ['/wec', 'Overview', 'World Endurance Championship archive'],
+                ['/wec/database', 'Overview', 'Browse the World Endurance Championship archive'],
                 ['/wec/seasons', 'Seasons', 'Championship calendars and classes'],
-                ['/wec/races', 'Races', 'Every WEC endurance event']
+                ['/wec/races', 'Races', 'Every WEC endurance event'],
+                ['/wec/drivers', 'Drivers', 'WEC careers, wins and championships'],
+                ['/wec/teams', 'Teams', 'Entries, victories and championship history'],
+                ['/wec/circuits', 'Circuits', 'Endurance tracks and venue history'],
+                ['/wec/cars', 'Cars', 'Models, manufacturers and race records']
             ];
             links.forEach((link, index) => {
                 const item = items[index];
@@ -329,7 +356,78 @@ function loadHeader() {
             });
             const title = database?.querySelector('.dropdown-title');
             if (title) title.textContent = 'WEC DATABASE';
-            navigationDropdowns.slice(1).forEach(dropdown => dropdown.remove());
+            const analysis = navigationDropdowns[1];
+            const analysisLinks = [...(analysis?.querySelectorAll('.dropdown-menu a') || [])];
+            const analysisItems = [
+                ['/wec/analysis', 'Overview', 'Choose a WEC analysis'],
+                ['/wec/season-analysis', 'Season analysis', 'Championship progression by class'],
+                ['/wec/season-comparison', 'Season comparison', 'Compare championships across WEC eras'],
+                ['/wec/race-analysis', 'Race analysis', 'Explore every class in an endurance race'],
+                ['/wec/circuit-analysis', 'Circuit analysis', 'Class specialists and reliability by venue'],
+                ['/wec/records', 'Records', 'All-time WEC leaders by class'],
+                ['/wec/driver-comparison', 'Driver comparison', 'Compare careers, shared events and crews'],
+                ['/wec/driver-form', 'Driver form', 'Recent class results, reliability and crews']
+            ];
+            analysisLinks.forEach((link, index) => {
+                const item = analysisItems[index];
+                if (!item) return link.remove();
+                link.href = item[0];
+                link.querySelector('span').textContent = item[1];
+                link.querySelector('small').textContent = item[2];
+            });
+            const analysisTitle = analysis?.querySelector('.dropdown-title');
+            if (analysisTitle) analysisTitle.textContent = 'WEC ANALYSIS';
+            const ratings = navigationDropdowns[2];
+            const ratingsItems = [
+                ['/ratings?series=wec&class=top', 'Overview', 'Explore WEC crew ratings by class'],
+                ['/ratings/leaderboard?series=wec&class=top', 'Leaderboard', 'See the class order through WEC history'],
+                ['/ratings/compare?series=wec&class=top', 'Compare drivers', 'Plot up to four class rating histories'],
+                ['/ratings/driver?series=wec&class=top', 'Rating profile', 'Inspect race-by-race class rating changes'],
+                ['/ratings/methodology?series=wec&class=top', 'Methodology', 'Understand crew strength and class pools']
+            ];
+            [...(ratings?.querySelectorAll('.dropdown-menu a') || [])].forEach((link, index) => {
+                const item = ratingsItems[index];
+                if (!item) return link.remove();
+                link.href = item[0];
+                link.querySelector('span').textContent = item[1];
+                link.querySelector('small').textContent = item[2];
+            });
+            const ratingsTitle = ratings?.querySelector('.dropdown-title');
+            if (ratingsTitle) ratingsTitle.textContent = 'WEC RATINGS';
+            const simulator = navigationDropdowns[3];
+            const simulatorItems = [
+                ['/wec/simulator', 'Overview', 'Choose a WEC simulation'],
+                ['/wec/simulate-season', 'Simulate season', 'Recalculate a class championship'],
+                ['/wec/scenario-calculator', 'Scenario calculator', 'Project a WEC title run-in'],
+                ['/wec/championship-builder', 'Championship builder', 'Build a custom WEC calendar'],
+                ['/wec/points-systems', 'Points systems', 'Create reusable endurance scoring rules']
+            ];
+            [...(simulator?.querySelectorAll('.dropdown-menu a') || [])].forEach((link, index) => {
+                const item = simulatorItems[index];
+                if (!item) return link.remove();
+                link.href = item[0];
+                link.querySelector('span').textContent = item[1];
+                link.querySelector('small').textContent = item[2];
+            });
+            const simulatorTitle = simulator?.querySelector('.dropdown-title');
+            if (simulatorTitle) simulatorTitle.textContent = 'WEC SIMULATOR';
+            const games = navigationDropdowns[4];
+            const gamesItems = [
+                ['/wec/games', 'Overview', 'Choose a WEC game'],
+                ['/wec/quizzes', 'WEC quizzes', 'Test overall winners and winning crews'],
+                ['/wec/idle-racing-manager', 'Idle Racing Manager', 'Build a fictional privateer team'],
+                ['/wec/lights-out', 'Lights Out!', 'Test your reaction time']
+            ];
+            [...(games?.querySelectorAll('.dropdown-menu a') || [])].forEach((link, index) => {
+                const item = gamesItems[index];
+                if (!item) return link.remove();
+                link.href = item[0];
+                link.querySelector('span').textContent = item[1];
+                link.querySelector('small').textContent = item[2];
+            });
+            const gamesTitle = games?.querySelector('.dropdown-title');
+            if (gamesTitle) gamesTitle.textContent = 'WEC GAMES';
+            navigationDropdowns.forEach((dropdown, index) => { if (index > 4) dropdown.remove(); });
             const aboutLink = container.querySelector('a[href="/about"]');
             if (aboutLink) aboutLink.href = '/about?series=wec';
             container.querySelectorAll('a[href="/account"]').forEach(link => { link.href = '/account?series=wec'; });
