@@ -44,8 +44,12 @@ function run(command, args, options = {}) {
   });
 }
 
+function isVersionedDataFile(file) {
+  return /^(?:f[123]db|fadb|fedb|wecdb)-.*\.csv$/i.test(file);
+}
+
 function dataFiles() {
-  return fs.readdirSync(DATA_DIR).filter(file => /^(?:f[123]db|fadb|fedb)-.*\.csv$/i.test(file));
+  return fs.readdirSync(DATA_DIR).filter(isVersionedDataFile);
 }
 
 function createBackup(runId) {
@@ -246,4 +250,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = { argumentValue, selectedSeries, trimBackups };
+module.exports = { argumentValue, isVersionedDataFile, selectedSeries, trimBackups };

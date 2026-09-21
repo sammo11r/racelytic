@@ -1,282 +1,165 @@
 # Racelytic
 
-Racelytic is a Formula 1 data and analytics website using:
+[![CI](https://github.com/sammo11r/racelytic/actions/workflows/ci.yml/badge.svg)](https://github.com/sammo11r/racelytic/actions/workflows/ci.yml)
 
-- F1DB CSV data
-- MySQL/MariaDB
-- Node.js
-- Express
+Racelytic is an independent motorsport archive for exploring results, careers,
+championships, ratings, simulations and racing history.
+
+[Open Racelytic](https://racelytic.com) · [Data sources and licences](https://racelytic.com/data-sources) · [Report an issue](https://github.com/sammo11r/racelytic/issues)
+
+![Racelytic social preview](frontend/assets/social-card.png)
+
+## Championships
+
+Racelytic currently covers:
+
+- Formula 1
+- Formula 2
+- Formula 3
+- F1 Academy
+- Formula E
+- FIA World Endurance Championship, from 2012 through the ongoing 2026 season
+
+WEC uses an endurance-specific data model. Each classification belongs to a car
+entry and links to its event crew, class, team, manufacturer and car model.
+
+## What is included
+
+- Connected season, event, session, driver, team, manufacturer, car and circuit archives
+- Class-aware WEC results and championship standings
+- Search across every supported championship
+- Historical analysis, comparisons, records and Racelytic Ratings
+- Season simulators, scenario calculators and custom championship builders
+- Archive-backed quizzes and racing games
+- Deterministic Ask Racelytic answers with visible evidence
+- Server-rendered metadata, canonical URLs, structured data and dynamic sitemaps
+
+## Technology
+
+- Node.js 24 and Express 5
+- MySQL 8 or MariaDB
 - Plain HTML, CSS and JavaScript
+- D3 for data visualisation
+- Node's built-in test runner and axe-core accessibility checks
 
-The archive also contains Formula 2, Formula 3, F1 Academy and Formula E. A native
-World Endurance Championship archive covers every completed championship from 2012 through 2025.
-Unlike the Formula datasets, its classification unit is a car entry
-linked to a multi-driver crew and a competition class.
+The frontend stays framework-free. Shared page shells and series configuration
+generate consistent public routes while each championship can retain its own
+formats and data model.
 
-## Requirements
+## Local setup
 
-- Node.js 24+
-- MySQL 8 / MariaDB
-- The F1DB tables imported into the `racelytics` database
+### Requirements
 
-## Setup
+- Node.js 24 or newer
+- MySQL 8 or MariaDB
+- Git
 
-1. Copy `.env.example` to `.env`.
-2. Set your database credentials.
-3. Install dependencies:
+### Install
 
 ```bash
-npm install
+git clone https://github.com/sammo11r/racelytic.git
+cd racelytic
+npm ci
 ```
 
-4. Make sure MySQL is running and the F1DB data has been imported.
-5. Start Racelytic:
+Copy `.env.example` to `.env`, then set the database credentials for a local
+database. The database itself must exist before the first import.
+
+```sql
+CREATE DATABASE racelytics CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+```
+
+Import the versioned CSV archive and build the ratings tables:
+
+```bash
+npm run import
+```
+
+Start the application:
 
 ```bash
 npm start
 ```
 
-Open:
+Open [http://localhost:3000](http://localhost:3000).
 
-http://localhost:3000
+Account, rating and analytics tables are created from the schemas in
+`database/` when their features are first used. Use a dedicated database user
+with the permissions needed to create and update Racelytic tables.
 
-## Existing database
+## Environment
 
-This project expects the F1DB table names created by the generic importer, for example:
+The full development template is in [`.env.example`](.env.example).
 
-- `seasons`
-- `drivers`
-- `constructors`
-- `circuits`
-- `countries`
-- `races`
-- `races_driver_standings`
-- `races_constructor_standings`
-- `races_race_results`
+| Variable | Purpose |
+| --- | --- |
+| `DB_HOST`, `DB_PORT`, `DB_NAME` | MariaDB or MySQL connection |
+| `DB_USER`, `DB_PASSWORD` | Dedicated application credentials |
+| `PORT` | Local HTTP port, default `3000` |
+| `SITE_URL` | Public origin used for canonical URLs and sitemaps |
+| `MONITOR_USERNAME`, `MONITOR_PASSWORD` | Optional private traffic dashboard credentials |
+| `DATA_SYNC_*` | Guardrails for scheduled archive refreshes |
+| `GITHUB_TOKEN` | Optional higher GitHub API allowance for F1DB release checks |
 
-The API is intentionally read-only: the website does not modify the F1DB data.
+Never commit `.env` or production credentials.
 
-## Pages
+## Useful commands
 
-- `/` — landing page
-- `/seasons` — season browser
-- `/season?year=2025` — season details
-- `/drivers` — driver browser
-- `/driver?id=max-verstappen` — driver details
-- `/circuits` — circuit browser
-- `/circuit?id=silverstone` — circuit details
-- `/constructors` — constructor browser
-- `/constructor?id=red-bull` — constructor details
+| Command | Purpose |
+| --- | --- |
+| `npm start` | Run the production-style server |
+| `npm run dev` | Run the server with Node watch mode |
+| `npm test` | Run the complete automated test suite |
+| `npm run check` | Validate generated routes, CSS, replays, links and JavaScript |
+| `npm run build:frontend` | Refresh and validate generated series pages |
+| `npm run audit:wec` | Validate WEC archive integrity |
+| `npm run sync:data:dry` | Validate local data without publishing it |
 
-- `/race?id=2025-01` — race classification
+See [Data maintenance](docs/data-maintenance.md) for collectors, guarded
+database publishing, ratings rebuilds and race replay imports.
 
-## Frontend structure
+## Project structure
 
-The frontend stays framework-free, but common behavior is generated from a small shared layer:
+```text
+backend/      Express routes, archive queries, SEO and calculations
+data/         Versioned championship data and data contracts
+database/     Application-owned SQL schemas
+deploy/       Production service and timer definitions
+docs/         Maintainer documentation
+frontend/     Pages, shared components, scripts, styles and static assets
+scripts/      Import, validation, generation and maintenance tools
+test/         Unit, integration, data integrity, SEO and rendering tests
+```
 
-- `frontend/templates/page-shell.html` owns the common document shell.
-- `frontend/js/series-config.js` is the single source for F1, F2, F3, and Academy identity and paths.
-- `backend/series-pages.js` maps reusable junior-series templates to public routes.
-- `frontend/js/ui-components.js` and `frontend/css/components.css` provide shared loading, error, empty, filter, table, and chart primitives.
-- `frontend/js/header.js` is only a compatibility loader; navigation, search, analytics, and privacy live in separate modules.
-
-Run `npm run build:frontend` after changing the shell, series configuration, or series-page mappings. It validates every generated route and refreshes `frontend/generated/page-manifest.json`; do not edit that manifest by hand.
-
-Use `npm run consolidate:css` to remove exact duplicate top-level CSS rules safely. The normal `npm run check` command verifies that both generated output and CSS remain current.
-
-## Ask Racelytic architecture
-
-Ask Racelytic uses a grounded conversational pipeline. `backend/routes/ask.js` interprets the question and follow-up context, `backend/ask-tools.js` selects a registered archive or calculation tool, and `backend/ask-engine.js` performs the deterministic calculation. Answers include the selected tool and evidence count; prose never replaces the underlying archive result.
-
-Language planning runs entirely inside the Node.js process. A small statistical intent model is trained at startup from the version-controlled intent catalogue and is used only when the higher-confidence grammar rules do not match. It has no API client, network call, hosted model, telemetry, or runtime download; missing slots still produce a clarification instead of invoking a broader tool.
-
-Run `node --test test/ask-supported-questions.test.js` for the supported-question contract suite. It fails when an intent lacks a canonical question, required-slot coverage, a trusted tool mapping, clarification behavior, or an out-of-scope safety boundary. The broader 270-question language-planner corpus lives in `test/ask-local-planner.test.js`.
-
-Successful questions receive an opaque conversation ID. The latest structured context and up to twelve turns are retained in server memory for 30 minutes so follow-ups such as “only since 2022” work without resending the full conversation. The **New conversation** action deletes that context immediately. Conversations are not written to the application database and are not sent to an external AI service.
-
-Register a new question family in `backend/ask-intents.js`, map it to a trusted tool in `backend/ask-tools.js`, implement its deterministic executor, and add language, API and evidence tests before exposing it in the interface.
+The most useful implementation notes are in [Architecture](docs/architecture.md).
 
 ## Quality checks
 
-Run JavaScript syntax and local-link checks with `npm run check`.
-
-Run the automated tests with `npm test`.
-
-Refresh the complete official 2012-2025 classifications, validate the WEC archive, and import its isolated tables with:
+Before opening a pull request, run:
 
 ```bash
-npm run collect:wec
-npm run audit:wec
-npm run import:wec
+npm test
+npm run check
 ```
 
-The versioned field contract is stored in `data/wec-data-contract.json`. Classification
-files deliberately model one result per entry; driver membership belongs in the separate
-entry-driver relation. A season-level competitor keeps each numbered car distinct for team
-championships. The archive includes the final classification for all 573 race-weekend
-practice, qualifying, Hyperpole, warm-up and race sessions, the two Super Seasons,
-historic LMP1 and GTE classes, later Le Mans-only LMP2, innovative entries, and official
-championship points after every round for all 13 completed seasons. Prologue and test sessions,
-interim race-hour snapshots, lap analysis, pit-stop logs and weather feeds are deliberately
-outside this archive scope. Use `npm run collect:wec -- --refresh` to bypass the local source
-cache.
+The suite covers application behaviour, archive integrity, responsive page
+contracts, search, SEO, structured data and WEC's entry-first result model.
 
-Refresh complete Formula 2 practice, qualifying, grid, and race classifications from Motorsport
-Stats with `npm run import:f2-results`. Use `-- --year=2025` to refresh one
-season, `-- --sessions=practice` to import only practice, or
-`-- --sessions=qualifying` to import only qualifying, or
-`-- --sessions=race` to import only races. Add `--csv-only` to update the source
-CSV without updating MariaDB. The importer also accepts
-`-- --cache=path/to/results.json` when direct site access is not available.
-If Motorsport Stats returns HTTP 403, the importer automatically switches to
-an installed Chrome or Edge browser and keeps one browser window open during
-the import. Use `-- --transport=browser` to select it immediately, or set
-`MOTORSPORTSTATS_BROWSER` when the browser is installed in a non-standard
-location. The optional `--headless` flag hides the window, but some site access
-rules may reject headless browsers.
+## Contributing and security
 
-Refresh complete official Formula 2 driver standings, team standings, and
-race-by-race awarded points with `npm run import:f2-standings`. Use
-`-- --year=2025` for one season or `--csv-only` to update CSV files without
-updating MariaDB. Run this after `import:f2-results` so official awarded points
-are applied to the latest classifications. The standings importer uses the
-last completed round and ignores future scheduled rounds.
+Read [CONTRIBUTING.md](CONTRIBUTING.md) before submitting a change. Report
+security issues privately using the process in [SECURITY.md](SECURITY.md).
 
-If your F1DB export uses a different release/version, the SQL may need small column adjustments.
+## Data rights and independence
 
-## Automatic database updates
+Racelytic is unofficial and is not affiliated with the championships,
+governing bodies, rights holders, teams, manufacturers or drivers represented
+in the archive. Championship names and related marks belong to their owners.
 
-Racelytic has one guarded synchronization command:
+Source material has its own attribution and reuse terms. Review the public
+[Data Sources & Licences](https://racelytic.com/data-sources) page and the
+attribution files stored beside applicable assets before reusing data or media.
 
-```bash
-npm run sync:data
-```
-
-The command checks the official F1DB GitHub release, refreshes the configured junior-series
-collectors, backs up the current CSV files, runs the full test suite and CSV integrity audits,
-loads every CSV into staging tables, and publishes all staging tables with one atomic MariaDB
-`RENAME TABLE` operation. The live site therefore continues to use the old tables until the
-entire replacement is ready. An import is rejected if a table unexpectedly loses more than 10%
-of its rows. Set `DATA_SYNC_MIN_ROW_RATIO` to adjust that guard.
-
-After publishing the selected championships, the sync rebuilds their driver ratings before the
-run is marked successful. A rating failure therefore fails the data-sync run instead of leaving a
-successful update with stale ratings. For local/manual full imports, use `npm run import`; its
-`postimport` lifecycle automatically rebuilds ratings for every championship. Avoid invoking
-`node backend/import/all.js` directly, because that low-level importer intentionally skips
-follow-up jobs.
-
-Rating research commands are read-only unless `--save` is supplied. Use
-`npm run audit:ratings -- --strict` to validate source event ordering and formats,
-`npm run evaluate:ratings -- --inactivity --summary` to test return-from-absence K changes, and
-`npm run evaluate:ratings -- --teammate --summary` to evaluate the isolated teammate-only prototype.
-The teammate report compares that prototype with the published competitive model on the same
-teammate matchups; it does not create published ratings.
-Use `npm run audit:rating-identities -- --summary` to inspect cross-series linkage and driver–team
-network connectivity. The joint driver–constructor prototype is available through
-`npm run evaluate:ratings -- --joint --summary`; add `--joint-validate` instead of `--joint` to
-select the allocation chronologically and score it on the locked holdout seasons.
-For the F1-first structural and learning-rate search, use
-`npm run evaluate:ratings -- --joint-improve --summary`; it defaults to F1, preserves the holdout,
-and reports a paired weekend-bootstrap interval against the competitive control.
-The selected model can be inspected directly with `--driver-k-multiplier`,
-`--constructor-k-multiplier`, `--constructor-season-retention`, and
-`--constructor-field-normalization`.
-
-Only one synchronization can run at once. Every attempt is recorded in
-`app_data_sync_runs`; inspect recent attempts with:
-
-```bash
-npm run sync:data:status
-```
-
-Validate the current CSV files without downloading or publishing anything with:
-
-```bash
-npm run sync:data:dry
-```
-
-Useful options are:
-
-```bash
-# Refresh selected championships only
-npm run sync:data -- --series=f1,f2
-
-# Publish already-downloaded CSV files
-npm run sync:data -- --skip-fetch
-
-# Re-download an F1DB release even if its version is unchanged
-npm run sync:data -- --series=f1 --force
-```
-
-The updater keeps five CSV snapshots in `data/.sync-backups` by default and restores the latest
-snapshot if source collection or validation fails. Configure the series, backup retention and
-row-loss guard in `.env`; see `.env.example`. `GITHUB_TOKEN` is optional and only raises the
-GitHub API rate limit. Database credentials should use a dedicated account that can create,
-rename, insert into and drop Racelytic data tables.
-
-For the Racelytics Linux VPS, the supplied service uses the `www-data` account,
-`/var/www/racelytics` checkout and `/usr/local/bin/node`. If those deployment values change,
-update `deploy/systemd/racelytic-data-sync.service` before installing the timer:
-
-```bash
-sudo cp deploy/systemd/racelytic-data-sync.* /etc/systemd/system/
-sudo systemctl daemon-reload
-sudo systemctl enable --now racelytic-data-sync.timer
-systemctl list-timers racelytic-data-sync.timer
-```
-
-The timer runs daily at approximately 04:15 server time and catches missed runs after a reboot.
-Run `systemctl start racelytic-data-sync.service` for an immediate manual refresh and inspect
-failures with `journalctl -u racelytic-data-sync.service`.
-
-## Private traffic monitor
-
-Racelytic includes anonymous first-party monitoring for visits, unique visitors,
-timestamps, external referrer hosts, page popularity, and active reading time.
-It does not store IP addresses, precise locations, or browser fingerprints, and
-it respects the browser's Do Not Track setting.
-
-Set private dashboard credentials in the VPS `.env` file:
-
-```env
-MONITOR_USERNAME=admin
-MONITOR_PASSWORD=replace-with-a-long-random-password
-```
-
-Restart the Node service and open `/monitor`. The browser will request those
-credentials using HTTP Basic authentication. The `app_analytics_visits` table
-is created automatically on the first tracked visit. Serve the site over HTTPS
-so dashboard credentials and traffic data are encrypted in transit.
-## Local race replay imports
-
-The race simulator at `/simulate-race` automatically lists replay files imported into
-`frontend/data/replays`. Imports are local files: they do not change the Racelytic
-database and can be deleted or regenerated independently.
-
-Replay manifests use schema version 2. Coordinates and timestamps are quantized, and
-each race is split into a small metadata manifest plus two-minute Brotli timeline chunks.
-The browser loads the first chunk before enabling playback and prefetches the next chunk
-near the end of the current window. Express serves chunks with immutable one-year caching
-and transparently decompresses them for clients that do not advertise Brotli support.
-
-Only Formula 1 coordinate replays from the 2018 season onward are supported.
-Install FastF1 once and run:
-
-```sh
-python -m pip install -r requirements-replay.txt
-npm run import:replay:telemetry -- --year=2024 --round=1
-```
-
-New imports are compacted automatically. To migrate or verify an existing replay library:
-
-```sh
-npm run compact:replays
-npm run check:replays
-```
-
-The manifest and chunk URLs are deliberately independent, so chunk files can later move
-to object storage or a CDN without changing the replay engine.
-
-The importer rejects earlier seasons. A successful import prints the exact
-preview URL.
+No open-source licence is currently granted for Racelytic's original software,
+design or writing. Their presence in this public repository does not by itself
+grant reuse rights.

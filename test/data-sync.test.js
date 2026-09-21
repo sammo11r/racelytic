@@ -6,7 +6,7 @@ const test = require('node:test');
 
 const { inferType, selectedFilePrefixes, tableNameFromFile } = require('../backend/import/importer');
 const { canonicalizeConstructorChronology } = require('../backend/constructor-lineage-data');
-const { selectedSeries } = require('../scripts/sync-data');
+const { isVersionedDataFile, selectedSeries } = require('../scripts/sync-data');
 const { checksumFor, extractCsvArchive, selectReleaseAssets } = require('../scripts/sync-f1db');
 
 test('supported database update commands rebuild ratings only for rating-enabled series', () => {
@@ -22,6 +22,14 @@ test('data sync accepts a unique subset of supported series', () => {
   assert.deepEqual(selectedSeries(['--series=fe,fe']), ['fe']);
   assert.deepEqual(selectedSeries(['--series=wec,wec']), ['wec']);
   assert.throws(() => selectedSeries(['--series=f1,unknown']), /Unsupported series/);
+});
+
+test('data sync backups cover every versioned championship archive', () => {
+  for (const file of ['f1db-races.csv', 'f2db-sessions.csv', 'f3db-drivers.csv', 'fadb-seasons.csv', 'fedb-races.csv', 'wecdb-standings.csv']) {
+    assert.equal(isVersionedDataFile(file), true, file);
+  }
+  assert.equal(isVersionedDataFile('wec-data-contract.json'), false);
+  assert.equal(isVersionedDataFile('.data-sync.lock'), false);
 });
 
 test('F1DB release selection requires the official CSV archive', () => {

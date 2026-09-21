@@ -1,8 +1,17 @@
 node_modules/
 .env
+.env.*
+!.env.example
 *.log
 .DS_Store
 Thumbs.db
+.claude/
+.idea/
+.vscode/
+coverage/
+__pycache__/
+*.py[cod]
+.pytest_cache/
 data/.f3-cache/
 data/.f2-cache/
 data/.formula-e-cache/
@@ -14,4 +23,4 @@ data/.f1db-sync-*/
 data/.wec-cache/
 .venv-replay/
 .venv-formula-e-circuits/
-/tmp/mysql-backup-*/
+/tmp/

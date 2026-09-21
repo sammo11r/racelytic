@@ -2,8 +2,19 @@
   "name": "racelytic",
   "version": "1.0.0",
   "private": true,
-  "description": "Formula 1 analytics website powered by F1DB, Node.js and MySQL.",
+  "description": "Independent multi-series motorsport archive, analysis and simulation platform.",
   "main": "backend/server.js",
+  "engines": {
+    "node": ">=24"
+  },
+  "homepage": "https://racelytic.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sammo11r/racelytic.git"
+  },
+  "bugs": {
+    "url": "https://github.com/sammo11r/racelytic/issues"
+  },
   "scripts": {
     "start": "node backend/server.js",
     "dev": "node --watch backend/server.js",
