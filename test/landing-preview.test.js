@@ -32,6 +32,7 @@ test('landing driver comparison and revealed quiz answers match the archive', as
         assert.equal(Number(archived.totalPolePositions), driver.poles);
     }
     const champions = await rowsFrom('f1db-seasons-driver-standings.csv', row => row.championshipWon === 'true');
+    for (const driver of preview.drivers) assert.equal(champions.filter(row => row.driverId === driver.id).length, driver.titles);
     for (const answer of preview.champions.filter(champion => champion.name)) {
         assert.equal(champions.find(row => Number(row.year) === answer.year).driverId, answer.id);
     }

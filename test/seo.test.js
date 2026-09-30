@@ -105,11 +105,27 @@ test('project-level metadata stays series neutral', () => {
     assert.equal(metadataFor('/community').title, 'Community · Racelytic');
 });
 
+test('landing metadata reflects the current season and archive questions', () => {
+    for (const route of ['/', '/f2', '/f3', '/academy', '/formula-e', '/wec']) {
+        assert.match(metadataFor(route).description, /current .* season, ask questions about the archive/);
+    }
+});
+
+test('Formula E breadcrumbs use the public championship URL', () => {
+    const html = renderStructuredData(metadataFor('/formula-e/drivers/example-driver'));
+    assert.match(html, /"name":"Formula E","item":"https:\/\/racelytic\.com\/formula-e"/);
+    assert.match(html, /"name":"Drivers","item":"https:\/\/racelytic\.com\/formula-e\/drivers"/);
+    assert.doesNotMatch(html, /racelytic\.com\/fe(?:\/|"|\\)/);
+});
+
 test('ratings subpages have distinct canonical metadata', () => {
     assert.equal(metadataFor('/ratings/leaderboard').title, 'Ratings Leaderboard · Racelytic');
     assert.equal(metadataFor('/ratings/compare').canonical, 'https://racelytic.com/ratings/compare');
     assert.equal(metadataFor('/ratings/driver').title, 'Driver Rating Profile · Racelytic');
     assert.equal(metadataFor('/ratings/methodology').title, 'Ratings Methodology · Racelytic');
+    for (const route of ['/ratings', '/ratings/leaderboard', '/ratings/compare', '/ratings/driver', '/ratings/methodology']) {
+        assert.equal(metadataFor(route).robots, 'noindex, follow');
+    }
 });
 
 test('unverified shared championships retain their URL but remain noindex', () => {
@@ -130,6 +146,7 @@ test('robots and sitemap advertise crawlable canonical pages only', () => {
     assert.match(sitemap, /<loc>https:\/\/racelytic\.com\/f2\/races<\/loc>/);
     assert.doesNotMatch(sitemap, /\/account<\/loc>/);
     assert.doesNotMatch(sitemap, /\/race<\/loc>/);
+    assert.doesNotMatch(renderSitemap(['/ratings', '/ratings/driver']), /<loc>/);
     assert.match(renderSitemap(['/driver?id=max-verstappen']), /\/driver\?id=max-verstappen/);
     const aboutSitemap = renderSitemap(['/about', '/f2/about', '/f3/about', '/academy/about']);
     assert.match(aboutSitemap, /<loc>https:\/\/racelytic\.com\/about<\/loc>/);

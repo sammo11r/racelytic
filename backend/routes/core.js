@@ -41,7 +41,6 @@ const SEARCH_PAGES = [
     ['Teammate battles', 'Intra-team head-to-heads', '/teammate-battles'],
     ['Circuit analysis', 'Performance by venue', '/circuit-analysis'],
     ['Records', 'Explore all-time rankings', '/records'],
-    ['Racelytic Ratings', 'Follow driver performance over time', '/ratings'],
     ['Simulator', 'Explore Formula 1 simulation tools', '/simulator-overview'],
     ['Simulate season', 'Recalculate a Formula 1 season', '/simulator'],
     ['Points systems', 'Create and manage scoring rules', '/points-systems'],
@@ -78,7 +77,6 @@ const F2_SEARCH_PAGES = [
     ['Teammate battles', 'Formula 2 intra-team head-to-heads', '/f2/teammate-battles'],
     ['Circuit analysis', 'Formula 2 performance by venue', '/f2/circuit-analysis'],
     ['Records', 'Formula 2 all-time rankings', '/f2/records'],
-    ['Racelytic Ratings', 'Formula 2 performance over time', '/ratings?series=f2'],
     ['Simulator', 'Formula 2 simulator overview', '/f2/simulator'],
     ['Simulate season', 'Formula 2 championship simulation', '/f2/simulate-season'],
     ['Scenario calculator', 'Project a Formula 2 championship run-in', '/f2/scenario-calculator'],
@@ -111,7 +109,6 @@ const F3_SEARCH_PAGES = [
     ['Teammate battles', 'Formula 3 intra-team head-to-heads', '/f3/teammate-battles'],
     ['Circuit analysis', 'Formula 3 performance by venue', '/f3/circuit-analysis'],
     ['Records', 'Formula 3 all-time rankings', '/f3/records'],
-    ['Racelytic Ratings', 'Formula 3 performance over time', '/ratings?series=f3'],
     ['Simulator', 'Formula 3 simulator overview', '/f3/simulator'],
     ['Simulate season', 'Formula 3 championship simulation', '/f3/simulate-season'],
     ['Scenario calculator', 'Project a Formula 3 championship run-in', '/f3/scenario-calculator'],
@@ -129,7 +126,7 @@ const ACADEMY_SEARCH_PAGES = F3_SEARCH_PAGES.map(([label, description, url]) => 
     url.replace('/f3', '/academy').replace('series=f3', 'series=academy')
 ]);
 const FORMULA_E_SEARCH_PAGES = F3_SEARCH_PAGES
-    .filter(([, , url]) => !/chassis|ratings|simulator|points-systems|games|quizz/.test(url))
+    .filter(([, , url]) => !/chassis|simulator|points-systems|games|quizz/.test(url))
     .map(([label, description, url]) => [
         label === 'Formula 3' ? 'Formula E' : label,
         description.replace(/Formula 3|FIA Formula 3/g, 'Formula E'),
@@ -153,11 +150,6 @@ const WEC_SEARCH_PAGES = [
     ['Driver form', 'Recent World Endurance Championship performance', '/wec/driver-form'],
     ['Circuit analysis', 'WEC performance and history by venue', '/wec/circuit-analysis'],
     ['Records', 'World Endurance Championship all-time rankings', '/wec/records'],
-    ['Racelytic Ratings', 'WEC crew performance ratings by class', '/ratings?series=wec&class=top'],
-    ['Ratings leaderboard', 'Historical WEC driver ratings within each class', '/ratings/leaderboard?series=wec&class=top'],
-    ['Compare ratings', 'Compare WEC class rating histories', '/ratings/compare?series=wec&class=top'],
-    ['Rating profiles', 'Inspect race-by-race WEC rating changes', '/ratings/driver?series=wec&class=top'],
-    ['Ratings methodology', 'How WEC crew and class ratings work', '/ratings/methodology?series=wec&class=top'],
     ['Simulator', 'Explore WEC simulation tools', '/wec/simulator'],
     ['Simulate season', 'Recalculate a World Endurance Championship season', '/wec/simulate-season'],
     ['Points systems', 'Create and manage WEC scoring rules', '/wec/points-systems'],
@@ -594,7 +586,7 @@ async function wecDashboardData(connection, includeArchive) {
     const latestRows = await connection.query('SELECT id, year, name FROM wec_seasons ORDER BY year DESC LIMIT 1');
     if (!latestRows.length) return null;
     const season = latestRows[0];
-    const [drivers, teams, circuits, seasons, rounds, leaders, latestEvent, nextEvent, archive] = await Promise.all([
+    const [drivers, teams, circuits, seasons, rounds, leaders, manufacturerLeader, completedEvents, latestEvent, nextEvent, archive] = await Promise.all([
         connection.query('SELECT COUNT(*) AS count FROM wec_drivers'),
         connection.query('SELECT COUNT(*) AS count FROM wec_teams'),
         connection.query('SELECT COUNT(*) AS count FROM wec_circuits'),
@@ -620,6 +612,18 @@ async function wecDashboardData(connection, includeArchive) {
             END, championships.id
             LIMIT 1
         `, [season.id]),
+        connection.query(`
+            SELECT manufacturers.name, standings.points, standings.championshipWon
+            FROM wec_championships championships
+            JOIN wec_standings standings ON standings.championshipId = championships.id
+            JOIN (SELECT championshipId, MAX(round) AS latestRound FROM wec_standings GROUP BY championshipId) latest
+                ON latest.championshipId = standings.championshipId AND latest.latestRound = standings.round
+            JOIN wec_manufacturers manufacturers ON manufacturers.id = standings.entityId
+            WHERE championships.seasonId = ? AND championships.id LIKE '%-hypercar-manufacturers'
+                AND standings.position = 1
+            ORDER BY championships.id LIMIT 1
+        `, [season.id]),
+        connection.query("SELECT COUNT(*) AS count FROM wec_events WHERE seasonId = ? AND status = 'completed'", [season.id]),
         connection.query(`
             SELECT id, round, date, name
             FROM wec_events
@@ -655,6 +659,12 @@ async function wecDashboardData(connection, includeArchive) {
                 championshipWon,
                 label: championshipWon ? 'Drivers’ champions' : 'Drivers’ championship leaders'
             } : null,
+            manufacturerLeader: manufacturerLeader[0] ? {
+                name: manufacturerLeader[0].name,
+                points: Number(manufacturerLeader[0].points || 0),
+                championshipWon: ['1', 'true'].includes(String(manufacturerLeader[0].championshipWon).toLowerCase())
+            } : null,
+            completedRaces: Number(completedEvents[0]?.count || 0),
             latestEvent: latestEvent[0] || null,
             nextEvent: nextEvent[0] || null
         }
@@ -672,11 +682,11 @@ router.get('/api/dashboard', async (req, res) => {
             return res.json(data);
         }
         const tables = {
-            f1: { drivers: 'drivers', constructors: 'constructors', circuits: 'circuits', seasons: 'seasons', races: 'races', chassis: 'chassis', standings: 'seasons_driver_standings', eventName: "COALESCE(NULLIF(grandPrix.fullName, ''), race.officialName)", eventFields: ', grandPrix.shortName, race.officialName', eventJoin: 'LEFT JOIN grands_prix grandPrix ON grandPrix.id = race.grandPrixId' },
-            f2: { drivers: 'f2_drivers', constructors: 'f2_constructors', circuits: 'f2_circuits', seasons: 'f2_seasons', races: 'f2_races', chassis: 'f2_chassis', standings: 'f2_season_driver_standings', eventName: 'race.name', eventFields: '', eventJoin: '' },
-            f3: { drivers: 'f3_drivers', constructors: 'f3_constructors', circuits: 'f3_circuits', seasons: 'f3_seasons', races: 'f3_races', chassis: 'f3_chassis', standings: 'f3_season_driver_standings', eventName: 'race.name', eventFields: '', eventJoin: '' },
-            academy: { drivers: 'fa_drivers', constructors: 'fa_constructors', circuits: 'fa_circuits', seasons: 'fa_seasons', races: 'fa_races', chassis: 'fa_chassis', standings: 'fa_season_driver_standings', eventName: 'race.name', eventFields: '', eventJoin: '' },
-            fe: { drivers: 'fe_drivers', constructors: 'fe_constructors', circuits: 'fe_circuits', seasons: 'fe_seasons', races: 'fe_races', chassis: 'fe_chassis', standings: 'fe_season_driver_standings', eventName: 'race.name', eventFields: '', eventJoin: '' }
+            f1: { drivers: 'drivers', constructors: 'constructors', circuits: 'circuits', seasons: 'seasons', races: 'races', chassis: 'chassis', standings: 'seasons_driver_standings', constructorStandings: 'seasons_constructor_standings', eventName: "COALESCE(NULLIF(grandPrix.fullName, ''), race.officialName)", eventFields: ', grandPrix.shortName, race.officialName', eventJoin: 'LEFT JOIN grands_prix grandPrix ON grandPrix.id = race.grandPrixId' },
+            f2: { drivers: 'f2_drivers', constructors: 'f2_constructors', circuits: 'f2_circuits', seasons: 'f2_seasons', races: 'f2_races', chassis: 'f2_chassis', standings: 'f2_season_driver_standings', constructorStandings: 'f2_season_constructor_standings', eventName: 'race.name', eventFields: '', eventJoin: '' },
+            f3: { drivers: 'f3_drivers', constructors: 'f3_constructors', circuits: 'f3_circuits', seasons: 'f3_seasons', races: 'f3_races', chassis: 'f3_chassis', standings: 'f3_season_driver_standings', constructorStandings: 'f3_season_constructor_standings', eventName: 'race.name', eventFields: '', eventJoin: '' },
+            academy: { drivers: 'fa_drivers', constructors: 'fa_constructors', circuits: 'fa_circuits', seasons: 'fa_seasons', races: 'fa_races', chassis: 'fa_chassis', standings: 'fa_season_driver_standings', constructorStandings: 'fa_season_constructor_standings', eventName: 'race.name', eventFields: '', eventJoin: '' },
+            fe: { drivers: 'fe_drivers', constructors: 'fe_constructors', circuits: 'fe_circuits', seasons: 'fe_seasons', races: 'fe_races', chassis: 'fe_chassis', standings: 'fe_season_driver_standings', constructorStandings: 'fe_season_constructor_standings', eventName: 'race.name', eventFields: '', eventJoin: '' }
         }[['f2', 'f3', 'academy', 'fe'].includes(series) ? series : 'f1'];
 
         const data = await withConnection(async connection => {
@@ -686,7 +696,7 @@ router.get('/api/dashboard', async (req, res) => {
                 : `SELECT MAX(year) AS year FROM \`${tables.seasons}\``);
             const latestSeason = Number(latest[0].year);
 
-            const [drivers, constructors, circuits, seasons, rounds, leader, latestEvent, nextEvent, archive] = await Promise.all([
+            const [drivers, constructors, circuits, seasons, rounds, leaders, constructorLeader, completedRaces, latestEvent, nextEvent, archive] = await Promise.all([
 
                 connection.query(`
                     SELECT COUNT(*) AS count
@@ -716,14 +726,30 @@ router.get('/api/dashboard', async (req, res) => {
                     JOIN \`${tables.drivers}\` drivers ON drivers.id = standings.driverId
                     WHERE standings.year = ?
                     ORDER BY standings.positionNumber IS NULL, standings.positionNumber
+                    LIMIT 3
+                `, [latestSeason]),
+
+                connection.query(`
+                    SELECT constructors.name, standings.points, standings.championshipWon
+                    FROM \`${tables.constructorStandings}\` standings
+                    JOIN \`${tables.constructors}\` constructors ON constructors.id = standings.constructorId
+                    WHERE standings.year = ?
+                    ORDER BY standings.positionNumber IS NULL, standings.positionNumber
                     LIMIT 1
+                `, [latestSeason]),
+
+                connection.query(`
+                    SELECT COUNT(*) AS count FROM \`${tables.races}\` race
+                    WHERE race.year = ? AND race.date < CURRENT_DATE()
                 `, [latestSeason]),
 
                 connection.query(`
                     SELECT race.id, race.round, race.date, ${tables.eventName} AS name${tables.eventFields}
                     FROM \`${tables.races}\` race
                     ${tables.eventJoin}
-                    WHERE race.year = ? AND race.date <= CURRENT_DATE()
+                    WHERE race.year = ? AND ${series === 'f1'
+                        ? 'race.date < CURRENT_DATE()'
+                        : 'race.date <= CURRENT_DATE()'}
                     ORDER BY race.date DESC, race.round DESC
                     LIMIT 1
                 `, [latestSeason]),
@@ -732,7 +758,9 @@ router.get('/api/dashboard', async (req, res) => {
                     SELECT race.id, race.round, race.date, ${tables.eventName} AS name${tables.eventFields}
                     FROM \`${tables.races}\` race
                     ${tables.eventJoin}
-                    WHERE race.year = ? AND race.date > CURRENT_DATE()
+                    WHERE race.year = ? AND ${series === 'f1'
+                        ? 'race.date >= CURRENT_DATE()'
+                        : 'race.date > CURRENT_DATE()'}
                     ORDER BY race.date, race.round
                     LIMIT 1
                 `, [latestSeason]),
@@ -756,11 +784,18 @@ router.get('/api/dashboard', async (req, res) => {
                 latestSeasonLabel: latest[0].label || String(latestSeason),
                 currentSeason: {
                     rounds: Number(rounds[0].count),
-                    leader: leader[0] ? {
-                        name: leader[0].name,
-                        points: Number(leader[0].points || 0),
-                        championshipWon: ['1', 'true'].includes(String(leader[0].championshipWon).toLowerCase())
+                    leader: leaders[0] ? {
+                        name: leaders[0].name,
+                        points: Number(leaders[0].points || 0),
+                        championshipWon: ['1', 'true'].includes(String(leaders[0].championshipWon).toLowerCase())
                     } : null,
+                    topDrivers: leaders.map(row => ({ name: row.name, points: Number(row.points || 0) })),
+                    constructorLeader: constructorLeader[0] ? {
+                        name: constructorLeader[0].name,
+                        points: Number(constructorLeader[0].points || 0),
+                        championshipWon: ['1', 'true'].includes(String(constructorLeader[0].championshipWon).toLowerCase())
+                    } : null,
+                    completedRaces: Number(completedRaces[0]?.count || 0),
                     latestEvent: latestEvent[0] || null,
                     nextEvent: nextEvent[0] || null
                 }

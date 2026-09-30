@@ -5,6 +5,9 @@ const f1Records = require('./f1-records');
 const { isJuniorSeries, minimumSeasonYear, normaliseSeries, seriesPrefix } = require('./series-config');
 const { all: SERIES } = require('../frontend/js/series-config');
 const { resourcePath } = require('./resource-routes');
+const inventoryCalculations = require('./ask-inventory-calculations');
+const { calculateCalendarQuestion } = require('./ask-calendar-calculations');
+const { calculateCareerChronology } = require('./ask-career-chronology');
 
 const cache = new Map();
 const recordCacheByConnection = new WeakMap();
@@ -1516,6 +1519,8 @@ async function calculateStreakLeader(connection, interpretation) {
     const toYear = Number(interpretation.toYear || 2100);
     const category = ['wins', 'podiums', 'points', 'finishes'].includes(interpretation.streakCategory)
         ? interpretation.streakCategory : 'wins';
+    const subject = interpretation.subjectName
+        ? await resolveNamedSubject(connection, interpretation.subjectName, 'drivers', series) : null;
     const rows = isJuniorSeries(series)
         ? await connection.query(`
             SELECT results.driverId, drivers.name AS driverName, results.raceId, results.sessionId,
@@ -1562,30 +1567,55 @@ async function calculateStreakLeader(connection, interpretation) {
         return position > 0 && !/^(?:DNS|DNQ|DNPQ|WD|DSQ|DISQ|DQ|EXC|EXCLUDED)$/i.test(String(row.status || row.positionText || ''));
     };
     const ranking = [...byDriver.entries()].map(([id, driverRows]) => {
-        let best = { length: 0, start: null, end: null };
-        let current = { length: 0, start: null, end: null };
+        let best = { length: 0, start: null, end: null, events: [] };
+        let current = { length: 0, start: null, end: null, events: [] };
         driverRows.forEach(row => {
             if (qualifies(row)) {
                 if (!current.length) current.start = row;
                 current.length += 1;
                 current.end = row;
-                if (current.length > best.length) best = { ...current };
-            } else current = { length: 0, start: null, end: null };
+                current.events.push(row);
+                if (current.length > best.length) best = { ...current, events: [...current.events] };
+            } else current = { length: 0, start: null, end: null, events: [] };
         });
         const name = driverRows[0]?.driverName || id;
         const event = row => row ? { year: Number(row.year), round: Number(row.round), name: row.raceName, sessionName: row.sessionName } : null;
-        return { id, name, value: best.length, start: event(best.start), end: event(best.end), href: entityHref(series, 'drivers', id) };
+        return { id, name, value: best.length, start: event(best.start), end: event(best.end),
+            events: best.events.map(row => ({ ...event(row), raceId: row.raceId })), href: entityHref(series, 'drivers', id) };
     }).filter(entry => entry.value > 0)
         .sort((a, b) => b.value - a.value || a.name.localeCompare(b.name))
         .map((entry, index) => ({ ...entry, rank: index + 1 }));
     if (!ranking.length) throw askHttpError(`No matching ${seriesDetails(series).name} streaks are recorded in that range.`);
     const labels = { wins: 'winning', podiums: 'podium', points: 'points-scoring', finishes: 'classified-finish' };
+    if (subject) {
+        const entry = ranking.find(row => String(row.id) === String(subject.id));
+        if (!entry) throw askHttpError(`No recorded ${labels[category]} streak was found for ${subject.name} in that range.`);
+        return {
+            intent: 'streak_subject',
+            answer: `${subject.name}'s longest recorded ${seriesDetails(series).name} ${labels[category]} streak was ${entry.value} consecutive starts, from ${entry.start.name} in ${entry.start.year} to ${entry.end.name} in ${entry.end.year}.`,
+            entity: 'drivers', entityLabel: 'Drivers',
+            fact: { title: `${subject.name} · longest ${labels[category]} streak`, rows: [
+                { label: 'Driver', value: subject.name, href: entry.href },
+                { label: 'Consecutive starts', value: entry.value },
+                ...entry.events.map((event, index) => ({ label: `${index + 1}. ${event.year} round ${event.round}`,
+                    value: `${event.name}${event.sessionName ? ` · ${event.sessionName}` : ''}`,
+                    href: resourcePath(series, 'race', event.raceId, event.name) }))
+            ] },
+            methodology: { source: 'Recorded race classifications in the Racelytic archive.',
+                coverage: `${seriesDetails(series).name} ${fromYear}–${toYear === 2100 ? 'latest' : toYear}`,
+                sample: `${entry.events.length} consecutive classified race results.` },
+            scope: { subjectName: subject.name, streakCategory: category, fromYear, toYear },
+            assumptions: ['A streak follows the driver’s consecutive recorded starts; races not entered do not break it.',
+                'The events shown are every start in the longest recorded run.']
+        };
+    }
     const leader = ranking[0];
     return {
         intent: 'streak_leader',
         answer: `${leader.name} has the longest ${seriesDetails(series).name} ${labels[category]} streak in the selected range at ${leader.value} consecutive starts.`,
         entity: 'drivers', entityLabel: 'Drivers',
-        streak: { category, label: `${labels[category][0].toUpperCase()}${labels[category].slice(1)} streak`, total: ranking.length, ranking: ranking.slice(0, interpretation.resultLimit || 10) },
+        streak: { category, label: `${labels[category][0].toUpperCase()}${labels[category].slice(1)} streak`, total: ranking.length,
+            ranking: ranking.slice(0, interpretation.resultLimit || 10).map(({ events, ...entry }) => entry) },
         methodology: {
             source: 'Official race classifications in the Racelytic archive.',
             coverage: `${fromYear}–${toYear === 2100 ? 'latest' : toYear}`,
@@ -1848,6 +1878,142 @@ async function calculateDriverHeadToHead(connection, interpretation) {
     };
 }
 
+function archiveDate(value) {
+    if (!value) return null;
+    if (value instanceof Date) {
+        const year = value.getFullYear();
+        const month = String(value.getMonth() + 1).padStart(2, '0');
+        const day = String(value.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+    return String(value).slice(0, 10);
+}
+
+function archiveFact(intent, answer, series, rows, coverage, assumptions) {
+    return {
+        intent, answer, entityLabel: seriesDetails(series).name,
+        fact: { title: coverage, rows },
+        methodology: { source: 'Recorded race calendar and official classifications in the Racelytic archive.',
+            coverage, sample: `${rows.length} supporting archive facts.` },
+        assumptions
+    };
+}
+
+async function calculateSeasonOpener(connection, interpretation) {
+    const series = normaliseSeries(interpretation.series);
+    const prefix = seriesPrefix(series);
+    const year = Number(interpretation.targetSeason);
+    const rows = isJuniorSeries(series)
+        ? await connection.query(`SELECT races.id, races.name, races.year, races.round, races.date,
+                circuits.id AS circuitId, circuits.name AS circuitName, circuits.placeName
+            FROM ${prefix}races races JOIN ${prefix}circuits circuits ON circuits.id = races.circuitId
+            WHERE races.year = ? AND EXISTS (
+                SELECT 1 FROM ${prefix}session_results results
+                JOIN ${prefix}sessions sessions ON sessions.id = results.sessionId
+                WHERE results.raceId = races.id AND LOWER(CAST(sessions.isRace AS CHAR)) IN ('1','true'))
+            ORDER BY races.round, races.date LIMIT 1`, [year])
+        : await connection.query(`SELECT races.id, COALESCE(NULLIF(gp.fullName, ''), races.officialName) AS name,
+                races.year, races.round, races.date, circuits.id AS circuitId,
+                COALESCE(NULLIF(circuits.fullName, ''), circuits.name) AS circuitName,
+                circuits.placeName, countries.name AS countryName
+            FROM races LEFT JOIN grands_prix gp ON gp.id = races.grandPrixId
+            JOIN circuits ON circuits.id = races.circuitId
+            LEFT JOIN countries ON countries.id = circuits.countryId
+            WHERE races.year = ? AND EXISTS (SELECT 1 FROM races_race_results results WHERE results.raceId = races.id)
+            ORDER BY races.round, races.date LIMIT 1`, [year]);
+    const race = rows[0];
+    if (!race) throw askHttpError(`No completed ${seriesDetails(series).name} race is recorded for ${year}.`);
+    const location = [race.placeName, race.countryName].filter(Boolean).join(', ');
+    const date = archiveDate(race.date);
+    const answer = `The first recorded ${seriesDetails(series).name} race of ${year} was ${race.name}, held at ${race.circuitName}${location ? ` in ${location}` : ''}${date ? ` on ${date}` : ''}.`;
+    return archiveFact('season_opener', answer, series, [
+        { label: 'Race', value: race.name, href: resourcePath(series, 'race', race.id, race.name) },
+        { label: 'Circuit', value: race.circuitName, href: resourcePath(series, 'circuit', race.circuitId) },
+        { label: 'Round', value: Number(race.round) },
+        { label: 'Date', value: date || 'Not recorded' }
+    ], `${seriesDetails(series).name} ${year} opening race`, ['The first round with a recorded race classification is used; an unrun scheduled event is excluded.']);
+}
+
+async function calculateDriverDebut(connection, interpretation) {
+    const series = normaliseSeries(interpretation.series);
+    const prefix = seriesPrefix(series);
+    const driver = await resolveNamedSubject(connection, interpretation.subjectName, 'drivers', series);
+    const rows = isJuniorSeries(series)
+        ? await connection.query(`SELECT races.id, races.name, races.year, races.round, races.date,
+                sessions.name AS sessionName, circuits.name AS circuitName
+            FROM ${prefix}session_results results
+            JOIN ${prefix}sessions sessions ON sessions.id = results.sessionId
+            JOIN ${prefix}races races ON races.id = results.raceId
+            LEFT JOIN ${prefix}circuits circuits ON circuits.id = races.circuitId
+            WHERE results.driverId = ? AND LOWER(CAST(sessions.isRace AS CHAR)) IN ('1','true')
+                AND LOWER(COALESCE(results.status, '')) NOT IN ('dns','did-not-start','not-started','withdrawn')
+            ORDER BY races.date, races.round, sessions.sessionNumber LIMIT 1`, [driver.id])
+        : await connection.query(`SELECT races.id, COALESCE(NULLIF(gp.fullName, ''), races.officialName) AS name,
+                races.year, races.round, races.date,
+                COALESCE(NULLIF(circuits.fullName, ''), circuits.name) AS circuitName
+            FROM races_race_results results JOIN races ON races.id = results.raceId
+            LEFT JOIN grands_prix gp ON gp.id = races.grandPrixId
+            LEFT JOIN circuits ON circuits.id = races.circuitId
+            WHERE results.driverId = ? AND UPPER(COALESCE(results.positionText, '')) NOT IN ('DNS','DNQ','DNPQ','WD')
+            ORDER BY races.date, races.round LIMIT 1`, [driver.id]);
+    const race = rows[0];
+    if (!race) throw askHttpError(`No recorded ${seriesDetails(series).name} race start was found for ${driver.name}.`);
+    const date = archiveDate(race.date);
+    const answer = `${driver.name}'s first recorded ${seriesDetails(series).name} race start was ${race.name} in ${race.year}${date ? ` on ${date}` : ''}.`;
+    return archiveFact('driver_debut', answer, series, [
+        { label: 'Driver', value: driver.name, href: entityHref(series, 'drivers', driver.id) },
+        { label: 'First race', value: race.name, href: resourcePath(series, 'race', race.id, race.name) },
+        { label: 'Circuit', value: race.circuitName || 'Not recorded' },
+        { label: 'Date', value: date || 'Not recorded' }
+    ], `${driver.name} · first recorded race start`, ['Debut means the first recorded race start in this championship, rather than first entry, practice, or qualifying appearance.']);
+}
+
+async function calculateLatestTeamPoints(connection, interpretation) {
+    const series = normaliseSeries(interpretation.series);
+    const prefix = seriesPrefix(series);
+    const team = await resolveNamedSubject(connection, interpretation.subjectName, 'constructors', series);
+    const rows = isJuniorSeries(series)
+        ? await connection.query(`SELECT races.id, races.name, races.year, races.round, races.date,
+                sessions.name AS sessionName, SUM(results.points) AS points
+            FROM ${prefix}session_results results
+            JOIN ${prefix}sessions sessions ON sessions.id = results.sessionId
+            JOIN ${prefix}races races ON races.id = results.raceId
+            WHERE results.constructorId = ? AND results.points > 0
+                AND LOWER(CAST(sessions.isRace AS CHAR)) IN ('1','true')
+            GROUP BY races.id, races.name, races.year, races.round, races.date, sessions.id, sessions.name, sessions.sessionNumber
+            ORDER BY races.date DESC, races.round DESC, sessions.sessionNumber DESC LIMIT 1`, [team.id])
+        : await connection.query(`SELECT races.id, COALESCE(NULLIF(gp.fullName, ''), races.officialName) AS name,
+                races.year, races.round, races.date,
+                CASE WHEN pointsRows.sessionName = 'Sprint' THEN COALESCE(races.sprintRaceDate, races.date)
+                    ELSE races.date END AS sessionDate,
+                pointsRows.sessionName, SUM(pointsRows.points) AS points
+            FROM (SELECT raceId, points, 'Grand Prix' AS sessionName, 2 AS sessionOrder
+                    FROM races_race_results WHERE constructorId = ? AND points > 0
+                  UNION ALL
+                  SELECT raceId, points, 'Sprint' AS sessionName, 1 AS sessionOrder
+                    FROM races_sprint_race_results WHERE constructorId = ? AND points > 0) pointsRows
+            JOIN races ON races.id = pointsRows.raceId
+            LEFT JOIN grands_prix gp ON gp.id = races.grandPrixId
+            GROUP BY races.id, gp.fullName, races.officialName, races.year, races.round, races.date, races.sprintRaceDate,
+                pointsRows.sessionName, pointsRows.sessionOrder
+            ORDER BY sessionDate DESC, races.round DESC, pointsRows.sessionOrder DESC LIMIT 1`, [team.id, team.id]);
+    const race = rows[0];
+    if (!race) throw askHttpError(`No points finish is recorded for ${team.name} in the ${seriesDetails(series).name} archive.`);
+    const date = archiveDate(race.sessionDate || race.date);
+    const points = Number(race.points || 0);
+    const sessionLocation = series === 'f1'
+        ? race.sessionName === 'Grand Prix' ? `at the ${race.name}` : `in the sprint at the ${race.name}`
+        : `in the ${race.sessionName} at ${race.name}`;
+    const answer = `${team.name} last scored ${points} ${seriesDetails(series).name} points ${sessionLocation}${date ? ` on ${date}` : ` in ${race.year}`}.`;
+    return archiveFact('latest_team_points', answer, series, [
+        { label: 'Team', value: team.name, href: entityHref(series, 'constructors', team.id) },
+        { label: 'Race', value: race.name, href: resourcePath(series, 'race', race.id, race.name) },
+        { label: 'Session', value: race.sessionName },
+        { label: 'Points', value: points },
+        { label: 'Date', value: date || 'Not recorded' }
+    ], `${team.name} · latest recorded points finish`, ['Grand Prix and sprint race points are included where recorded; non-race sessions are excluded.', 'The latest event is based on the recorded session date and round.']);
+}
+
 const MOTORSPORT_GLOSSARY = Object.freeze({
     countback: ['Countback', 'When competitors are tied on points, countback ranks them by their best results: most wins first, then second places, third places, and so on until the tie is broken.'],
     classification: ['Classification', 'A classification is the official finishing order. A driver may be classified without reaching the finish if they completed enough of the race distance; disqualifications and non-starters are handled separately.'],
@@ -1941,6 +2107,59 @@ async function explainMotorsportTerm(_connection, interpretation) {
 }
 
 const ASK_QUERY_HANDLERS = Object.freeze({
+    lineup_record: require('./ask-result-analytics').lineupRecord,
+    consecutive_event_wins: require('./ask-result-analytics').consecutiveEventWins,
+    team_change_comparison: require('./ask-result-analytics').teamChangeComparison,
+    compare_seasons: require('./ask-result-analytics').compareSeasons,
+    longest_milestone_gap: require('./ask-result-analytics').longestMilestoneGap,
+    best_worst_result: require('./ask-result-analytics').bestWorstResult,
+    result_distribution: require('./ask-result-analytics').resultDistribution,
+    latest_failure: require('./ask-result-analytics').latestFailure,
+    driver_season_participation: require('./ask-season-participation').driverSeasonParticipation,
+    driver_team_history: require('./ask-team-history').driverTeamHistory,
+    round_standings_change: require('./ask-round-standings').roundStandingsChange,
+    round_rival_swing: require('./ask-round-standings').roundRivalSwing,
+    championship_lead_changes: require('./ask-round-standings').championshipLeadChanges,
+    champion_season_extreme: require('./ask-season-extremes').championSeasonExtreme,
+    single_season_record: require('./ask-season-extremes').singleSeasonRecord,
+    team_season_extreme: require('./ask-season-extremes').teamSeasonExtreme,
+    standings_improvement: require('./ask-season-extremes').standingsImprovement,
+    grid_position: require('./ask-race-details').calculateF1RaceDetail,
+    race_pole: require('./ask-race-details').calculateF1RaceDetail,
+    session_classification: require('./ask-race-details').calculateF1RaceDetail,
+    event_points: require('./ask-race-details').calculateF1RaceDetail,
+    race_status: require('./ask-race-details').calculateF1RaceDetail,
+    grid_movement: require('./ask-race-details').calculateF1RaceDetail,
+    race_entries: require('./ask-race-details').calculateF1RaceDetail,
+    fastest_race_lap: require('./ask-race-details').calculateF1RaceDetail,
+    qualifying_position: require('./ask-race-details').calculateF1RaceDetail,
+    streak_subject: calculateStreakLeader,
+    milestone_threshold: inventoryCalculations.milestoneThreshold,
+    debut_milestone: inventoryCalculations.debutMilestone,
+    milestone_never_reached: inventoryCalculations.milestoneNeverReached,
+    team_tenure: inventoryCalculations.teamTenure,
+    team_seasons: inventoryCalculations.teamSeasons,
+    teammate_events: inventoryCalculations.teammateEvents,
+    debut_to_milestone: inventoryCalculations.firstMilestone,
+    standings_gap: inventoryCalculations.standingsGap,
+    season_standings_gap: inventoryCalculations.seasonStandingsGap,
+    top_four_spread: inventoryCalculations.topFourSpread,
+    latest_team_milestone: inventoryCalculations.latestTeamMilestone,
+    points_without_win: inventoryCalculations.mostPointsWithoutWin,
+    season_opener: calculateSeasonOpener,
+    season_closer: calculateCalendarQuestion,
+    season_calendar: calculateCalendarQuestion,
+    season_event_count: calculateCalendarQuestion,
+    adjacent_event: calculateCalendarQuestion,
+    calendar_host_years: require('./ask-calendar-history').calculateCalendarHistory,
+    calendar_host_boundary: require('./ask-calendar-history').calculateCalendarHistory,
+    calendar_host_leader: require('./ask-calendar-history').calculateCalendarHistory,
+    driver_debut: calculateDriverDebut,
+    driver_last_start: calculateCareerChronology,
+    team_boundary_start: calculateCareerChronology,
+    competitor_milestone: calculateCareerChronology,
+    competitor_season_summary: require('./ask-competitor-season').calculateCompetitorSeason,
+    latest_team_points: calculateLatestTeamPoints,
     record_leader: calculateRecordLeader,
     record_subject_total: calculateRecordSubjectTotal,
     race_result: calculateRaceResult,
@@ -1990,6 +2209,9 @@ async function executeAskQuery(connection, interpretation) {
 
 module.exports = {
     ASK_QUERY_HANDLERS,
+    calculateSeasonOpener,
+    calculateDriverDebut,
+    calculateLatestTeamPoints,
     availablePointsSystems,
     nationalityOptions,
     calculateRecordLeader,

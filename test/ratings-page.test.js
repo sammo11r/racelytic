@@ -214,10 +214,17 @@ test('ratings explains model context and exposes trustworthy freshness messaging
   assert.match(html, /Rating &amp; evidence guide/);
 });
 
-test('ratings is a top-level section while games remains available', () => {
-  assert.doesNotMatch(header.match(/data-nav-section="analysis"[\s\S]*?<\/div>\s*<\/div>/)?.[0] || '', /href="\/ratings"/);
-  assert.match(header, /data-nav-section="ratings"[\s\S]*?Ratings[\s\S]*?\/ratings\/leaderboard[\s\S]*?\/ratings\/compare[\s\S]*?\/ratings\/driver[\s\S]*?\/ratings\/methodology/);
+test('ratings stays available by URL without appearing in championship discovery', () => {
+  const footer = fs.readFileSync(path.join(root, 'frontend/components/footer.html'), 'utf8');
+  const search = fs.readFileSync(path.join(root, 'backend/routes/core.js'), 'utf8');
+  const navigation = fs.readFileSync(path.join(root, 'frontend/js/navigation.js'), 'utf8');
+  assert.doesNotMatch(header, /data-nav-section="ratings"|href="\/ratings/);
+  assert.doesNotMatch(footer, /data-footer-page="ratings"|href="\/ratings/);
+  assert.doesNotMatch(search, /\['[^']*[Rr]atings[^']*',\s*'[^']*',\s*'\/ratings/);
+  assert.doesNotMatch(navigation, /\['RACELYTIC RATINGS'/);
+  assert.match(header, /data-nav-section="simulator"[\s\S]*?href="\/simulator-overview"/);
   assert.match(header, /data-nav-section="games"[\s\S]*?Games[\s\S]*?href="\/games"/);
+  assert.match(server, /'\/ratings\/leaderboard': \['templates\/ratings-explorer\.html'/);
 });
 
 test('ratings page exposes matching internal destinations', () => {

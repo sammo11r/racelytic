@@ -11,6 +11,7 @@ const dataSources = fs.readFileSync(path.join(frontend, 'data-sources.html'), 'u
 const aboutPages = ['about.html', 'f2-about.html', 'f3-about.html']
   .map(file => fs.readFileSync(path.join(frontend, file), 'utf8'));
 const navigation = fs.readFileSync(path.join(frontend, 'js/navigation.js'), 'utf8');
+const privacyScript = fs.readFileSync(path.join(frontend, 'js/privacy.js'), 'utf8');
 
 test('terms cover public creations, moderation, reports and all championships', () => {
   assert.match(terms, /id="moderation"/);
@@ -41,6 +42,11 @@ test('privacy notice matches account, analytics and browser storage behaviour', 
   assert.match(privacy, /unfinished points-system, scenario or championship drafts/);
   assert.match(privacy, /Changing your password ends other active sessions/);
   assert.match(privacy, /does not sell personal data/);
+});
+
+test('analytics consent gives allow and decline equal visual weight', () => {
+  assert.match(privacyScript, /class="button secondary" data-analytics-choice="declined"/);
+  assert.match(privacyScript, /class="button secondary" data-analytics-choice="allowed"/);
 });
 
 test('account consent versions match the published legal documents', () => {

@@ -10,11 +10,14 @@ const { all: SERIES } = require('../../frontend/js/series-config');
 const { AskConversationStore } = require('../ask-conversations');
 const { executeAskTool } = require('../ask-tools');
 const { LOCAL_PLANNER_VERSION } = require('../ask-local-fallback');
+const { executeWecQuestion } = require('../ask-wec');
 
 function askOptions(series = 'f1') {
     return {
-        pointsSystems: isJuniorSeries(series) ? [] : availablePointsSystems(),
-        recordCategories: RECORD_CATEGORIES
+        pointsSystems: isJuniorSeries(series) || series === 'wec' ? [] : availablePointsSystems(),
+        recordCategories: series === 'wec'
+            ? RECORD_CATEGORIES.filter(category => ['wins', 'podiums', 'starts'].includes(category.id))
+            : RECORD_CATEGORIES
     };
 }
 
@@ -36,10 +39,32 @@ function optionalMinimumStarts(value) {
     return Number.isInteger(number) && number >= 1 && number <= 1000 ? number : null;
 }
 
+function optionalMilestoneCount(value) {
+    if (value === '' || value === null || value === undefined) return null;
+    const number = Number(value);
+    return Number.isInteger(number) && number >= 1 && number <= 10000 ? number : null;
+}
+
 function optionalRound(value) {
     if (value === '' || value === null || value === undefined) return null;
     const number = Number(value);
     return Number.isInteger(number) && number >= 1 && number <= 100 ? number : null;
+}
+
+function isEvidenceFollowUp(query) {
+    return /^(?:why\??|how (?:did you|was (?:that|this|it)) (?:calculate|work out|derive)|what (?:data|sources?|evidence) did you use)/i.test(String(query || '').trim());
+}
+
+function explainPreviousCalculation(conversation) {
+    const previous = conversation?.lastEvidence;
+    if (!previous?.methodology?.source) return null;
+    const { methodology, assumptions = [], grounding } = previous;
+    const answer = `I used ${methodology.source} ${methodology.coverage ? `The calculation covers ${methodology.coverage}.` : ''} ${methodology.sample || ''}`.replace(/\s+/g, ' ').trim();
+    return {
+        intent: 'explain_calculation', answer, methodology, assumptions,
+        grounding: { grounded: true, tool: 'explain_previous_calculation', label: 'Previous calculation evidence',
+            source: methodology.source, evidenceItems: grounding?.evidenceItems || 0 }
+    };
 }
 
 function assertRequestedScopesApplied(interpretation, result) {
@@ -104,9 +129,29 @@ function applyConfirmedInterpretation(interpreted, requested) {
         targetSeason,
         subjectName,
         subjectNames,
+        milestoneCount: Object.hasOwn(requested, 'milestoneCount') ? optionalMilestoneCount(requested.milestoneCount) : interpreted.milestoneCount || null,
+        milestoneMeasure: ['starts', 'days'].includes(requested.milestoneMeasure) ? requested.milestoneMeasure : interpreted.milestoneMeasure || null,
         eventName: confirmedName('eventName'),
+        resultPosition: Object.hasOwn(requested, 'resultPosition') ? optionalRound(requested.resultPosition) : interpreted.resultPosition || null,
+        sessionType: ['race', 'sprint', 'qualifying'].includes(requested.sessionType) ? requested.sessionType : interpreted.sessionType || null,
+        statusFilter: ['retired', 'dns', 'disqualified'].includes(requested.statusFilter) ? requested.statusFilter : interpreted.statusFilter || null,
+        entryMode: ['entered', 'started'].includes(requested.entryMode) ? requested.entryMode : interpreted.entryMode || null,
+        historyMode: ['teams', 'teammates'].includes(requested.historyMode) ? requested.historyMode : interpreted.historyMode || null,
+        participationMode: ['entered', 'started', 'missed'].includes(requested.participationMode) ? requested.participationMode : interpreted.participationMode || null,
+        resultMetric: ['race_finish', 'season_points', 'season_rank'].includes(requested.resultMetric) ? requested.resultMetric : interpreted.resultMetric || null,
+        distributionMetric: ['finishes', 'points'].includes(requested.distributionMetric) ? requested.distributionMetric : interpreted.distributionMetric || null,
+        failureMetric: ['points', 'finish'].includes(requested.failureMetric) ? requested.failureMetric : interpreted.failureMetric || null,
+        gapMeasure: ['days', 'starts'].includes(requested.gapMeasure) ? requested.gapMeasure : interpreted.gapMeasure || null,
+        newTeamName: confirmedName('newTeamName'),
+        calendarHistoryName: confirmedName('calendarHistoryName'),
+        calendarHistoryKind: ['circuit', 'event', 'country'].includes(requested.calendarHistoryKind) ? requested.calendarHistoryKind : interpreted.calendarHistoryKind || null,
+        calendarDirection: ['previous', 'next'].includes(requested.calendarDirection) ? requested.calendarDirection : interpreted.calendarDirection || null,
+        countUnit: ['events', 'races'].includes(requested.countUnit) ? requested.countUnit : interpreted.countUnit || null,
+        chronologyDirection: ['first', 'last'].includes(requested.chronologyDirection) ? requested.chronologyDirection : interpreted.chronologyDirection || null,
         resultView: Object.hasOwn(requested, 'resultView') && resultViews.has(requested.resultView) ? requested.resultView : interpreted.resultView || null,
         standingRound: Object.hasOwn(requested, 'standingRound') ? optionalRound(requested.standingRound) : interpreted.standingRound || null,
+        roundStart: Object.hasOwn(requested, 'roundStart') ? optionalRound(requested.roundStart) : interpreted.roundStart || null,
+        roundEnd: Object.hasOwn(requested, 'roundEnd') ? optionalRound(requested.roundEnd) : interpreted.roundEnd || null,
         comparisonScope: Object.hasOwn(requested, 'comparisonScope') && comparisonScopes.has(requested.comparisonScope) ? requested.comparisonScope : interpreted.comparisonScope || null,
         comparisonMetric: Object.hasOwn(requested, 'comparisonMetric') && comparisonMetrics.has(requested.comparisonMetric) ? requested.comparisonMetric : interpreted.comparisonMetric || null,
         streakCategory: Object.hasOwn(requested, 'streakCategory') && streakCategories.has(requested.streakCategory) ? requested.streakCategory : interpreted.streakCategory || null,
@@ -127,22 +172,27 @@ function applyConfirmedInterpretation(interpreted, requested) {
     };
     const missingFields = missingRequiredSlots(detectedIntent, candidate);
     if (detectedIntent === 'race_result' && candidate.resultView === 'driver' && !candidate.subjectName) missingFields.push('subjectName');
+    const inventoryEntityMismatch = ['team_tenure', 'team_seasons', 'teammate_events', 'debut_to_milestone', 'debut_milestone', 'milestone_never_reached', 'milestone_threshold', 'points_without_win'].includes(detectedIntent)
+        ? candidate.entity !== 'drivers' : detectedIntent === 'latest_team_milestone' && candidate.entity !== 'constructors';
     const systemsAvailable = detectedIntent === 'compare_points_systems'
         ? comparisonPointsSystemYears.length >= 2 && comparisonPointsSystemYears.every(pointsSystemExists)
         : !detectedIntent || !detectedIntent.startsWith('recalculate_') && detectedIntent !== 'list_changed_championships'
             ? true
             : pointsSystemExists(pointsSystemYear);
-    const ready = detectedIntent && !missingFields.length && systemsAvailable && !interpreted.unsupportedQualifiers?.length;
+    const ready = detectedIntent && !missingFields.length && systemsAvailable && !interpreted.unsupportedQualifiers?.length && !inventoryEntityMismatch;
     return {
         ...candidate,
         intent: ready ? detectedIntent : 'unsupported',
         missingFields,
-        reason: ready ? 'Confirmed by the user.' : interpreted.reason
+        reason: ready ? 'Confirmed by the user.' : inventoryEntityMismatch
+            ? 'That question has a fixed subject type; ask for a driver ranking or name a team as appropriate.' : interpreted.reason
     };
 }
 
 function mentionedSeries(query) {
     const text = String(query || '').toLowerCase();
+    if (/\b(?:world\s+endurance\s+championship|wec)\b/.test(text)) return 'wec';
+    if (/\b(?:formula\s*e|e-prix)\b/.test(text)) return 'fe';
     if (/\bf1\s+academy\b|\bformula\s+1\s+academy\b/.test(text)) return 'academy';
     if (/\b(?:formula\s*3|f3)\b/.test(text)) return 'f3';
     if (/\b(?:formula\s*2|f2)\b/.test(text)) return 'f2';
@@ -156,7 +206,9 @@ function applyFollowUpInterpretation(interpreted, context, query) {
     const directives = extractFollowUpDirectives(text);
     const hasReference = /\b(?:he|him|his|she|her|hers|they|them|their|theirs|it|its|that|those|same|previous|former|latter)\b/i.test(text);
     if ((!directives.isFollowUp && !hasReference) || !supportedIntentIds().has(context.intent)) return interpreted;
-    const { clearFields, subjectReplacement } = directives;
+    const { clearFields } = directives;
+    const subjectReplacement = /^(?:wins?|victor(?:y|ies)|podiums?|points?|(?:19|20)\d{2})$/i.test(directives.subjectReplacement || '')
+        ? null : directives.subjectReplacement;
     const entityChanged = interpreted.entityExplicit && interpreted.entity && interpreted.entity !== context.entity;
     const value = (field, fallback = null) => mergeFollowUpSlot(interpreted, context, field, clearFields, fallback);
     let detectedIntent = directives.isFollowUp && interpreted.interpretationSource === 'local_fallback'
@@ -184,6 +236,10 @@ function applyFollowUpInterpretation(interpreted, context, query) {
     }
     const requestedScope = directives.comparisonScope;
     const requestedView = directives.resultView;
+    const followUpPositions = [...text.matchAll(/\bp\s*(\d{1,2})\b/gi)].map(match => Number(match[1]));
+    const followUpMilestone = ['debut_to_milestone', 'debut_milestone', 'milestone_never_reached', 'milestone_threshold', 'latest_team_milestone'].includes(context.intent)
+        ? /\bpodiums?\b/i.test(text) ? 'podium' : /\b(?:wins?|victor(?:y|ies))\b/i.test(text) ? 'win'
+            : /\bpoints?\b/i.test(text) ? 'points' : null : null;
     const candidate = {
         ...context,
         ...interpreted,
@@ -194,8 +250,20 @@ function applyFollowUpInterpretation(interpreted, context, query) {
         comparisonPointsSystemYears: interpreted.comparisonPointsSystemYears?.length >= 2
             ? interpreted.comparisonPointsSystemYears : context.comparisonPointsSystemYears || [],
         recordCategory: value('recordCategory'),
-        subjectName: entityChanged ? null : subjectReplacement && ['record_leader', 'record_subject_total', 'race_result', 'driver_profile', 'constructor_profile'].includes(context.intent)
+        subjectName: entityChanged ? null : subjectReplacement && ['record_leader', 'record_subject_total', 'race_result', 'driver_profile', 'constructor_profile', 'team_tenure', 'latest_team_milestone', 'latest_team_points', 'competitor_season_summary', 'streak_subject'].includes(context.intent)
             ? subjectReplacement : value('subjectName'),
+        milestone: followUpMilestone || value('milestone'),
+        milestoneCount: context.intent === 'milestone_threshold' && /\b(\d{1,4})\s+(?:wins?|victor(?:y|ies)|podiums?|points?|starts?)\b/i.test(text)
+            ? Number(text.match(/\b(\d{1,4})\s+(?:wins?|victor(?:y|ies)|podiums?|points?|starts?)\b/i)[1]) : value('milestoneCount'),
+        milestoneMeasure: /\b(?:starts?|races?)\b/i.test(text) && context.intent === 'debut_to_milestone' ? 'starts'
+            : /\b(?:days?|calendar\s+time)\b/i.test(text) && context.intent === 'debut_to_milestone' ? 'days' : value('milestoneMeasure'),
+        chronologyDirection: context.intent === 'milestone_threshold' && /\b(?:fewest|fastest|quickest|least)\b/i.test(text) ? null
+            : /\b(?:first|earliest)\b/i.test(text) ? 'first'
+                : /\b(?:last|latest|final|most\s+recent)\b/i.test(text) ? 'last' : value('chronologyDirection'),
+        firstPosition: followUpPositions.length === 2 ? followUpPositions[0] : value('firstPosition'),
+        secondPosition: followUpPositions.length === 2 ? followUpPositions[1] : value('secondPosition'),
+        extreme: /\b(?:largest|widest|biggest|greatest)\b/i.test(text) ? 'largest'
+            : /\b(?:smallest|closest|narrowest|tightest)\b/i.test(text) ? 'smallest' : value('extreme'),
         constructorName: entityChanged ? null : value('constructorName'),
         circuitName: /\b(?:that|the same|previous)\s+(?:circuit|track|venue)\b/i.test(text) ? context.circuitName
             : interpreted.venueCountryName ? null : value('circuitName'),
@@ -204,20 +272,51 @@ function applyFollowUpInterpretation(interpreted, context, query) {
         raceFormat: value('raceFormat'),
         resultLimit: value('resultLimit'),
         minStarts: value('minStarts'),
-        targetSeason: /\b(?:that|the same|previous)\s+(?:season|year)\b/i.test(text) ? context.targetSeason : value('targetSeason'),
+        targetSeason: /\b(?:that|the same|previous)\s+(?:season|year)\b/i.test(text) ? context.targetSeason
+            : /\b(?:19|20)\d{2}\b/.test(text) && /\bwhat\s+about\b/i.test(text)
+                ? Number(text.match(/\b((?:19|20)\d{2})\b/)[1]) : value('targetSeason'),
         eventName: /\b(?:that|the same|previous)\s+race\b/i.test(text) ? context.eventName : value('eventName'),
+        resultPosition: value('resultPosition'),
+        sessionType: value('sessionType'),
+        statusFilter: value('statusFilter'),
+        entryMode: value('entryMode'),
+        historyMode: value('historyMode'),
+        participationMode: value('participationMode'),
+        resultMetric: value('resultMetric'),
+        distributionMetric: value('distributionMetric'),
+        failureMetric: value('failureMetric'),
+        gapMeasure: value('gapMeasure'),
+        newTeamName: value('newTeamName'),
+        calendarHistoryName: subjectReplacement && ['calendar_host_years', 'calendar_host_boundary'].includes(context.intent)
+            ? subjectReplacement : value('calendarHistoryName'),
+        calendarHistoryKind: /\b(?:circuits?|tracks?|venues?)\b/i.test(text) ? 'circuit'
+            : /\b(?:events?|grands?\s+prix|gps?)\b/i.test(text) && context.intent === 'calendar_host_leader' ? 'event'
+                : value('calendarHistoryKind'),
+        calendarDirection: /\b(?:previous|before|preceding)\b/i.test(text) ? 'previous'
+            : /\b(?:next|after|following)\b/i.test(text) ? 'next' : value('calendarDirection'),
+        countUnit: context.intent === 'season_event_count' && /\b(?:races?|events?)\b/i.test(text)
+            ? /\bevents?\b/i.test(text) ? 'events' : 'races' : value('countUnit'),
         resultView: subjectReplacement && context.intent === 'race_result' ? 'driver' : requestedView || value('resultView'),
         standingRound: value('standingRound'),
+        roundStart: value('roundStart'),
+        roundEnd: value('roundEnd'),
         subjectNames,
         comparisonScope: requestedScope || value('comparisonScope'),
         comparisonMetric: value('comparisonMetric'),
-        streakCategory: value('streakCategory'),
+        streakCategory: context.intent === 'streak_subject' && /\b(?:podiums?|points?|wins?|victor(?:y|ies)|finish(?:es|ed|ing)?)\b/i.test(text)
+            ? /\bpodiums?\b/i.test(text) ? 'podiums' : /\bpoints?\b/i.test(text) ? 'points'
+                : /\bfinish(?:es|ed|ing)?\b/i.test(text) ? 'finishes' : 'wins' : value('streakCategory'),
         topic: value('topic'),
         fromYear: value('fromYear'),
         toYear: value('toYear'),
         confidence: 'contextual',
         ambiguousFields: [],
-        unsupportedQualifiers: interpreted.unsupportedQualifiers || []
+        unsupportedQualifiers: (interpreted.unsupportedQualifiers || []).filter(qualifier => !(
+            ['a race-format, class, or condition filter', 'a class, race-format, or condition filter'].includes(qualifier)
+            && ['record_leader', 'record_subject_total'].includes(detectedIntent)
+            && interpreted.raceFormat
+            && !/\b(?:wet|rainy|night)\b/i.test(text)
+        ))
     };
     candidate.missingFields = missingRequiredSlots(detectedIntent, candidate);
     if (candidate.missingFields.length || candidate.unsupportedQualifiers.length) candidate.intent = 'unsupported';
@@ -268,7 +367,7 @@ function createAskRouter({
     execute = executeAskQuery,
     interpret = interpretQuestion,
     connect = withConnection,
-    limiter = new MemoryRateLimiter({ windowMs: 5 * 60 * 1000, limit: 20, maxEntries: 5000 }),
+    limiter = new MemoryRateLimiter({ windowMs: 5 * 60 * 1000, limit: 60, maxEntries: 5000 }),
     conversations = new AskConversationStore()
 } = {}) {
     const router = express.Router();
@@ -277,6 +376,15 @@ function createAskRouter({
         const prefix = seriesPrefix(series);
         try {
             const options = await connect(async connection => {
+                if (series === 'wec') {
+                    const [teams, circuits, drivers] = await Promise.all([
+                        connection.query('SELECT name FROM wec_teams ORDER BY name'),
+                        connection.query('SELECT name FROM wec_circuits ORDER BY name'),
+                        connection.query('SELECT name FROM wec_drivers ORDER BY name')
+                    ]);
+                    return { teams: teams.map(row => row.name), circuits: circuits.map(row => row.name),
+                        drivers: drivers.map(row => row.name), countries: [], nationalities: [] };
+                }
                 const teams = await connection.query(`SELECT name FROM ${prefix}constructors ORDER BY name`);
                 const circuits = await connection.query(`SELECT name FROM ${prefix}circuits ORDER BY name`);
                 const drivers = await connection.query(`SELECT name FROM ${prefix}drivers ORDER BY name`);
@@ -320,8 +428,9 @@ function createAskRouter({
     }
     const query = String(req.body?.query || '').trim();
     const series = normaliseSeries(req.body?.series);
-    if (query.length < 8 || query.length > 300) {
-        return res.status(400).json({ error: 'Enter a question between 8 and 300 characters.' });
+    const continuing = Boolean(conversations.get(req.body?.conversationId, series));
+    if (query.length < (continuing ? 2 : 8) || query.length > 300) {
+        return res.status(400).json({ error: continuing ? 'Enter at least two characters for a follow-up.' : 'Enter a question between 8 and 300 characters.' });
     }
     let interpretation;
     try {
@@ -333,12 +442,46 @@ function createAskRouter({
                 seriesMismatch: { current: series, requested: requestedSeries, name: target.name, url: `${target.path}/ask?q=${encodeURIComponent(query)}` }
             });
         }
+        if (isEvidenceFollowUp(query)) {
+            const conversation = conversations.get(req.body?.conversationId, series);
+            const result = explainPreviousCalculation(conversation);
+            if (!result) return res.status(422).json({ error: 'Ask a calculable archive question first, then I can explain its evidence and assumptions.' });
+            const savedConversation = conversations.remember({
+                id: conversation.id, series, query, answer: result.answer,
+                context: conversation.context, tool: result.grounding.tool,
+                evidence: conversation.lastEvidence
+            });
+            return res.json({ query, ...result, interpretation: conversation.context,
+                planner: { mode: 'local', version: LOCAL_PLANNER_VERSION, externalServices: false },
+                options: askOptions(series), conversation: conversations.publicView(savedConversation) });
+        }
+        if (series === 'wec') {
+            const conversation = conversations.get(req.body?.conversationId, series);
+            const context = req.body?.context && typeof req.body.context === 'object'
+                ? req.body.context : conversation?.context;
+            const result = await connect(connection => executeWecQuestion(connection, query, context));
+            interpretation = { ...result.interpretation, series: SERIES.wec.name };
+            const savedConversation = conversations.remember({
+                id: conversation?.id, series, query, answer: result.answer,
+                context: result.interpretation, tool: result.grounding.tool,
+                evidence: { methodology: result.methodology, assumptions: result.assumptions, grounding: result.grounding }
+            });
+            return res.json({ query, ...result, interpretation,
+                planner: { mode: 'local', version: 'wec-archive-v1', externalServices: false },
+                options: askOptions(series), conversation: conversations.publicView(savedConversation) });
+        }
         const conversation = conversations.get(req.body?.conversationId, series);
         const conversationContext = req.body?.context && typeof req.body.context === 'object'
             ? req.body.context
             : conversation?.context;
         const contextual = applyFollowUpInterpretation({ ...interpret(query), series }, conversationContext, query);
+        if (series === 'fe' && /^formula\s*e$/i.test(contextual.constructorName || '')) {
+            contextual.constructorName = null;
+        }
         interpretation = applyConfirmedInterpretation(contextual, req.body?.interpretation);
+        if (interpretation.intent === 'motorsport_explanation') {
+            return supportedResponse(res, interpretation, 'Ask Racelytic only answers questions it can calculate from recorded archive data. Try a race result, standings, record, or comparison.');
+        }
         const supportedIntents = supportedIntentIds();
         if (!supportedIntents.has(interpretation.intent)) return supportedResponse(res, interpretation);
         if (isJuniorSeries(series) && intentDefinition(interpretation.intent)?.family === 'points_counterfactual') {
@@ -357,16 +500,35 @@ function createAskRouter({
         const responseInterpretation = {
                 intent: result.intent || interpretation.intent,
                 series: SERIES[series].name,
-                entity: result.entity,
+                entity: result.entity || interpretation.entity,
                 entityLabel: result.entityLabel,
                 pointsSystemYear: interpretation.pointsSystemYear,
                 comparisonPointsSystemYears: interpretation.comparisonPointsSystemYears,
                 targetSeason: interpretation.targetSeason,
                 subjectName: interpretation.subjectName,
+                milestone: interpretation.milestone,
+                milestoneCount: interpretation.milestoneCount,
+                milestoneMeasure: interpretation.milestoneMeasure,
+                chronologyDirection: interpretation.chronologyDirection,
+                firstPosition: interpretation.firstPosition,
+                secondPosition: interpretation.secondPosition,
+                extreme: interpretation.extreme,
                 subjectNames: interpretation.subjectNames,
                 eventName: interpretation.eventName,
+                resultPosition: interpretation.resultPosition,
+                sessionType: interpretation.sessionType,
+                statusFilter: interpretation.statusFilter,
+                entryMode: interpretation.entryMode,
+                historyMode: interpretation.historyMode,
+                participationMode: interpretation.participationMode,
+                calendarHistoryName: interpretation.calendarHistoryName,
+                calendarHistoryKind: interpretation.calendarHistoryKind,
+                calendarDirection: interpretation.calendarDirection,
+                countUnit: interpretation.countUnit,
                 resultView: interpretation.resultView,
                 standingRound: interpretation.standingRound,
+                roundStart: interpretation.roundStart,
+                roundEnd: interpretation.roundEnd,
                 comparisonScope: result.comparison?.scope || interpretation.comparisonScope,
                 comparisonMetric: result.comparison?.metric || interpretation.comparisonMetric,
                 streakCategory: interpretation.streakCategory,
@@ -392,7 +554,8 @@ function createAskRouter({
             query,
             answer: result.answer,
             context: { ...interpretation, ...responseInterpretation, series },
-            tool: grounding.tool
+            tool: grounding.tool,
+            evidence: { methodology: result.methodology, assumptions: result.assumptions, grounding }
         });
         res.json({
             query,

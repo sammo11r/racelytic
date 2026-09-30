@@ -70,7 +70,7 @@ test('Formula E exposes archive, analysis, simulator and games surfaces', () => 
     for (const page of ['games', 'idle-racing-manager', 'lights-out', 'quizzes', 'champions-quiz', 'race-winners-quiz', 'constructor-champions-quiz', 'season-race-winners-quiz']) {
         assert.ok(FORMULA_E_PAGES[page], `missing ${page}`);
     }
-    assert.equal(FORMULA_E_PAGES.ask, undefined);
+    assert.equal(FORMULA_E_PAGES.ask, 'ask.html');
 });
 
 test('Formula E games retain their namespace, identity and archive-backed quiz contracts', () => {
@@ -123,7 +123,8 @@ test('Formula E renderer removes Formula 3 identity and points scripts at Formul
     const analysisDirectory = renderFormulaEHtml('f3-analysis.html', read('frontend/f3-analysis.html'));
     const chassis = renderFormulaEHtml('f3-chassis.html', read('frontend/f3-chassis.html'));
     assert.match(database, /href="\/formula-e\/chassis"/);
-    assert.doesNotMatch(analysisDirectory, /analysis-ask-entry|\/formula-e\/ask/);
+    assert.match(analysisDirectory, /analysis-ask-entry/);
+    assert.match(analysisDirectory, /\/formula-e\/ask/);
     assert.match(chassis, /\/formula-e-js\/f3-chassis\.js/);
 
     const script = renderFormulaEScript("fetch('/api/races?series=f3'); const config = { series: 'f3' }; location.href = '/f3/races';");

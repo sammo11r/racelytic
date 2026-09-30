@@ -119,7 +119,6 @@ function renderFormulaEHtml(file, content) {
         rendered = rendered.replace(/(<script src="\/js\/(?:simulator|scenario-calculator|championship-builder|points-systems)\.js"><\/script>)/,
             '<script src="/js/formula-e-points-systems.js"></script>\n  $1');
     }
-    if (file === 'f3-analysis.html') rendered = rendered.replace(/\s*<section class="analysis-ask-entry"[\s\S]*?<\/section>/, '');
     return replaceAll(rendered, PAGE_COPY[file] || []);
 }
 

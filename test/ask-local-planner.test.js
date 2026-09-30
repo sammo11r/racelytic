@@ -29,8 +29,8 @@ const evaluationCorpus = INTENT_CATALOG.flatMap(intent => wrappers.map(transform
     query: transform(intent.examples[0])
 })));
 
-test('local planner evaluation corpus covers 270 conversational questions', () => {
-    assert.equal(evaluationCorpus.length, 270);
+test('local planner evaluation corpus covers every declared intent with conversational wrappers', () => {
+    assert.equal(evaluationCorpus.length, INTENT_CATALOG.length * wrappers.length);
     evaluationCorpus.forEach(({ intent, query }) => {
         assert.equal(interpretLocally(query).intent, intent, query);
     });
@@ -48,6 +48,41 @@ test('local statistical model handles flexible language and rejects unrelated re
     flexible.forEach(([query, intent]) => assert.equal(interpretLocally(query).intent, intent, query));
     assert.equal(localModelCandidates('What is the weather forecast tomorrow?').length, 0);
     assert.match(LOCAL_PLANNER_VERSION, /^racelytic-intent-nb-v\d+$/);
+});
+
+test('unseen result and standings wording retains the requested slots', () => {
+    for (const query of [
+        'Who came P1 at Monaco in 2024?',
+        'Who was P1 at Monaco in 2024?',
+        'Who took the chequered flag at Monaco in 2024?',
+        'Who finished on the top step at Monaco in 2024?'
+    ]) {
+        const result = interpretLocally(query);
+        assert.equal(result.intent, 'race_result', query);
+        assert.equal(result.eventName, 'Monaco', query);
+        assert.equal(result.targetSeason, 2024, query);
+        assert.equal(result.resultView, 'winner', query);
+    }
+    for (const query of ['Show the 2024 drivers points ladder', 'Who led the 2024 points ranking?', '2024 points leaderboard']) {
+        const result = interpretLocally(query);
+        assert.equal(result.intent, 'season_standings', query);
+        assert.equal(result.targetSeason, 2024, query);
+        assert.equal(result.pointsSystemYear, null, query);
+    }
+});
+
+test('fallback does not turn ordinary season points or positions into another calculation', () => {
+    const seasonPoints = interpretLocally('Which driver scored most points in 2024?');
+    assert.equal(seasonPoints.intent, 'record_leader');
+    assert.equal(seasonPoints.recordCategory, 'points');
+    assert.deepEqual([seasonPoints.fromYear, seasonPoints.toYear], [2024, 2024]);
+    assert.equal(seasonPoints.pointsSystemYear, null);
+    assert.equal(interpretLocally('Who came P1 in qualifying at Monaco in 2024?').intent, 'qualifying_position');
+    for (const query of [
+        'Who was P2 at Monaco in 2024?',
+        'Who had the quickest pit stop at Monaco in 2024?',
+        'Who topped the points pile in 2024?'
+    ]) assert.equal(interpretLocally(query).intent, 'unsupported', query);
 });
 
 test('Ask language planning contains no external API client or network call', () => {

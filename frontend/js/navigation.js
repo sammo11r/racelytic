@@ -132,7 +132,6 @@ function loadHeader() {
         const reverseAcademyPagePairs = Object.fromEntries(Object.entries(academyPagePairs).map(([f1, academy]) => [academy, f1]));
         const formulaEPagePairs = {
             ...Object.fromEntries(Object.entries(f3PagePairs)
-            .filter(([f1]) => !/ask/.test(f1))
             .map(([f1, f3]) => [f1, f3.replace('/f3', '/formula-e')])),
             '/world-champions-quiz': '/formula-e/champions-quiz',
             '/race-winners-quiz': '/formula-e/race-winners-quiz'
@@ -142,6 +141,7 @@ function loadHeader() {
             '/': '/wec',
             '/database': '/wec/database',
             '/analysis': '/wec/analysis',
+            '/ask': '/wec/ask',
             '/season-analysis': '/wec/season-analysis',
             '/season-comparison': '/wec/season-comparison',
             '/race-analysis': '/wec/race-analysis',
@@ -360,6 +360,7 @@ function loadHeader() {
             const analysisLinks = [...(analysis?.querySelectorAll('.dropdown-menu a') || [])];
             const analysisItems = [
                 ['/wec/analysis', 'Overview', 'Choose a WEC analysis'],
+                ['/wec/ask', 'Ask Racelytic', 'Calculate WEC class and overall answers'],
                 ['/wec/season-analysis', 'Season analysis', 'Championship progression by class'],
                 ['/wec/season-comparison', 'Season comparison', 'Compare championships across WEC eras'],
                 ['/wec/race-analysis', 'Race analysis', 'Explore every class in an endurance race'],
@@ -377,24 +378,7 @@ function loadHeader() {
             });
             const analysisTitle = analysis?.querySelector('.dropdown-title');
             if (analysisTitle) analysisTitle.textContent = 'WEC ANALYSIS';
-            const ratings = navigationDropdowns[2];
-            const ratingsItems = [
-                ['/ratings?series=wec&class=top', 'Overview', 'Explore WEC crew ratings by class'],
-                ['/ratings/leaderboard?series=wec&class=top', 'Leaderboard', 'See the class order through WEC history'],
-                ['/ratings/compare?series=wec&class=top', 'Compare drivers', 'Plot up to four class rating histories'],
-                ['/ratings/driver?series=wec&class=top', 'Rating profile', 'Inspect race-by-race class rating changes'],
-                ['/ratings/methodology?series=wec&class=top', 'Methodology', 'Understand crew strength and class pools']
-            ];
-            [...(ratings?.querySelectorAll('.dropdown-menu a') || [])].forEach((link, index) => {
-                const item = ratingsItems[index];
-                if (!item) return link.remove();
-                link.href = item[0];
-                link.querySelector('span').textContent = item[1];
-                link.querySelector('small').textContent = item[2];
-            });
-            const ratingsTitle = ratings?.querySelector('.dropdown-title');
-            if (ratingsTitle) ratingsTitle.textContent = 'WEC RATINGS';
-            const simulator = navigationDropdowns[3];
+            const simulator = navigationDropdowns[2];
             const simulatorItems = [
                 ['/wec/simulator', 'Overview', 'Choose a WEC simulation'],
                 ['/wec/simulate-season', 'Simulate season', 'Recalculate a class championship'],
@@ -411,7 +395,7 @@ function loadHeader() {
             });
             const simulatorTitle = simulator?.querySelector('.dropdown-title');
             if (simulatorTitle) simulatorTitle.textContent = 'WEC SIMULATOR';
-            const games = navigationDropdowns[4];
+            const games = navigationDropdowns[3];
             const gamesItems = [
                 ['/wec/games', 'Overview', 'Choose a WEC game'],
                 ['/wec/quizzes', 'WEC quizzes', 'Test overall winners and winning crews'],
@@ -427,7 +411,7 @@ function loadHeader() {
             });
             const gamesTitle = games?.querySelector('.dropdown-title');
             if (gamesTitle) gamesTitle.textContent = 'WEC GAMES';
-            navigationDropdowns.forEach((dropdown, index) => { if (index > 4) dropdown.remove(); });
+            navigationDropdowns.forEach((dropdown, index) => { if (index > 3) dropdown.remove(); });
             const aboutLink = container.querySelector('a[href="/about"]');
             if (aboutLink) aboutLink.href = '/about?series=wec';
             container.querySelectorAll('a[href="/account"]').forEach(link => { link.href = '/account?series=wec'; });
@@ -470,13 +454,6 @@ function loadHeader() {
                     ['/f3/circuit-analysis', 'Circuit analysis', 'Performance by venue'],
                     ['/f3/records', 'Records', 'Formula 3 all-time leaders']
                 ]],
-                ['RACELYTIC RATINGS', [
-                    ['/ratings?series=f3', 'Overview', 'Explore Formula 3 driver ratings'],
-                    ['/ratings/leaderboard?series=f3', 'Leaderboard', 'See the order through Formula 3 history'],
-                    ['/ratings/compare?series=f3', 'Compare drivers', 'Plot up to four rating histories'],
-                    ['/ratings/driver?series=f3', 'Rating profile', 'Inspect race-by-race rating changes'],
-                    ['/ratings/methodology?series=f3', 'Methodology', 'Understand the model and its limits']
-                ]],
                 ['FORMULA 3 SIMULATOR', [
                     ['/f3/simulator', 'Overview', 'Choose a Formula 3 simulation tool'],
                     ['/f3/simulate-season', 'Simulate season', 'Recalculate an F3 championship'],
@@ -503,6 +480,7 @@ function loadHeader() {
                 ]],
                 ['FORMULA E ANALYSIS', [
                     ['/formula-e/analysis', 'Overview', 'Choose a Formula E analysis'],
+                    ['/formula-e/ask', 'Ask Racelytic', 'Calculate an answer from the Formula E archive'],
                     ['/formula-e/season-analysis', 'Season analysis', 'Championship progression and results'],
                     ['/formula-e/season-comparison', 'Season comparison', 'Compare two championships'],
                     ['/formula-e/race-analysis', 'Race analysis', 'Explore an E-Prix'],
@@ -511,13 +489,6 @@ function loadHeader() {
                     ['/formula-e/teammate-battles', 'Teammate battles', 'Direct intra-team head-to-heads'],
                     ['/formula-e/circuit-analysis', 'Circuit analysis', 'Performance by venue'],
                     ['/formula-e/records', 'Records', 'Formula E all-time leaders']
-                ]],
-                ['RACELYTIC RATINGS', [
-                    ['/ratings?series=fe', 'Overview', 'Explore Formula E driver ratings'],
-                    ['/ratings/leaderboard?series=fe', 'Leaderboard', 'See the order through Formula E history'],
-                    ['/ratings/compare?series=fe', 'Compare drivers', 'Plot up to four rating histories'],
-                    ['/ratings/driver?series=fe', 'Rating profile', 'Inspect E-Prix rating changes'],
-                    ['/ratings/methodology?series=fe', 'Methodology', 'Understand the model and its limits']
                 ]],
                 ['FORMULA E SIMULATOR', [
                     ['/formula-e/simulator', 'Overview', 'Choose a Formula E simulation tool'],
@@ -537,7 +508,7 @@ function loadHeader() {
                 ? f3Menus.map(([title, items]) => [
                     title.replace('FORMULA 3', 'F1 ACADEMY'),
                     items.map(([url, label, description]) => [
-                        url.startsWith('/ratings') ? url.replace('series=f3', 'series=academy') : url.replace('/f3', '/academy'), label,
+                        url.replace('/f3', '/academy'), label,
                         description.replace(/Formula 3|F3/g, 'F1 Academy')
                     ])
                 ])
@@ -633,23 +604,7 @@ function loadHeader() {
                 link.querySelector('small').textContent = item[2];
             });
 
-            const ratingsDropdown = navigationDropdowns[2];
-            const ratingsLinks = [...(ratingsDropdown?.querySelectorAll('.dropdown-menu a') || [])];
-            const f2RatingsRoutes = [
-                ['/ratings?series=f2', 'Overview', 'Explore Formula 2 driver ratings'],
-                ['/ratings/leaderboard?series=f2', 'Leaderboard', 'See the order through Formula 2 history'],
-                ['/ratings/compare?series=f2', 'Compare drivers', 'Plot up to four rating histories'],
-                ['/ratings/driver?series=f2', 'Rating profile', 'Inspect race-by-race rating changes'],
-                ['/ratings/methodology?series=f2', 'Methodology', 'Understand the model and its limits']
-            ];
-            ratingsLinks.forEach((link, index) => {
-                const item = f2RatingsRoutes[index];
-                if (!item) return link.remove();
-                link.href = item[0];
-                link.querySelector('span').textContent = item[1];
-                link.querySelector('small').textContent = item[2];
-            });
-            const simulatorDropdown = navigationDropdowns[3];
+            const simulatorDropdown = navigationDropdowns[2];
             const simulatorLinks = [...(simulatorDropdown?.querySelectorAll('.dropdown-menu a') || [])];
             const f2SimulatorRoutes = [
                 ['/f2/simulator', 'Overview', 'Choose a Formula 2 simulation tool'],
@@ -667,7 +622,7 @@ function loadHeader() {
             });
             const simulatorTitle = simulatorDropdown?.querySelector('.dropdown-title');
             if (simulatorTitle) simulatorTitle.textContent = 'FORMULA 2 SIMULATOR';
-            const gamesDropdown = navigationDropdowns[4];
+            const gamesDropdown = navigationDropdowns[3];
             const gamesLinks = [...(gamesDropdown?.querySelectorAll('.dropdown-menu a') || [])];
             const f2GamesRoutes = [
                 ['/f2/games', 'Overview', 'Choose a Formula 2 game'],

@@ -4,9 +4,7 @@ const SERIES_HOME_CONFIG = Object.freeze({
     f1: {
         ...SERIES.f1,
         favicon: '/assets/favicon.svg', description: 'Explore, analyse, simulate and play with more than seventy years of Formula 1 history.',
-        headline: 'More than results.', subheadline: 'A different way to experience F1.',
-        introduction: 'Welcome to Racelytic. Discover the statistics and stories behind your favourite Formula 1 drivers, teams and countries. Recalculate championships with historical or custom points systems to compare eras using the same scoring rules. Explore distinctive visualisations, rewrite history in the F1 simulator and put your knowledge and instincts to the test with our games.',
-        askExample: 'Who has the most titles using the 1982 points system?',
+        askExample: 'Who has the most F1 race wins?',
         entityLabel: 'Constructors',
         archiveTitle: 'Decades of Formula 1,|ready for your next question.',
         archiveCopy: 'The database powers every part of Racelytic, from all-time comparisons and race replays to championship simulations and games.'
@@ -14,9 +12,7 @@ const SERIES_HOME_CONFIG = Object.freeze({
     f2: {
         ...SERIES.f2,
         description: 'Explore, analyse, simulate and play with the complete Formula 2 archive in Racelytic.',
-        headline: 'The proving ground.', subheadline: 'Every story behind the step up.',
-        introduction: 'Discover the stories behind Formula 2’s rising stars. Explore drivers, teams and circuits, follow title fights race by race and compare the careers that led to the next step. Recalculate seasons, build your own championship and put your knowledge and reactions to the test with our games.',
-        askExample: 'Who has the most Formula 2 race wins?',
+        askExample: 'Who has the most F2 race wins?',
         entityLabel: 'Teams',
         archiveTitle: 'A feeder series.|A history of its own.',
         archiveCopy: 'Every season, driver, team, circuit and session result connects to the tools built on top of the Formula 2 archive.'
@@ -24,9 +20,7 @@ const SERIES_HOME_CONFIG = Object.freeze({
     f3: {
         ...SERIES.f3,
         description: 'Explore, analyse, simulate and play with FIA Formula 3 history in Racelytic.',
-        headline: 'The first global stage.', subheadline: 'Where the next generation breaks through.',
-        introduction: 'Explore the drivers, teams and breakthrough performances that have shaped FIA Formula 3 since 2019. Trace championship battles, compare careers and uncover the details behind the results. Recalculate seasons, create your own championship or take a break with our racing games.',
-        askExample: 'Who has the most Formula 3 race wins?',
+        askExample: 'Who has the most F3 race wins?',
         entityLabel: 'Teams',
         archiveTitle: 'Every campaign.|Full race-by-race detail.',
         archiveCopy: 'The championship calendar, entrants, classifications and standings come together in one connected Formula 3 archive.'
@@ -34,9 +28,7 @@ const SERIES_HOME_CONFIG = Object.freeze({
     academy: {
         ...SERIES.academy,
         description: 'Explore, analyse, simulate and play with the complete F1 Academy archive in Racelytic.',
-        headline: 'A new generation.', subheadline: 'Every race, career and title story.',
-        introduction: 'Get to know the drivers, teams and title stories shaping F1 Academy. Explore every season, compare careers and follow how each race changes the championship. Take the results further with season simulations and custom championships, then test your reactions or build a racing team of your own.',
-        askExample: 'Who has the most F1 Academy race wins?',
+        askExample: 'Who has the most F1 Academy wins?',
         entityLabel: 'Teams',
         archiveTitle: 'A young championship.|A complete record.',
         archiveCopy: 'Seasons, entrants, sessions and standings connect across a dedicated archive built for the championship’s own race formats.'
@@ -44,9 +36,7 @@ const SERIES_HOME_CONFIG = Object.freeze({
     fe: {
         ...SERIES.fe,
         description: 'Explore, analyse, simulate and play with twelve completed seasons of Formula E history in Racelytic.',
-        headline: 'Electric from the start.', subheadline: 'Every E-Prix tells a story.',
-        introduction: 'Explore Formula E from its inaugural 2014–15 season through the latest completed championship. Follow title fights, compare drivers and teams, revisit every E-Prix, simulate alternate outcomes and put your knowledge and reactions to the test with our games.',
-        askExample: '', askEnabled: false,
+        askExample: 'Who has the most Formula E wins?',
         entityLabel: 'Teams',
         archiveTitle: 'Twelve seasons.|One connected archive.',
         archiveCopy: 'Official seasons, entrants, session classifications and standings connect every Formula E driver, team, circuit and E-Prix to the analysis, simulator and games.'
@@ -54,13 +44,20 @@ const SERIES_HOME_CONFIG = Object.freeze({
     wec: {
         ...SERIES.wec,
         description: 'Explore, analyse, simulate and play with every FIA World Endurance Championship season since 2012 in Racelytic.',
-        headline: 'One race.', subheadline: 'Many races within it.',
-        introduction: 'Explore endurance racing by car, crew and class. Follow every FIA World Endurance Championship season since 2012, compare drivers across multiclass careers, revisit each race and recalculate championships while keeping shared entries and parallel classifications intact.',
-        askExample: '', askEnabled: false,
+        askExample: 'Who has the most WEC overall wins?',
         entityLabel: 'Teams',
         archiveTitle: 'Every WEC season.|Every class, crew and entry.',
         archiveCopy: 'Calendars, entry crews, session classifications and championship standings connect the complete WEC era to Racelytic’s analysis, simulator and games.'
     }
+});
+
+const ASK_ALTERNATIVES = Object.freeze({
+    f1: { question: 'Who wins the 2008 championship under 1991 rules?', label: '2008 with 1991 points' },
+    f2: { question: 'Who won the 2020 Formula 2 championship?', label: '2020 champion' },
+    f3: { question: 'Who has the most Formula 3 podiums?', label: 'Most F3 podiums' },
+    academy: { question: 'Who has the most F1 Academy podiums?', label: 'Most Academy podiums' },
+    fe: { question: 'Who has the most Formula E podiums?', label: 'Most Formula E podiums' },
+    wec: { question: 'Who has the most WEC Hypercar wins since 2020?', label: 'Hypercar wins since 2020' }
 });
 
 function esc(value) {
@@ -73,7 +70,7 @@ const F1_HOME_PREVIEW = {
     alternateSystem: '1991-2002',
     official: [{ name: 'Lewis Hamilton', id: 'lewis-hamilton', points: 98 }, { name: 'Felipe Massa', id: 'felipe-massa', points: 97 }],
     alternate: [{ name: 'Felipe Massa', id: 'felipe-massa', points: 83 }, { name: 'Lewis Hamilton', id: 'lewis-hamilton', points: 80 }],
-    drivers: [{ id: 'ayrton-senna', name: 'Senna', wins: 41, poles: 65 }, { id: 'alain-prost', name: 'Prost', wins: 51, poles: 33 }],
+    drivers: [{ id: 'ayrton-senna', name: 'Senna', wins: 41, poles: 65, titles: 3 }, { id: 'alain-prost', name: 'Prost', wins: 51, poles: 33, titles: 4 }],
     champions: [{ year: 1950, name: 'Giuseppe Farina', id: 'nino-farina' }, { year: 1951, name: null }, { year: 1952, name: 'Alberto Ascari', id: 'alberto-ascari' }]
 };
 
@@ -84,6 +81,8 @@ const SERIES_HOME_PREVIEWS = {
         copy: 'Keep the races. Change the rules. The 2008 title fight tells a different story.',
         note: 'Same results, all 18 races. Only the points system changes.',
         href: '/simulator?year=2008&points=1991-2002', action: 'Recalculate 2008',
+        comparisonMetrics: [['wins', 'Race wins'], ['poles', 'Pole positions'], ['titles', 'World titles']],
+        comparisonInsight: 'Prost leads in wins and titles; Senna leads in pole positions.',
         quizHref: '/world-champions-quiz'
     },
     f2: {
@@ -94,6 +93,7 @@ const SERIES_HOME_PREVIEWS = {
         note: '2020 title contenders · Sprint and feature race wins combined.',
         href: '/f2/season-analysis?year=2020', action: 'Explore the 2020 title fight',
         drivers: [{ id: 'charles-leclerc', name: 'Leclerc', wins: 7, poles: 8 }, { id: 'george-russell', name: 'Russell', wins: 7, poles: 5 }],
+        comparisonInsight: 'Leclerc and Russell share seven F2 wins; Leclerc took more pole positions.',
         champions: [{ year: 2017, name: 'Charles Leclerc', id: 'charles-leclerc' }, { year: 2018, name: null }, { year: 2019, name: 'Nyck de Vries', id: 'nyck-de-vries' }],
         quizHref: '/f2/champions-quiz'
     },
@@ -105,7 +105,8 @@ const SERIES_HOME_PREVIEWS = {
         note: '2024 title contenders · Final standings, including post-race penalties.',
         href: '/f3/season-analysis?year=2024', action: 'Follow Fornaroli’s title season',
         drivers: [{ id: 'oscar-piastri', name: 'Piastri', wins: 2, podiums: 6 }, { id: 'theo-pourchaire', name: 'Pourchaire', wins: 2, podiums: 8 }],
-        comparisonMetrics: [['wins', 'Race wins'], ['podiums', 'Podiums']]
+        comparisonMetrics: [['wins', 'Race wins'], ['podiums', 'Podiums']],
+        comparisonInsight: 'Piastri and Pourchaire share two F3 wins; Pourchaire reached the podium more often.'
     },
     academy: {
         year: 2024,
@@ -114,7 +115,8 @@ const SERIES_HOME_PREVIEWS = {
         contenders: [{ name: 'Abbi Pulling', id: 'abbi-pulling', points: 338, wins: 9 }, { name: 'Doriane Pin', id: 'doriane-pin', points: 217, wins: 4 }],
         note: '2024 title contenders · Points and wins across the full season.',
         href: '/academy/season-analysis?year=2024', action: 'Explore Pulling’s championship',
-        drivers: [{ id: 'marta-garcia', name: 'García', wins: 7, poles: 4 }, { id: 'abbi-pulling', name: 'Pulling', wins: 9, poles: 12 }]
+        drivers: [{ id: 'marta-garcia', name: 'García', wins: 7, poles: 4 }, { id: 'abbi-pulling', name: 'Pulling', wins: 9, poles: 12 }],
+        comparisonInsight: 'Pulling leads García in both F1 Academy wins and pole positions.'
     },
     fe: {
         year: '2025–26',
@@ -126,6 +128,7 @@ const SERIES_HOME_PREVIEWS = {
         href: '/formula-e/season-analysis?year=2026', action: 'Explore Wehrlein’s title season',
         drivers: [{ id: 'sebastien-buemi', name: 'Buemi', wins: 14, podiums: 35 }, { id: 'mitch-evans', name: 'Evans', wins: 16, podiums: 38 }],
         comparisonMetrics: [['wins', 'Race wins'], ['podiums', 'Podiums']],
+        comparisonInsight: 'Evans leads Buemi in Formula E wins and podiums.',
         champions: [{ year: '2014–15', dataYear: 2015, name: 'Nelson Piquet Jr.', id: 'nelson-piquet-jr' }, { year: '2019–20', name: null }, { year: '2025–26', dataYear: 2026, name: 'Pascal Wehrlein', id: 'pascal-wehrlein' }],
         quizHref: '/formula-e/champions-quiz', quizAction: 'Name the champions'
     },
@@ -137,7 +140,8 @@ const SERIES_HOME_PREVIEWS = {
         note: '2025 Hypercar manufacturers · Official final standings and overall race wins.',
         href: '/wec/season-analysis?year=2025', action: 'Explore Ferrari’s title season',
         drivers: [{ id: 'sebastien-buemi', name: 'Buemi', wins: 27, podiums: 57 }, { id: 'brendon-hartley', name: 'Hartley', wins: 24, podiums: 54 }],
-        comparisonMetrics: [['wins', 'Race wins'], ['podiums', 'Class podiums']]
+        comparisonMetrics: [['wins', 'Race wins'], ['podiums', 'Class podiums']],
+        comparisonInsight: 'Buemi leads Hartley in WEC race wins and class podiums.'
     }
 };
 
@@ -160,11 +164,7 @@ function renderQuestions(config) {
     const metrics = preview.comparisonMetrics || [['wins', 'Race wins'], ['poles', 'Pole positions']];
     const careerLabel = config.key === 'f1' ? 'CAREER TOTALS' : `${config.shortName.toUpperCase()} CAREERS`;
     const missingChampion = preview.champions?.find(champion => !champion.name);
-    return `<section class="container home-questions" id="series-explore" aria-labelledby="home-questions-title">
-      <div class="home-section-head">
-        <div><div class="eyebrow">TAKE THE WHEEL</div><h2 id="home-questions-title">Start with a question.</h2></div>
-        <p>Real history. Different perspectives.<br>See where your curiosity takes you.</p>
-      </div>
+    return `<section class="container home-questions" id="series-explore" aria-label="Explore Racelytic">
       <div class="home-question-grid">
         <article class="home-question-card home-question-scoring">
           <h3>${esc(preview.question)}</h3>
@@ -181,6 +181,7 @@ function renderQuestions(config) {
             <div class="home-duel-names"><strong>${esc(first.name)}</strong><span>${esc(careerLabel)}</span><strong>${esc(second.name)}</strong></div>
             ${metrics.map(([key, label]) => `<div class="home-duel-row"><strong${first[key] > second[key] ? ' class="home-duel-leading"' : ''}>${first[key]}</strong><span>${esc(label)}</span><strong${second[key] > first[key] ? ' class="home-duel-leading"' : ''}>${second[key]}</strong></div>`).join('')}
           </div>
+          ${preview.comparisonInsight ? `<p class="home-duel-insight">${esc(preview.comparisonInsight)}</p>` : ''}
           <a class="home-question-link" href="${esc(config.path)}/driver-comparison?first=${esc(first.id)}&amp;second=${esc(second.id)}">Compare ${esc(first.name)} &amp; ${esc(second.name)}</a>
         </article>
         <article class="home-question-card home-question-quiz">
@@ -203,6 +204,18 @@ function renderSeriesHome(seriesKey) {
     const config = SERIES_HOME_CONFIG[seriesKey] || SERIES_HOME_CONFIG.f1;
     const title = config.key === 'f1' ? 'Racelytic' : `${config.name} · Racelytic`;
     const archiveLines = config.archiveTitle.split('|');
+    const askAlternative = ASK_ALTERNATIVES[config.key];
+    const askLabel = config.key === 'fe' ? config.name : config.shortName;
+    const askCopy = config.key === 'f1'
+        ? 'Ask about race results, records, standings or alternate points systems. Get a direct answer with the evidence behind it.'
+        : 'Ask about race results, records and standings. Get a direct answer with the evidence behind it.';
+    const askSection = `<section class="container home-ask-entry" aria-labelledby="home-ask-title">
+      <div class="home-ask-copy"><h2 id="home-ask-title">Your ${esc(askLabel)} question, answered.</h2><p>${askCopy}</p></div>
+      <div class="home-ask-action">
+        <form action="${esc(config.path)}/ask" method="get"><label class="visually-hidden" for="home-ask-query">Ask a ${esc(config.name)} history question</label><input id="home-ask-query" name="q" type="search" minlength="8" maxlength="300" value="${esc(config.askExample)}" required><button type="submit">Ask <span aria-hidden="true">→</span></button></form>
+        <div class="home-ask-examples" aria-label="Another example question"><span>Or try</span><a href="${esc(config.path)}/ask?q=${encodeURIComponent(askAlternative.question)}">${esc(askAlternative.label)}</a></div>
+      </div>
+    </section>`;
     return `<!doctype html>
 <html lang="en">
 <head>
@@ -218,32 +231,27 @@ function renderSeriesHome(seriesKey) {
 <body${config.modeClass ? ` class="${esc(config.modeClass)}"` : ''} data-series-home="${esc(config.key)}">
   <div id="header"></div>
   <main>
-    <section class="hero home-hero series-home-hero container">
-      <div class="series-home-hero-copy">
-        <h1>${esc(config.headline)}<br><span>${esc(config.subheadline)}</span></h1>
-        <p class="hero-copy">${esc(config.introduction)}</p>
-      </div>
-    </section>
-
     <section class="container series-snapshot" aria-labelledby="season-snapshot-title">
       <div class="series-snapshot-intro">
-        <h2 class="eyebrow" id="season-snapshot-title">CURRENT SEASON</h2>
+        <h1 class="home-season-eyebrow" id="season-snapshot-title"><span id="snapshot-season-label">Current season</span> <span aria-hidden="true">·</span> <span id="snapshot-season">—</span></h1>
       </div>
-      <div class="series-snapshot-grid" aria-live="polite">
-        <a class="series-snapshot-item" id="snapshot-season-link" href="${esc(config.path)}/seasons"><span>Season</span><strong id="snapshot-season">—</strong><small>Open championship</small></a>
-        <div class="series-snapshot-item"><span>Calendar</span><strong id="snapshot-rounds">—</strong><small>Rounds</small></div>
-        <div class="series-snapshot-item"><span id="snapshot-leader-label">Championship leader</span><strong id="snapshot-leader">—</strong><small id="snapshot-leader-points">Standings</small></div>
-        <a class="series-snapshot-item" id="snapshot-event-link" href="${esc(config.path)}/races"><span id="snapshot-event-label">Latest event</span><strong id="snapshot-event">—</strong><small id="snapshot-event-meta">Race calendar</small></a>
+      <div class="home-season-strip${config.key === 'wec' ? ' home-season-strip-wec' : ''}" aria-live="polite">
+        <a class="home-season-cell home-season-first" id="snapshot-season-link" href="${esc(config.path)}/seasons">
+          <span id="snapshot-leader-label">${config.key === 'wec' ? 'Hypercar drivers’ leaders' : 'Drivers’ leader'}</span>
+          <strong id="snapshot-leader">—</strong>
+          <small id="snapshot-leader-points">Standings</small>
+        </a>
+        ${config.key === 'wec' ? '' : `<div class="home-season-cell"><span>Second place</span><strong id="snapshot-runner-up">—</strong><small id="snapshot-runner-up-points">Drivers’ standings</small></div>
+        <div class="home-season-cell"><span>Third place</span><strong id="snapshot-third">—</strong><small id="snapshot-third-points">Drivers’ standings</small></div>`}
+        <div class="home-season-cell"><span id="snapshot-constructor-label">${config.key === 'wec' ? 'Hypercar manufacturers’ leader' : config.key === 'f1' ? 'Constructors’ leader' : 'Teams’ leader'}</span><strong id="snapshot-constructor">—</strong><small id="snapshot-constructor-points">${config.key === 'wec' ? 'Manufacturer standings' : 'Team standings'}</small></div>
+        <div class="home-season-cell home-season-races"><span>Races</span><strong><span id="snapshot-completed-races">—</span><i>/</i><span id="snapshot-rounds">—</span></strong><small>Completed</small></div>
+        <a class="home-season-cell home-season-next" id="snapshot-event-link" href="${esc(config.path)}/races"><span id="snapshot-event-label">${config.key === 'wec' ? 'Next event' : config.key === 'fe' ? 'Next E-Prix' : 'Next race'}</span><strong id="snapshot-event">See the calendar</strong><small id="snapshot-event-meta">Upcoming round</small></a>
       </div>
     </section>
 
-    ${renderQuestions(config)}
+    ${askSection}
 
-    ${config.askEnabled === false ? '' : `<section class="container home-ask-entry" aria-labelledby="home-ask-title">
-      <div><div class="eyebrow">ASK RACELYTIC</div><h2 id="home-ask-title">What would you like to know?</h2><p>${config.key === 'f1' ? 'Describe an alternate Formula 1 history' : `Ask about ${esc(config.name)} records`}. Racelytic calculates the answer from recorded results.</p></div>
-      <form action="${esc(config.path)}/ask" method="get"><label class="visually-hidden" for="home-ask-query">Ask a ${esc(config.name)} history question</label><input id="home-ask-query" name="q" type="search" maxlength="300" value="${esc(config.askExample)}" aria-describedby="home-ask-example-note" required><button type="submit">Calculate <span aria-hidden="true">→</span></button></form>
-      <span class="visually-hidden" id="home-ask-example-note">Example question. Edit it to ask something else, or calculate it as shown.</span>
-    </section>`}
+    ${renderQuestions(config)}
 
     <section class="container home-archive" id="series-archive">
       <div class="home-archive-copy">

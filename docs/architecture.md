@@ -42,7 +42,10 @@ The versioned WEC field contract is `data/wec-data-contract.json`.
 Ask Racelytic is deterministic and runs locally inside the Node.js process.
 `backend/routes/ask.js` manages requests and follow-up context,
 `backend/ask-tools.js` selects a registered calculation, and
-`backend/ask-engine.js` executes it against the archive.
+`backend/ask-engine.js` executes Formula 1, Formula 2, Formula 3, F1 Academy and
+Formula E calculations against their archives. `backend/ask-wec.js` answers
+WEC records, classifications and standings from the entry-first, class-aware
+archive.
 
 The intent fallback model is trained at startup from the version-controlled
 catalogue. It has no external model API, runtime download or hosted telemetry.
@@ -50,8 +53,11 @@ Answers expose their selected tool and evidence count, and missing required
 slots produce a clarification.
 
 Conversation context is held in server memory for 30 minutes, is bounded to
-twelve turns and is deleted by the New conversation action. It is not written
-to the application database.
+twelve turns and is deleted by the New conversation action. The current tab
+also keeps the latest answer and conversation in session storage for reloads;
+it is restored only within 25 minutes. Ask conversations are not written to
+the application database. A follow-up about evidence explains the source and
+assumptions of the previous calculation.
 
 ## Data and generated assets
 

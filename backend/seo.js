@@ -63,7 +63,8 @@ const PAGE_META = Object.freeze({
     404: ['Page not found', 'The requested Racelytic page could not be found.'],
 });
 
-const NOINDEX_PAGES = new Set(['404', 'account', 'ask', 'monitor', 'search']);
+const NOINDEX_PAGES = new Set(['404', 'account', 'ask', 'monitor', 'search', 'ratings',
+    'ratings-leaderboard', 'ratings-compare', 'ratings-driver', 'ratings-methodology']);
 const NEUTRAL_PAGES = new Set(['404', 'about', 'community', 'ratings', 'ratings-leaderboard', 'ratings-compare',
     'ratings-driver', 'ratings-methodology', 'data-sources', 'privacy', 'terms', 'account', 'monitor', 'search']);
 const DETAIL_PARAMS = Object.freeze({ season: 'year', race: 'id', driver: 'id', constructor: 'id', team: 'id', manufacturer: 'id', carModel: 'id', entry: 'id', circuit: 'id', chassis: 'id', 'championship-builder': 'id' });
@@ -158,7 +159,7 @@ function metadataFor(pathname, query = {}, overrides = {}) {
         description = pageMeta[1];
     } else if (context.page === 'home') {
         title = `${context.series.name} History, Statistics & Analysis · Racelytic`;
-        description = `Explore ${context.series.name} history, results, drivers, teams, circuits, analysis, simulators and games with Racelytic.`;
+        description = `Follow the current ${context.series.name} season, ask questions about the archive, and explore results, comparisons and championship simulations.`;
     } else {
         if (detailName && ['driver', 'constructor', 'team', 'manufacturer', 'carModel', 'entry', 'circuit'].includes(context.page)) {
             const entityLabel = context.page === 'constructor' ? 'Constructor' : context.page === 'team' ? 'Team'
@@ -216,7 +217,7 @@ function jsonForHtml(value) {
 
 function breadcrumbItems(metadata) {
     const context = routeContext(new URL(metadata.canonical).pathname);
-    const prefix = context.series.key === 'f1' ? '' : `/${context.series.key}`;
+    const prefix = context.series.key === 'f1' ? '' : context.series.key === 'fe' ? '/formula-e' : `/${context.series.key}`;
     const items = [{ '@type': 'ListItem', position: 1, name: 'Racelytic', item: siteOrigin() }];
     if (context.series.key !== 'f1') {
         items.push({ '@type': 'ListItem', position: items.length + 1, name: context.series.name, item: `${siteOrigin()}${prefix}` });

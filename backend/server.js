@@ -180,6 +180,7 @@ for (const [route, series] of [['/', 'f1'], ['/f2', 'f2'], ['/f3', 'f3'], ['/aca
 
 app.get('/wec/database', (req, res, next) => sendSeoPage(req, res, next, 'wec-database.html'));
 app.get('/wec/analysis', (req, res, next) => sendSeoPage(req, res, next, 'wec-analysis.html'));
+app.get('/wec/ask', (req, res, next) => sendSeoPage(req, res, next, 'ask.html'));
 app.get('/wec/season-analysis', (req, res, next) => sendSeoPage(req, res, next, 'wec-season-analysis.html'));
 app.get('/wec/season-comparison', (req, res, next) => sendSeoPage(req, res, next, 'wec-season-comparison.html'));
 app.get('/wec/race-analysis', (req, res, next) => sendSeoPage(req, res, next, 'wec-race-analysis.html'));
@@ -294,8 +295,8 @@ for (const [resource, bySeries] of Object.entries(resourceFiles)) {
 const sitemapRoutes = [
     '/', '/f2', '/f3', '/academy', '/formula-e', '/wec', '/wec/database', '/wec/analysis', '/wec/season-analysis', '/wec/season-comparison', '/wec/race-analysis', '/wec/circuit-analysis', '/wec/records', '/wec/driver-comparison', '/wec/driver-form', '/wec/simulator', '/wec/simulate-season', '/wec/scenario-calculator', '/wec/championship-builder', '/wec/points-systems', '/wec/seasons', '/wec/races', '/wec/drivers', '/wec/teams', '/wec/cars', '/wec/circuits',
     '/wec/seasons/2022', '/wec/seasons/2023', '/wec/seasons/2024', '/wec/seasons/2025',
-    ...Object.keys(ratingsPages),
-    ...publicPages.map(file => `/${file.slice(0, -'.html'.length)}`).filter(route => !/^\/f[23]-/.test(route)),
+    '/wec/ask',
+    ...publicPages.map(file => `/${file.slice(0, -'.html'.length)}`).filter(route => !/^\/f[23]-/.test(route) && route !== '/ratings'),
     ...juniorPages.map(({ route }) => route),
     ...Object.keys(ACADEMY_PAGES).filter(Boolean).map(slug => `/academy/${slug}`),
     ...Object.keys(FORMULA_E_PAGES).map(slug => `/formula-e/${slug}`),

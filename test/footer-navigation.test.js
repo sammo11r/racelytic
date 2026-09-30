@@ -13,6 +13,7 @@ test('footer adds useful explore and project navigation above unchanged legal co
   assert.match(footer, /id="footer-explore-title">Explore/);
   assert.match(footer, /data-footer-page="database"/);
   assert.match(footer, /data-footer-page="analysis"/);
+  assert.match(footer, /data-footer-page="ask"/);
   assert.match(footer, /data-footer-page="simulator"/);
   assert.match(footer, /data-footer-page="games"/);
   assert.match(footer, /data-footer-page="community"/);
@@ -40,10 +41,12 @@ test('footer navigation follows the active championship on regular and neutral r
   assert.match(privacy, /\['f1', 'f2', 'f3', 'academy', 'fe', 'wec'\]\.includes\(requestedSeries\)/);
   assert.match(privacy, /activeSeries === 'fe' \? '\/formula-e'/);
   assert.match(privacy, /games: `\$\{seriesBase\}\/games`/);
+  assert.match(privacy, /ask: `\$\{seriesBase\}\/ask`/);
   assert.doesNotMatch(privacy, /data-footer-page="games"[^\n]*remove\(\)/);
   assert.match(privacy, /simulator: activeSeries === 'f1' \? '\/simulator-overview' : `\$\{seriesBase\}\/simulator`/);
   assert.match(privacy, /about: `\/about\?series=\$\{activeSeries\}`/);
   assert.match(privacy, /account: `\/account\?series=\$\{activeSeries\}`/);
+  assert.match(privacy, /ask: '\/wec\/ask'/);
 });
 
 test('footer navigation has responsive and keyboard-visible styling', () => {

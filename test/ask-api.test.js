@@ -109,6 +109,24 @@ test('Ask API carries the selected championship into execution', async () => {
     });
 });
 
+test('Ask API routes unfamiliar winner wording only after preserving event and season', async () => {
+    const executions = [];
+    await withAskApi({ execute: async (connection, interpretation) => {
+        executions.push(interpretation);
+        return { intent: 'race_result', answer: 'Recorded winner', entity: 'drivers', entityLabel: 'Drivers',
+            assumptions: [], classifications: [] };
+    } }, async server => {
+        const result = await post(server, '/api/ask', { query: 'Who came P1 at Monaco in 2024?' });
+        assert.equal(result.status, 200);
+        assert.equal(executions[0].intent, 'race_result');
+        assert.equal(executions[0].eventName, 'Monaco');
+        assert.equal(executions[0].targetSeason, 2024);
+        const unsupported = await post(server, '/api/ask', { query: 'Who had the quickest pit stop at Monaco in 2024?' });
+        assert.equal(unsupported.status, 422);
+        assert.equal(executions.length, 1);
+    });
+});
+
 test('Ask API rejects invalid ranges, cross-origin requests and excess traffic', async () => {
     await withAskApi({ execute: async () => { throw new Error('executor should not run'); } }, async server => {
         const range = await post(server, '/api/ask', {
@@ -358,5 +376,27 @@ test('Ask API refuses a broader answer when execution drops a requested scope', 
         assert.equal(response.status, 422);
         assert.match(response.body.error, /requested circuit scope/);
         assert.match(response.body.error, /broader answer was not returned/);
+    });
+});
+
+test('Ask explains prior calculated evidence and refuses unsupported glossary replies', async () => {
+    await withAskApi({ execute: async () => ({
+        intent: 'record_leader', entity: 'drivers', entityLabel: 'Drivers', answer: 'A driver leads.',
+        record: { label: 'Wins', total: 1, entries: [{ id: 'one', value: 5 }] },
+        methodology: { source: 'Recorded race results.', coverage: '2020–2025', sample: 'Five winning classifications.' },
+        assumptions: ['Only completed races count.']
+    }) }, async server => {
+        const first = await post(server, '/api/ask', { query: 'Who has the most Formula 1 race wins?' });
+        assert.equal(first.status, 200);
+        const why = await post(server, '/api/ask', { query: 'Why?', conversationId: first.body.conversation.id });
+        assert.equal(why.status, 200);
+        assert.equal(why.body.intent, 'explain_calculation');
+        assert.match(why.body.answer, /Recorded race results/);
+        assert.deepEqual(why.body.assumptions, ['Only completed races count.']);
+        assert.equal(why.body.conversation.turnCount, 2);
+
+        const glossary = await post(server, '/api/ask', { query: 'Define countback in racing' });
+        assert.equal(glossary.status, 422);
+        assert.match(glossary.body.error, /only answers questions it can calculate/);
     });
 });

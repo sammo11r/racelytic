@@ -48,7 +48,7 @@ function showAnalyticsChoice(settings = false) {
         </div>
         <div class="privacy-banner-actions">
             <button type="button" class="button secondary" data-analytics-choice="declined">Decline</button>
-            <button type="button" class="button primary" data-analytics-choice="allowed">Allow analytics</button>
+            <button type="button" class="button secondary" data-analytics-choice="allowed">Allow analytics</button>
         </div>`;
     banner.querySelectorAll('[data-analytics-choice]').forEach(button => button.addEventListener('click', () => setAnalyticsChoice(button.dataset.analyticsChoice)));
     document.body.appendChild(banner);
@@ -79,10 +79,10 @@ function initialiseFooter() {
         const footerRoutes = {
             database: `${seriesBase}/database`,
             analysis: `${seriesBase}/analysis`,
+            ask: `${seriesBase}/ask`,
             simulator: activeSeries === 'f1' ? '/simulator-overview' : `${seriesBase}/simulator`,
             games: `${seriesBase}/games`,
             community: `/community?series=${activeSeries}`,
-            ratings: `/ratings?series=${activeSeries}`,
             about: `/about?series=${activeSeries}`,
             method: `/about?series=${activeSeries}#about-method`,
             account: `/account?series=${activeSeries}`
@@ -117,8 +117,8 @@ function initialiseFooter() {
             const brand = footer.querySelector('.footer-brand');
             if (brand) brand.href = '/wec';
             const routes = {
-                database: '/wec/database', analysis: '/wec/analysis', simulator: '/wec/simulator',
-                games: '/wec/games', community: '/community?series=wec', ratings: '/ratings?series=wec&class=top'
+                database: '/wec/database', analysis: '/wec/analysis', ask: '/wec/ask', simulator: '/wec/simulator',
+                games: '/wec/games', community: '/community?series=wec'
             };
             footer.querySelectorAll('[data-footer-page]').forEach(link => {
                 if (routes[link.dataset.footerPage]) link.href = routes[link.dataset.footerPage];

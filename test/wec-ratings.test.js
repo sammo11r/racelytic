@@ -127,7 +127,7 @@ test('ratings navigation follows WEC class changes without a reload', () => {
   assert.ok(links.every(link => new URL(link.href, location.origin).searchParams.get('class') === 'gt'));
 });
 
-test('WEC ratings are discoverable and class selection survives every ratings surface', () => {
+test('WEC ratings keep class selection on direct pages without global promotion', () => {
   const explorer = fs.readFileSync(path.join(root, 'frontend/templates/ratings-explorer.html'), 'utf8');
   const ratings = fs.readFileSync(path.join(root, 'frontend/js/ratings.js'), 'utf8');
   const navigation = fs.readFileSync(path.join(root, 'frontend/js/navigation.js'), 'utf8');
@@ -136,8 +136,8 @@ test('WEC ratings are discoverable and class selection survives every ratings su
   const styles = fs.readFileSync(path.join(root, 'frontend/css/ratings.css'), 'utf8');
   assert.match(explorer, /id="ratings-class"/);
   assert.match(ratings, /query\.set\('class', ratingState\.classScope\)/);
-  assert.match(navigation, /WEC RATINGS/);
-  assert.match(navigation, /ratings\/leaderboard\?series=wec&class=top/);
+  assert.doesNotMatch(navigation, /WEC RATINGS/);
+  assert.match(navigation, /const simulator = navigationDropdowns\[2\]/);
   assert.match(overview, /ratings-overview-class/);
   assert.match(methodology, /How WEC crew/);
   assert.match(methodology, /WEC crew 1\.1/);

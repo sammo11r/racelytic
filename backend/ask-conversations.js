@@ -37,7 +37,7 @@ class AskConversationStore {
         return conversation;
     }
 
-    remember({ id, series, query, answer, context, tool }) {
+    remember({ id, series, query, answer, context, tool, evidence }) {
         const now = Date.now();
         this.sweep(now);
         const existing = this.get(id, series);
@@ -48,6 +48,7 @@ class AskConversationStore {
             turns: []
         };
         conversation.context = { ...context };
+        if (evidence) conversation.lastEvidence = evidence;
         conversation.turns.push({
             query: String(query || '').slice(0, 300),
             answer: String(answer || '').slice(0, 500),

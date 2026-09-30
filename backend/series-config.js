@@ -11,7 +11,7 @@ function academySessionType(session, sessionIndex, sessionCount, year) {
 
 function normaliseSeries(value) {
     const series = String(value || '').toLowerCase();
-    return ['f1', ...JUNIOR_SERIES].includes(series) ? series : 'f1';
+    return ['f1', ...JUNIOR_SERIES, 'wec'].includes(series) ? series : 'f1';
 }
 
 function isJuniorSeries(value) {

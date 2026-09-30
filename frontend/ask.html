@@ -15,8 +15,8 @@
   <main class="container page ask-workspace">
     <header class="ask-heading">
       <div class="ask-heading-copy">
-        <h1>Start with a question.</h1>
-        <p>Describe the Formula 1 history you want to recalculate or compare. Racelytic interprets the question, then explains the answer from recorded results.</p>
+        <h1>Ask Racelytic.</h1>
+        <p>Ask the Formula 1 archive. Follow up to explore the evidence.</p>
       </div>
       <details class="ask-question-help" id="ask-question-help">
         <summary aria-label="Show supported question types"><span class="ask-question-mark" aria-hidden="true">?</span><span>Supported questions</span></summary>
@@ -34,7 +34,6 @@
             <li><strong>Constructor profiles</strong><span>Explore a team’s seasons, drivers, results and titles.</span></li>
             <li><strong>Circuit profiles</strong><span>See a venue’s location, archive span and leading winners.</span></li>
             <li><strong>Season summaries</strong><span>Review champions, race counts, winners and leading standings.</span></li>
-            <li><strong>Motorsport explanations</strong><span>Explain supported terms such as countback, DRS, undercut and classification.</span></li>
           </ul></section>
           <section aria-labelledby="ask-question-comparisons"><h2 id="ask-question-comparisons">Comparisons</h2><ul>
             <li><strong>Driver head-to-heads</strong><span>Compare two drivers across careers, shared starts or teammate races.</span></li>
@@ -50,20 +49,37 @@
           </ul></section>
         </div>
       </details>
+      <button class="ask-new-conversation" type="button" data-ask-new-conversation>New conversation</button>
     </header>
 
     <div class="ask-layout">
-      <aside class="ask-query-panel" aria-label="Question and filters">
+      <div class="ask-output" id="ask-output" role="region" aria-label="Conversation messages" tabindex="0">
+        <div class="ask-transcript" id="ask-transcript" role="log" aria-label="Ask Racelytic conversation" aria-live="off"></div>
+        <div class="ask-current-question" id="ask-current-question" hidden></div>
+        <section class="ask-answer-status" id="ask-answer-status" aria-live="polite" aria-atomic="true" aria-busy="false">
+          <div class="ask-empty">
+            <div class="ask-empty-intro"><span aria-hidden="true">R</span><div><strong>Start a conversation with the archive.</strong><p>Ask for a race result, a record, or a championship calculation. The answer and its evidence will appear here.</p></div></div>
+          </div>
+        </section>
+        <section class="ask-result" id="ask-result" aria-label="Supporting records and calculations"></section>
+        <div class="ask-refinement" id="ask-refinement"></div>
+      </div>
+      <div class="ask-query-panel" aria-label="Ask a question">
         <form class="ask-form" id="ask-form">
           <label class="visually-hidden" for="ask-query">Your question</label>
           <div class="ask-input-row">
-            <input id="ask-query" name="q" type="search" minlength="8" maxlength="300" autocomplete="off" placeholder="Ask a Formula 1 history question…" required>
-            <button class="button primary" type="submit">Ask</button>
+            <textarea id="ask-query" name="q" rows="1" minlength="2" maxlength="300" autocomplete="off" placeholder="Ask a Formula 1 history question…" required></textarea>
+            <button class="button primary" type="submit">Send</button>
           </div>
-          <div class="ask-examples" aria-labelledby="ask-examples-title">
+          <details class="ask-example-disclosure"><summary>Try an example</summary><div class="ask-examples" aria-labelledby="ask-examples-title">
             <span id="ask-examples-title">Start with an example</span>
             <!-- ask-examples:start -->
             <div class="ask-example-groups">
+              <section class="ask-example-group" aria-label="Archive chronology"><strong>Archive chronology</strong><div class="ask-example-list">
+                <button type="button" data-ask-example="Where was the first Grand Prix of 2025 held?">2025 opening race</button>
+                <button type="button" data-ask-example="When did Michael Schumacher make his debut?">Schumacher debut</button>
+                <button type="button" data-ask-example="What was the last time Alpine scored points?">Alpine's latest points</button>
+              </div></section>
               <section class="ask-example-group" aria-label="Records"><strong>Records</strong><div class="ask-example-list">
                 <button type="button" data-ask-example="Who has the most Formula 1 race wins?">Race win leaders</button>
                 <button type="button" data-ask-example="Which driver has the most pole positions with Ferrari?">Ferrari pole leaders</button>
@@ -79,20 +95,8 @@
               </div></section>
             </div>
             <!-- ask-examples:end -->
-          </div>
+          </div></details>
         </form>
-        <div class="ask-refinement" id="ask-refinement"></div>
-      </aside>
-
-      <div class="ask-output">
-        <section class="ask-answer-status" id="ask-answer-status" aria-live="polite" aria-atomic="true" aria-busy="false">
-          <div class="ask-empty">
-            <div class="ask-empty-intro"><span aria-hidden="true">?</span><div><strong>One question, every completed season.</strong><p>Ask for archive records, or recalculate Formula 1 Drivers’ or Constructors’ Championships under historical points systems.</p></div></div>
-            <div class="ask-answer-preview" aria-label="What an answer includes"><span>WHAT YOU’LL GET</span><strong>A direct answer, backed by the archive.</strong><p>Racelytic shows the leading result, the ranked evidence, and the rules or filters used in the calculation.</p></div>
-            <p class="ask-support-boundary"><strong>Supported:</strong> recorded race and championship history. <strong>Not supported:</strong> future predictions, live timing, or opinion questions.</p>
-          </div>
-        </section>
-        <section class="ask-result" id="ask-result" aria-label="Supporting records and calculations"></section>
       </div>
     </div>
   </main>

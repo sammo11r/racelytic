@@ -1,9 +1,12 @@
 const askForm = document.getElementById('ask-form');
 const askQuery = document.getElementById('ask-query');
 const askAnswerStatus = document.getElementById('ask-answer-status');
+const askOutput = document.getElementById('ask-output');
+const askTranscript = document.getElementById('ask-transcript');
+const askCurrentQuestion = document.getElementById('ask-current-question');
 const askResult = document.getElementById('ask-result');
 const askRefinement = document.getElementById('ask-refinement');
-const askExamples = document.querySelector('.ask-examples');
+const askExamples = document.querySelector('.ask-example-disclosure');
 const askQuestionHelp = document.getElementById('ask-question-help');
 const askInitialState = askAnswerStatus.innerHTML;
 let askRequest = null;
@@ -12,8 +15,74 @@ let askConversationId = null;
 let askFilterOptions = null;
 let askLastInterpretation = null;
 let askConversation = [];
+let askTurnComplete = false;
+let askArchivedTurnId = 0;
 const askSeries = window.RacelyticSeries.fromPath();
 const askSeriesName = askSeries.name;
+const askStorageKey = `racelytic-ask-conversation-${askSeries.key}`;
+
+function resizeComposer() {
+  askQuery.style.height = 'auto';
+  askQuery.style.height = `${Math.min(askQuery.scrollHeight, 160)}px`;
+}
+
+function scrollToCurrentTurn() {
+  const top = askOutput.scrollTop + askCurrentQuestion.getBoundingClientRect().top - askOutput.getBoundingClientRect().top - 18;
+  askOutput.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+}
+
+function questionBubble(query) {
+  return `<div class="ask-message ask-message-user"><span>You</span><p>${esc(query)}</p></div>`;
+}
+
+function currentQuestion() {
+  return askCurrentQuestion.textContent || askQuery.value;
+}
+
+function archiveCurrentTurn() {
+  if (!askTurnComplete || askCurrentQuestion.hidden) return;
+  const turn = document.createElement('article');
+  turn.className = 'ask-thread-turn';
+  turn.innerHTML = questionBubble(askCurrentQuestion.textContent);
+  const answer = document.createElement('div');
+  answer.className = 'ask-thread-answer';
+  while (askAnswerStatus.firstChild) answer.append(askAnswerStatus.firstChild);
+  if (askResult.hasChildNodes()) {
+    const evidence = document.createElement('div');
+    evidence.className = 'ask-thread-evidence';
+    while (askResult.firstChild) evidence.append(askResult.firstChild);
+    answer.append(evidence);
+  }
+  const prefix = `ask-history-${askArchivedTurnId++}-`;
+  const ids = new Map();
+  answer.querySelectorAll('[id]').forEach(element => {
+    ids.set(element.id, `${prefix}${element.id}`);
+    element.id = ids.get(element.id);
+  });
+  answer.querySelectorAll('[aria-labelledby], [aria-controls], [for]').forEach(element => {
+    for (const attribute of ['aria-labelledby', 'aria-controls', 'for']) {
+      if (!element.hasAttribute(attribute)) continue;
+      element.setAttribute(attribute, element.getAttribute(attribute).split(/\s+/).map(id => ids.get(id) || id).join(' '));
+    }
+  });
+  turn.append(answer);
+  askTranscript.append(turn);
+  while (askTranscript.children.length > 11) askTranscript.firstElementChild.remove();
+  askTurnComplete = false;
+}
+
+function saveConversation(data) {
+  try {
+    sessionStorage.setItem(askStorageKey, JSON.stringify({
+      savedAt: Date.now(), id: askConversationId, context: askContext,
+      turns: askConversation, lastResult: data
+    }));
+  } catch { /* Conversation still works when storage is unavailable. */ }
+}
+
+function clearSavedConversation() {
+  try { sessionStorage.removeItem(askStorageKey); } catch {}
+}
 
 function isFollowUpQuery(query) {
   return /^(?:and\b|now\b|only\b|instead\b|what\s+about\b|how\s+about\b|show\b|make\s+that\b|at\b|in\b|with\b|without\b|from\b|since\b|through\b|until\b|between\b|before\b|after\b|use\b|using\b|all\b|remove\b|clear\b|as\s+team-?mates?\b|career\b|shared\b)/i.test(String(query || '').trim());
@@ -21,12 +90,13 @@ function isFollowUpQuery(query) {
 
 function entityName(entity, plural = false) {
   if (entity !== 'constructors') return plural ? 'Drivers' : 'Driver';
+  if (askSeries.key === 'wec') return plural ? 'Teams' : 'Team';
   if (askSeries.entity === 'team') return plural ? 'Teams' : 'Team';
   return plural ? 'Constructors' : 'Constructor';
 }
 
 function entityUrl(entity, id) {
-  const slug = entity === 'constructors' ? (askSeries.entity === 'team' ? 'team' : 'constructor') : 'driver';
+  const slug = entity === 'constructors' ? (askSeries.entity === 'team' || askSeries.key === 'wec' ? 'team' : 'constructor') : 'driver';
   return resourceUrl(slug, id, { base: askSeries.path });
 }
 
@@ -125,19 +195,12 @@ function interpretationControls(data) {
   </form>`;
 }
 
-function conversationTrail() {
-  if (!askConversationId) return '';
-  const history = askConversation.length < 2 ? '' : `<details class="ask-conversation"><summary>Conversation history <span>${askConversation.length}</span></summary><ol>${askConversation.slice(-8).map(entry => `<li><button type="button" data-ask-history-query="${esc(entry.query)}"><span>${esc(entry.query)}</span><small>${esc(entry.answer)}</small></button></li>`).join('')}</ol></details>`;
-  return `<div class="ask-conversation-actions"><span>Context stays active for follow-up questions.</span><button type="button" data-ask-new-conversation>New conversation</button></div>${history}`;
-}
-
 function refinementPanel(data, followUps = [], forceOpen = false) {
-  const compact = window.matchMedia('(max-width: 980px)').matches;
-  const editable = ['record_leader', 'record_subject_total', 'race_result', 'season_standings', 'driver_head_to_head', 'constructor_head_to_head', 'streak_leader', 'recalculate_title_counts', 'recalculate_points_totals', 'recalculate_season_champion', 'recalculate_entity_titles', 'list_changed_championships', 'compare_points_systems']
+  const editable = askSeries.key !== 'wec' && ['record_leader', 'record_subject_total', 'race_result', 'season_standings', 'driver_head_to_head', 'constructor_head_to_head', 'streak_leader', 'recalculate_title_counts', 'recalculate_points_totals', 'recalculate_season_champion', 'recalculate_entity_titles', 'list_changed_championships', 'compare_points_systems']
     .includes(data.intent || data.interpretation?.detectedIntent || data.interpretation?.intent);
-  return `${conversationTrail()}${followUps.length ? `<div class="ask-followups"><span>Ask a follow-up</span>${followUps.map(question => `<button type="button" data-ask-followup="${esc(question)}">${esc(question)}</button>`).join('')}</div>` : ''}
+  return `${followUps.length ? `<div class="ask-followups" role="group" aria-label="Suggested follow-up questions">${followUps.map(question => `<button type="button" data-ask-followup="${esc(question)}">${esc(question)}</button>`).join('')}</div>` : ''}
     ${editable ? `
-    <details class="ask-refinement-details"${forceOpen || !compact ? ' open' : ''}>
+    <details class="ask-refinement-details"${forceOpen ? ' open' : ''}>
       <summary>Refine this answer</summary>
       <div class="ask-interpretation-after">${interpretationControls(data)}</div>
     </details>` : ''}`;
@@ -496,6 +559,11 @@ function recordScopeSummary(data) {
 }
 
 function suggestedFollowUps(data) {
+  if (data.wecEvidence) {
+    if (data.intent === 'race_result') return ['Show the podium instead', 'Show the full classification'];
+    if (data.intent === 'season_standings') return ['Now show manufacturers', 'Now show drivers'];
+    return ['Now show Hypercar', 'Only since 2020', 'Now show teams'];
+  }
   if (data.intent === 'recalculate_points_totals') return ['Only since 2000', 'Now show constructors', 'Use the 1991 points system instead'];
   if (['driver_profile', 'constructor_profile'].includes(data.intent)) return [
     data.profile?.associations?.[0] ? `Tell me about ${data.profile.associations[0].name}${data.intent === 'driver_profile' ? ' team' : ''}` : 'Who has the most wins?',
@@ -550,16 +618,64 @@ function seasonSummarySection(data) {
   return `<section class="ask-evidence" aria-labelledby="ask-season-summary-title"><div class="ask-section-heading"><div><span>SEASON SUMMARY</span><h2 id="ask-season-summary-title">${fmtNumber(summary.year)} at a glance</h2></div><small>${fmtNumber(summary.races)} races · ${fmtNumber(summary.winners)} winners</small></div>${table('Drivers’ championship', summary.standings)}${table('Constructors’ championship', summary.constructorStandings)}</section>`;
 }
 
+function archiveFactSection(data) {
+  if (!data.fact) return '';
+  const interpretation = data.interpretation || {};
+  const understood = [
+    interpretation.series || askSeriesName,
+    interpretation.classCode && interpretation.classCode !== 'overall' ? interpretation.classCode : null,
+    interpretation.subjectName,
+    interpretation.calendarHistoryName,
+    interpretation.calendarHistoryKind,
+    interpretation.targetSeason,
+    interpretation.entity === 'manufacturers' ? 'manufacturers' : ['constructors', 'teams'].includes(interpretation.entity) ? 'teams' : interpretation.entity === 'drivers' ? 'drivers' : null,
+    interpretation.milestone,
+    interpretation.milestoneCount ? `${interpretation.milestoneCount} target` : null,
+    interpretation.minStarts ? `minimum ${interpretation.minStarts} starts` : null,
+    interpretation.milestoneMeasure,
+    interpretation.firstPosition && interpretation.secondPosition ? `P${interpretation.firstPosition} to P${interpretation.secondPosition}` : null,
+    interpretation.extreme,
+    interpretation.chronologyDirection,
+    interpretation.calendarDirection,
+    interpretation.countUnit
+  ].filter(Boolean).join(' · ');
+  return `<section class="ask-evidence" aria-labelledby="ask-fact-title"><div class="ask-section-heading"><div><span>ARCHIVE EVIDENCE</span><h2 id="ask-fact-title">${esc(data.fact.title)}</h2></div></div>
+    ${understood ? `<p>I understood this as: ${esc(understood)}</p>` : ''}
+    <dl>${data.fact.rows.map(row => `<div><dt>${esc(row.label)}</dt><dd>${row.href ? `<a href="${esc(row.href)}">${esc(row.value)}</a>` : esc(row.value)}</dd></div>`).join('')}</dl></section>`;
+}
+
 function knowledgeSection(data) {
   if (!data.explanation) return '';
   return `<section class="ask-explanation" aria-labelledby="ask-knowledge-title"><div class="ask-section-heading"><div><span>MOTORSPORT GLOSSARY</span><h2 id="ask-knowledge-title">${esc(data.explanation.topic)}</h2></div><small>Curated definition</small></div><p class="ask-explanation-outcome">${esc(data.explanation.text)}</p></section>`;
 }
 
+function wecEvidenceSection(data) {
+  const evidence = data.wecEvidence;
+  if (!evidence) return '';
+  const interpretation = data.interpretation || {};
+  const understood = [interpretation.entity, interpretation.metric, interpretation.classCode,
+    interpretation.targetSeason || (interpretation.fromYear && interpretation.toYear === interpretation.fromYear ? interpretation.fromYear : null),
+    interpretation.fromYear && interpretation.fromYear !== interpretation.toYear ? `since ${interpretation.fromYear}` : null,
+    interpretation.toYear && interpretation.toYear !== interpretation.fromYear ? `through ${interpretation.toYear}` : null,
+    interpretation.placeName ? `at ${interpretation.placeName}` : null,
+    interpretation.standingRound ? `after round ${interpretation.standingRound}` : null,
+    interpretation.subjectName || interpretation.subjectNames?.join(' vs '),
+    interpretation.calendarHistoryName, interpretation.calendarHistoryKind,
+    interpretation.chronologyDirection, interpretation.calendarDirection,
+    interpretation.firstPosition && interpretation.secondPosition ? `P${interpretation.firstPosition} to P${interpretation.secondPosition}` : null
+  ].filter(Boolean).join(' · ');
+  return `<section class="ask-evidence" aria-labelledby="ask-wec-evidence-title"><div class="ask-section-heading"><div><span>RECORDED WEC DATA</span><h2 id="ask-wec-evidence-title">${esc(evidence.title)}</h2></div><small>${fmtNumber(evidence.rows.length)} shown</small></div>
+    <p>I understood this as: ${esc(understood)}</p>
+    <div class="table-wrap"><table class="ask-ranking-table"><caption class="visually-hidden">${esc(evidence.title)}</caption><thead><tr>${evidence.columns.map(column => `<th scope="col">${esc(column)}</th>`).join('')}</tr></thead><tbody>${evidence.rows.map(row => `<tr>${row.slice(0, evidence.columns.length).map((cell, index) => `<td>${index === (evidence.linkColumn ?? 1) && row.at(-1) ? `<a href="${esc(row.at(-1))}">${esc(cell)}</a>` : esc(cell)}</td>`).join('')}</tr>`).join('')}</tbody></table></div></section>`;
+}
+
 function renderAnswer(data) {
   const changed = data.changedChampionships || [];
   const recordIntent = ['record_leader', 'record_subject_total'].includes(data.intent);
-  const archiveFact = ['race_result', 'season_standings', 'driver_head_to_head', 'constructor_head_to_head', 'streak_leader', 'driver_profile', 'constructor_profile', 'circuit_profile', 'season_summary', 'motorsport_explanation'].includes(data.intent);
-  const evidence = ['driver_profile', 'constructor_profile', 'circuit_profile'].includes(data.intent) ? profileSection(data)
+  const archiveFact = ['best_worst_result', 'result_distribution', 'latest_failure', 'compare_seasons', 'longest_milestone_gap', 'team_change_comparison', 'consecutive_event_wins', 'lineup_record', 'driver_season_participation', 'driver_team_history', 'round_standings_change', 'round_rival_swing', 'championship_lead_changes', 'champion_season_extreme', 'single_season_record', 'team_season_extreme', 'standings_improvement', 'grid_position', 'race_pole', 'session_classification', 'event_points', 'race_status', 'grid_movement', 'race_entries', 'fastest_race_lap', 'qualifying_position', 'team_tenure', 'team_seasons', 'teammate_events', 'debut_to_milestone', 'debut_milestone', 'milestone_threshold', 'milestone_never_reached', 'standings_gap', 'season_standings_gap', 'top_four_spread', 'latest_team_milestone', 'points_without_win', 'season_closer', 'season_calendar', 'season_event_count', 'adjacent_event', 'calendar_host_years', 'calendar_host_boundary', 'calendar_host_leader', 'driver_last_start', 'team_boundary_start', 'competitor_milestone', 'competitor_season_summary', 'race_result', 'season_standings', 'season_opener', 'driver_debut', 'latest_team_points', 'driver_head_to_head', 'constructor_head_to_head', 'streak_leader', 'streak_subject', 'driver_profile', 'constructor_profile', 'circuit_profile', 'season_summary', 'motorsport_explanation'].includes(data.intent);
+  const evidence = data.wecEvidence ? wecEvidenceSection(data)
+    : data.fact ? archiveFactSection(data)
+    : ['driver_profile', 'constructor_profile', 'circuit_profile'].includes(data.intent) ? profileSection(data)
     : data.intent === 'season_summary' ? seasonSummarySection(data)
     : data.intent === 'motorsport_explanation' ? knowledgeSection(data)
     : data.intent === 'race_result' ? raceResultSection(data)
@@ -575,7 +691,11 @@ function renderAnswer(data) {
     : data.intent === 'list_changed_championships'
       ? `${changesSection(data)}${rankingSection(data)}`
       : `${explanationSection(data)}${rankingSection(data)}${changesSection(data)}`;
-  const answerContext = archiveFact
+  const answerContext = data.intent === 'explain_calculation'
+    ? 'This explains the evidence and assumptions behind the previous answer.'
+    : data.wecEvidence
+    ? `Calculated from the recorded WEC archive. ${esc(data.methodology?.coverage || '')}`
+    : archiveFact
     ? `Based on the recorded ${esc(askSeriesName)} archive.`
     : recordIntent
     ? data.intent === 'record_subject_total'
@@ -586,23 +706,25 @@ function renderAnswer(data) {
     : data.intent === 'recalculate_points_totals'
     ? 'Career points are summed after every completed season is rescored under the selected complete rulebook.'
     : `${fmtNumber(changed.length)} championship${changed.length === 1 ? '' : 's'} change${changed.length === 1 ? 's' : ''} hands compared with the official results.`;
-  const grounding = data.grounding?.grounded
-    ? `<span class="ask-grounding">Grounded · ${esc(data.grounding.label)}</span>`
-    : '';
   const scopeSummary = recordIntent ? recordScopeSummary(data) : '';
-  const followUps = suggestedFollowUps(data);
+  const followUps = data.intent === 'explain_calculation' ? [] : suggestedFollowUps(data).slice(0, 2);
   askAnswerStatus.innerHTML = `
     <article class="ask-answer-card">
-      <div class="ask-answer-kicker"><span>${recordIntent || archiveFact ? 'OFFICIAL ARCHIVE ANSWER' : 'RECALCULATED ANSWER'}</span><span>${recordIntent ? esc(scopeSummary || data.record.label) : archiveFact ? esc(askSeriesName) : `${fmtNumber(data.seasonsEvaluated)} seasons`}</span></div>
       <h2 tabindex="-1">${esc(data.answer)}</h2>
-      <p>${answerContext}</p>${grounding}
     </article>`;
   askResult.innerHTML = `
     ${data.intent === 'compare_points_systems' || recordIntent ? '' : focusSection(data)}
-    ${evidence}
-    <details class="ask-method">
-      <summary>Evidence, rules and assumptions</summary>
-      <div>${data.planner ? `<dl><dt>Language planner</dt><dd>Local · ${esc(data.planner.version)}</dd><dt>External services</dt><dd>None</dd></dl>` : ''}${data.grounding ? `<dl><dt>Trusted tool</dt><dd>${esc(data.grounding.label)}</dd><dt>Evidence returned</dt><dd>${fmtNumber(data.grounding.evidenceItems)} item${Number(data.grounding.evidenceItems) === 1 ? '' : 's'}</dd></dl>` : ''}${data.methodology ? `<dl><dt>Source</dt><dd>${esc(data.methodology.source)}${data.methodology.href ? ` <a href="${esc(data.methodology.href)}">Open source record</a>` : ''}</dd><dt>Coverage</dt><dd>${esc(data.methodology.coverage)}</dd><dt>Sample</dt><dd>${esc(data.methodology.sample)}</dd></dl>` : ''}${data.pointsSystem ? `<ul>${data.pointsSystem.rules.map(rule => `<li>${esc(rule)}</li>`).join('')}</ul>` : ''}<ul>${(data.assumptions || []).map(assumption => `<li>${esc(assumption)}</li>`).join('')}</ul>${data.excludedSeasons?.length ? `<p>Excluded because detailed classifications are incomplete: ${data.excludedSeasons.map(fmtNumber).join(', ')}.</p>` : ''}</div>
+    <details class="ask-evidence-disclosure">
+      <summary>View evidence</summary>
+      <div class="ask-evidence-content">
+        ${scopeSummary ? `<p class="ask-evidence-scope"><strong>Scope:</strong> ${esc(scopeSummary)}</p>` : ''}
+        <p class="ask-evidence-summary">${answerContext}</p>
+        ${evidence}
+        <details class="ask-method">
+          <summary>Source, rules and assumptions</summary>
+          <div>${data.planner ? `<dl><dt>Language planner</dt><dd>Local · ${esc(data.planner.version)}</dd><dt>External services</dt><dd>None</dd></dl>` : ''}${data.grounding ? `<dl><dt>Trusted tool</dt><dd>${esc(data.grounding.label)}</dd><dt>Evidence returned</dt><dd>${fmtNumber(data.grounding.evidenceItems)} item${Number(data.grounding.evidenceItems) === 1 ? '' : 's'}</dd></dl>` : ''}${data.methodology ? `<dl><dt>Source</dt><dd>${esc(data.methodology.source)}${data.methodology.href ? ` <a href="${esc(data.methodology.href)}">Open source record</a>` : ''}</dd><dt>Coverage</dt><dd>${esc(data.methodology.coverage)}</dd><dt>Sample</dt><dd>${esc(data.methodology.sample)}</dd></dl>` : ''}${data.pointsSystem ? `<ul>${data.pointsSystem.rules.map(rule => `<li>${esc(rule)}</li>`).join('')}</ul>` : ''}<ul>${(data.assumptions || []).map(assumption => `<li>${esc(assumption)}</li>`).join('')}</ul>${data.excludedSeasons?.length ? `<p>Excluded because detailed classifications are incomplete: ${data.excludedSeasons.map(fmtNumber).join(', ')}.</p>` : ''}</div>
+        </details>
+      </div>
     </details>`;
   askRefinement.innerHTML = refinementPanel(data, followUps);
   syncInterpretationForms();
@@ -611,19 +733,24 @@ function renderAnswer(data) {
 
 async function ask(question, pushHistory = true, interpretation = null) {
   const query = question.trim();
-  if (query.length < 8) {
-    askQuery.setCustomValidity('Enter at least 8 characters.');
+  if (query.length < (askConversationId ? 2 : 8)) {
+    askQuery.setCustomValidity(askConversationId ? 'Enter at least two characters.' : 'Enter at least 8 characters.');
     askQuery.reportValidity();
     return;
   }
   askQuery.setCustomValidity('');
   if (askExamples) askExamples.hidden = true;
   askRequest?.abort();
+  archiveCurrentTurn();
+  askCurrentQuestion.textContent = query;
+  askCurrentQuestion.hidden = false;
+  askTurnComplete = false;
   askRequest = new AbortController();
   const request = askRequest;
   askLastInterpretation = interpretation;
   if (pushHistory) history.pushState({}, '', askUrl(query, interpretation));
   renderLoading(query);
+  scrollToCurrentTurn();
   try {
     const response = await fetch('/api/ask', {
       method: 'POST',
@@ -638,8 +765,12 @@ async function ask(question, pushHistory = true, interpretation = null) {
       signal: request.signal
     });
     const payload = await response.json();
+    if (askRequest !== request) return;
     if (!response.ok) {
-      return renderError(payload);
+      renderError(payload);
+      askTurnComplete = true;
+      scrollToCurrentTurn();
+      return;
     }
     askContext = payload.interpretation;
     askLastInterpretation = payload.interpretation;
@@ -647,13 +778,17 @@ async function ask(question, pushHistory = true, interpretation = null) {
     askConversation = payload.conversation?.turns || [{ query, answer: payload.answer || 'Calculated answer' }];
     if (pushHistory) history.replaceState({}, '', askUrl(query, payload.interpretation));
     renderAnswer(payload);
-    if (pushHistory && window.matchMedia('(max-width: 980px)').matches) {
-      const heading = askAnswerStatus.querySelector('h2');
-      heading?.focus({ preventScroll: true });
-      askAnswerStatus.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+    askTurnComplete = true;
+    saveConversation(payload);
+    askQuery.value = '';
+    resizeComposer();
+    scrollToCurrentTurn();
   } catch (error) {
-    if (error.name !== 'AbortError') renderError({ error: 'The answer could not be calculated. Check your connection and try again.' });
+    if (error.name !== 'AbortError' && askRequest === request) {
+      renderError({ error: 'The answer could not be calculated. Check your connection and try again.' });
+      askTurnComplete = true;
+      scrollToCurrentTurn();
+    }
   } finally {
     if (askRequest === request) askAnswerStatus.setAttribute('aria-busy', 'false');
   }
@@ -664,14 +799,19 @@ askForm.addEventListener('submit', event => {
   ask(askQuery.value, true);
 });
 
-askQuery.addEventListener('input', () => askQuery.setCustomValidity(''));
+askQuery.addEventListener('input', () => { askQuery.setCustomValidity(''); resizeComposer(); });
+askQuery.addEventListener('keydown', event => {
+  if (event.key !== 'Enter' || event.shiftKey || event.isComposing) return;
+  event.preventDefault();
+  askForm.requestSubmit();
+});
 
 document.addEventListener('submit', event => {
   const form = event.target.closest('.ask-interpretation-form');
   if (!form) return;
   event.preventDefault();
   const values = Object.fromEntries(new FormData(form));
-  ask(askQuery.value, true, {
+  ask(currentQuestion(), true, {
     intent: form.dataset.intent,
     entity: values.entity,
     recordCategory: values.recordCategory,
@@ -716,28 +856,32 @@ document.addEventListener('change', event => {
 document.addEventListener('click', event => {
   const newConversation = event.target.closest('[data-ask-new-conversation]');
   if (newConversation) {
+    askRequest?.abort();
+    askRequest = null;
     if (askConversationId) fetch(`/api/ask/conversations/${encodeURIComponent(askConversationId)}`, { method: 'DELETE' }).catch(() => {});
     askConversationId = null;
     askContext = null;
     askConversation = [];
+    askTranscript.replaceChildren();
+    askCurrentQuestion.hidden = true;
+    askCurrentQuestion.textContent = '';
+    askTurnComplete = false;
+    clearSavedConversation();
     askLastInterpretation = null;
     askQuery.value = '';
+    resizeComposer();
     history.pushState({}, '', `${askSeries.path}/ask`);
     askAnswerStatus.innerHTML = askInitialState;
+    askAnswerStatus.setAttribute('aria-busy', 'false');
     askRefinement.innerHTML = '';
     askResult.innerHTML = '';
     if (askExamples) askExamples.hidden = false;
+    askOutput.scrollTop = 0;
     askQuery.focus();
     return;
   }
   if (askQuestionHelp?.open && !askQuestionHelp.contains(event.target)) askQuestionHelp.open = false;
-  const historyEntry = event.target.closest('[data-ask-history-query]');
-  if (historyEntry) {
-    askQuery.value = historyEntry.dataset.askHistoryQuery;
-    askQuery.focus();
-    ask(askQuery.value, true);
-    return;
-  }
+  if (askExamples?.open && !askExamples.contains(event.target)) askExamples.open = false;
   const followUp = event.target.closest('[data-ask-followup]');
   if (followUp) {
     askQuery.value = followUp.dataset.askFollowup;
@@ -761,12 +905,14 @@ document.addEventListener('click', event => {
     if (nameSuggestion.dataset.suggestionField === 'subjectNames' && Number.isInteger(suggestionIndex) && askLastInterpretation) {
       const revised = { ...askLastInterpretation, subjectNames: [...(askLastInterpretation.subjectNames || [])] };
       revised.subjectNames[suggestionIndex] = nameSuggestion.dataset.askName;
-      ask(askQuery.value, true, revised);
+      ask(currentQuestion(), true, revised);
       return;
     }
     if (original) {
       const pattern = new RegExp(original.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
-      askQuery.value = askQuery.value.replace(pattern, nameSuggestion.dataset.askName);
+      askQuery.value = currentQuestion().replace(pattern, nameSuggestion.dataset.askName);
+    } else {
+      askQuery.value = currentQuestion();
     }
     ask(askQuery.value, true);
     return;
@@ -774,7 +920,9 @@ document.addEventListener('click', event => {
   const example = event.target.closest('[data-ask-example]');
   if (!example) return;
   if (askQuestionHelp) askQuestionHelp.open = false;
+  if (askExamples) askExamples.open = false;
   askQuery.value = example.dataset.askExample;
+  resizeComposer();
   askQuery.focus();
   ask(askQuery.value, true);
 });
@@ -789,6 +937,9 @@ window.addEventListener('popstate', () => {
   askConversationId = null;
   askContext = null;
   askConversation = [];
+  askTranscript.replaceChildren();
+  askCurrentQuestion.hidden = true;
+  askTurnComplete = false;
   const query = new URLSearchParams(location.search).get('q') || '';
   askQuery.value = query;
   if (query) ask(query, false, interpretationFromUrl());
@@ -800,11 +951,37 @@ window.addEventListener('popstate', () => {
     askRefinement.innerHTML = '';
     askResult.innerHTML = '';
     if (askExamples) askExamples.hidden = false;
+    askOutput.scrollTop = 0;
   }
 });
 
 const initialQuestion = new URLSearchParams(location.search).get('q');
-if (initialQuestion) {
+let restoredConversation = false;
+try {
+  const saved = JSON.parse(sessionStorage.getItem(askStorageKey) || 'null');
+  if (saved && Date.now() - saved.savedAt < 25 * 60 * 1000 && saved.id && saved.lastResult?.answer) {
+    askConversationId = saved.id;
+    askContext = saved.context;
+    askConversation = saved.turns || [];
+    for (const turn of askConversation.slice(0, -1)) {
+      const article = document.createElement('article');
+      article.className = 'ask-thread-turn ask-thread-summary';
+      article.innerHTML = `${questionBubble(turn.query)}<div class="ask-message ask-message-assistant"><span>Racelytic</span><p>${esc(turn.answer)}</p></div>`;
+      askTranscript.append(article);
+    }
+    askQuery.value = askConversation.at(-1)?.query || '';
+    askCurrentQuestion.textContent = askQuery.value;
+    askCurrentQuestion.hidden = false;
+    if (askExamples) askExamples.hidden = true;
+    renderAnswer(saved.lastResult);
+    askQuery.value = '';
+    askTurnComplete = true;
+    restoredConversation = true;
+  } else if (saved) clearSavedConversation();
+} catch { clearSavedConversation(); }
+if (initialQuestion && (!restoredConversation || initialQuestion !== askQuery.value)) {
   askQuery.value = initialQuestion;
   ask(initialQuestion, false, interpretationFromUrl());
 }
+resizeComposer();
+if (restoredConversation) requestAnimationFrame(scrollToCurrentTurn);
