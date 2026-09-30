@@ -139,9 +139,9 @@ const SERIES_HOME_PREVIEWS = {
         contenders: [{ name: 'Ferrari', id: 'ferrari', points: 245, wins: 4 }, { name: 'Toyota', id: 'toyota', points: 171, wins: 1 }],
         note: '2025 Hypercar manufacturers · Official final standings and overall race wins.',
         href: '/wec/season-analysis?year=2025', action: 'Explore Ferrari’s title season',
-        drivers: [{ id: 'sebastien-buemi', name: 'Buemi', wins: 27, podiums: 57 }, { id: 'brendon-hartley', name: 'Hartley', wins: 24, podiums: 54 }],
+        drivers: [{ id: 'sebastien-buemi', name: 'Buemi', wins: 26, podiums: 55 }, { id: 'brendon-hartley', name: 'Hartley', wins: 23, podiums: 52 }],
         comparisonMetrics: [['wins', 'Race wins'], ['podiums', 'Class podiums']],
-        comparisonInsight: 'Buemi leads Hartley in WEC race wins and class podiums.'
+        comparisonInsight: 'Through 2025, Buemi leads Hartley in WEC race wins and class podiums.'
     }
 };
 

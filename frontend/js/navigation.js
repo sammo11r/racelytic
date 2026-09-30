@@ -280,7 +280,6 @@ function loadHeader() {
         const championshipOptionButtons = [...(championshipOptions?.querySelectorAll('[role="option"]') || [])];
         if (championshipSelect) {
             const activeShortName = championshipSelect.querySelector('[data-active-series-short]');
-            const selectableChampionshipOptions = championshipOptionButtons.filter(option => option.dataset.series !== activeSeries);
             const switcherAbbreviations = { f1: 'F1', f2: 'F2', f3: 'F3', academy: 'F1A', fe: 'FE', wec: 'WEC' };
             if (activeShortName) activeShortName.textContent = switcherAbbreviations[activeSeries] || seriesConfig.shortName;
             championshipSelect.setAttribute('aria-label', `Change championship, currently ${seriesConfig.name}`);
@@ -295,7 +294,7 @@ function loadHeader() {
                 championshipOptions.hidden = false;
                 championshipSelector?.classList.add('is-expanded');
                 championshipSelect.setAttribute('aria-expanded', 'true');
-                selectableChampionshipOptions[0]?.focus();
+                championshipOptionButtons.find(option => option.dataset.series === activeSeries)?.focus();
             };
             championshipOptionButtons.forEach(option => {
                 const active = option.dataset.series === activeSeries;
@@ -325,10 +324,10 @@ function loadHeader() {
                 if (event.key === 'Escape') { event.preventDefault(); closeChampionshipOptions(true); return; }
                 if (!['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) return;
                 event.preventDefault();
-                const current = Math.max(0, selectableChampionshipOptions.indexOf(document.activeElement));
-                const next = event.key === 'Home' ? 0 : event.key === 'End' ? selectableChampionshipOptions.length - 1
-                    : (current + (event.key === 'ArrowDown' ? 1 : -1) + selectableChampionshipOptions.length) % selectableChampionshipOptions.length;
-                selectableChampionshipOptions[next]?.focus();
+                const current = Math.max(0, championshipOptionButtons.indexOf(document.activeElement));
+                const next = event.key === 'Home' ? 0 : event.key === 'End' ? championshipOptionButtons.length - 1
+                    : (current + (event.key === 'ArrowDown' ? 1 : -1) + championshipOptionButtons.length) % championshipOptionButtons.length;
+                championshipOptionButtons[next]?.focus();
             });
             document.addEventListener('click', event => {
                 if (!event.target.closest('.championship-selector')) closeChampionshipOptions();

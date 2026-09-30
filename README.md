@@ -69,7 +69,9 @@ database. The database itself must exist before the first import.
 CREATE DATABASE racelytics CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ```
 
-Import the versioned CSV archive and build the ratings tables:
+Import the versioned CSV archive and build the ratings tables. The import
+publishes new archive tables as one database rename, then the npm lifecycle
+rebuilds ratings:
 
 ```bash
 npm run import
@@ -113,10 +115,13 @@ Never commit `.env` or production credentials.
 | `npm run check` | Validate generated routes, CSS, replays, links and JavaScript |
 | `npm run build:frontend` | Refresh and validate generated series pages |
 | `npm run audit:wec` | Validate WEC archive integrity |
-| `npm run sync:data:dry` | Validate local data without publishing it |
+| `npm run import` | Import all versioned CSV files and rebuild all ratings |
+| `npm run import:formula-e`, `npm run import:wec` | Import one archive and rebuild its ratings |
+| `npm run sync:data:dry` | Validate local data without publishing archive tables |
+| `npm run sync:data` | Collect, validate and publish configured series |
 
 See [Data maintenance](docs/data-maintenance.md) for collectors, guarded
-database publishing, ratings rebuilds and race replay imports.
+database publishing, ratings rebuilds, recovery and race replay imports.
 
 ## Project structure
 
@@ -132,6 +137,9 @@ test/         Unit, integration, data integrity, SEO and rendering tests
 ```
 
 The most useful implementation notes are in [Architecture](docs/architecture.md).
+The [Ask question types](docs/ask-question-types.md) document includes the
+concrete question inventory; [wording variations](docs/ask-question-variations.md)
+are a separate evaluation roadmap.
 
 ## Quality checks
 

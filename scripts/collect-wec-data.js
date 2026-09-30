@@ -594,6 +594,31 @@ async function timingPage(parameters, cacheName = '') {
   return content;
 }
 
+async function refreshCurrentSeason() {
+  const season = SEASONS.find(candidate => candidate.status === 'ongoing');
+  if (!season) return;
+  const index = await timingPage({ season: '15_2026' });
+  const options = selectOptions(index, 'evvent');
+  for (const [index, event] of season.events.entries()) {
+    if (event.status === 'completed' || Date.parse(event.startTimeUtc) > Date.now()) continue;
+    const option = options.find(candidate => candidate.value.startsWith(`${String(index + 1).padStart(2, '0')}_`));
+    if (!option) continue;
+    const html = await timingPage({ season: '15_2026', evvent: option.value });
+    const finalRace = officialLinks(html)
+      .map(url => ({ url, match: url.match(/\/(\d{12})_Race\/.*\/03_Classification_Race_Hour%20(\d+)(?:_Final\.CSV|\._FinalCSV)$/i) }))
+      .filter(candidate => candidate.match)
+      .sort((left, right) => Number(left.match[2]) - Number(right.match[2])).at(-1);
+    if (!finalRace) continue;
+    event.directory = option.value;
+    event.sourceUrl = finalRace.url;
+    event.startTimeUtc = sessionStart(finalRace.match[1], event.utcOffsetHours);
+    event.timingSeasonKey = '15_2026';
+    event.entryListUrl = entryListUrlFromHtml(html);
+    event.status = 'completed';
+  }
+  season.completedRounds = season.events.filter(event => event.status === 'completed').length;
+}
+
 function utcOffsetFor(timestamp, timeZone) {
   const year = Number(timestamp.slice(0, 4)), month = Number(timestamp.slice(4, 6)), day = Number(timestamp.slice(6, 8));
   const hour = Number(timestamp.slice(8, 10)), minute = Number(timestamp.slice(10, 12));
@@ -681,7 +706,7 @@ function writeCsv(filename, headers, rows) {
 async function cachedText(cacheName, url) {
   fs.mkdirSync(CACHE_DIRECTORY, { recursive: true });
   const cachePath = path.join(CACHE_DIRECTORY, cacheName);
-  if (!refresh && fs.existsSync(cachePath)) return fs.readFileSync(cachePath, 'utf8');
+  if (!refresh && cacheName !== 'season-2026.html' && fs.existsSync(cachePath)) return fs.readFileSync(cachePath, 'utf8');
   const response = await fetch(url, { headers: { 'user-agent': 'Racelytic WEC data collector' } });
   if (!response.ok) throw new Error(`Could not fetch ${url}: ${response.status}`);
   const content = await response.text();
@@ -1061,6 +1086,7 @@ async function parsePdfStandings(championship, season, context = {}) {
 }
 
 async function collect() {
+  await refreshCurrentSeason();
   const collectionSeasons = [...await discoverLegacySeasons(), ...SEASONS];
   const countries = await countryIdsByCode();
   const discoveredEntryLists = collectionSeasons.flatMap(season => season.events
@@ -1343,4 +1369,4 @@ async function collect() {
 
 if (require.main === module) collect().catch(error => { console.error(error); process.exitCode = 1; });
 
-module.exports = { CHAMPIONSHIPS, EVENTS, MANUFACTURER_BY_MODEL, SEASONS, canonicalDriverId, canonicalDriverName, championshipClassIds, championshipPdfMatches, competitorId, milliseconds, parseRows, parseStandings, parsePdfStandings, slug, tableRows };
+module.exports = { CHAMPIONSHIPS, EVENTS, MANUFACTURER_BY_MODEL, SEASONS, canonicalDriverId, canonicalDriverName, championshipClassIds, championshipPdfMatches, competitorId, milliseconds, parseRows, parseStandings, parsePdfStandings, refreshCurrentSeason, slug, tableRows };

@@ -1,6 +1,11 @@
 # Ask Racelytic wording variations
 
-This is a planning/evaluation set for the types in [ask-question-types.md](ask-question-types.md). It is **not a claim that these wordings work today**. Each row gives two equivalent ways to ask for the same answer type. Brackets are slots to substitute with a real archive value. Keep every explicit slot when turning a template into a test. Types marked `Data` or `Define` in the inventory remain unsupported until their prerequisites exist.
+This is a planning and evaluation set for the catalogue and concrete examples
+in [Ask question types](ask-question-types.md). It is **not a claim that these
+wordings work today**. Each row gives two ways to ask for the same answer type.
+Brackets are slots to substitute with a real archive value. Keep every
+explicit slot when turning a template into a test. Types marked `Data` or
+`Define` remain unsupported until their prerequisites exist.
 
 The fallback should output the type ID's intent family and all slots, then the calculator should either apply all filters or clarify/refuse. The variation set deliberately separates **synonyms** from **changed calculations**: “first” versus “last” is a slot change; “fastest lap” versus “fastest pit stop” changes the metric and evidence.
 

@@ -85,6 +85,14 @@ const SESSION_DEFINITIONS = [
   { path: 'sprint-race-classification', documentKind: 'sprint', suffix: 'race', number: 4, name: 'Race', isRace: true },
   { path: 'feature-race-classification', documentKind: 'feature', suffix: 'race-2', number: 6, name: 'Race', isRace: true }
 ];
+const MADRID_SESSIONS = [
+  SESSION_DEFINITIONS[0],
+  { path: 'qualifying-i-classification', documentKind: 'qualifying', suffix: 'qualifying', number: 2, name: 'Qualifying 1', isRace: false },
+  { path: 'qualifying-ii-classification', documentKind: 'qualifying', suffix: 'qualifying-2', number: 3, name: 'Qualifying 2', isRace: false },
+  SESSION_DEFINITIONS[2],
+  { path: 'feature-race-i-classification', documentKind: 'feature', suffix: 'race-2', number: 6, name: 'Feature Race 1', isRace: true },
+  { path: 'feature-race-ii-classification', documentKind: 'feature', suffix: 'race-3', number: 8, name: 'Feature Race 2', isRace: true }
+];
 
 let decisionDocumentsHtml;
 
@@ -490,13 +498,15 @@ async function main() {
     const race = racesByRound.get(event.round);
     if (!race) throw new Error(`2026 race round ${event.round} was not found.`);
     if ((race.endDate || race.date) >= today) continue;
-    for (const definition of SESSION_DEFINITIONS) {
+    const definitions = event.idSlug === 'madrid' ? MADRID_SESSIONS : SESSION_DEFINITIONS;
+    if (definitions.every(definition => existingResults.filter(result => result.sessionId === `fia-formula-3-championship_${YEAR}_${event.idSlug}_${definition.suffix}`).length >= 20)) continue;
+    for (const definition of definitions) {
       const id = `fia-formula-3-championship_${YEAR}_${event.idSlug}_${definition.suffix}`;
       const session = {
         id, raceId: race.id, year: YEAR, round: race.round, sessionNumber: definition.number,
         code: '', name: definition.name, startTimeUtc: '', endTimeUtc: '',
         isRace: definition.isRace ? 'True' : 'False', cancelled: 'False',
-        isQualifying: definition.suffix === 'qualifying'
+        isQualifying: definition.suffix.startsWith('qualifying')
       };
       const { rows: officialRows } = await classificationRows(event, definition);
       const results = officialRows.map((row, index) => {
@@ -525,7 +535,7 @@ async function main() {
       applyResultOverrides(results);
       importedSessions.push(session);
       importedResults.push(...results);
-      console.log(`${YEAR} round ${race.round} ${definition.name}${definition.suffix === 'race-2' ? ' 2' : ''}: ${results.length} results`);
+      console.log(`${YEAR} round ${race.round} ${definition.name}: ${results.length} results`);
     }
   }
 
@@ -540,6 +550,12 @@ async function main() {
   mergedSessions.sort((a, b) => Number(a.year) - Number(b.year) || Number(a.round) - Number(b.round) || Number(a.sessionNumber) - Number(b.sessionNumber));
   const sessionOrder = new Map(mergedSessions.map((session, index) => [session.id, index]));
   mergedResults.sort((a, b) => (sessionOrder.get(a.sessionId) ?? 999999) - (sessionOrder.get(b.sessionId) ?? 999999) || Number(a.positionDisplayOrder) - Number(b.positionDisplayOrder));
+  const seasonComplete = EVENTS.every(event => {
+    const race = racesByRound.get(event.round);
+    const definitions = event.idSlug === 'madrid' ? MADRID_SESSIONS : SESSION_DEFINITIONS;
+    return race && (race.endDate || race.date) < today && definitions.every(definition =>
+      mergedResults.some(result => result.sessionId === `fia-formula-3-championship_${YEAR}_${event.idSlug}_${definition.suffix}`));
+  });
 
   const [driverStandingsHtml, constructorStandingsHtml] = await Promise.all([
     fetchText('https://www.fiaformula3.com/en/standings/2026/drivers'),
@@ -553,14 +569,14 @@ async function main() {
     return {
       year: YEAR, positionNumber: mapped.position, driverId: mapped.driver.id,
       constructorId: latestConstructor(mapped.driver.id, mergedEntries), points,
-      championshipWon: 'False', ...stats
+      championshipWon: seasonComplete && mapped.position === 1 ? 'True' : 'False', ...stats
     };
   });
   const constructorStandings = parseStandingsRows(constructorStandingsHtml).map(cells => {
     const mapped = constructorIdForStanding(cells[0], constructors);
     return {
       year: YEAR, positionNumber: mapped.position, constructorId: mapped.constructorId,
-      points: parseNumber(cells.at(-1)), championshipWon: 'False'
+      points: parseNumber(cells.at(-1)), championshipWon: seasonComplete && mapped.position === 1 ? 'True' : 'False'
     };
   });
 

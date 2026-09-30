@@ -12,6 +12,10 @@ Email `racelytic@gmail.com` with:
 - any suggested mitigation;
 - a safe way to contact you for follow-up.
 
+Do not include passwords, API tokens, private database dumps or personal data
+in the report. If a short sanitized example is insufficient, describe the
+material first and arrange a safer way to share it in the follow-up.
+
 Avoid accessing data that does not belong to you, disrupting the service or
 publishing exploit details before the issue has been assessed.
 

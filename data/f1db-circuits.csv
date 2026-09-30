@@ -7,7 +7,7 @@
 "austin","Americas","Circuit of the Americas",,"RACE","ANTI_CLOCKWISE","Austin","united-states-of-america",30.132778,-97.641111,5.513,20,13
 "avus","AVUS","AVUS",,"ROAD","ANTI_CLOCKWISE","Berlin","germany",52.480556,13.251389,8.300,4,1
 "bahrain","Bahrain","Bahrain International Circuit",,"RACE","CLOCKWISE","Sakhir","bahrain",26.0325,50.510556,5.412,15,22
-"baku","Baku","Baku City Circuit",,"STREET","ANTI_CLOCKWISE","Baku","azerbaijan",40.3725,49.853333,6.003,20,9
+"baku","Baku","Baku City Circuit",,"STREET","ANTI_CLOCKWISE","Baku","azerbaijan",40.3725,49.853333,6.003,20,10
 "brands-hatch","Brands Hatch","Brands Hatch",,"RACE","CLOCKWISE","Fawkham","united-kingdom",51.356667,0.2625,4.207,9,14
 "bremgarten","Bremgarten","Circuit Bremgarten",,"ROAD","CLOCKWISE","Bern","switzerland",46.95,7.410833,7.280,13,5
 "buddh","Buddh","Buddh International Circuit",,"RACE","CLOCKWISE","Greater Noida","india",28.350556,77.535,5.125,16,3
@@ -37,7 +37,7 @@
 "las-vegas","Las Vegas","Las Vegas Street Circuit",,"STREET","ANTI_CLOCKWISE","Las Vegas","united-states-of-america",36.175,-115.136389,6.201,17,3
 "long-beach","Long Beach","Long Beach",,"STREET","CLOCKWISE","Long Beach","united-states-of-america",33.766389,-118.192778,3.275,18,8
 "lusail","Lusail","Lusail International Circuit",,"RACE","CLOCKWISE","Lusail","qatar",25.49,51.454167,5.419,16,4
-"madring","Madring","Circuito de Madring",,"STREET","CLOCKWISE","Madrid","spain",40.465278,-3.615278,5.416,22,0
+"madring","Madring","Circuito de Madring",,"STREET","CLOCKWISE","Madrid","spain",40.465278,-3.615278,5.416,22,1
 "magny-cours","Magny-Cours","Circuit de Nevers Magny-Cours",,"RACE","CLOCKWISE","Nevers","france",46.863242,3.164228,4.411,17,18
 "marina-bay","Marina Bay","Marina Bay Street Circuit",,"STREET","ANTI_CLOCKWISE","Singapore","singapore",1.291531,103.86385,4.927,19,16
 "melbourne","Melbourne","Melbourne Grand Prix Circuit","Albert Park Circuit","STREET","CLOCKWISE","Melbourne","australia",-37.849722,144.968333,5.278,14,29

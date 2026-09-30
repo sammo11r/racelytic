@@ -166,7 +166,7 @@ async function importAll(options = {}) {
   const stageName = table => `__sync_${token}_${table}`;
   const oldName = table => `__old_${token}_${table}`;
   const failedName = table => `__failed_${token}_${table}`;
-  const connection = await databasePool().getConnection();
+  const connection = await (options.pool || databasePool()).getConnection();
   let locked = false;
   let published = false;
   let existing = new Set();
@@ -208,14 +208,23 @@ async function importAll(options = {}) {
         rollbackPairs.push(`${identifier(dataset.table)} TO ${identifier(failedName(dataset.table))}`);
         if (existing.has(dataset.table)) rollbackPairs.push(`${identifier(oldName(dataset.table))} TO ${identifier(dataset.table)}`);
       }
-      await connection.query(`RENAME TABLE ${rollbackPairs.join(',')}`);
-      await dropTables(connection, datasets.map(dataset => failedName(dataset.table)));
+      try {
+        await connection.query(`RENAME TABLE ${rollbackPairs.join(',')}`);
+      } catch (rollbackError) {
+        error.archivePublished = true;
+        error.message += ` Database rollback failed: ${rollbackError.message}`;
+        throw error;
+      }
       published = false;
+      try { await dropTables(connection, datasets.map(dataset => failedName(dataset.table))); }
+      catch (cleanupError) { console.error('Failed to remove rejected tables:', cleanupError); }
       throw error;
     }
 
-    await dropTables(connection, datasets.filter(dataset => existing.has(dataset.table)).map(dataset => oldName(dataset.table)));
-    require('../constructor-lineage').clearConstructorLineageCache();
+    try { await dropTables(connection, datasets.filter(dataset => existing.has(dataset.table)).map(dataset => oldName(dataset.table))); }
+    catch (cleanupError) { console.error('Published tables, but failed to remove old tables:', cleanupError); }
+    try { require('../constructor-lineage').clearConstructorLineageCache(); }
+    catch (cacheError) { console.error('Published tables, but failed to clear the constructor lineage cache:', cacheError); }
     console.log(`Atomically published ${datasets.length} tables.`);
     return { tables: datasets.length, rows: datasets.reduce((sum, dataset) => sum + dataset.rows.length, 0) };
   } catch (error) {

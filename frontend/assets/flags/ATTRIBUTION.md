@@ -4,3 +4,6 @@ Country flag SVGs are provided by [flag-icons](https://github.com/lipis/flag-ico
 The `ae`, `ao`, `bh`, `by`, `ci`, `do`, `ec`, `gr`, `kn`, `lu`, `lv`, `om`, `ph`, `pr`, `qa`, `sa`, `sk`, and `tw` assets are project-rendered geometric representations added for series coverage.
 
 The flag-icons project is distributed under the MIT License. Individual national flags may be subject to their respective national laws.
+
+See [Data Sources & Licences](https://racelytic.com/data-sources) for the
+project's general source and reuse notes.

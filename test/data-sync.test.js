@@ -4,17 +4,21 @@ const os = require('node:os');
 const path = require('node:path');
 const test = require('node:test');
 
-const { inferType, selectedFilePrefixes, tableNameFromFile } = require('../backend/import/importer');
+const { importAll, inferType, selectedFilePrefixes, tableNameFromFile } = require('../backend/import/importer');
 const { canonicalizeConstructorChronology } = require('../backend/constructor-lineage-data');
 const { isVersionedDataFile, selectedSeries } = require('../scripts/sync-data');
 const { checksumFor, extractCsvArchive, selectReleaseAssets } = require('../scripts/sync-f1db');
 
-test('supported database update commands rebuild ratings only for rating-enabled series', () => {
+test('supported database update commands rebuild ratings for every published series', () => {
   const packageJson = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'package.json'), 'utf8'));
   const syncSource = fs.readFileSync(path.join(__dirname, '..', 'scripts', 'sync-data.js'), 'utf8');
   assert.equal(packageJson.scripts.postimport, 'npm run rebuild:ratings');
-  assert.match(syncSource, /for \(const name of series\.filter\(value => value !== 'fe'\)\) await run\(process\.execPath, \['scripts\/rebuild-ratings\.js', `--series=\$\{name\}`\]\)/);
+  assert.equal(packageJson.scripts['postimport:formula-e'], 'npm run rebuild:ratings -- --series=fe');
+  assert.equal(packageJson.scripts['postimport:wec'], 'npm run rebuild:ratings -- --series=wec');
+  assert.match(syncSource, /for \(const name of series\) await run\(process\.execPath, \['scripts\/rebuild-ratings\.js', `--series=\$\{name\}`\]\)/);
   assert.ok(syncSource.indexOf("scripts/rebuild-ratings.js") < syncSource.indexOf("finishRun(runId, 'succeeded'"));
+  assert.match(syncSource, /const archivePublished = published \|\| error\.archivePublished/);
+  assert.match(syncSource, /if \(backupDirectory && !archivePublished\) \{/);
 });
 
 test('data sync accepts a unique subset of supported series', () => {
@@ -22,6 +26,7 @@ test('data sync accepts a unique subset of supported series', () => {
   assert.deepEqual(selectedSeries(['--series=fe,fe']), ['fe']);
   assert.deepEqual(selectedSeries(['--series=wec,wec']), ['wec']);
   assert.throws(() => selectedSeries(['--series=f1,unknown']), /Unsupported series/);
+  assert.throws(() => selectedSeries(['--series=']), /Select at least one series/);
 });
 
 test('data sync backups cover every versioned championship archive', () => {
@@ -89,4 +94,74 @@ test('constructor chronology import collapses repeated parent copies into one ch
   const normalized = canonicalizeConstructorChronology(rows);
   assert.equal(normalized.length, 2);
   assert.deepEqual(normalized.map(row => row.id), ['b-1', 'b-2']);
+});
+
+function importConnection({ failOldCleanup = false, failVerification = false, failRollback = false } = {}) {
+  const tables = new Map([['f2_drivers', 1]]);
+  let published = false;
+  const connection = {
+    release() {},
+    async batch(sql, rows) {
+      const table = sql.match(/INSERT INTO `([^`]+)`/)[1];
+      tables.set(table, (tables.get(table) || 0) + rows.length);
+    },
+    async query(sql) {
+      if (sql.startsWith('SELECT GET_LOCK')) return [{ acquired: 1 }];
+      if (sql.startsWith('SELECT RELEASE_LOCK')) return [];
+      if (sql === 'SHOW TABLES') return [...tables.keys()].map(name => ({ table: name }));
+      if (sql.startsWith('SELECT COUNT(*)')) {
+        const table = sql.match(/FROM `([^`]+)`/)[1];
+        return [{ count: failVerification && published && table === 'f2_drivers' ? 0 : tables.get(table) }];
+      }
+      if (sql.startsWith('CREATE TABLE')) { tables.set(sql.match(/CREATE TABLE `([^`]+)`/)[1], 0); return []; }
+      if (sql.startsWith('RENAME TABLE')) {
+        if (failRollback && sql.includes('__failed_')) throw new Error('rollback unavailable');
+        published = true;
+        for (const [, from, to] of sql.matchAll(/`([^`]+)` TO `([^`]+)`/g)) {
+          tables.set(to, tables.get(from));
+          tables.delete(from);
+        }
+        return [];
+      }
+      if (sql.startsWith('DROP TABLE IF EXISTS')) {
+        if (failOldCleanup && sql.includes('__old_')) throw new Error('old table cleanup unavailable');
+        for (const [, table] of sql.matchAll(/`([^`]+)`/g)) tables.delete(table);
+        return [];
+      }
+      throw new Error(`Unexpected query: ${sql}`);
+    }
+  };
+  return { pool: { async getConnection() { return connection; } }, tables };
+}
+
+test('a post-publication cleanup failure keeps the new archive published', async () => {
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'racelytic-import-test-'));
+  fs.writeFileSync(path.join(directory, 'f2db-drivers.csv'), 'id,name\na,Driver A\n');
+  const { pool, tables } = importConnection({ failOldCleanup: true });
+  const originalError = console.error;
+  console.error = () => {};
+  try {
+    assert.deepEqual(await importAll({ dataDirectory: directory, series: 'f2', pool }), { tables: 1, rows: 1 });
+    assert.equal(tables.get('f2_drivers'), 1);
+    assert.equal([...tables.keys()].some(name => name.startsWith('__old_')), true);
+  } finally {
+    console.error = originalError;
+    fs.rmSync(directory, { recursive: true, force: true });
+  }
+});
+
+test('a failed publication rollback signals that CSV files must be retained', async () => {
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'racelytic-import-test-'));
+  fs.writeFileSync(path.join(directory, 'f2db-drivers.csv'), 'id,name\na,Driver A\n');
+  const { pool, tables } = importConnection({ failVerification: true, failRollback: true });
+  try {
+    await assert.rejects(importAll({ dataDirectory: directory, series: 'f2', pool }), error => {
+      assert.equal(error.archivePublished, true);
+      assert.match(error.message, /Database rollback failed/);
+      return true;
+    });
+    assert.equal(tables.get('f2_drivers'), 1);
+  } finally {
+    fs.rmSync(directory, { recursive: true, force: true });
+  }
 });

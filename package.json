@@ -24,6 +24,8 @@
     "import:formula-e": "node backend/import/all.js --series=fe",
     "import:wec": "node backend/import/all.js --series=wec",
     "postimport": "npm run rebuild:ratings",
+    "postimport:formula-e": "npm run rebuild:ratings -- --series=fe",
+    "postimport:wec": "npm run rebuild:ratings -- --series=wec",
     "sync:data": "node scripts/sync-data.js",
     "sync:data:dry": "node scripts/sync-data.js --dry-run",
     "sync:data:status": "node scripts/sync-data.js --status",

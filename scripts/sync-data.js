@@ -28,10 +28,11 @@ function argumentValue(name, args = process.argv.slice(2)) {
 }
 
 function selectedSeries(args = process.argv.slice(2)) {
-  const requested = (argumentValue('series', args) || process.env.DATA_SYNC_SERIES || ALLOWED_SERIES.join(','))
+  const requested = (argumentValue('series', args) ?? process.env.DATA_SYNC_SERIES ?? ALLOWED_SERIES.join(','))
     .split(',').map(value => value.trim().toLowerCase()).filter(Boolean);
   const invalid = requested.filter(value => !ALLOWED_SERIES.includes(value));
   if (invalid.length) throw new Error(`Unsupported series: ${invalid.join(', ')}.`);
+  if (!requested.length) throw new Error('Select at least one series to synchronize.');
   return [...new Set(requested)];
 }
 
@@ -207,6 +208,7 @@ async function main(args = process.argv.slice(2)) {
   const backupId = `${new Date().toISOString().replace(/[:.]/g, '-')}-${runId.slice(0, 8)}`;
   let backupDirectory;
   let runRecorded = false;
+  let published = false;
   const sourceVersions = {};
 
   acquireFileLock(runId);
@@ -219,19 +221,22 @@ async function main(args = process.argv.slice(2)) {
     await validateSources(series);
     if (dryRun) {
       await finishRun(runId, 'validated', sourceVersions, { dryRun: true }, null);
-      console.log('Dry run complete: source data passed validation; database was not changed.');
+      console.log('Dry run complete: source data passed validation; archive tables were not changed.');
       return;
     }
     const imported = await importAll({ series });
-    for (const name of series.filter(value => value !== 'fe')) await run(process.execPath, ['scripts/rebuild-ratings.js', `--series=${name}`]);
+    published = true;
+    for (const name of series) await run(process.execPath, ['scripts/rebuild-ratings.js', `--series=${name}`]);
     await finishRun(runId, 'succeeded', sourceVersions, imported, null);
     trimBackups();
     console.log(`Data sync ${runId} completed successfully.`);
   } catch (error) {
-    if (backupDirectory) {
+    const archivePublished = published || error.archivePublished;
+    if (backupDirectory && !archivePublished) {
       try { restoreBackup(backupDirectory); }
       catch (restoreError) { error.message += ` CSV restore also failed: ${restoreError.message}`; }
     }
+    if (archivePublished) error.message += ' Archive tables were published; CSV files were retained to match them. Check sync status and rebuild ratings before retrying.';
     if (runRecorded) {
       try { await finishRun(runId, 'failed', sourceVersions, {}, error); }
       catch (recordError) { console.error('Could not record failed sync:', recordError); }

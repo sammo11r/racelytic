@@ -30,6 +30,11 @@ npm run build:frontend
 Generated manifests should be updated through the build command rather than
 edited manually.
 
+For archive updates, follow [Data maintenance](docs/data-maintenance.md).
+Collector changes should keep the versioned CSV files, import mapping and
+published tables consistent. Review row-count changes before publishing; a
+ratings rebuild follows the import rather than taking part in the table rename.
+
 ## Pull requests
 
 A pull request should explain:
@@ -48,6 +53,10 @@ npm run check
 
 Add tests when behaviour, parsing, calculations, routes, SEO or archive
 contracts change. Avoid tests that only repeat static implementation details.
+
+Update the relevant Markdown guide when changing a command, data source,
+supported question type or recovery procedure. Keep source attribution beside
+the affected assets.
 
 ## Style
 

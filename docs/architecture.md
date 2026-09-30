@@ -66,6 +66,15 @@ championship tables. Compact race replay manifests and Brotli chunks in
 `frontend/data/replays/` are deployed static assets and are intentionally
 versioned.
 
+`backend/import/importer.js` reads CSV files, checks row counts against the
+published tables, loads staging tables and switches the selected tables with
+one `RENAME TABLE` statement. `backend/import/all.js` is the command-line
+entry point. `scripts/sync-data.js` adds source collection, validation, local
+CSV backups, a run log and per-series ratings rebuilds. Ratings are rebuilt
+after archive publication, so a ratings failure needs a retry without rolling
+the CSV files back to an older archive. Operational steps are in
+[Data maintenance](data-maintenance.md).
+
 Collectors use ignored local cache directories. Review images, downloaded
 documents, database backups and temporary audit output belong in `tmp/` and
 must not be committed.
@@ -75,3 +84,8 @@ must not be committed.
 `npm test` runs behaviour, route, rendering, data-integrity and security
 regression tests. `npm run check` validates generated pages, CSS, compact
 replays, constructor lineage, JavaScript syntax and local links.
+
+The [Ask question types](ask-question-types.md) document keeps the calculation
+catalogue and concrete question inventory together. The separate
+[wording variations](ask-question-variations.md) document tracks phrasing and
+follow-up evaluation cases.

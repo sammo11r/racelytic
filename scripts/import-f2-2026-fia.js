@@ -13,6 +13,8 @@ const {
 const YEAR = 2026;
 const CSV_ONLY = process.argv.includes('--csv-only');
 const APPLY = process.argv.includes('--apply') || CSV_ONLY;
+const REFRESH_ROUNDS = new Set((process.argv.find(argument => argument.startsWith('--refresh-round='))?.split('=')[1] || '')
+  .split(',').filter(Boolean).map(Number).filter(Number.isInteger));
 const DATA_DIR = path.join(__dirname, '../data');
 const CACHE_DIR = path.join(DATA_DIR, '.f2-cache');
 const file = suffix => path.join(DATA_DIR, `f2db-${suffix}.csv`);
@@ -20,6 +22,7 @@ const file = suffix => path.join(DATA_DIR, `f2db-${suffix}.csv`);
 const SESSION_COLUMNS = ['id','raceId','year','round','sessionNumber','code','name','startTimeUtc','endTimeUtc','isRace','cancelled'];
 const RESULT_COLUMNS = ['sessionId','raceId','year','round','positionDisplayOrder','positionNumber','points','polePosition','status','driverNumber','driverId','constructorId','laps','time','timeMillis','gapMillis','gapLaps','fastestLap','fastestLapNumber','fastestLapTime','fastestLapTimeMillis','averageSpeed'];
 const ENTRY_COLUMNS = ['raceId','year','round','driverNumber','driverId','constructorId','chassisId','engineId'];
+const DRIVER_COLUMNS = ['id','name','firstName','lastName','abbreviation','countryCode'];
 const DRIVER_STANDING_COLUMNS = ['year','positionNumber','driverId','constructorId','points','championshipWon','starts','wins','podiums','poles','fastestLaps','retirements'];
 const CONSTRUCTOR_STANDING_COLUMNS = ['year','positionNumber','constructorId','points','championshipWon'];
 const RESULT_OVERRIDES = new Map([
@@ -29,6 +32,9 @@ const RESULT_OVERRIDES = new Map([
   ['fia-formula-2-championship_2026_montreal_race-2:sebastian-montoya', { points: 12 }],
   ['fia-formula-2-championship_2026_montreal_race-2:ritomo-miyata', { time: '55:47.074' }]
 ]);
+const NEW_DRIVER_METADATA = [
+  { id:'hiyu-yamakoshi', name:'Hiyu Yamakoshi', firstName:'Hiyu', lastName:'Yamakoshi', abbreviation:'YAMA', countryCode:'jp' }
+];
 
 const EVENTS = [
   { round:1, sourceSlug:'melbourne', idSlug:'melbourne' },
@@ -126,6 +132,17 @@ function driverForStanding(label, drivers, activeDriverIds) {
   return { position:Number(match[1]), driver:candidates[0] };
 }
 
+function driverIdForClassification(label, drivers, preferredId, driverNumber) {
+  const parts = String(label || '').trim().split(/\s+/);
+  const initial = normalized(parts[0]).charAt(0);
+  const surname = normalized(parts.slice(1).join(''));
+  if (driverNumber === '20' && surname === 'fittipaldi') return 'emerson-fanucchi-fittipaldi-jr';
+  const candidates = drivers.filter(driver => normalized(driver.name).charAt(0) === initial && normalized(driver.name).endsWith(surname));
+  if (candidates.length > 1 && candidates.some(driver => driver.id === preferredId)) return preferredId;
+  if (candidates.length !== 1) throw new Error(`Could not uniquely map official F2 classification driver: ${label}`);
+  return candidates[0].id;
+}
+
 function constructorForStanding(label, constructors) {
   const match = label.match(/^(\d+)\s*(.+)$/);
   if (!match) throw new Error(`Invalid constructor standing: ${label}`);
@@ -164,13 +181,17 @@ async function replaceYear(connection, table, columns, rows) {
   );
 }
 
-async function updateDatabase(sessions, results, newEntries, driverStandings, constructorStandings) {
+async function updateDatabase(sessions, results, newDrivers, newEntries, driverStandings, constructorStandings) {
   const connection = await pool.getConnection();
   try {
     await connection.beginTransaction();
     const ids = sessions.map(session => session.id);
     await connection.query(`DELETE FROM f2_session_results WHERE sessionId IN (${ids.map(()=>'?').join(',')})`, ids);
     await connection.query(`DELETE FROM f2_sessions WHERE id IN (${ids.map(()=>'?').join(',')})`, ids);
+    if (newDrivers.length) await connection.batch(
+      `INSERT INTO f2_drivers (${DRIVER_COLUMNS.map(column=>`\`${column}\``).join(',')}) VALUES (${DRIVER_COLUMNS.map(()=>'?').join(',')})`,
+      newDrivers.map(row => DRIVER_COLUMNS.map(column => databaseValue(row[column])))
+    );
     for (const entry of newEntries) {
       await connection.query('DELETE FROM f2_entries WHERE raceId = ? AND driverNumber = ?', [entry.raceId, entry.driverNumber]);
     }
@@ -200,6 +221,8 @@ async function main() {
     readCsv(file('races')), readCsv(file('entries')), readCsv(file('drivers')), readCsv(file('constructors')),
     readCsv(file('sessions')), readCsv(file('session-results')), readCsv(file('season-driver-standings')), readCsv(file('season-constructor-standings'))
   ]);
+  const newDrivers = NEW_DRIVER_METADATA.filter(driver => !drivers.some(existing => existing.id === driver.id));
+  drivers.push(...newDrivers);
   const racesByRound = new Map(races.filter(race=>race.year===String(YEAR)).map(race=>[Number(race.round),race]));
   const entriesByRaceNumber = new Map(entries.map(entry=>[`${entry.raceId}:${entry.driverNumber}`,entry]));
   const latestEntryByNumber = new Map(entries.filter(entry=>entry.year===String(YEAR)).sort((a,b)=>Number(a.round)-Number(b.round)).map(entry=>[String(entry.driverNumber),entry]));
@@ -221,6 +244,7 @@ async function main() {
     const race = racesByRound.get(event.round);
     if (!race) throw new Error(`F2 round ${event.round} not found.`);
     if ((race.endDate || race.date) >= today) continue;
+    if (!REFRESH_ROUNDS.has(event.round) && SESSION_DEFINITIONS.every(definition => oldResults.filter(result => result.sessionId === `fia-formula-2-championship_${YEAR}_${event.idSlug}_${definition.suffix}`).length >= 18)) continue;
     for (const definition of SESSION_DEFINITIONS) {
       const session = {
         id:`fia-formula-2-championship_${YEAR}_${event.idSlug}_${definition.suffix}`,
@@ -232,10 +256,11 @@ async function main() {
       const rows = official.map((row,index)=>{
         const number = String(row.Nr || row.No || row.Number || '').replace(/\D/g,'');
         let entry = entriesByRaceNumber.get(`${race.id}:${number}`);
-        if (!entry) {
-          const template = latestEntryByNumber.get(number);
+        const template = entry || latestEntryByNumber.get(number);
+        const officialDriverId = driverIdForClassification(row.Driver, drivers, template?.driverId, number);
+        if (!entry || entry.driverId !== officialDriverId) {
           if (!template) throw new Error(`No F2 entry mapping for round ${race.round}, car ${number} (${row.Driver}).`);
-          entry = { ...template, raceId:race.id, year:String(YEAR), round:String(race.round) };
+          entry = { ...template, raceId:race.id, year:String(YEAR), round:String(race.round), driverId:officialDriverId };
           entriesByRaceNumber.set(`${race.id}:${number}`, entry);
           newEntries.push(entry);
         }
@@ -253,7 +278,9 @@ async function main() {
   const mergedResults = oldResults.filter(result=>!importedIds.has(result.sessionId)).concat(importedResults);
   const sessionOrder = new Map(mergedSessions.map((session,index)=>[session.id,index]));
   mergedResults.sort((a,b)=>(sessionOrder.get(a.sessionId)??999999)-(sessionOrder.get(b.sessionId)??999999)||Number(a.positionDisplayOrder)-Number(b.positionDisplayOrder));
-  const mergedEntries = entries.concat(newEntries).sort((a,b)=>Number(a.year)-Number(b.year)||Number(a.round)-Number(b.round)||Number(a.driverNumber)-Number(b.driverNumber));
+  const repairedEntryKeys = new Set(newEntries.map(entry => `${entry.raceId}:${entry.driverNumber}`));
+  const mergedEntries = entries.filter(entry => !repairedEntryKeys.has(`${entry.raceId}:${entry.driverNumber}`)).concat(newEntries)
+    .sort((a,b)=>Number(a.year)-Number(b.year)||Number(a.round)-Number(b.round)||Number(a.driverNumber)-Number(b.driverNumber));
 
   const [driverHtml, constructorHtml] = await Promise.all([
     fetchText('https://www.fiaformula2.com/en/standings/2026/drivers'),
@@ -278,15 +305,16 @@ async function main() {
   const backup = path.join(CACHE_DIR,`fia-2026-import-backup-${new Date().toISOString().replace(/[:.]/g,'-')}.json`);
   fs.writeFileSync(backup,`${JSON.stringify({
     sessions:oldSessions.filter(row=>row.year===String(YEAR)), results:oldResults.filter(row=>row.year===String(YEAR)),
-    entries:entries.filter(row=>row.year===String(YEAR)), driverStandings:oldDriverStandings.filter(row=>row.year===String(YEAR)),
+    entries:entries.filter(row=>row.year===String(YEAR)), newDrivers, driverStandings:oldDriverStandings.filter(row=>row.year===String(YEAR)),
     constructorStandings:oldConstructorStandings.filter(row=>row.year===String(YEAR))
   },null,2)}\n`);
+  writeCsv(file('drivers'),DRIVER_COLUMNS,drivers);
   writeCsv(file('entries'),ENTRY_COLUMNS,mergedEntries);
   writeCsv(file('sessions'),SESSION_COLUMNS,mergedSessions);
   writeCsv(file('session-results'),RESULT_COLUMNS,mergedResults);
   writeCsv(file('season-driver-standings'),DRIVER_STANDING_COLUMNS,oldDriverStandings.filter(row=>row.year!==String(YEAR)).concat(driverStandings));
   writeCsv(file('season-constructor-standings'),CONSTRUCTOR_STANDING_COLUMNS,oldConstructorStandings.filter(row=>row.year!==String(YEAR)).concat(constructorStandings));
-  if (!CSV_ONLY) await updateDatabase(importedSessions,importedResults,newEntries,driverStandings,constructorStandings);
+  if (!CSV_ONLY) await updateDatabase(importedSessions,importedResults,newDrivers,newEntries,driverStandings,constructorStandings);
   console.log(`Updated F2 CSV${CSV_ONLY ? '' : ' and database'} data. Backup: ${backup}`);
 }
 
