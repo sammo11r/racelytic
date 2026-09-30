@@ -143,6 +143,17 @@ test('same-origin writes accept HTTPS forwarded by the local reverse proxy', asy
 });
 
 test('public pages use extensionless URLs and preserve legacy query strings', async () => {
+    const originalQuery = pool.query;
+    pool.query = async (sql, params = []) => {
+        const id = String(params[0] ?? '');
+        if (id === 'max-verstappen') return [{ name: 'Max Verstappen' }];
+        if (id === 'not-a-real-driver') return [];
+        if (id === '1139' && sql.includes('FROM races LEFT JOIN grands_prix')) {
+            return [{ id: 1139, year: 2025, round: 1, displayName: 'Test Grand Prix', officialName: 'Test Grand Prix' }];
+        }
+        if (id === '2025' && sql.includes('SELECT year FROM fa_seasons')) return [{ year: 2025 }];
+        return [];
+    };
     const server = app.listen(0, '127.0.0.1');
     await new Promise((resolve, reject) => {
         server.once('listening', resolve);
@@ -258,6 +269,7 @@ test('public pages use extensionless URLs and preserve legacy query strings', as
         assert.equal(pitwallWasm.statusCode, 404);
         assert.equal(pitwallPack.statusCode, 404);
     } finally {
+        pool.query = originalQuery;
         await new Promise((resolve, reject) => server.close(error => error ? reject(error) : resolve()));
     }
 });
